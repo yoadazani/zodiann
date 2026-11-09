@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.content { max-width: 1180px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); align-items: start; }
+.col { gap: var(--s5); }
+.set-row { display: flex; gap: var(--s4); align-items: center; padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line-soft); }
+.set-row:last-child { border-bottom: 0; }
+.set-row .lbl { flex: 1; min-width: 0; }
+.set-row .lbl b { display: block; font-weight: 500; }
+.set-row .lbl span { font-size: var(--fs-xs); color: var(--text-2); }
+.set-row.stack { flex-direction: column; align-items: stretch; gap: var(--s3); }
+.ro { color: var(--text-2); font-size: var(--fs-sm); text-align: end; }
+.orbs { display: grid; grid-template-columns: auto 1fr auto auto; gap: 6px var(--s4); align-items: center; }
+.orbs .g { font-family: var(--font-glyph); font-size: 16px; width: 20px; text-align: center; }
+.orbs .ang { color: var(--text-2); font-size: var(--fs-sm); }
+.orbs i { width: 18px; border-top: 2px solid; }
+.bodies { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.radio { display: grid; gap: 2px; }
+.radio label { display: flex; gap: var(--s3); align-items: center; padding: 8px 0; }
+.radio .dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; }
+.radio .on .dot { border: 5px solid var(--accent); }
+.radio small { color: var(--text-3); margin-inline-start: auto; font-size: var(--fs-xs); }
+.set-row.danger b { color: var(--danger); }
+@media (max-width: 1000px) { .cols { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .content { padding: var(--s3) var(--s4) var(--s6); }
+  .topbar { padding-inline: var(--s1) var(--s4); --topbar-h: 60px; } .topbar h1 { font-size: 18px; }
+  .set-row { padding: var(--s3) var(--s4); flex-wrap: wrap; }
+  .set-row .seg { width: 100%; display: flex; } .set-row .seg > span { flex: 1; justify-content: center; }
+  .panel-head { padding: var(--s3) var(--s4); }
+}
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const dlg = Q.get('dialog') === 'delete';
+const sec = (title, rows, cls = '') => `<section class="panel ${cls}"><div class="panel-head"><h2>${title}</h2></div>${rows}</section>`;
+const row = (l, hint, ctrl, stack, cls = '') => `<div class="set-row ${stack ? 'stack' : ''} ${cls}"><div class="lbl"><b>${l}</b>${hint ? `<span>${hint}</span>` : ''}</div>${ctrl}</div>`;
+const orbs = ASPECTS.map(a => `<span class="g" style="color:var(--asp-${a.c})">${a.g}</span><span>${T(a.k)} <span class="ang num">${a.a}°</span></span>
+  <i style="border-color:var(--asp-${a.c})"></i><span class="stepper"><button>−</button><span class="v num">±${a.orb}°</span><button>+</button></span>`).join('');
+const bodies = BODIES.map(b => `<span class="chk ${b.k === 'node' ? '' : 'on'}"><span class="glyph" style="color:var(--b-${b.k})">${vs(b.g)}</span>${nm(b)}</span>`).join('');
+
+shell({ screen: 'settings', body: `
+<div class="cols">
+  <div class="col">
+    ${sec(T('langRegion'),
+      row(T('language'), '', `<div class="seg"><span>${T('system')}</span><span class="${LANG === 'he' ? 'on' : ''}">עברית</span><span class="${LANG === 'en' ? 'on' : ''}">English</span></div>`) +
+      row(T('dateOrder'), LANG === 'he' ? 'בעברית התאריך תמיד יום.חודש.שנה' : 'Hebrew always uses day.month.year', `<div class="seg"><span class="on">${T('dmy')}</span><span>${T('mdy')}</span></div>`) +
+      row(T('timeFormat'), '', `<span class="ro">${T('h24')}</span>`) +
+      row(T('timeZone'), LANG === 'he' ? 'שלבים של 4 שעות נמדדים בזמן מוחלט' : '4-hour steps are measured in absolute time', `<span class="ro">${T('deviceTz')}</span>`))}
+    ${sec(T('appearance'),
+      row(T('theme'), '', `<div class="seg"><span>${icon('globe', 'sm')}${T('system')}</span><span class="${THEME === 'dark' ? 'on' : ''}">${icon('moon', 'sm')}${T('dark')}</span><span class="${THEME === 'light' ? 'on' : ''}">${icon('sun', 'sm')}${T('light')}</span></div>`) +
+      row(T('motionPref'), LANG === 'he' ? 'ניגון וסיבוב אוטומטי קופצים ללא אנימציה' : 'Playback and automatic rotation jump without animation', `<span class="ro">${T('motionPrefV')}</span>`))}
+    ${sec(T('sqDefaults'),
+      row(T('defMode'), '', `<div class="seg"><span>${T('numbers')}</span><span class="on">${T('dates')}</span><span>${T('datetime')}</span></div>`) +
+      row(T('defSize'), '', `<div class="seg"><span class="on num">9×9</span><span class="num">13×13</span><span class="num">17×17</span><span class="num">21×21</span></div>`) +
+      row(T('stepHours'), '', `<span class="ro">${T('stepHoursV')}</span>`))}
+    ${sec(T('data'),
+      row(T('backupExport'), T('backupHint'), `<button class="btn sm">${icon('download', 'sm')}${T('export')}</button>`) +
+      row(T('backupImport'), LANG === 'he' ? 'מחליף את ההגדרות ומוסיף את הריבועים מהקובץ' : 'Replaces settings and adds the squares from the file', `<button class="btn sm">${icon('upload', 'sm')}${LANG === 'he' ? 'ייבוא' : 'Import'}</button>`) +
+      row(T('deleteAll'), T('deleteAllHint'), `<button class="btn sm danger">${icon('trash', 'sm')}${T('del')}</button>`, false, 'danger'))}
+  </div>
+  <div class="col">
+    ${sec(T('wheelSettings'),
+      row(T('visibleBodies'), '', `<div class="bodies">${bodies}</div>`, true) +
+      row(T('orbs'), T('orbsHint'), `<div class="orbs">${orbs}</div>`, true) +
+      row(T('nodeType'), LANG === 'he' ? 'הסוג הפעיל מוצג בטבלה ובייצוא' : 'The active type is shown in the table and in exports', `<div class="seg"><span class="on">${T('nodeMean')}</span><span>${T('nodeTrue')}</span></div>`) +
+      row(T('ephemeris'), '', `<div class="radio"><label class="on"><span class="dot"></span>${T('ephSwiss')}<small>${LANG === 'he' ? 'מומלץ' : 'Recommended'}</small></label><label><span class="dot"></span>${T('ephMoshier')}</label><label><span class="dot"></span>${T('ephAE')}<small>${LANG === 'he' ? 'גיבוי' : 'Backup'}</small></label></div>`, true) +
+      row(T('zodiac'), '', `<div class="seg"><span class="on">${T('tropical')}</span><span class="dis">${T('sidereal')}</span></div>`) +
+      row(T('viewpoint'), LANG === 'he' ? 'טופוצנטרית משפיעה בעיקר על הירח, עד כמעלה' : 'Topocentric mainly affects the Moon, by up to about a degree', `<div class="seg"><span class="on">${T('geocentric')}</span><span>${T('topocentric')}</span></div>`))}
+  </div>
+</div>
+${dlg ? `<div class="scrim" style="display:grid;place-items:center"><div class="dialog">
+  <h3>${LANG === 'he' ? 'למחוק את כל הנתונים?' : 'Delete all data?'}</h3>
+  <p>${LANG === 'he' ? 'ההגדרות ו-7 ריבועים שמורים יימחקו מהמכשיר. אי אפשר לבטל את הפעולה. כדאי לייצא גיבוי קודם.' : 'Your settings and 7 saved squares will be removed from this device. This cannot be undone. Export a backup first if you may need them.'}</p>
+  <div class="actions"><button class="btn">${LANG === 'he' ? 'ביטול' : 'Cancel'}</button><button class="btn danger solid">${T('deleteAll')}</button></div></div></div>` : ''}` });
+</script>
+</body></html>

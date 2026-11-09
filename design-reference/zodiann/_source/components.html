@@ -1,0 +1,208 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Components</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+body { padding: var(--s10) var(--s10) var(--s12); }
+.sheet-title { display: flex; align-items: center; gap: var(--s4); margin-bottom: var(--s8); }
+.sheet-title h1 { font-weight: 600; font-size: var(--fs-3xl); letter-spacing: -.02em; }
+.sheet-title span { color: var(--text-2); }
+.sec { margin-bottom: var(--s10); }
+.sec > h2 { font-size: var(--fs-xl); font-weight: 600; margin-bottom: 4px; }
+.sec > p { color: var(--text-2); font-size: var(--fs-sm); margin-bottom: var(--s5); max-width: 90ch; }
+.board { background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r-lg); padding: var(--s6); }
+.g { display: grid; gap: var(--s5); }
+.sw-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--s3); }
+.sw { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line-soft); }
+.sw i { display: block; height: 52px; }
+.sw div { padding: 8px 10px; font-size: var(--fs-xs); }
+.sw div b { display: block; font-weight: 500; color: var(--text); }
+.sw div span { color: var(--text-3); }
+.grp { font-size: var(--fs-xs); color: var(--text-2); margin: var(--s5) 0 var(--s2); font-weight: 500; }
+.grp:first-child { margin-top: 0; }
+.type-row { display: grid; grid-template-columns: 160px 1fr 1fr; gap: var(--s5); align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.type-row .k { font-size: var(--fs-xs); color: var(--text-3); }
+.states { display: grid; grid-template-columns: 140px repeat(5, 1fr); gap: var(--s3) var(--s4); align-items: center; }
+.states .h { font-size: var(--fs-xs); color: var(--text-3); }
+.cells-demo { display: grid; grid-template-columns: repeat(9, auto); gap: var(--s4) var(--s5); justify-content: start; align-items: start; }
+.cells-demo figure { display: grid; gap: 8px; justify-items: center; }
+.cells-demo figcaption { font-size: var(--fs-xs); color: var(--text-2); text-align: center; max-width: 92px; }
+.cells-demo .cell { width: 64px; height: 64px; border: 1px solid var(--cell-line); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
+.icons { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--s3); }
+.icons figure { display: grid; justify-items: center; gap: 6px; padding: var(--s3) 0; border-radius: var(--r-md); background: var(--bg-raised); }
+.icons figcaption { font-size: 10.5px; color: var(--text-3); }
+.glyph-row { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--s2); }
+.glyph-row figure { display: grid; justify-items: center; gap: 4px; padding: var(--s3) 0; }
+.glyph-row .glyph { font-size: 26px; }
+.glyph-row figcaption { font-size: 11px; color: var(--text-2); }
+.empty { display: grid; justify-items: center; text-align: center; gap: var(--s3); padding: var(--s10) var(--s6); }
+.empty p { color: var(--text-2); max-width: 40ch; }
+.mini-wheel { width: 220px; }
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const he = LANG === 'he';
+const cs = getComputedStyle(document.documentElement);
+const tok = (n, label) => `<div class="sw"><i style="background:var(--${n})"></i><div><b>${label || n}</b><span class="ltr">${cs.getPropertyValue('--' + n).trim()}</span></div></div>`;
+const btnStates = (cls, label) => `<span class="h">${cls || 'secondary'}</span>
+  <span><button class="btn ${cls}">${label}</button></span>
+  <span><button class="btn ${cls}" style="filter:brightness(1.12)">${label}</button></span>
+  <span><button class="btn ${cls} focus">${label}</button></span>
+  <span><button class="btn ${cls} pressed">${label}</button></span>
+  <span><button class="btn ${cls}" disabled>${label}</button></span>`;
+const m = squareModel({ mode: 'numbers', side: 9 });
+const cellDemo = (cls, content, cap) => `<figure><div class="cell ${cls}">${MARK[cls.split(' ')[0]] ? `<span class="mk">${MARK[cls.split(' ')[0]]}</span>` : ''}<span>${content}</span></div><figcaption>${cap}</figcaption></figure>`;
+
+document.body.innerHTML = `
+<div class="sheet-title">${markSVG(44)}<h1>Zodiann components</h1><span>${THEME === 'dark' ? 'Dark theme, Graphite' : 'Light theme, Porcelain'}</span></div>
+
+<section class="sec"><h2>Colour tokens</h2><p>Semantic tokens only. Components never use raw values. Analytical roles come from the spec (Appendix D, WH-1, WH-6) and are tuned for WCAG AA in each theme.</p>
+<div class="board">
+  <div class="grp">Surfaces and text</div>
+  <div class="sw-grid">${['bg', 'bg-raised', 'surface', 'surface-2', 'surface-3', 'line', 'text', 'text-2'].map(n => tok(n)).join('')}</div>
+  <div class="grp">Brand and state</div>
+  <div class="sw-grid">${['accent', 'accent-line', 'text-3', 'focus', 'danger', 'ok', 'line-soft', 'on-accent'].map(n => tok(n)).join('')}</div>
+  <div class="grp">Square of Nine roles</div>
+  <div class="sw-grid">${['axis-fill', 'axis', 'diag-fill', 'diag', 'eighth-fill', 'today', 'center', 'sel-outer'].map(n => tok(n)).join('')}</div>
+  <div class="grp">Elements and aspects</div>
+  <div class="sw-grid">${['fire', 'earth', 'air', 'water', 'asp-conj', 'asp-soft', 'asp-hard', 'cell-fill'].map(n => tok(n)).join('')}</div>
+  <div class="grp">Bodies</div>
+  <div class="sw-grid" style="grid-template-columns:repeat(11,1fr)">${BODIES.map(b => tok('b-' + b.k, b.en)).join('')}</div>
+</div></section>
+
+<section class="sec"><h2>Typography</h2><p>One crisp family, IBM Plex Sans with IBM Plex Sans Hebrew. Instrument readouts use the light weight with tight tracking; titles use semibold. Always tabular figures, so columns of degrees line up.</p>
+<div class="board">
+  <div class="type-row"><span class="k">Display 44, Plex 300</span><span class="display" style="font-size:44px;line-height:1">17°03′ Scorpio</span><span lang="he" dir="rtl" class="display" style="font-family:'IBM Plex Sans Hebrew';font-size:44px;line-height:1">17°03′ עקרב</span></div>
+  <div class="type-row"><span class="k">Section 26, Plex 600</span><span class="section-title">Saved squares</span><span dir="rtl" class="section-title" style="font-family:'IBM Plex Sans Hebrew';">ריבועים שמורים</span></div>
+  <div class="type-row"><span class="k">Screen title 18, Plex 600</span><span style="font-size:18px;font-weight:600;letter-spacing:-.01em">Gann Square of Nine</span><span dir="rtl" style="font-family:'IBM Plex Sans Hebrew';font-size:18px;font-weight:600">ריבוע התשע של גאן</span></div>
+  <div class="type-row"><span class="k">Panel title 16, Plex 600</span><span style="font-size:16px;font-weight:600">Degree crossings</span><span dir="rtl" style="font-size:16px;font-weight:600;font-family:'IBM Plex Sans Hebrew'">מעברי מעלות</span></div>
+  <div class="type-row"><span class="k">Body 14, Plex 400</span><span>Tapping a row rotates the wheel until the body is under the pointer.</span><span dir="rtl" style="font-family:'IBM Plex Sans Hebrew'">הקשה על שורה מסובבת את הגלגל עד שהגוף מתחת למחוג.</span></div>
+  <div class="type-row"><span class="k">Label 12, Plex 500</span><span style="font-size:12px;font-weight:500;color:var(--text-2)">Local date and time</span><span dir="rtl" style="font-size:12px;font-weight:500;color:var(--text-2);font-family:'IBM Plex Sans Hebrew'">תאריך ושעה מקומיים</span></div>
+  <div class="type-row"><span class="k">Cell 11.5, Plex tabular</span><span style="font-size:11.5px">4.1.22 &nbsp; 15.4.26 &nbsp; 1,771 &nbsp; 00:00</span><span class="faint" style="font-size:12px">Digits stay Western and left to right in both languages (L-7, L-14)</span></div>
+</div></section>
+
+<section class="sec"><h2>Buttons</h2><p>One primary per screen region, a solid accent fill. Secondary is the default. The accent outline marks a time or anchor shortcut (Now, Show up to today). Columns: default, hover, keyboard focus, pressed, disabled.</p>
+<div class="board"><div class="states">
+  <span></span><span class="h">Default</span><span class="h">Hover</span><span class="h">Focus</span><span class="h">Pressed</span><span class="h">Disabled</span>
+  ${btnStates('primary', icon('download', 'sm') + 'Export to Excel')}
+  ${btnStates('', icon('save', 'sm') + 'Save')}
+  ${btnStates('outline-accent', icon('target', 'sm') + 'Show up to today')}
+  ${btnStates('quiet', 'Cancel')}
+  ${btnStates('danger', icon('trash', 'sm') + 'Delete')}
+</div>
+<div class="row" style="margin-top:var(--s6);gap:var(--s5)">
+  <button class="icon-btn boxed">${icon('chevL')}</button><button class="play">${icon('play')}</button><button class="play on">${icon('pause')}</button><button class="icon-btn boxed">${icon('chevR')}</button>
+  <span class="vr"></span>
+  <button class="icon-btn">${icon('menu')}</button><span class="hint">Hamburger, 46 × 46 (NAV-1)</span>
+  <span class="vr"></span>
+  <button class="btn sm">${icon('download', 'sm')}Export</button><button class="btn sm primary">Small primary</button>
+</div></div></section>
+
+<section class="sec"><h2>Inputs and selectors</h2><p>Labels always visible above the field. Errors sit under the field and say how to fix the value (NFR-R2).</p>
+<div class="board two">
+  <div class="g">
+    <div class="field"><label>Anchor</label><div class="input">${icon('calendar', 'sm')}<span class="val num">15/04/2026</span></div></div>
+    <div class="field"><label>Anchor, focused</label><div class="input focus">${icon('clock', 'sm')}<span class="val num">01/11/2026 00:00</span></div></div>
+    <div class="field"><label>Cells</label><div class="input error"><span class="val num">4,000</span></div><span class="err">${icon('alert', 'sm')}Enter a number from 9 to 3,721. The largest square is 61 × 61.</span></div>
+    <div class="field"><label>Body</label><div class="input select"><span class="val">All except the Moon</span>${icon('chevD', 'sm chev')}</div></div>
+    <div class="field"><label>Cells, disabled until Custom is chosen</label><div class="input disabled" style="width:120px"><span class="val num">289</span></div></div>
+  </div>
+  <div class="g" style="align-content:start">
+    <div class="field"><span class="label">Segmented, mode</span><div class="seg"><span>Numbers</span><span class="on">Dates</span><span>Date and time</span></div></div>
+    <div class="field"><span class="label">Segmented with icons, drag mode</span><div class="seg"><span class="on">${icon('rotate', 'sm')}Rotate wheel</span><span>${icon('datewheel', 'sm')}Change date</span></div></div>
+    <div class="field"><span class="label">Segmented with a planned option</span><div class="seg"><span class="on">Tropical</span><span class="dis">Sidereal (planned)</span></div></div>
+    <div class="row" style="gap:var(--s6)"><div class="field"><span class="label">Stepper, aspect orb</span><span class="stepper"><button>−</button><span class="v num">±8°</span><button>+</button></span></div>
+      <div class="field"><span class="label">Switch</span><div class="row"><span class="switch on"></span><span class="switch"></span></div></div></div>
+    <div class="field"><span class="label">Body chips, visible bodies</span><div class="row wrap" style="gap:var(--s2)">${BODIES.slice(0, 4).map(b => `<span class="chk on"><span class="glyph" style="color:var(--b-${b.k})">${vs(b.g)}</span>${b.en}</span>`).join('')}<span class="chk"><span class="glyph" style="color:var(--b-node)">${vs('☊')}</span>Mean node</span></div></div>
+  </div>
+</div></section>
+
+<section class="sec"><h2>Square of Nine cells</h2><p>Colour never carries meaning alone (NFR-X4): axes carry +, diagonals carry ×, eighths are a lighter neutral tint. Borders stack in a fixed order, outermost first: selected, then today, then center. The cell content is always left to right (SQ-21).</p>
+<div class="board">
+  <div class="cells-demo">
+    ${cellDemo('', '27', 'Plain')}
+    ${cellDemo('axis', '25', 'Axis, blue')}
+    ${cellDemo('diag', '49', 'Diagonal, yellow')}
+    ${cellDemo('eighth', '19', 'Eighth, gray')}
+    ${cellDemo('center', '1', 'Center, amber')}
+    ${cellDemo('today', '9.11.26', 'Today')}
+    ${cellDemo('today center', '9.11.26', 'Center is today, double border')}
+    ${cellDemo('axis sel', '31.8.26', 'Selected')}
+    ${cellDemo('sel today', '9.11.26<span class="t">12:00</span>', 'Selected and today')}
+  </div>
+  <div class="grp" style="margin-top:var(--s6)">Content per mode, sizes from SQ-20</div>
+  <div class="row" style="gap:var(--s8);align-items:end">
+    <figure class="cells-demo" style="display:grid;gap:8px"><div class="cell diag" style="width:44px;height:44px"><span class="mk">×</span><span>2,401</span></div><figcaption>Numbers, 30–56 px</figcaption></figure>
+    <figure class="cells-demo" style="display:grid;gap:8px"><div class="cell axis" style="width:56px;height:56px"><span class="mk">+</span><span>4.1.22</span></div><figcaption>Dates, 40–64 px</figcaption></figure>
+    <figure class="cells-demo" style="display:grid;gap:8px"><div class="cell eighth" style="width:64px;height:64px"><span>4.1.22<span class="t">16:00</span></span></div><figcaption>Date and time, 46–72 px</figcaption></figure>
+    <span class="vr"></span>
+    <div>${squareHTML(m, { cell: 30, sel: 49, font: 10.5 })}<div class="hint" style="margin-top:8px">9 × 9: 16 blue, 16 yellow, 16 gray (T-GAN-2)</div></div>
+    <div style="max-width:420px">${legendHTML()}</div>
+  </div>
+</div></section>
+
+<section class="sec"><h2>Tags, tables and wheel marks</h2><p>Retrograde is marked ℞ in the aspect red. Table rows are 44 px; the selected row gets the accent tint and an accent edge on the start side.</p>
+<div class="board three">
+  <div class="g" style="align-content:start">
+    <div class="grp">Highlight and state tags</div>
+    <div class="row wrap" style="gap:var(--s2)"><span class="tag axis"><span class="mk">+</span>Axis</span><span class="tag diag"><span class="mk">×</span>Diagonal</span><span class="tag eighth">Eighth</span><span class="tag none">No highlight</span><span class="tag center">Center</span><span class="tag today">Today</span><span class="tag neutral">Dates</span><span class="tag accent">Mean node</span></div>
+    <div class="grp">Aspect lines (WH-6)</div>
+    <div class="g" style="gap:8px;font-size:var(--fs-sm)">${ASPECTS.map(a => `<div class="row"><span style="width:32px;border-top:2px solid var(--asp-${a.c})"></span><span class="glyph" style="color:var(--asp-${a.c});width:18px">${a.g}</span>${S.en[a.k]} <span class="faint num">${a.a}° ±${a.orb}°</span></div>`).join('')}</div>
+  </div>
+  <div style="grid-column:span 2" class="panel">
+    <table class="tbl"><thead><tr><th>Body</th><th>Sign</th><th>Position</th><th>Motion</th><th>State</th></tr></thead><tbody>
+      <tr><td><span class="body-cell"><span class="glyph" style="color:var(--b-mars)">${vs('♂')}</span>Mars</span></td><td><span class="sign-cell"><span class="glyph" style="color:var(--fire)">${vs('♌')}</span>Leo</span></td><td class="pos num">18°26′</td><td class="motion direct">Direct</td><td class="faint">Default</td></tr>
+      <tr class="hover"><td><span class="body-cell"><span class="glyph" style="color:var(--b-venus)">${vs('♀')}</span>Venus</span></td><td><span class="sign-cell"><span class="glyph" style="color:var(--air)">${vs('♎')}</span>Libra</span></td><td class="pos num">22°48′</td><td class="motion"><span class="retro">℞</span> Retrograde</td><td class="faint">Hover</td></tr>
+      <tr class="on"><td><span class="body-cell"><span class="glyph" style="color:var(--b-sun)">${vs('☉')}</span>Sun</span></td><td><span class="sign-cell"><span class="glyph" style="color:var(--water)">${vs('♏')}</span>Scorpio</span></td><td class="pos num">17°03′</td><td class="motion direct">Direct</td><td class="faint">Selected, under the pointer</td></tr>
+      <tr><td><span class="body-cell"><span class="glyph" style="color:var(--b-node)">${vs('☊')}</span>Mean node</span></td><td><span class="sign-cell"><span class="glyph" style="color:var(--air)">${vs('♒')}</span>Aquarius</span></td><td class="pos num">26°19′</td><td class="motion"><span class="retro">℞</span> Mean</td><td class="faint">Node, always mean ℞</td></tr>
+    </tbody></table>
+  </div>
+</div></section>
+
+<section class="sec"><h2>Glyphs</h2><p>Signs are coloured by element; bodies have their own colour and are always shown with a glyph or name, never colour alone (Appendix D). Glyphs render from Noto Sans Symbols with the text presentation selector so no platform turns them into emoji.</p>
+<div class="board">
+  <div class="glyph-row">${SIGNS.map(s => `<figure><span class="glyph" style="color:var(--${s.el})">${vs(s.g)}</span><figcaption>${s.en}</figcaption></figure>`).join('')}</div>
+  <div class="divider" style="margin:var(--s3) 0"></div>
+  <div class="glyph-row" style="grid-template-columns:repeat(11,1fr)">${BODIES.map(b => `<figure><span class="glyph" style="color:var(--b-${b.k})">${vs(b.g)}</span><figcaption>${b.en}</figcaption></figure>`).join('')}</div>
+</div></section>
+
+<section class="sec"><h2>Icons</h2><p>24 px grid, 1.6 px round stroke, drawn for Zodiann. Back and forward chevrons mirror in Hebrew; the wheel, square and rotation icons never mirror.</p>
+<div class="board"><div class="icons">${Object.keys(IC).map(k => `<figure>${icon(k)}<figcaption>${k}</figcaption></figure>`).join('')}</div></div></section>
+
+<section class="sec"><h2>Feedback</h2><p>Export status follows EX-6. Long crossing computations show progress without blocking (NFR-P3). Messages say what happened and what to do.</p>
+<div class="board two">
+  <div class="g" style="align-content:start">
+    <div class="toast"><span class="dot"></span><div class="grow"><div>Preparing gann-square-of-nine_dates_17x17.xlsx</div><div class="progress" style="margin-top:8px"><i style="width:62%"></i></div></div></div>
+    <div class="toast ok"><span class="dot"></span>Saved gann-square-of-nine_dates_17x17.xlsx<span class="act">Share</span></div>
+    <div class="toast idle"><span class="dot"></span>Export canceled</div>
+    <div class="toast err"><span class="dot"></span>Export failed: not enough storage space. Free some space and try again.</div>
+    <div class="toast"><span class="dot"></span><div class="grow"><div>Computing crossings for 10 years, 18%</div><div class="progress" style="margin-top:8px"><i style="width:18%"></i></div></div><span class="act">Stop</span></div>
+  </div>
+  <div class="g" style="align-content:start">
+    <div class="banner">${icon('info', 'sm')}<div>The anchor is after today, so there is no today cell to show. Move the anchor back to see today.</div></div>
+    <div class="banner">${icon('alert', 'sm')}<div>Today is more than 3,721 cells from the anchor. The square stopped at the largest size, 61 × 61.</div></div>
+    <div class="banner">${icon('alert', 'sm')}<div>Dates this far ahead use a forecast of ΔT, so the Moon's position is less accurate.</div></div>
+    <div class="banner" style="background:var(--danger-soft);border-color:color-mix(in srgb,var(--danger) 40%,transparent)"><span style="color:var(--danger)">${icon('alert', 'sm')}</span><div>Storage is unavailable. Zodiann keeps working, but changes will not be saved until storage is free.</div></div>
+  </div>
+</div></section>
+
+<section class="sec"><h2>Dialogs, drawer items and empty state</h2>
+<div class="board three" style="align-items:start">
+  <div class="dialog" style="width:auto;box-shadow:var(--shadow-float)">
+    <h3>Save square</h3><p style="margin-bottom:var(--s4)">Saves the mode, anchor, size and highlights.</p>
+    <div class="field"><label>Name</label><div class="input focus"><span class="val">Spring equinox 2026</span></div></div>
+    <div class="actions"><button class="btn quiet">Cancel</button><button class="btn primary">Save</button></div>
+  </div>
+  <div class="panel" style="padding:var(--s3)">
+    <div class="nav-item on">${icon('wheel')}<span class="name">Zodiac wheel</span><span class="desc">Planet positions, aspects and degree crossings</span></div>
+    <div class="nav-item">${icon('grid')}<span class="name">Gann Square of Nine</span><span class="desc">Numbers, days or 4-hour blocks on the spiral</span></div>
+    <div class="nav-item" style="background:var(--surface-2)">${icon('folder')}<span class="name">Saved squares</span><span class="desc">Hover</span></div>
+  </div>
+  <div class="panel empty">${miniSquare(5, 64)}<b>No saved squares yet</b><p>Build a square, then use Save to keep its mode, anchor and size here.</p><button class="btn">${icon('grid', 'sm')}Open the Square of Nine</button></div>
+</div></section>
+`;
+</script>
+</body></html>

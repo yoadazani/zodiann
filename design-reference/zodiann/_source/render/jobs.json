@@ -1,0 +1,309 @@
+[
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark",
+"device": "desktop",
+"out": "screens/01-zodiac-wheel_desktop_en_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=dates",
+"device": "desktop",
+"out": "screens/02-square-of-nine_dates_desktop_en_dark.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=dark",
+"device": "desktop",
+"out": "screens/01-zodiac-wheel_desktop_he_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=dark&mode=dates",
+"device": "desktop",
+"out": "screens/02-square-of-nine_dates_desktop_he_dark.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=light",
+"device": "desktop",
+"out": "screens/01-zodiac-wheel_desktop_en_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=light&mode=dates",
+"device": "desktop",
+"out": "screens/02-square-of-nine_dates_desktop_en_light.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=light",
+"device": "desktop",
+"out": "screens/01-zodiac-wheel_desktop_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=light&mode=dates",
+"device": "desktop",
+"out": "screens/02-square-of-nine_dates_desktop_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=numbers",
+"device": "desktop",
+"out": "screens/02-square-of-nine_numbers_desktop_en_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=dark&mode=datetime&side=13",
+"device": "desktop",
+"out": "screens/02-square-of-nine_datetime_desktop_he_dark.png"
+},
+{
+"page": "saved.html",
+"q": "lang=en&theme=dark",
+"device": "desktop",
+"out": "screens/03-saved-squares_desktop_en_dark.png"
+},
+{
+"page": "saved.html",
+"q": "lang=he&theme=dark",
+"device": "desktop",
+"out": "screens/03-saved-squares_desktop_he_dark.png"
+},
+{
+"page": "saved.html",
+"q": "lang=he&theme=light",
+"device": "desktop",
+"out": "screens/03-saved-squares_desktop_he_light.png"
+},
+{
+"page": "settings.html",
+"q": "lang=en&theme=dark",
+"device": "desktop",
+"out": "screens/04-settings_desktop_en_dark.png"
+},
+{
+"page": "settings.html",
+"q": "lang=he&theme=dark",
+"device": "desktop",
+"out": "screens/04-settings_desktop_he_dark.png"
+},
+{
+"page": "settings.html",
+"q": "lang=he&theme=light",
+"device": "desktop",
+"out": "screens/04-settings_desktop_he_light.png"
+},
+{
+"page": "about.html",
+"q": "lang=en&theme=dark",
+"device": "desktop",
+"out": "screens/05-about-sources_desktop_en_dark.png"
+},
+{
+"page": "about.html",
+"q": "lang=he&theme=dark",
+"device": "desktop",
+"out": "screens/05-about-sources_desktop_he_dark.png"
+},
+{
+"page": "about.html",
+"q": "lang=he&theme=light",
+"device": "desktop",
+"out": "screens/05-about-sources_desktop_he_light.png"
+},
+{
+"page": "settings.html",
+"q": "lang=en&theme=dark&dialog=delete",
+"device": "desktop",
+"out": "screens/04-settings_delete-dialog_desktop_en_dark.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=dark&drawer=1",
+"device": "desktop",
+"out": "screens/00-navigation-drawer_desktop_he_dark.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark&drawer=1",
+"device": "desktop",
+"out": "screens/00-navigation-drawer_desktop_en_dark.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/zodiac-wheel_mobile_en_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=datetime",
+"device": "mobile",
+"out": "responsive/mobile/square-of-nine_datetime_mobile_en_dark.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/zodiac-wheel_mobile_he_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=dark&mode=datetime",
+"device": "mobile",
+"out": "responsive/mobile/square-of-nine_datetime_mobile_he_dark.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=light",
+"device": "mobile",
+"out": "responsive/mobile/zodiac-wheel_mobile_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=light&mode=datetime",
+"device": "mobile",
+"out": "responsive/mobile/square-of-nine_datetime_mobile_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=dates",
+"device": "mobile",
+"out": "responsive/mobile/square-of-nine_dates_mobile_en_dark.png"
+},
+{
+"page": "saved.html",
+"q": "lang=he&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/saved-squares_mobile_he_dark.png"
+},
+{
+"page": "saved.html",
+"q": "lang=en&theme=light",
+"device": "mobile",
+"out": "responsive/mobile/saved-squares_mobile_en_light.png"
+},
+{
+"page": "settings.html",
+"q": "lang=he&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/settings_mobile_he_dark.png"
+},
+{
+"page": "settings.html",
+"q": "lang=en&theme=light",
+"device": "mobile",
+"out": "responsive/mobile/settings_mobile_en_light.png"
+},
+{
+"page": "about.html",
+"q": "lang=he&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/about-sources_mobile_he_dark.png"
+},
+{
+"page": "about.html",
+"q": "lang=en&theme=light",
+"device": "mobile",
+"out": "responsive/mobile/about-sources_mobile_en_light.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark&drawer=1",
+"device": "mobile",
+"out": "responsive/mobile/navigation-drawer_mobile_en_dark.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=dark&drawer=1",
+"device": "mobile",
+"out": "responsive/mobile/navigation-drawer_mobile_he_dark.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark",
+"device": "mobile",
+"out": "responsive/mobile/zodiac-wheel_mobile_en_dark_first-screen.png",
+"full": false
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=dark&mode=datetime",
+"device": "mobile",
+"out": "responsive/mobile/square-of-nine_mobile_he_dark_first-screen.png",
+"full": false
+},
+{
+"page": "wheel.html",
+"q": "lang=en&theme=dark&drag=date&playing=1",
+"device": "tablet",
+"out": "responsive/tablet/zodiac-wheel_tablet_en_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=numbers",
+"device": "tablet",
+"out": "responsive/tablet/square-of-nine_numbers_tablet_en_dark.png"
+},
+{
+"page": "square.html",
+"q": "lang=en&theme=dark&mode=dates",
+"device": "tablet-land",
+"out": "responsive/tablet/square-of-nine_dates_tablet-landscape_en_dark.png"
+},
+{
+"page": "settings.html",
+"q": "lang=en&theme=dark",
+"device": "tablet",
+"out": "responsive/tablet/settings_tablet_en_dark.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=light&drag=date&playing=1",
+"device": "tablet",
+"out": "responsive/tablet/zodiac-wheel_tablet_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=light&mode=numbers",
+"device": "tablet",
+"out": "responsive/tablet/square-of-nine_numbers_tablet_he_light.png"
+},
+{
+"page": "square.html",
+"q": "lang=he&theme=light&mode=dates",
+"device": "tablet-land",
+"out": "responsive/tablet/square-of-nine_dates_tablet-landscape_he_light.png"
+},
+{
+"page": "settings.html",
+"q": "lang=he&theme=light",
+"device": "tablet",
+"out": "responsive/tablet/settings_tablet_he_light.png"
+},
+{
+"page": "wheel.html",
+"q": "lang=he&theme=dark",
+"device": "tablet-land",
+"out": "responsive/tablet/zodiac-wheel_tablet-landscape_he_dark.png"
+},
+{
+"page": "components.html",
+"q": "lang=en&theme=dark",
+"device": "sheet",
+"out": "components/components_dark.png"
+},
+{
+"page": "components.html",
+"q": "lang=en&theme=light",
+"device": "sheet",
+"out": "components/components_light.png"
+}
+]

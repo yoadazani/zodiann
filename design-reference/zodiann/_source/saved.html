@@ -1,0 +1,65 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saved squares</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.content { max-width: 1080px; }
+.head { display: flex; align-items: end; gap: var(--s4); margin: var(--s4) 0 var(--s5); }
+.head .section-title { margin-bottom: 2px; }
+.list { overflow: hidden; }
+.item { display: grid; grid-template-columns: 56px minmax(0, 1fr) 150px auto; gap: var(--s5); align-items: center; padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line-soft); }
+.item:last-child { border-bottom: 0; }
+.item.on { background: var(--accent-soft); }
+.item .name { font-size: var(--fs-lg); font-weight: 500; margin-bottom: 4px; }
+.item .meta { display: flex; gap: var(--s2) var(--s4); flex-wrap: wrap; align-items: center; font-size: var(--fs-sm); color: var(--text-2); }
+.item .upd { font-size: var(--fs-sm); color: var(--text-2); }
+.item .upd b { display: block; color: var(--text); font-weight: 500; }
+.item .acts { display: flex; gap: var(--s1); align-items: center; }
+.item .input.focus { height: 36px; margin-bottom: 4px; max-width: 380px; }
+.kebab { display: none !important; }
+.foot { margin-top: var(--s4); display: flex; gap: var(--s3); align-items: center; }
+@media (max-width: 700px) {
+  .content { padding: var(--s3) var(--s4) var(--s6); }
+  .topbar { padding-inline: var(--s1) var(--s4); --topbar-h: 60px; } .topbar h1 { font-size: 18px; }
+  .head { flex-direction: column; align-items: stretch; gap: var(--s3); margin-top: var(--s2); }
+  .head .btn { width: 100%; }
+  .item { grid-template-columns: 44px minmax(0, 1fr) auto; gap: var(--s3); padding: var(--s3) var(--s4); }
+  .item .upd, .item .acts .btn, .item .acts .icon-btn:not(.kebab) { display: none; }
+  .kebab { display: inline-grid !important; }
+  .item .name { font-size: var(--fs-md); }
+  .item .meta { font-size: var(--fs-xs); gap: 4px var(--s3); }
+}
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const items = [
+  { en: 'Cycle from 4.1.22', he: 'מחזור מ-4.1.22', mode: 'dates', side: 43, anchor: { en: '04/01/2022', he: '4.1.2022' }, upd: '9.11.26', today: 1771 },
+  { en: 'November four-hour blocks', he: 'בלוקים של 4 שעות, נובמבר', mode: 'datetime', side: 9, anchor: { en: '01/11/2026 00:00', he: '1.11.2026 00:00' }, upd: '8.11.26', today: 52 },
+  { en: 'Spring equinox 2026', he: 'שוויון האביב 2026', mode: 'dates', side: 17, anchor: { en: '20/03/2026', he: '20.3.2026' }, upd: '2.11.26', today: 235, rename: true },
+  { en: 'Base numbers, 21 × 21', he: 'מספרי בסיס, 21 × 21', mode: 'numbers', side: 21, upd: '28.10.26' },
+  { en: 'Yearly low, April 2025', he: 'שפל שנתי, אפריל 2025', mode: 'dates', side: 25, anchor: { en: '07/04/2025', he: '7.4.2025' }, upd: '14.10.26', custom: true },
+  { en: 'Eclipse window', he: 'חלון הליקוי', mode: 'datetime', side: 13, anchor: { en: '12/08/2026 00:00', he: '12.8.2026 00:00' }, upd: '30.9.26' },
+  { en: 'Teaching example', he: 'דוגמה ללימוד', mode: 'numbers', side: 9, upd: '3.9.26' },
+];
+const modeName = { numbers: T('numbers'), dates: T('dates'), datetime: T('datetime') };
+const rows = items.map((it, i) => `<div class="item">
+  ${miniSquare(Math.min(it.side, 13), 52, { today: it.side <= 13 ? it.today : null })}
+  <div style="min-width:0">
+    ${it.rename ? `<div class="input focus"><span class="val">${it[LANG]}</span></div>` : `<div class="name">${it[LANG]}</div>`}
+    <div class="meta"><span class="tag neutral">${modeName[it.mode]}</span><span class="num">${it.side}×${it.side}${it.custom ? ` (${T('custom')})` : ''}</span>${it.anchor ? `<span>${T('anchor')} <span class="num">${it.anchor[LANG]}</span></span>` : ''}</div>
+  </div>
+  <div class="upd">${T('updated')}<b class="num">${it.upd}</b></div>
+  <div class="acts">${it.rename ? `<button class="btn sm primary">${icon('check', 'sm')}${T('save')}</button>` : `<button class="btn sm">${T('open')}</button>`}
+    <button class="icon-btn sm" aria-label="${T('rename')}">${icon('pencil', 'sm')}</button>
+    <button class="icon-btn sm" aria-label="${T('del')}">${icon('trash', 'sm')}</button>
+    <button class="icon-btn sm kebab">${icon('more')}</button></div>
+</div>`).join('');
+
+shell({ screen: 'saved', body: `
+  <div class="head"><div class="grow"><h2 class="section-title">${T('saved')}</h2><div class="muted">${T('savedCount')}</div></div>
+    <button class="btn primary">${icon('save', 'sm')}${T('saveCurrent')}</button></div>
+  <section class="panel list">${rows}</section>
+  <div class="foot hint">${icon('shield', 'sm')}${T('offline')}</div>` });
+</script>
+</body></html>

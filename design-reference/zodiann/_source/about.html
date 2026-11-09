@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About and sources</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.content { max-width: 1180px; }
+.hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s8); align-items: center; padding: var(--s8) var(--s4) var(--s8); }
+.hero h2 { font-weight: 300; font-size: 56px; letter-spacing: -.035em; line-height: 1; }
+.hero .ver { color: var(--text-2); margin: var(--s2) 0 var(--s4); }
+.hero p { font-size: var(--fs-lg); max-width: 62ch; color: var(--text); line-height: 1.6; }
+.grid2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--s5); align-items: start; }
+.tbl td { white-space: normal; padding-block: 10px; height: auto; vertical-align: top; }
+.tbl td:first-child { font-weight: 500; }
+.note { display: grid; grid-template-columns: auto 1fr; gap: var(--s3); padding: var(--s5); }
+.note svg { color: var(--accent-strong); }
+.note b { display: block; margin-bottom: 4px; }
+.note p { color: var(--text-2); font-size: var(--fs-sm); line-height: 1.55; }
+.formula { padding: var(--s5); display: grid; gap: var(--s3); }
+.formula code { direction: ltr; unicode-bidi: isolate; display: block; font-family: var(--font-ui); background: var(--bg-raised); border: 1px solid var(--line-soft); border-radius: var(--r-md); padding: var(--s3) var(--s4); font-size: var(--fs-sm); line-height: 1.7; text-align: left; }
+.lic { display: flex; flex-wrap: wrap; gap: var(--s2); padding: var(--s5); }
+@media (max-width: 1000px) { .grid2 { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .content { padding: var(--s3) var(--s4) var(--s6); }
+  .topbar { padding-inline: var(--s1) var(--s4); --topbar-h: 60px; } .topbar h1 { font-size: 18px; }
+  .hero { grid-template-columns: 1fr; gap: var(--s4); padding: var(--s5) var(--s1); }
+  .hero h2 { font-size: 40px; } .hero p { font-size: var(--fs-md); }
+  .tbl th, .tbl td { padding-inline: var(--s3); font-size: var(--fs-sm); }
+}
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const he = LANG === 'he';
+const src = he ? [
+  ['Swiss Ephemeris, קובצי JPL', 'מקור ראשי', 'מתחת לשנייה קשת'],
+  ['Swiss Ephemeris, Moshier', 'כשהקבצים חסרים, עם הודעה', 'נמוך יותר מהקבצים'],
+  ['astronomy-engine', 'גיבוי ובדיקות השוואה', 'דקת קשת או טוב יותר'],
+  ['JPL Horizons', 'נתוני ייחוס לבדיקות בלבד', 'מקור הייחוס'],
+] : [
+  ['Swiss Ephemeris, JPL data files', 'Primary source', 'Sub-arcsecond'],
+  ['Swiss Ephemeris, Moshier', 'When the files are missing, with a message', 'Lower than the files'],
+  ['astronomy-engine', 'Backup and test comparison', 'An arcminute or better'],
+  ['JPL Horizons', 'Reference data for tests only', 'The reference'],
+];
+const meth = he ? [
+  ['נקודת מבט', 'גאוצנטרית'], ['סוג מיקום', 'מיקום נראה: זמן אור, אברציה, הסטת אור ונוטציה'],
+  ['מערכת ייחוס', 'אקליפטיקה ושוויון של התאריך (טרופי), ללא תיקון פרצסיה נוסף'], ['ראש הדרקון', 'ממוצע'],
+  ['זמן', 'זמן מקומי מומר ל-UTC ומשם לזמן ארצי (ΔT)'], ['טווח תאריכים', 'לפי כיסוי קובצי הנתונים הארוזים. מחוץ לטווח מוצגת הודעה במקום תוצאה'], ['נסיגה', 'לפי סימן המהירות מהאפמריס'],
+] : [
+  ['Viewpoint', 'Geocentric'], ['Position type', 'Apparent: light time, aberration, light deflection and nutation'],
+  ['Reference frame', 'Ecliptic and equinox of date (tropical), no extra precession correction'], ['Lunar node', 'Mean'],
+  ['Time', 'Local time converted to UTC, then to terrestrial time (ΔT)'], ['Date range', 'The coverage of the packaged data files. Outside it, a message replaces the result'], ['Retrograde', 'By the sign of the speed from the ephemeris'],
+];
+const tbl = (head, rows) => `<table class="tbl"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? 'muted' : ''}">${bidi(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+
+shell({ screen: 'about', body: `
+<div class="hero">${markSVG(132)}<div>
+  <h2>Zodiann</h2><div class="ver">${T('version')} <span class="faint" style="margin-inline-start:12px">${T('build')} <span class="num">2026.11.09</span></span></div>
+  <p>${T('aboutLead')}</p></div></div>
+<div class="grid2">
+  <div class="col" style="gap:var(--s5)">
+    <section class="panel"><div class="panel-head"><h2>${T('sources')}</h2></div>${tbl([he ? 'מקור' : 'Source', T('role'), T('accuracy')], src)}</section>
+    <section class="panel"><div class="panel-head"><h2>${T('method')}</h2></div>${tbl([T('param'), T('value')], meth)}</section>
+  </div>
+  <div class="col" style="gap:var(--s5)">
+    <section class="panel"><div class="panel-head"><h2>${T('gannMethod')}</h2></div>
+      <div class="formula">
+        <p class="muted" style="font-size:var(--fs-sm)">${he ? '1 במרכז, 2 משמאלו, והספירלה ממשיכה עם כיוון השעון. הזווית נמדדת מהציר של תא 2.' : '1 sits in the center, 2 to its left, and the spiral continues clockwise. The angle is measured from the axis of cell 2.'}</p>
+        <code>k = ⌈(√n − 1) ÷ 2⌉&nbsp;&nbsp;&nbsp; j = n − (2k − 1)² − 1<br>i = (j − (k − 1)) mod 8k&nbsp;&nbsp;&nbsp; θ = 45° · i ÷ k</code>
+        <div class="legend" style="gap:var(--s2) var(--s4)">
+          <span class="it"><span class="sw axis">+</span><span class="num">i mod 2k = 0</span></span>
+          <span class="it"><span class="sw diag">×</span><span class="num">i mod k = 0</span></span>
+          <span class="it"><span class="sw eighth"></span><span class="num">2i mod k = 0</span></span>
+        </div>
+      </div></section>
+    <section class="panel note">${icon('alert')}<div><b>${T('disclaimer')}</b><p>${T('disclaimerText')}</p></div></section>
+    <section class="panel note">${icon('shield')}<div><b>${T('privacy')}</b><p>${T('privacyText')}</p></div></section>
+    <section class="panel"><div class="panel-head"><h2>${T('licenses')}</h2></div>
+      <div class="lic">${['Swiss Ephemeris', 'astronomy-engine', 'Flutter', 'Riverpod', 'go_router', 'drift', 'IBM Plex', 'Noto Sans Symbols'].map(n => `<span class="tag neutral ltr">${n}</span>`).join('')}</div></section>
+  </div>
+</div>` });
+</script>
+</body></html>

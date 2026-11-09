@@ -1,0 +1,169 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zodiac wheel</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.wl { display: grid; gap: var(--s5); grid-template-columns: minmax(0, 1fr) 470px;
+  grid-template-areas: "wheel time" "wheel pos" "cross cross"; grid-template-rows: auto 1fr auto; align-items: start; }
+.wheel-panel { grid-area: wheel; } .time-panel { grid-area: time; } .pos-panel { grid-area: pos; } .cross-panel { grid-area: cross; }
+.wheel-stage { padding: var(--s5) var(--s6) var(--s3); display: grid; justify-items: center; }
+.wheel-stage .wheel { max-width: 680px; }
+.readout { display: grid; grid-template-columns: 1fr auto; gap: var(--s5); align-items: end; padding: var(--s5) var(--s6) var(--s6); border-top: 1px solid var(--line-soft); }
+.readout .lbl { font-size: var(--fs-xs); color: var(--text-2); margin-bottom: 4px; }
+.readout .big { display: flex; align-items: baseline; gap: 12px; font-size: var(--fs-4xl); line-height: 1; font-weight: 300; letter-spacing: -.03em; }
+.readout .big .glyph { font-size: 30px; color: var(--water); }
+.readout .big .sname { font-size: var(--fs-2xl); color: var(--text-2); font-weight: 400; letter-spacing: -.01em; }
+.near { display: flex; gap: var(--s2); flex-wrap: wrap; margin-top: var(--s2); }
+.near .chip { display: inline-flex; gap: 8px; align-items: center; height: 32px; padding-inline: 10px 12px; border-radius: var(--r-pill); border: 1px solid var(--line); font-size: var(--fs-sm); background: var(--bg-raised); }
+.near .chip .glyph { font-size: 15px; }
+.asp-legend { display: grid; gap: 6px; font-size: var(--fs-xs); color: var(--text-2); }
+.asp-legend span { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.asp-legend i { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+.time-body { padding: var(--s5); display: grid; gap: var(--s4); }
+.transport { display: flex; align-items: center; gap: var(--s3); }
+.transport .tz { margin-inline-start: auto; text-align: end; }
+.filters { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr .7fr; gap: var(--s3); padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line-soft); }
+.cross-wrap { max-height: 590px; overflow: hidden; position: relative; }
+.cross-wrap::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 64px; background: linear-gradient(transparent, var(--surface)); }
+.xlist { display: none; }
+.drag-hint { font-size: var(--fs-xs); color: var(--text-2); }
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .wl { grid-template-columns: 1fr 1fr; grid-template-areas: "wheel wheel" "time time" "pos cross"; }
+  .wheel-split { display: grid; grid-template-columns: minmax(0, 1fr) 250px; }
+  .wheel-split .readout { grid-template-columns: 1fr; border-top: 0; border-inline-start: 1px solid var(--line-soft); align-content: start; align-items: start; padding-top: var(--s6); }
+  .wheel-stage { padding: var(--s5); }
+  .time-body { grid-template-columns: 1.2fr 1fr; align-items: end; }
+  .time-body .transport { grid-column: 1 / -1; }
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters .f-body { grid-column: 1 / -1; }
+  .cross-panel .tbl, .pos-panel .tbl { font-size: var(--fs-sm); }
+  .cross-panel .tbl td, .cross-panel .tbl th, .pos-panel .tbl td, .pos-panel .tbl th { padding-inline: 10px; }
+  .cross-panel .tbl { display: none; } .xlist { display: block; }
+  .readout .big { font-size: 38px; }
+}
+/* Phone */
+@media (max-width: 700px) {
+  .content { padding: var(--s3) var(--s4) var(--s6); }
+  .topbar { padding-inline: var(--s1) var(--s4); --topbar-h: 60px; }
+  .topbar h1 { font-size: 18px; }
+  .wl { grid-template-columns: 1fr; grid-template-areas: "wheel" "time" "pos" "cross"; gap: var(--s4); }
+  .wheel-split { display: block; }
+  .wheel-split .readout { border-inline-start: 0; border-top: 1px solid var(--line-soft); padding: var(--s4); }
+  .wheel-stage { padding: var(--s3) 0 var(--s2); }
+  .panel-head { padding: var(--s3) var(--s4); min-height: 52px; }
+  .wheel-panel .panel-head { flex-wrap: wrap; }
+  .wheel-panel .panel-head .seg { width: 100%; } .wheel-panel .panel-head .seg > span { flex: 1; justify-content: center; }
+  .readout .big { font-size: 34px; } .readout .big .sname { font-size: 20px; }
+  .readout { grid-template-columns: 1fr; gap: var(--s4); }
+  .asp-legend { grid-template-columns: 1fr 1fr 1fr; }
+  .time-body { grid-template-columns: 1fr; padding: var(--s4); }
+  .seg.steps { width: 100%; } .seg.steps > span { flex: 1; justify-content: center; padding-inline: 4px; }
+  .pos-panel .tbl th:nth-child(4), .pos-panel .tbl td:nth-child(4) { display: none; }
+  .pos-panel .tbl .sname { display: none; }
+  .pos-panel .mob-rx { display: inline !important; }
+  .filters { padding: var(--s3) var(--s4); }
+}
+.xrow { display: grid; grid-template-columns: auto 1fr auto; gap: 2px var(--s3); align-items: center; padding: 10px var(--s4); border-bottom: 1px solid var(--line-soft); }
+.xrow .glyph { font-size: 18px; width: 26px; text-align: center; grid-row: span 2; }
+.xrow .when { font-weight: 500; }
+.xrow .what { font-size: var(--fs-xs); color: var(--text-2); }
+.xrow .deg { grid-row: span 2; text-align: end; font-weight: 500; display: flex; gap: 6px; align-items: center; }
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const dragDate = Q.get('drag') === 'date';
+const playing = Q.get('playing') === '1';
+const sun = BODIES[0];
+const fmtField = LANG === 'he' ? '9.11.2026  12:00' : '09/11/2026  12:00';
+
+const posRows = BODIES.map((b, i) => {
+  const sg = signOf(b.lon);
+  const mo = b.node ? `<span class="retro">℞</span> ${T('mean')}` : b.rx ? `<span class="retro">℞</span> ${T('retro')}` : T('direct');
+  return `<tr class="${i === 0 ? 'on' : ''}">
+    <td><span class="body-cell"><span class="glyph" style="color:var(--b-${b.k})">${vs(b.g)}</span>${nm(b)}</span></td>
+    <td><span class="sign-cell"><span class="glyph" style="color:var(--${sg.el})">${vs(sg.g)}</span><span class="sname">${nm(sg)}</span></span></td>
+    <td><span class="pos num">${fmtDM(b.lon)}</span>${b.rx ? ' <span class="retro mob-rx" style="display:none">℞</span>' : ''}</td>
+    <td class="motion ${b.rx ? '' : 'direct'}">${mo}</td></tr>`;
+}).join('');
+
+const xRows = CROSSINGS.map(([d, t, k, si, rx]) => { const b = bodyBy(k), sg = SIGNS[si];
+  return `<tr><td><span class="num">${d}&nbsp;&nbsp;<span class="faint">${t}</span></span></td>
+    <td><span class="body-cell"><span class="glyph" style="color:var(--b-${k})">${vs(b.g)}</span>${nm(b)}</span></td>
+    <td><span class="sign-cell"><span class="glyph" style="color:var(--${sg.el})">${vs(sg.g)}</span>${nm(sg)}</span></td>
+    <td class="num">0°</td><td class="motion ${rx ? '' : 'direct'}">${rx ? `<span class="retro">℞</span> ${T('retro')}` : T('direct')}</td></tr>`; }).join('');
+const xList = CROSSINGS.slice(0, 9).map(([d, t, k, si, rx]) => { const b = bodyBy(k), sg = SIGNS[si];
+  return `<div class="xrow"><span class="glyph" style="color:var(--b-${k})">${vs(b.g)}</span>
+    <span class="when"><span class="num">${d}&nbsp;&nbsp;<span class="faint">${t}</span></span></span>
+    <span class="deg"><span class="glyph" style="color:var(--${sg.el});font-size:15px">${vs(sg.g)}</span><span class="num">0°</span>${rx ? '<span class="retro">℞</span>' : ''}</span>
+    <span class="what">${nm(b)} ${RTL ? "←" : "→"} ${nm(sg)}</span></div>`; }).join('');
+
+const sgSun = signOf(sun.lon);
+shell({ screen: 'wheel', body: `
+<div class="wl">
+  <section class="panel wheel-panel">
+    <div class="panel-head">
+      <div class="seg"><span class="${dragDate ? '' : 'on'}">${icon('rotate', 'sm')}${T('rotate')}</span><span class="${dragDate ? 'on' : ''}">${icon('datewheel', 'sm')}${T('changeDate')}</span></div>
+      <span class="drag-hint end">${dragDate ? (LANG === 'he' ? 'גרירה נגד כיוון השעון מקדמת את הזמן, מעלה ליום.' : 'Drag counterclockwise to move time forward, one degree per day.') : T('rotateHint')}</span>
+    </div>
+    <div class="wheel-split">
+      <div class="wheel-stage">${wheelSVG({ compact: innerWidth <= 1100 })}</div>
+      <div class="readout">
+        <div>
+          <div class="lbl">${T('underPointer')}</div>
+          <div class="big"><span class="num">${fmtDM(sun.lon)}</span><span class="glyph">${vs(sgSun.g)}</span><span class="sname">${nm(sgSun)}</span></div>
+          <div class="lbl" style="margin-top:var(--s4)">${T('within3')}</div>
+          <div class="near">${BODIES.slice(0, 2).map(b => `<span class="chip"><span class="glyph" style="color:var(--b-${b.k})">${vs(b.g)}</span>${nm(b)} <span class="num muted">${fmtDM(b.lon)}</span></span>`).join('')}</div>
+        </div>
+        <div class="asp-legend">
+          <span><i style="border-color:var(--asp-conj)"></i>${T('conj')}</span>
+          <span><i style="border-color:var(--asp-soft)"></i>${T('sextile')}, ${T('trine')}</span>
+          <span><i style="border-color:var(--asp-hard)"></i>${T('sq')}, ${T('opp')}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel time-panel">
+    <div class="panel-head"><h2>${T('time')}</h2></div>
+    <div class="time-body">
+      <div class="row" style="align-items:end">
+        <div class="field grow"><label>${T('dateTime')}</label><div class="input">${icon('calendar', 'sm')}<span class="val num">${fmtField}</span></div></div>
+        <button class="btn outline-accent">${T('now')}</button>
+      </div>
+      <div class="field"><span class="label">${T('step')}</span>
+        <div class="seg steps"><span>${T('hour')}</span><span class="on">${T('day')}</span><span>${T('week')}</span><span>${T('d30')}</span></div></div>
+      <div class="transport">
+        <button class="icon-btn boxed" aria-label="${T('back')}">${iconBack()}</button>
+        <button class="play ${playing ? 'on' : ''}" aria-label="${T('play')}">${icon(playing ? 'pause' : 'play')}</button>
+        <button class="icon-btn boxed" aria-label="${T('forward')}">${iconFwd()}</button>
+        <span class="hint tz">${T('localTz')}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel pos-panel">
+    <div class="panel-head"><h2>${T('positions')}</h2><span class="meta">${T('positionsMeta')}</span></div>
+    <table class="tbl"><thead><tr><th>${T('body')}</th><th>${T('sign')}</th><th>${T('position')}</th><th>${T('motion')}</th></tr></thead><tbody>${posRows}</tbody></table>
+  </section>
+
+  <section class="panel cross-panel">
+    <div class="panel-head"><h2>${T('crossings')}</h2><span class="meta">${T('crossingsCount')}</span>
+      <div class="end"><button class="btn sm">${icon('download', 'sm')}${T('export')}</button></div></div>
+    <div class="filters">
+      <div class="field f-body"><label>${T('body')}</label><div class="input select"><span class="val">${T('allButMoon')}</span>${icon('chevD', 'sm chev')}</div></div>
+      <div class="field"><label>${T('from')}</label><div class="input">${icon('calendar', 'sm')}<span class="val num">${LANG === 'he' ? '9.11.2026' : '09/11/2026'}</span></div></div>
+      <div class="field"><label>${T('to')}</label><div class="input">${icon('calendar', 'sm')}<span class="val num">${LANG === 'he' ? '9.11.2027' : '09/11/2027'}</span></div></div>
+      <div class="field"><label>${T('sign')}</label><div class="input select"><span class="val">${T('anySign')}</span>${icon('chevD', 'sm chev')}</div></div>
+      <div class="field"><label>${T('degree')}</label><div class="input select"><span class="val num">0°</span>${icon('chevD', 'sm chev')}</div></div>
+    </div>
+    <div class="cross-wrap">
+      <table class="tbl"><thead><tr><th>${T('localDateTime')}</th><th>${T('body')}</th><th>${T('sign')}</th><th>${T('degree')}</th><th>${T('motion')}</th></tr></thead><tbody>${xRows}</tbody></table>
+      <div class="xlist">${xList}</div>
+    </div>
+  </section>
+</div>` });
+</script>
+</body></html>

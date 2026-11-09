@@ -1,0 +1,133 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gann Square of Nine</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.controls { display: flex; flex-wrap: wrap; gap: var(--s4) var(--s6); align-items: end; padding: var(--s4) var(--s5); }
+.controls .anchor-group { display: flex; gap: var(--s2); align-items: end; }
+.controls .anchor-group .input { width: 210px; }
+.custom-in { width: 92px; }
+.cells-line { padding: 10px var(--s5); border-top: 1px solid var(--line-soft); display: flex; gap: var(--s5); align-items: center; font-size: var(--fs-sm); color: var(--text-2); }
+.cells-line b { color: var(--text); font-weight: 500; }
+.sq-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--s5); margin-top: var(--s5); align-items: start; }
+.sq-panel { padding: var(--s5) var(--s5) var(--s5); }
+.sq-panel .sq-scroll { display: grid; justify-content: center; padding-bottom: var(--s2); }
+.sq-panel .legend-wrap { border-top: 1px solid var(--line-soft); margin-top: var(--s4); padding-top: var(--s4); }
+.details { position: sticky; top: 84px; }
+.det-head { padding: var(--s5); border-bottom: 1px solid var(--line-soft); }
+.det-head .lbl { font-size: var(--fs-xs); color: var(--text-2); }
+.det-head .n { font-size: var(--fs-4xl); line-height: 1.05; font-weight: 300; letter-spacing: -.03em; margin: 2px 0 var(--s3); }
+.det-head .tags { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.det-date { padding: var(--s4) var(--s5); border-bottom: 1px solid var(--line-soft); background: var(--bg-raised); }
+.det-date-main { font-weight: 500; margin-bottom: 2px; }
+.det-body { padding: var(--s2) var(--s5) var(--s4); }
+.det-line { margin: 0 var(--s5) var(--s5); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: var(--bg-raised); border-inline-start: 3px solid var(--axis); font-size: var(--fs-sm); }
+.det-line.diag { border-color: var(--diag); } .det-line.eighth { border-color: var(--eighth); } .det-line.none, .det-line.center { border-color: var(--line); }
+.scroll-hint { display: none; }
+
+@media (max-width: 1100px) {
+  .sq-layout { grid-template-columns: 1fr; }
+  .details { position: static; order: -1; display: grid; grid-template-columns: 240px 1fr; }
+  .details .det-head { border-bottom: 0; border-inline-end: 1px solid var(--line-soft); grid-row: span 3; }
+  .details .det-body { padding-top: var(--s2); }
+  .details .det-body .dl { grid-template-columns: auto 1fr auto 1fr; }
+  .details .det-body .dl > dd { padding-inline-end: var(--s6); }
+  .details .det-body .dl > :nth-last-child(-n+4) { border-bottom: 0; }
+  .details .det-line { margin-top: 0; }
+  .controls .anchor-group .input { width: 190px; }
+  .topbar .end .btn .lbl-long { display: none; }
+}
+@media (max-width: 700px) {
+  .content { padding: var(--s3) var(--s4) var(--s6); }
+  .topbar { padding-inline: var(--s1) var(--s2); --topbar-h: 60px; }
+  .topbar h1 { font-size: 18px; }
+  .topbar .end .btn { display: none; }
+  .topbar .end .icon-btn { display: inline-grid !important; }
+  .controls { padding: var(--s4); gap: var(--s4); }
+  .controls > * { width: 100%; }
+  .controls .seg { display: flex; } .controls .seg > span { flex: 1; justify-content: center; padding-inline: 4px; }
+  .controls .anchor-group .input { width: auto; flex: 1; }
+  .controls .size-row { display: grid !important; grid-template-columns: 1fr; }
+  .controls .btn.today-btn { width: 100%; }
+  .cells-line { padding: 10px var(--s4); }
+  .sq-layout { gap: var(--s4); margin-top: var(--s4); }
+  .details { display: block; }
+  .details .det-head { border-inline-end: 0; border-bottom: 1px solid var(--line-soft); display: grid; grid-template-columns: auto 1fr; column-gap: var(--s4); align-items: center; padding: var(--s4); }
+  .details .det-head .lbl { grid-column: 1 / -1; }
+  .details .det-head .n { margin: 0; font-size: 38px; }
+  .details .det-date { padding: var(--s3) var(--s4); }
+  .details .det-body { display: block; padding: var(--s1) var(--s4) var(--s3); }
+  .details .det-body .dl { grid-template-columns: auto 1fr; }
+  .details .det-body .dl > dd { padding-inline-end: 0; }
+  .details .det-body .dl > :nth-last-child(-n+4) { border-bottom: 1px solid var(--line-soft); }
+  .details .det-body .dl > :nth-last-child(-n+2) { border-bottom: 0; }
+  .details .det-line { margin: 0 var(--s4) var(--s4); }
+  .sq-panel { padding: var(--s3) 0 var(--s4); overflow: hidden; }
+  .sq-panel .sq-scroll { justify-content: start; padding-inline: var(--s3); position: relative; }
+  .sq-panel .legend-wrap { margin-inline: var(--s4); }
+  .scroll-hint { display: flex; gap: 6px; align-items: center; font-size: var(--fs-xs); color: var(--text-2); padding: 0 var(--s4) var(--s3); }
+  .legend { gap: var(--s2) var(--s4); }
+}
+</style></head>
+<body>
+<script src="kit.js"></script>
+<script>
+const mode = Q.get('mode') || 'dates';
+const presets = {
+  numbers: { side: 13, sel: 49, cell: 50 },
+  dates: { side: 17, sel: 139, cell: 52, anchor: new Date(2026, 3, 15) },
+  datetime: { side: 9, sel: null, cell: 58, anchor: new Date(2026, 10, 1, 0, 0) },
+};
+const p = presets[mode];
+const side = +(Q.get('side') || p.side);
+const m = squareModel({ mode, side, anchor: p.anchor });
+const sel = Q.get('sel') ? +Q.get('sel') : (p.sel ?? m.today);
+const mobile = innerWidth <= 700, tablet = innerWidth <= 1100 && !mobile;
+let cell = +(Q.get('cell') || p.cell);
+if (mobile) cell = mode === 'numbers' ? 38 : mode === 'dates' ? 44 : 50;
+if (tablet && mode === 'numbers') cell = 52;
+
+const det = cellDetails(m, sel);
+const anchorVal = mode === 'dates' ? (LANG === 'he' ? '15.4.2026' : '15/04/2026') : (LANG === 'he' ? '1.11.2026  00:00' : '01/11/2026  00:00');
+const sizes = [9, 13, 17, 21];
+const isCustom = !sizes.includes(side);
+
+shell({ screen: 'square',
+  end: `<button class="btn">${icon('save', 'sm')}<span>${T('save')}</span></button>
+        <button class="btn primary">${icon('download', 'sm')}<span>${T('exportXlsx')}</span></button>
+        <button class="icon-btn" style="display:none">${icon('save')}</button>
+        <button class="icon-btn" style="display:none">${icon('download')}</button>`,
+  body: `
+  <section class="panel">
+    <div class="controls">
+      <div class="field"><span class="label">${T('mode')}</span>
+        <div class="seg"><span class="${mode === 'numbers' ? 'on' : ''}">${T('numbers')}</span><span class="${mode === 'dates' ? 'on' : ''}">${T('dates')}</span><span class="${mode === 'datetime' ? 'on' : ''}">${T('datetime')}</span></div></div>
+      ${mode === 'numbers' ? '' : `<div class="field"><label>${T('anchor')}</label>
+        <div class="anchor-group"><div class="input">${icon(mode === 'dates' ? 'calendar' : 'clock', 'sm')}<span class="val num">${anchorVal}</span></div>
+        <button class="btn">${icon('anchor', 'sm')}${mode === 'dates' ? T('anchorToday') : T('anchorNow')}</button></div></div>`}
+      <div class="field"><span class="label">${T('size')}</span>
+        <div class="row size-row" style="gap:var(--s2)">
+          <div class="seg">${sizes.map(s => `<span class="${s === side ? 'on' : ''} num">${s}×${s}</span>`).join('')}<span class="${isCustom ? 'on' : ''}">${T('custom')}</span></div>
+        </div></div>
+      <div class="field"><label>${T('cells')}</label><div class="input custom-in ${isCustom ? '' : 'disabled'}"><span class="val num">${fmtInt(side * side)}</span></div></div>
+      ${mode === 'numbers' ? '' : `<button class="btn outline-accent today-btn">${icon('target', 'sm')}${mode === 'dates' ? T('showToday') : T('showNow')}</button>`}
+    </div>
+    <div class="cells-line"><span><b>${S[LANG].cellsLine(m.total, side)}</b></span>
+      ${m.today ? `<span><span class="tag today">${T('tagToday')}</span> <span class="num" style="margin-inline-start:6px">${T('cell')} ${fmtInt(m.today)}</span></span>` : ''}</div>
+  </section>
+
+  <div class="sq-layout">
+    <section class="panel sq-panel">
+      <div class="scroll-hint">${icon('chevL', 'sm')}${icon('chevR', 'sm')}${T('scrollHint')}</div>
+      <div class="sq-scroll">${squareHTML(m, { cell, sel, font: mobile ? (mode === 'numbers' ? 12 : 11) : null })}</div>
+      <div class="legend-wrap">${legendHTML()}</div>
+    </section>
+    <aside class="panel details">
+      <div class="det-head"><div class="lbl">${T('cell')}</div><div class="n num">${fmtInt(sel)}</div><div class="tags">${det.tags}</div></div>
+      ${det.dateBlock}
+      <div class="det-body"><dl class="dl">${det.rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
+      <div class="det-line ${det.c.hl}">${det.line}</div>
+    </aside>
+  </div>` });
+</script>
+</body></html>
