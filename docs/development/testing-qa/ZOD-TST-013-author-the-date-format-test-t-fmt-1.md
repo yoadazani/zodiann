@@ -35,7 +35,9 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision): this task owns the dedicated T-FMT-1 verification of the date format implemented in [ZOD-GAN-003](../computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md), whose criterion was amended to point here. As with ZOD-TST-002:
+  - expected strings are literals, never produced by production helpers;
+  - add a mutation proof (for example a padded day or month must fail).
 
 ---
 
