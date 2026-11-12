@@ -93,6 +93,8 @@ Example:
 
 `docs/plans/FOUNDATION-001-project-initialization.md`
 
+Every plan is reviewed by the `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) before the user sees it, and carries a `## Plan review` record (Section 3, "Automatic Plan Review").
+
 ---
 
 # 2. Core Development Principles
@@ -157,10 +159,45 @@ After completing the plan:
 
 1. Save the complete plan under `docs/plans/`.
 2. Use the task ID in the filename.
-3. Preserve the approved plan.
-4. Update `docs/PROGRESS.md` with the plan path.
+3. Run the **Automatic Plan Review** cycle below. It's mandatory, and the user never has to ask for it.
+4. Preserve the approved plan.
+5. Update `docs/PROGRESS.md` with the plan path.
 
-Do not begin implementation before the plan is ready and approved.
+Do not begin implementation before the plan is ready, reviewed and approved.
+
+## Automatic Plan Review
+
+Every implementation plan is independently reviewed by the project's `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) **before the user sees it**. This cycle extends `writing-plans`; it doesn't replace it.
+- `writing-plans` still does all the planning, including its own self-review.
+- This cycle runs after the plan is saved and before the plan is presented.
+- `writing-plans`' execution-handoff message to the user is deferred until this cycle is complete.
+
+**When it runs:**
+- After every new plan is written.
+- After every material revision of a plan, including revisions made in response to the user's review comments. A material revision changes scope, interfaces, tests, commands, or decisions; typo-only edits don't count.
+
+**The cycle:**
+
+1. **Dispatch the reviewer.** Use the Agent tool with `subagent_type: "plan-reviewer"`. Give it:
+   - the plan path and task ID;
+   - the task file path;
+   - the review round number;
+   - any product-owner decisions made in this conversation that aren't yet written into the plan or task files.
+
+   If the `plan-reviewer` agent type isn't available (agent definitions load when a session starts), dispatch a `general-purpose` subagent instead, with the body of `.claude/agents/plan-reviewer.md` as its instructions. Never skip the review.
+
+2. **Triage the findings.** The orchestrator owns the gate, and the reviewer's severities are advice.
+   - **Critical / Important:** apply the reviewer's correction to the plan. If you disagree, record why in the plan's review record and surface it to the user. Never silently drop a finding.
+   - **Minor:** apply it if it's a clear, local improvement; otherwise list it in the review record.
+   - **Needs user decision:** never resolve these yourself. Ask the user (AskUserQuestion), or present them with the plan as open items to decide before approval. When an answer changes task files, update them consistently, as for any product-owner decision.
+
+3. **Re-review once if needed.** If round 1 produced any Critical or Important correction, dispatch the reviewer again (round 2) on the revised plan, passing it the round-1 findings. **At most two rounds.** Anything still unresolved after round 2 goes to the user as an open item; don't loop further.
+
+4. **Record the review in the plan.** Add a `## Plan review` section to the plan. For each round, list the verdict, the findings by ID and severity with what was done about each (applied / applied differently, with the reason / deferred / needs user decision), and any open items. Commit the reviewed plan on the task branch.
+
+5. **Present the plan to the user** with a short review summary: the verdict, what was corrected, and what's open or needs their decision. Then hand off and wait for approval. Summarize the findings in your own words; don't paste the reviewer's report.
+
+The plan review complements the whole-branch code review (`requesting-code-review`) after implementation. Neither replaces the other.
 
 ## Test-Driven Development
 
@@ -309,7 +346,9 @@ Create a detailed implementation plan and save it under:
 
 The plan must be complete enough to execute without relying on undocumented conversation context.
 
-Present the plan to the user and wait for approval.
+Run the **Automatic Plan Review** cycle (Section 3) on the saved plan, applying corrections and resolving user decisions as described there.
+
+Present the reviewed plan to the user, with its review summary, and wait for approval. If the user asks for changes, revise the plan and run the review cycle again on the revision before presenting it.
 
 ## Step 4 — Implement
 
@@ -625,8 +664,9 @@ When the user asks to plan a task:
 - Use brainstorming when necessary.
 - Invoke writing-plans.
 - Save the completed plan under `docs/plans/` on the task branch.
+- Run the Automatic Plan Review cycle (Section 3): `plan-reviewer` subagent, corrections applied, at most two rounds, user decisions surfaced, review recorded in the plan.
 - Update progress documentation.
-- Wait for approval before implementation.
+- Present the reviewed plan with its review summary and wait for approval before implementation. Re-run the review on any material revision.
 
 ## Execute
 
