@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-GAN-001-spiral-positions` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), awaiting approval · **Branch:** `task/ZOD-GAN-001-spiral-positions` · **Written:** 2026-11-12
 
 **Goal:** Implement the Square of Nine's core spiral math in `gann_core`. For a cell number `n`, compute its ring `k`, its index in the ring `j`, its steps from the west axis `i`, its discrete angle `θ` and its grid position `(x, y)`. Also implement the inverse, `(x, y) → n`.
 
@@ -25,7 +25,7 @@
 
 ## Spec observation (recorded, not decided here)
 
-T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision. It doesn't change any GAN-001 output. The **same wording is GAN-002's second criterion**, and GAN-002 is planned before TST-010. So a matching note pointing to TST-010's open item is added to GAN-002's Notes in the planning commit. When to decide it is a product-owner question raised with this plan.
+T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision. It doesn't change any GAN-001 output. The **same wording is GAN-002's second criterion**, and GAN-002 is planned before TST-010. So a matching note pointing to TST-010's open item has been added to GAN-002's Notes (planning commits). When to decide it is a product-owner question raised with this plan.
 
 ## Global Constraints
 
@@ -112,7 +112,7 @@ packages/gann_core/test/spiral/
   - `'accepts maxSpiralNumber, the last cell of ring maxSpiralRing'`: `spiralCell(9007199136250225)` has ring 47453132 at (−47453132, 47453132).
   - `'matches the reference table'`: every row of the Reference values table (k, j, i, θ, x, y).
   - `'cell 2 is left of cell 1 and the first ring runs clockwise: left, up, right, down'`: positions of 2–9 in order, as in the table.
-  - `'every ring 1–6 runs clockwise on screen'`. For each ring, take the cells in number order and compute the geometric screen angle `ψ = (180 − atan2(−y, x)·180/π) mod 360` (west = 0°, north = 90°, with y down). `ψ` must strictly increase from the ring's first cell to its last, with one wrap through 360 at most.
+  - `'every ring 1–6 runs clockwise on screen'`. For each ring, take the cells in number order and compute the geometric screen angle `ψ = (180 − atan2(−y, x)·180/π) mod 360` (west = 0°, north = 90°, with y down). `ψ` must strictly increase from the ring's first cell to its last, with one wrap through 360 at most. Detect wraps by counting indices where `ψ[m+1] ≤ ψ[m]`. The count must be 0 for k = 1, and exactly 1 for k ≥ 2, at the step from the ring's first cell to its second.
   - `'θ equals the geometric angle on axes and diagonals'`: for every cell in rings 1–6 with `i mod k == 0`, `θ` is `closeTo(ψ, 1e-9)`, comparing after normalising 360 → 0.
   - `'consecutive cells are grid neighbours'`: for n = 1…3720, `|Δx| + |Δy| == 1` between n and n+1.
   - `'ring boundaries'`: rings of 9, 10, 25, 26, 81, 82, 3721, 3722 are 1, 2, 2, 3, 4, 5, 30, 31.
@@ -157,7 +157,7 @@ packages/gann_core/test/spiral/
 
 - [ ] **Step 1:** Whole-branch code review (`requesting-code-review`), then resolve any important findings. Re-run lint and test (`verification-before-completion`).
 - [ ] **Step 2:**
-  - Set `Status: Done` in the GAN-001 task file and `TASKS.md`, and tick its acceptance criteria. (The GAN-001 / TST-010 notes are already committed in the planning commit.)
+  - Set `Status: Done` in the GAN-001 task file and `TASKS.md`, and tick its acceptance criteria. (The GAN-001, GAN-002 and TST-010 notes are already committed in the planning commits.)
   - Update `docs/PROGRESS.md`: completed task, decisions, conventions (spiral API, fixed SQ-8 orientation), verification, next task.
 - [ ] **Step 3:** Commit, push, open a PR, then record the PR link.
 
@@ -174,3 +174,30 @@ packages/gann_core/test/spiral/
 - **Configurable spiral start and rotation** (EXT-010) will need these functions parameterised. They're fixed now and documented as SQ-8's orientation, so EXT-010 can generalise them.
 - **The T-GAN-3 wording conflict** is recorded for TST-010 and GAN-002 (see "Spec observation").
 - **Heads-up for ZOD-GAN-002 planning:** its criteria "T-GAN-2 passes" / "T-GAN-3 passes" have the same cycle pattern resolved here (TST-010 and TST-011 depend on GAN-002). Expect to apply the same resolution.
+
+## Plan review
+
+Automatic plan review (`zodiann-development` → `plan-reviewer`), two rounds. Both rounds re-derived every value independently: the reference table, the corner formulas, the 94906263² case, the top-of-range values, int64 fit, round trips over 61×61, and the geometric clockwise check.
+
+**Round 1.** Verdict: *Approve after corrections*.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| C1 | Critical | The corner test expected `(k, −k)` → `(2k+1)²`. On screen that's the top-right corner; the last cell is `(−k, k)`. A correct implementation would have failed the test | **Applied:** screen-coordinate expectations for all four corners, plus a pre-flip/on-screen note in the decision table |
+| I1 | Important | Forward accepted n ≤ 2^53, which is in ring 47,453,133, while the inverse rejected that ring, so the round trip broke inside the valid range | **Applied:** public `maxSpiralRing = 47453132` / `maxSpiralNumber = 9007199136250225`; rejection, acceptance and top-of-range round-trip tests |
+| I2 | Important | Large-n test values didn't exercise the integer correction | **Applied:** 94906263² ± 1 (the plain formula is wrong at +1), plus a mutation check |
+| I3 | Important | Task 1 committed without the lint/test gates | **Applied** |
+| I4 | Important | `SpiralCell` constructor unspecified | **Applied:** private constructor, no JSON, value equality |
+| I5 | Important | GAN-002 carries the same T-GAN-3 wording | **Applied:** note added to GAN-002 (not decided) |
+| M1–M6 | Minor | `cellsInRing(0)`; helper bounds; 64-bit note; full paths; `closeTo` for θ vs ψ; GAN-002 cycle heads-up | **Applied** |
+| D1 | Needs user decision | When to decide the T-GAN-3 wording conflict | Raised with the product owner alongside this plan |
+
+**Round 2.** Verdict: **Approve**. All round-1 findings were confirmed resolved, with no new Critical or Important issues.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| M1 | Minor | The GAN-002 note was committed in the corrections commit, not the planning commit | **Applied:** wording fixed |
+| M2 | Minor | Clockwise test didn't say how to detect the single wrap | **Applied:** wrap-count rule (0 for k = 1, exactly 1 for k ≥ 2) |
+| D1 | Needs user decision | Carried over (see above). GAN-001's output is unaffected either way | Raised with the product owner |
+
+**Open items:** D1 only (product owner).
