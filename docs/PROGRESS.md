@@ -12,7 +12,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-001 | Set up the Melos monorepo workspace | Done (PR pending merge) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
+| ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), pending merge) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
 
@@ -106,7 +106,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 - **Current task branch:** `task/ZOD-FND-001-melos-workspace` (from `main` @ `5f7797f`)
 - **Relevant commits:** `2c66f9b` FVM pin · `2d810e3` workspace + skeletons · `0063563` ARCH-2 guard · `aeccc8e` README · `4733e36` conditional-import fix · plus planning/docs commits
-- **Pull request:** to be opened (link recorded after push)
+- **Pull request:** https://github.com/yoadazani/zodiann/pull/2 (open)
 - **Unmerged task branches others depend on:** `task/ZOD-FND-001-melos-workspace` (ZOD-FND-002 and later need it on `main`)
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
