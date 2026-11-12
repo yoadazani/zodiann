@@ -6,7 +6,7 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -24,8 +24,8 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] DST-boundary case passes with the documented (accepted, not "fixed") one-hour-jump behavior for date-and-time mode (R-4's accepted tradeoff), and with dates-mode calendar-day arithmetic unaffected by DST.
-- [ ] Leap-year case correctly includes Feb 29 without an off-by-one.
+- [x] DST-boundary case passes with the documented (accepted, not "fixed") one-hour-jump behavior for date-and-time mode (R-4's accepted tradeoff), and with dates-mode calendar-day arithmetic unaffected by DST.
+- [x] Leap-year case correctly includes Feb 29 without an off-by-one.
 
 ## Dependencies
 
