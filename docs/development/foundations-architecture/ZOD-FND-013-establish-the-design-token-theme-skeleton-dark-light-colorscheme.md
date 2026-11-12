@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -25,8 +25,8 @@ Create the Flutter theming scaffold (`ColorScheme` + `ThemeExtension`s) that eve
 
 ## Acceptance Criteria
 
-- [ ] Both themes compile and can be toggled at runtime with no visual regression (blank screen is fine at this stage).
-- [ ] No component file in the codebase contains a raw hex color literal (enforced by lint or review).
+- [x] Both themes compile and can be toggled at runtime with no visual regression (blank screen is fine at this stage). Evidence: `packages/shared_ui/test/theme/zodiann_theme_test.dart`; `apps/astro_mobile/test/theme_switch_test.dart` (device default, set dark/light/system without restart, mid-animation `lerp`); the 13 FND-005 tests unchanged; emulator-5554 light (unchanged from FND-005) and dark screenshots.
+- [x] No component file in the codebase contains a raw hex color literal (enforced by lint or review). Enforced automatically: `test/architecture/no_color_literals_test.dart` (runs in `melos run test`; only `packages/shared_ui/lib/src/theme/tokens/` may hold literals).
 
 ## Dependencies
 
@@ -39,7 +39,12 @@ Create the Flutter theming scaffold (`ColorScheme` + `ThemeExtension`s) that eve
 
 ## Notes
 
-_No additional notes._
+Plan: `docs/plans/ZOD-FND-013-theme-token-skeleton.md`.
+
+- **Product-owner decision (2026-11-13):** token values are placeholders derived from Material's default `ColorScheme` (no literals); ZOD-UI-001 fills MASTER.md §2's exact values. `signTintOpacity` already carries MASTER's 0.10 / 0.09.
+- **Where things live:** the theme is in `packages/shared_ui` (feature packages can import it). Values live only in `packages/shared_ui/lib/src/theme/tokens/`.
+- **`themeModeProvider`** (`apps/astro_mobile/lib/src/theme/`) is an app-level placeholder, not a contract for feature packages; ZOD-SET-003 / SET-007 decide where the picker's provider contract lives and persist the choice.
+- **Flutter 3.50:** import `package:material_ui/material_ui.dart`, never `package:flutter/material.dart`.
 
 ---
 

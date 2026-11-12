@@ -40,7 +40,7 @@ Build theme selection and the reduced-motion status row.
 
 ## Notes
 
-_No additional notes._
+`themeModeProvider` (`apps/astro_mobile/lib/src/theme/theme_mode_provider.dart`, ZOD-FND-013) already switches the running app's theme mode (default: system). It is an app-level placeholder, not a contract for feature packages: this task decides where the picker's provider contract lives, and ZOD-SET-007 / ZOD-FND-006 persist the choice.
 
 ---
 

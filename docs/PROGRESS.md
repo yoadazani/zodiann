@@ -5,14 +5,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) done, PR open; iOS build/runtime verification outstanding (needs a Mac). 13 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) done, PR open. 14 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) ([PR #15](https://github.com/yoadazani/zodiann/pull/15), open) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
+| ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), open) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
+| ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) ([PR #15](https://github.com/yoadazani/zodiann/pull/15), merged `e4a8859`) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
 | ZOD-TST-011 | Author the ring highlight-count test (T-GAN-2) | Done ([PR #14](https://github.com/yoadazani/zodiann/pull/14), merged `30ea9eb`) | `gann_core` T-GAN-2 suite 8: Appendix B rows 1–6 with every column asserted (cells placed geometrically, angle per cell, blue/yellow/gray/unhighlighted, side, last number), named 9×9 total 16/16/16 with unhighlighted center, T-GAN-2 rule for rings 7–30. Mutants H1–H7 caught exactly as planned. Plan review: Approve (2 rounds, 3 Important applied). Code review: Ready to merge, comment minors fixed, 1 deferred. Plan: [`docs/plans/ZOD-TST-011-gann-ring-counts-suite.md`](plans/ZOD-TST-011-gann-ring-counts-suite.md) |
 | ZOD-TST-010 | Author the Gann spiral direction test suite (T-GAN-1, T-GAN-3) | Done ([PR #13](https://github.com/yoadazani/zodiann/pull/13), merged `3a447d5`) | `gann_core` T-GAN-1 6 + T-GAN-3 11: all 169 cells of the 13×13 design grid (literal, re-checked by two reviewers), 2 left of 1, unit-step + clockwise over 61×61 (3690 same-ring pairs), ring corners k ≤ 30, inverse round-trip 61×61; Appendix C rows over 30-cell rays (angle, category, `isNot` others), "only" over 61×61, 48 design highlight literals, angles in [0, 360). Mutants S1–S9, C1–C4 all caught. Plan review: Approve (2 rounds, 4 Important applied). Code review: Ready to merge, 2 minors promoted, 1 deferred. Plan: [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md) |
 | ZOD-TST-013 | Author the date-format test (T-FMT-1) | Done ([PR #12](https://github.com/yoadazani/zodiann/pull/12), merged `c5e442f`) | `gann_core` T-FMT-1 suite 20: 15 literal spot checks (all single/double day-month combinations, `00`/`05`/`09` years, design references), parse-back over every valid date of 2024/2026 at 00:00 and 23:59:59.999 UTC (366/365 per time of day), two-digit year 1900–2100. Mutants F1–F8 all caught with the planned counts. Plan review: Approve (2 rounds, 1 Important applied). Code review: Ready to merge, 3 minors promoted and fixed. Plan: [`docs/plans/ZOD-TST-013-date-format-suite.md`](plans/ZOD-TST-013-date-format-suite.md) |
@@ -28,11 +29,11 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-FND-005 is done on `task/ZOD-FND-005-flutter-app-shell`, PR open (see Git State). Next: ZOD-FND-013 (planning requested).
+- **None in progress.** ZOD-FND-013 is done on `task/ZOD-FND-013-theme-token-skeleton`, PR open (see Git State); merge on approval.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-FND-013 — Establish the design-token theme skeleton (dark + light `ColorScheme`). Critical; its dependency FND-005 is done (PR open). It replaces FND-005's placeholder `AppTheme` seam (`apps/astro_mobile/lib/src/theme/app_theme.dart`) and unblocks UI-001 and the UI track. Note for it: on Flutter 3.50 import `package:material_ui/material_ui.dart`, never `package:flutter/material.dart` (deprecated, fails `--fatal-infos`). Alternatives: ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code).
+- **ID:** ZOD-UI-001 — Implement the color token values (dark + light). Critical; its dependency FND-013 is done (PR open). Replace the right-hand sides of `packages/shared_ui/lib/src/theme/tokens/graphite_tokens.dart` / `porcelain_tokens.dart` with MASTER §2's literal values, delete `placeholder_tokens.dart`, and add the swatch harness (the `tokens` maps are keyed by MASTER names). Alternatives: ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code).
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
@@ -136,8 +137,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-13 | Theme lives in `shared_ui`: five `ThemeExtension`s (one per MASTER §2 group, fields = MASTER tokens, `tokens` map keyed by MASTER names), `ZodiannTokens`, `buildZodiannTheme` (ColorScheme + scaffold derived from `ZodiannSurfaces`), `ZodiannTheme.graphite/porcelain`. | Feature packages can import `shared_ui`, not the app; one source per colour. | `packages/shared_ui`, all UI | ZOD-FND-013 plan |
+| 2026-11-13 | Token values are placeholders from Material's default `ColorScheme` (no literals; `bg` = default `surface` so the shell is unchanged); UI-001 fills MASTER values in `tokens/`. | User decision; keeps the FND-013 / UI-001 boundary exact. | `shared_ui/lib/src/theme/tokens` | ZOD-FND-013 plan, decision 1 |
+| 2026-11-13 | `themeModeProvider` (app, default system) drives `MaterialApp.themeMode`; app-level placeholder, not a feature contract (SET-003/SET-007 decide). | Runtime toggle without restart; feature packages can't import the app. | `apps/astro_mobile/lib/src/theme` | ZOD-FND-013 plan |
+| 2026-11-13 | ARCH-7 guard: `test/architecture/no_color_literals_test.dart` fails on any colour literal in `apps/*/lib` or `packages/*/lib` outside `packages/shared_ui/lib/src/theme/tokens/`. | "Enforced by lint or review" made automatic; runs in `melos run test` (and in FND-004's CI once it exists). | All Flutter packages | ZOD-FND-013 plan |
 | 2026-11-13 | App ID `com.zodiann.app` (Android `applicationId`/`namespace`, iOS bundle ID), display name "Zodiann". | Store identity; nothing in spec/tasks set it. User decision. | `apps/astro_mobile` android/ios | ZOD-FND-005 plan, decision 1 |
-| 2026-11-13 | Placeholder theme seam `AppTheme.light/dark` (plain `ThemeData`, no color literals, `ThemeMode.system`). | UI-001 → FND-013 → FND-005 makes the token theme unavailable. User decision; FND-013/UI-001 replace it. | `apps/astro_mobile/lib/src/theme` | ZOD-FND-005 plan, decision 2 |
+| 2026-11-13 | Placeholder theme seam `AppTheme.light/dark` (plain `ThemeData`, no color literals, `ThemeMode.system`). | **Superseded by ZOD-FND-013.** UI-001 → FND-013 → FND-005 makes the token theme unavailable. User decision; FND-013/UI-001 replace it. | `apps/astro_mobile/lib/src/theme` | ZOD-FND-005 plan, decision 2 |
 | 2026-11-13 | Material types and `GlobalMaterialLocalizations.delegates` come from `package:material_ui`; never import `package:flutter/material.dart` or `flutter/cupertino.dart`. | Deprecated since Flutter 3.47; they fail `--fatal-infos`. | All Flutter packages | ZOD-FND-005 plan review C1 |
 | 2026-11-13 | `ephemerisPortProvider` is an app-level placeholder (not exported, not a feature-package contract); unbound read throws a `StateError` naming `appOverrides`; `appOverrides` is the single binding list and deliberately non-const. | Feature packages must not import the app layer; an unbound source must fail loudly; a const list would hide a `main()` that drops `overrides:`. The first feature-side consumer decides the real contract. | `apps/astro_mobile/lib/src/di` | ZOD-FND-005 plan, P2 |
 | 2026-11-13 | ARCH-3 means one Provider per screen, not one `ProviderScope`; single root scope in `main()`. Verification handed to ZOD-WHL-001 and ZOD-SQR-001 (added criteria). | Product-owner correction of FND-005 criterion 3. | Screen tasks | ZOD-FND-005 plan, decision 4 |
@@ -172,6 +177,21 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-FND-013, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| shared_ui | `fvm dart run melos exec --scope=shared_ui -- flutter test` | 26/26 |
+| App | `… --scope=astro_mobile -- flutter test` | 16/16 (FND-005's 13 unchanged) |
+| Architecture | `fvm dart test test/architecture` | 23/23 (ARCH-2 + ARCH-7 guard) |
+| Mutation proof | ad-hoc mutants, each confirmed applied (`git diff`), all three suites run, restored | G1 literal in app −2, G2 `Colors.white` in theme −1, G3 primary→text −2, G4 lerp returns this −2, G5 drop `ok` −2, G6 hard-coded themeMode −2, G7 drop AspectColors −2, G8 lerp throws −6. No compile errors |
+| Review fix | scanner: 5 new flagged samples (0X, digit separators, trailing comma, HSL, HSV) | RED (11 of 16) → GREEN |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 (root 23, astro_core 53, gann_core 189, shared_ui 26, astro_mobile 16) |
+| On device | debug APK on emulator-5554 | Light identical to FND-005, dark OK, no crash |
+| Code review | Fresh opus reviewer, whole branch | Ready to merge; 1 minor re-graded Important and fixed; 3 minors deferred (block comments, generated doc wording, `set` name) |
+
+**Known failures:** none.
 
 ZOD-FND-005, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -356,9 +376,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-005-flutter-app-shell` (from `main` @ `30ea9eb`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), all merged. FND-005 branch: plan `2c9b0b6`, `170072f`; `f96390d` (scaffold), `679691d` (DI), `96a163b` (root widget + mutation proof), close-out
-- **Pull request:** PRs #2–#14 merged. FND-005: [PR #15](https://github.com/yoadazani/zodiann/pull/15) (open)
+- **Current task branch:** `task/ZOD-FND-013-theme-token-skeleton` (from `main` @ `e4a8859`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), all merged. FND-013 branch: plan `a13006f`; `47e19b0` (extensions), `9d776d1` (themes), `19a420d` (app), `47fd3e6` (guard), review fix, close-out
+- **Pull request:** PRs #2–#15 merged. FND-013: [PR #16](https://github.com/yoadazani/zodiann/pull/16) (open)
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
