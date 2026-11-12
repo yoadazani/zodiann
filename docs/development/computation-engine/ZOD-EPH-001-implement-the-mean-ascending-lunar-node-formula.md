@@ -27,6 +27,13 @@ Implement the closed-form mean node longitude, the one body position in the app 
 - Return the constant daily speed `−1934.136261 / 36525` degrees/day alongside the longitude.
 - Retrograde for the node is **defined as constant** (always shown "℞ Mean"), not derived from a speed sign — implement this as a fixed flag, not a computed one.
 - Document the known ~0.01° deviation from the full formula over 200 years around 2000.
+- **Required unit tests** (this task's own tests, which must pass before the task is Done):
+  - **Reference epoch:** at 2000-01-01 12:00 UTC (`T = 0`) the longitude is exactly `125.04452`.
+  - **Dates before and after the reference epoch**, e.g. 1900 and 2100, checked against hand-computed expected values.
+  - **Negative-angle normalization:** results whose raw `Ω` is negative or ≥ 360 normalize into [0, 360), including the `x % 360 == 360.0` edge, which must yield `0.0`.
+  - **Constant negative angular speed:** the speed is exactly `−1934.136261 / 36525` degrees/day for every date.
+  - **Rejection of non-UTC input:** a local-time `DateTime` throws `ArgumentError` (per the FND-002 contract).
+  - **The expected formula coefficients:** the implementation uses exactly `125.04452` and `1934.136261`, pinned by tests whose expected values are derived from those coefficients.
 
 ## Design Reference
 
@@ -35,7 +42,7 @@ No direct design reference applies — pure computation.
 ## Acceptance Criteria
 
 - [ ] Output matches the formula to floating-point precision on a spot-checked date.
-- [ ] T-EPH-2 passes (exact formula match within the defined accuracy range).
+- [ ] The production mean-node formula is implemented and covered by its own unit tests (see "Required unit tests" above). Dedicated T-EPH-2 accuracy verification is tracked by [ZOD-TST-002](../testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md).
 - [ ] The node is never reported as "direct" — always the constant mean-℞ state.
 
 ## Dependencies
@@ -51,6 +58,7 @@ No direct design reference applies — pure computation.
 ## Notes
 
 - 2026-11-12 (product-owner decision): this task owns the node formula implementation, including [0, 360) normalization and the constant daily speed. ZOD-FND-002 only declares the method and documents the contract. T-EPH-2 coverage is ZOD-TST-002.
+- 2026-11-12 (product-owner decision): the acceptance criterion "T-EPH-2 passes (exact formula match within the defined accuracy range)" was amended to "implemented and covered by its own unit tests; dedicated T-EPH-2 verification tracked by ZOD-TST-002". The original wording made EPH-001 depend on ZOD-TST-002, which itself depends on EPH-001 (a cycle). The dependency direction stays EPH-001 → TST-002, and the two tasks are planned and delivered separately.
 
 ---
 
