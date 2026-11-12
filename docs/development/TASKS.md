@@ -297,7 +297,7 @@ The spec's principle is explicit: **every formula requires an automated test tha
 | ZOD-TST-008 | [Author the crossing-solver accuracy and boundary tests (T-CRS-1, T-CRS-3)](testing-qa/ZOD-TST-008-author-the-crossing-solver-accuracy-and-boundary-tests-t-crs-1-t-crs-3.md) | Critical | Not Started |
 | ZOD-TST-009 | [Author the aspect boundary-value test suite (T-ASP-1)](testing-qa/ZOD-TST-009-author-the-aspect-boundary-value-test-suite-t-asp-1.md) | High | Not Started |
 | ZOD-TST-010 | [Author the Gann spiral/direction test suite (T-GAN-1, T-GAN-3)](testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md) | Critical | Done |
-| ZOD-TST-011 | [Author the ring highlight-count test (T-GAN-2)](testing-qa/ZOD-TST-011-author-the-ring-highlight-count-test-t-gan-2.md) | Critical | Not Started |
+| ZOD-TST-011 | [Author the ring highlight-count test (T-GAN-2)](testing-qa/ZOD-TST-011-author-the-ring-highlight-count-test-t-gan-2.md) | Critical | Done |
 | ZOD-TST-012 | [Author the Gann date-mapping test suite (T-GAN-4)](testing-qa/ZOD-TST-012-author-the-gann-date-mapping-test-suite-t-gan-4.md) | Critical | Done |
 | ZOD-TST-013 | [Author the date-format test (T-FMT-1)](testing-qa/ZOD-TST-013-author-the-date-format-test-t-fmt-1.md) | Medium | Done |
 | ZOD-TST-014 | [Author the component/interface test suite (T-UI-1 through T-UI-5)](testing-qa/ZOD-TST-014-author-the-component-interface-test-suite-t-ui-1-through-t-ui-5.md) | High | Not Started |

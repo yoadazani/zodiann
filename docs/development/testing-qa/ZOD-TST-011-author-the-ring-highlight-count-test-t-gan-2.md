@@ -6,7 +6,7 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -24,8 +24,8 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] Every row of Appendix B's table is individually asserted.
-- [ ] The 9×9 total assertion exists as its own named test case.
+- [x] Every row of Appendix B's table is individually asserted.
+- [x] The 9×9 total assertion exists as its own named test case.
 
 ## Dependencies
 
