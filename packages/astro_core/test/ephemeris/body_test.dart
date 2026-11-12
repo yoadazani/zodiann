@@ -18,6 +18,10 @@ void main() {
     ]);
   });
 
+  test('only the node has the constant mean-retrograde flag', () {
+    expect(Body.values.where((b) => b.hasConstantMeanRetrograde), [Body.node]);
+  });
+
   test('round-trips every value through JSON', () {
     for (final body in Body.values) {
       expect(Body.fromJson(body.toJson()), body);

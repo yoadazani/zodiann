@@ -36,4 +36,13 @@ enum Body {
 
   /// The stable, language-independent key used in JSON (L-9).
   String toJson() => name;
+
+  /// Whether this body's retrograde state is the fixed "℞ Mean" rather than
+  /// derived from the sign of its speed (spec "Planet position": for the
+  /// node, retrograde is defined as constant, and the table shows mean ℞).
+  ///
+  /// True only for [node]. A fixed flag by design (ZOD-EPH-001), never
+  /// computed: retrograde detection (ZOD-EPH-005) reads it instead of the
+  /// speed sign for such bodies.
+  bool get hasConstantMeanRetrograde => this == node;
 }

@@ -2,6 +2,7 @@
 library;
 
 export 'src/crossing.dart';
+export 'src/ephemeris/angles.dart';
 export 'src/ephemeris/body.dart';
 export 'src/ephemeris/ecliptic_position.dart';
 export 'src/ephemeris/ephemeris_port.dart';
