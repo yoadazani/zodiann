@@ -6,7 +6,7 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -26,9 +26,9 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] Expected values come from a separately implemented reference formula in the test. The production helpers are never called to compute them.
-- [ ] Test fails if the formula's coefficients (`125.04452`, `1934.136261`) are altered in the production code. This is verified by temporarily altering each coefficient and observing the failure.
-- [ ] Passes within the documented ~0.01° accuracy bound against the full Meeus mean-node formula over ±100 years around 2000-01-01 12:00 UTC.
+- [x] Expected values come from a separately implemented reference formula in the test. The production helpers are never called to compute them.
+- [x] Test fails if the formula's coefficients (`125.04452`, `1934.136261`) are altered in the production code. This is verified by temporarily altering each coefficient and observing the failure.
+- [x] Passes within the documented ~0.01° accuracy bound against the full Meeus mean-node formula over ±100 years around 2000-01-01 12:00 UTC.
 
 ## Dependencies
 

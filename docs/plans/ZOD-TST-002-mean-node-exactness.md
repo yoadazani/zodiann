@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), awaiting approval · **Branch:** `task/ZOD-TST-002-mean-node-exactness` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), approved and implemented (2026-11-12) · **Branch:** `task/ZOD-TST-002-mean-node-exactness` · **Written:** 2026-11-12
 
 **Goal:** Independently verify ZOD-EPH-001's production mean-node formula (T-EPH-2). Check it against a separately implemented reference on a shared, versioned reference date set, prove it detects coefficient changes, and confirm the spec's ~0.01° accuracy bound against the full Meeus formula over ±100 years.
 

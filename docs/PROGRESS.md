@@ -5,13 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** ZOD-FND-001, ZOD-FND-002, ZOD-FND-012 and ZOD-EPH-001 merged; automatic plan review added (PR #6). Planning ZOD-TST-002 (T-EPH-2). 4 of 205 tasks done.
+- **Overall status:** ZOD-FND-001, ZOD-FND-002, ZOD-FND-012 and ZOD-EPH-001 merged; automatic plan review added (PR #6). ZOD-TST-002 (T-EPH-2) complete, PR pending merge. 5 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-TST-002 | Author the mean-node formula exactness test (T-EPH-2) | Done (PR pending merge) | T-EPH-2 suite 12/12 + fixture shape 6/6. Production matches an independent reference (Meeus JD, literal coefficients) within 1e-9° on 53 reference dates. Max deviation from full Meeus over ±100 years (daily) = 0.0021292° < 0.01°. Mutation proofs: either coefficient → fail; wrong rate → bound fail (0.012077°); impossible fixture date → fail. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 1 minor fixed, 3 deferred. Plan: [`docs/plans/ZOD-TST-002-mean-node-exactness.md`](plans/ZOD-TST-002-mean-node-exactness.md) |
 | ZOD-EPH-001 | Implement the mean ascending lunar node formula | Done ([PR #5](https://github.com/yoadazani/zodiann/pull/5), merged `a21e4ed`) | `astro_core` 41/41 (epoch exact, 1900 / 2100 / 2026 references, normalization incl. the `−1e-15` edge, constant speed, non-UTC rejection, coefficients, "never direct" 1800–2400, node bypasses `coveredRange`) · lint exit 0. Ad-hoc coefficient mutations each fail 3 tests. Review: 0 Critical / 0 Important. The reviewer fuzzed `normalizeDegrees` over the full double range. 4 minor doc/test items fixed. Plan: [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md) |
 | ZOD-FND-012 | Define `SquareConfig`, `HighlightRule`, `Crossing` data classes (`UserSettings` → SET-007) | Done ([PR #4](https://github.com/yoadazani/zodiann/pull/4), merged `13ea8e6`) | `gann_core` 33/33 · `astro_core` 26/26 · workspace architecture 17/17 · lint exit 0. The `Crossing` guard was proven to fail on an injected reference. Review: 0 Critical, 2 Important fixed, 3 minors promoted and fixed test-first (strict ISO-8601, out-of-range wall clock, required `anchor` key), 2 deferred. Plan: [`docs/plans/ZOD-FND-012-data-model.md`](plans/ZOD-FND-012-data-model.md) |
 | ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), merged `331c7dc`) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
@@ -19,16 +20,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **ID:** ZOD-TST-002
-- **Name:** Author the mean-node formula exactness test (T-EPH-2)
-- **Status:** Plan written and reviewed (plan-reviewer: Approve after 2 rounds), awaiting user approval
-- **Plan:** [`docs/plans/ZOD-TST-002-mean-node-exactness.md`](plans/ZOD-TST-002-mean-node-exactness.md)
-- **Completed steps:** Product-owner decision: TST-002 defines the shared reference date set, and TST-001 reuses it. Task files updated. Plan written. Automatic plan review run: round 1 had 1 Important + 6 Minor (all applied); round 2 approved, with 2 Minor applied.
-- **Remaining steps:** Plan approval → Task 1 (date set + exactness + mutation proof) → Task 2 (Meeus bound + mutation proof) → Task 3 (verified wording, review, close-out).
+_None._ ZOD-TST-002 is complete and awaiting PR merge.
 
 ## Next Recommended Task
 
-- **ID:** to be re-evaluated after ZOD-TST-002. Strong candidate: ZOD-GAN-001 (Gann spiral formulas, Critical, depends only on FND-001). It starts the Square of Nine critical path and Gate 1's T-GAN tests.
+- **ID:** ZOD-GAN-001 — Implement the Gann spiral position formulas (k, j, i, θ) (Critical)
+- **Why next:** It depends only on FND-001 (done). It starts the Square of Nine critical path (GAN-001 → GAN-002 → GAN-003), and Gate 1's T-GAN tests (TST-010/011/012) depend on it. The node track (EPH-001 + TST-002) is now complete. The remaining astro work (EPH-002/004/005, CRS-*, TST-001) is blocked behind FND-003 and the iOS decision.
+- **Carry into ZOD-TST-001:**
+  - Reuse `packages/astro_core/test/fixtures/reference_dates.json` (add-only, bump `version`).
+  - Its shape test limits instants to the T = ±1 window (≤ 2100-01-01T12:00Z). If TST-001 adds later-2100 instants (ACC-1 says "1900 to 2100"), move that window check into the T-EPH-2 suite, which only needs it for the bound.
 - **Carry into ZOD-EPH-002/004 (adapters):**
   - Reuse the "node at 1900 succeeds while the Moon is out of range" check in each adapter's tests.
   - Consider an architecture guard so the coefficient literals `125.04452` / `1934.136261` appear only in `mean_node.dart`. Test files stay exempt for TST-002's independent coefficients.
@@ -95,6 +95,11 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - The mean-node formula exists once (`meanAscendingNodeAt` in `mean_node.dart`). `EphemerisPort` adapters `with MeanAscendingNodeFormula implements EphemerisPort` and answer `Body.node` **before** checking `coveredRange`, because the node is formula-based and not bounded by the data range.
 - The node's retrograde state is the fixed flag `Body.hasConstantMeanRetrograde` ("℞ Mean"), never derived from speed.
 
+**Accuracy tests** (established in ZOD-TST-002)
+- Accuracy and verification suites live in `packages/<pkg>/test/accuracy/`. Their expected values come from an **independent** reference: only the code under test is imported (`show …`), with literal reference coefficients and test-local helpers. Production constants and helpers are never used for expectations.
+- Each verification suite is accompanied by a **mutation proof**: alter each production constant or behaviour it guards, observe the failure, restore, and record it in the commit message.
+- The shared reference date set is `packages/astro_core/test/fixtures/reference_dates.json`. It's add-only: increment `version` when adding; never drop or change an instant. A v1-subset test enforces this.
+
 ## Technical Decisions
 
 | Date | Decision | Reason | Impacted components | Reference |
@@ -124,6 +129,23 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-TST-002, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| AC1: independent reference | `fvm dart run melos exec --scope=astro_core -- dart test test/accuracy` | Only `meanAscendingNodeAt` imported (`show`). Meeus JD self-check exact at 2451545.0 / 2415020.0 / 2488070.0. Production matches the reference within 1e-9° on all 53 reference dates (actual ≤ 8.2e-12°) |
+| AC2: coefficient changes are caught | Mutation proof | `125.04453` → reference-match fails; `1934.136262` → reference-match + speed fail. Restored |
+| AC3: within 0.01° of full Meeus over ±100 years | same | Daily sweep (73,051 samples, T = −1 … +1 exactly): max 0.0021292° (pinned `closeTo(0.00213, 1e-5)`). Wrong rate `1934.146261` → fails at 0.012077° (T = +1). Restored |
+| Shared fixture | `reference_dates_test.dart` | 6/6: version, v1 subset, ≥ 50 unique, canonical (impossible `2026-02-30` rejected by mutation), T = ±1 window, chronological |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 / `astro_core` 53, `gann_core` 33, workspace 17 |
+| Plan review | `plan-reviewer`, 2 rounds | Approve (round 1: 1 Important + 6 Minor applied; round 2: 2 Minor applied) |
+| Code review | Fresh reviewer, whole branch | Ready to merge: 0 Critical / 0 Important. Its own extra mutations (ΔT-shifted epoch, /36524 speed, 36524-day century, broken seconds term) were all caught. 1 minor fixed, 3 deferred |
+
+**Deferred review minors (TST-002):**
+- The 1e-9 exactness check covers the 53 fixture dates only; the daily loop could assert it too.
+- The fixture window ends at T = +1 (see the TST-001 carry-over).
+- Two test names are longer than 80 columns.
 
 ZOD-EPH-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -189,8 +211,8 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 ## Git State
 
 - **Current task branch:** `task/ZOD-TST-002-mean-node-exactness` (from `main` @ `83ee377`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), all merged. TST-002 branch: planning/review commits only
-- **Pull request:** PRs #2–#6 merged. TST-002: not opened yet
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), all merged. TST-002: `7003b39` date set + exactness · `da6937c` Meeus bound · `8305933` verified wording · `52b5a99` review fix · plus planning/review commits
+- **Pull request:** PRs #2–#6 merged. TST-002: to be opened (link recorded after push)
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
