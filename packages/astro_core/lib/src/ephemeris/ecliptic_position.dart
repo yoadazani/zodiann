@@ -9,6 +9,9 @@ final class EclipticPosition {
   /// Throws [ArgumentError] if [longitude] is not finite or is outside
   /// `[0, 360)`, or if [speed] is not finite. A longitude of `-0.0` is
   /// stored as `0.0`.
+  ///
+  /// When normalizing a raw angle, note that `x % 360` in Dart can return
+  /// exactly `360.0` for tiny negative `x`; map that to `0.0` before calling.
   EclipticPosition({required double longitude, required this.speed})
     : longitude = longitude == 0 ? 0.0 : longitude {
     if (!longitude.isFinite || longitude < 0 || longitude >= 360) {

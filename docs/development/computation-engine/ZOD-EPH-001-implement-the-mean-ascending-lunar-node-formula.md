@@ -19,6 +19,9 @@ Implement the closed-form mean node longitude, the one body position in the app 
   - `EclipticPosition meanAscendingNodeAt(DateTime utc)`: the pure formula function.
   - `mixin MeanAscendingNodeFormula implements EphemerisPort`: provides `meanAscendingNode(utc) => meanAscendingNodeAt(utc)`.
   - Every adapter (ZOD-EPH-002/003/004) declares `… with MeanAscendingNodeFormula implements EphemerisPort` and answers `position(Body.node, utc)` with `EphemerisSuccess(meanAscendingNode(utc))`. No adapter re-implements the formula.
+  - Declare the mixin with `implements EphemerisPort`, **not** `on EphemerisPort`. `EphemerisPort` is an `interface` class, so it can't be a superclass constraint outside its declaring library. The `implements` form was verified to compile across packages in the ZOD-FND-002 review.
+  - Normalization pitfall: in Dart, `x % 360` returns exactly `360.0` for tiny negative `x`, which `EclipticPosition` rejects. Map `360.0` to `0.0`, and add a test for it.
+  - `T` is computed from the Julian Day of the UTC instant, with no ΔT/TT conversion (see the `meanAscendingNode` contract).
 - `Ω = 125.04452 − 1934.136261·T` degrees, where `T` = Julian centuries since 2000-01-01 12:00 UTC.
 - Normalize result into [0, 360).
 - Return the constant daily speed `−1934.136261 / 36525` degrees/day alongside the longitude.

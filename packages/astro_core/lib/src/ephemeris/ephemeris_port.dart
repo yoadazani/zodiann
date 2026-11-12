@@ -38,7 +38,7 @@ import 'utc_range.dart';
 /// UTC by the caller before calling.
 abstract interface class EphemerisPort {
   /// The inclusive UTC range in which this source guarantees its stated
-  /// accuracy for the physical bodies. The interface uses it to limit date
+  /// accuracy for the physical bodies. The app's UI uses it to limit date
   /// input (R-2). Outside it, [position] returns [OutOfCoveredRange].
   UtcRange get coveredRange;
 
@@ -69,9 +69,14 @@ abstract interface class EphemerisPort {
   /// Formula contract (spec "Planet position"):
   ///
   /// * `Ω = 125.04452 − 1934.136261·T` degrees, where
-  ///   `T = (JD_UT − 2451545.0) / 36525` is the number of Julian centuries
-  ///   since 2000-01-01 12:00 UTC.
-  /// * The longitude is normalized to `[0, 360)`.
+  ///   `T = (JD − 2451545.0) / 36525` is the number of Julian centuries
+  ///   since 2000-01-01 12:00 UTC, and `JD` is the Julian Day of the UTC
+  ///   instant [utc] itself. Do **not** convert to terrestrial time (no ΔT);
+  ///   the spec defines `T` from UTC.
+  /// * The longitude is normalized to `[0, 360)`. Beware: in Dart, `x % 360`
+  ///   returns exactly `360.0` for tiny negative `x` (e.g. `-1e-15 % 360`),
+  ///   which [EclipticPosition] rejects with an [ArgumentError]. Map a
+  ///   `360.0` result to `0.0`.
   /// * The speed is the constant `−1934.136261 / 36525` degrees per day.
   /// * This is a linear approximation that deviates from the full formula by
   ///   less than 0.01° over two hundred years around 2000.
