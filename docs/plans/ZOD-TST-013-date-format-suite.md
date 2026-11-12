@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), awaiting approval · **Branch:** `task/ZOD-TST-013-date-format-suite` (from `main` @ `718edf1`) · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), approved and implemented 2026-11-12 (see PROGRESS.md) · **Branch:** `task/ZOD-TST-013-date-format-suite` (from `main` @ `718edf1`) · **Written:** 2026-11-12
 
 **Goal:** Independently verify ZOD-GAN-003's cell date format (T-FMT-1). A date shows as `d.m.yy`:
 - no leading zero on the day or month;

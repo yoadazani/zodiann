@@ -6,7 +6,7 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Medium
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -23,7 +23,7 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] Both single-digit and double-digit day/month combinations are tested (e.g., `4.1.24` and `14.11.24`).
+- [x] Both single-digit and double-digit day/month combinations are tested (e.g., `4.1.24` and `14.11.24`).
 
 ## Dependencies
 
