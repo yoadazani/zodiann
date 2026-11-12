@@ -70,8 +70,43 @@ void main() {
         expect(classifyAt(1, -1), HighlightCategory.diagonal); // 5
         expect(classifyAt(-1, -2), HighlightCategory.eighth); // 14
         expect(classifyAt(1, -2), HighlightCategory.eighth); // 16
+        // Classification is symmetric under rotation/mirroring, so pin the
+        // orientation through the forward mapping alone: every 90° axis cell
+        // is straight above cell 1, every 270° cell straight below.
+        for (var n = 2; n <= 81; n++) {
+          final c = spiralCell(n);
+          if (c.angle == 90) {
+            expect((c.x == 0, c.y < 0), (true, true), reason: '90° n=$n');
+          } else if (c.angle == 270) {
+            expect((c.x == 0, c.y > 0), (true, true), reason: '270° n=$n');
+          }
+        }
       },
     );
+
+    test('is exact at the outermost ring (maxSpiralRing)', () {
+      const k = maxSpiralRing; // even
+      final b = (2 * k - 1) * (2 * k - 1);
+      expect(k.isEven, isTrue);
+      // j = i + (k − 1), so n = b + 1 + j = b + k + i.
+      final axis = spiralCell(b + k); // i = 0
+      final diagonal = spiralCell(b + 2 * k); // i = k
+      final eighth = spiralCell(b + k + k ~/ 2); // i = k / 2
+      final none = spiralCell(b + k + 1); // i = 1
+      expect(
+        [
+          axis.stepsFromAxis,
+          diagonal.stepsFromAxis,
+          eighth.stepsFromAxis,
+          none.stepsFromAxis,
+        ],
+        [0, k, k ~/ 2, 1],
+      );
+      expect(classifyHighlight(axis), HighlightCategory.axis);
+      expect(classifyHighlight(diagonal), HighlightCategory.diagonal);
+      expect(classifyHighlight(eighth), HighlightCategory.eighth);
+      expect(classifyHighlight(none), isNull);
+    });
 
     test('matches the geometric oracle for every cell of a 61×61 square', () {
       for (var x = -30; x <= 30; x++) {
