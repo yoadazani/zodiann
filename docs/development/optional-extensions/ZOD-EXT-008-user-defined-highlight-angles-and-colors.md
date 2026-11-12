@@ -37,7 +37,7 @@ No direct design reference applies — not shown in any mockup; follow the exist
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision during ZOD-GAN-002 planning): GAN-002 implements a **fixed** classifier (the spec's integer tests on `i` and `k`), mapped to the default rule ids `axes` / `diagonals` / `eighths`. Evaluating a square's arbitrary `List<HighlightRule>` against cells belongs to **this** task: priority ordering, and exact matching of user angles against the discrete angle θ = 45°·i/k, for example via rational arithmetic on `i` and `k`.
 
 ---
 

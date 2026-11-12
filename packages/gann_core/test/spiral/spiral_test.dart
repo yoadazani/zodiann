@@ -173,6 +173,12 @@ void main() {
       expect(spiralCell(9007198756625170).ring, 47453132);
     });
 
+    test('isCenter is true only for n = 1', () {
+      expect(spiralCell(1).isCenter, isTrue);
+      expect(spiralCell(2).isCenter, isFalse);
+      expect(spiralCell(81).isCenter, isFalse);
+    });
+
     test('has value equality', () {
       expect(spiralCell(49), spiralCell(49));
       expect(spiralCell(49).hashCode, spiralCell(49).hashCode);
