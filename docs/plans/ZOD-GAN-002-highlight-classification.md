@@ -137,7 +137,7 @@ packages/gann_core/test/spiral/spiral_test.dart  + isCenter test
   `spiral_test.dart`: `'isCenter is true only for n = 1'`, checking cells 1, 2 and 81.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/highlight test/spiral`. Expected: compilation FAIL (`classifyHighlight`, `HighlightCategory`, `highlightRuleFor` and `isCenter` are undefined).
 - [ ] **Step 3: Implement** per the Interfaces and the decision table. The doc comments cite the spec rules (SQ-12 … SQ-15) and the EXT-008 boundary. The `classifyHighlight` doc comment states that the argument is the cell's spiral **position** (n = 1 is the center), not the anchor-shifted displayed value, and cites the open numeric-anchor decision (TASKS.md §6.2).
-- [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0. Expected counts: `test/highlight` has 13 tests (10 `classifyHighlight` + 1 `HighlightCategory` + 2 `highlightRuleFor`), and `test/spiral` has 24 (23 existing + `isCenter`).
+- [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0. Expected counts: `test/highlight` has 12 tests (9 `classifyHighlight` + 1 `HighlightCategory` + 2 `highlightRuleFor`), and `test/spiral` has 24 (23 existing + `isCenter`).
 - [ ] **Step 5: Mutation proof** (priority, AC 3). Temporarily make each change below in `classifyHighlight`, confirm the suite FAILS each time, then restore and check that `git diff packages/gann_core/lib` shows only the intended changes:
   - (a) swap the yellow and gray checks;
   - (b) check yellow before blue;
