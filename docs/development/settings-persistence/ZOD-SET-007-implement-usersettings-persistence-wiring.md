@@ -15,6 +15,7 @@ Connect every control built in [ZOD-SET-002](../settings-persistence/ZOD-SET-002
 
 ## Implementation Details
 
+- **Define the `UserSettings` data class first** (deferred here from ZOD-FND-012 by product-owner decision, 2026-11-12). It's an immutable class with JSON, holding exactly the spec's fields: theme, time zone, aspect orbs, visible bodies, node type, ephemeris source, zodiac system, square defaults. Use the resolutions of D-1, D-3 and D-5/D19 available at that time, and the conventions set by FND-012 (hand-written JSON, constructor validation, `FormatException` on invalid input). `Body` JSON already exists in `astro_core`.
 - Each setting row writes through immediately (no separate "Save" step for settings — matches the mockup's direct-manipulation controls).
 - Verify every field in the `UserSettings` entity (theme, time zone, aspect orbs, visible bodies, node type, ephemeris source, zodiac system, square defaults) round-trips through storage.
 

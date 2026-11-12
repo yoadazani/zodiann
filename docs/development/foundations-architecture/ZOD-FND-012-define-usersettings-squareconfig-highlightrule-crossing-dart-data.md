@@ -15,7 +15,8 @@ Implement the four core immutable data classes from the spec's data model, with 
 
 ## Implementation Details
 
-- Implement exactly the `SquareMode`, `SpiralStart`, `SpiralRotation`, `SquareConfig`, `HighlightMatch`/`AnglesMatch`/`MultipleOfMatch`, `HighlightRule`, `Body`, `Crossing` types as specified (code block in "Data model and user settings").
+- Implement exactly the `SquareMode`, `SpiralStart`, `SpiralRotation`, `SquareConfig`, `HighlightMatch`/`AnglesMatch`/`MultipleOfMatch`, `HighlightRule` and `Crossing` types as specified (code block in "Data model and user settings"), and add JSON to the existing `Body` enum (defined by ZOD-FND-002). `UserSettings` is **not** part of this task (deferred to [ZOD-SET-007](../settings-persistence/ZOD-SET-007-implement-usersettings-persistence-wiring.md)).
+- Model `SquareConfig.anchor` as a pure-Dart `OffsetDateTime` (UTC instant + offset in minutes, serialized as ISO-8601 with offset), so the offset required by DATA-4 is held and serialized. Dart's `DateTime` can't hold an arbitrary offset.
 - Add `fromJson`/`toJson` for every class (used by DATA-1 storage and DATA-3 backup export).
 - `Crossing` is explicitly **not** persisted — ensure no storage code path attempts to save it (it's derived/recomputed only).
 - Document the default highlight rules (Axes/Diagonals/Eighths, priorities 1/2/3) as the default `List<HighlightRule>` a new `SquareConfig` gets.
@@ -26,7 +27,7 @@ No direct design reference applies — this is a pure data-model task in `packag
 
 ## Acceptance Criteria
 
-- [ ] All four classes compile and round-trip through JSON without data loss.
+- [ ] `SquareConfig`, `HighlightRule` (with `HighlightMatch`) and `Crossing` compile, and the persisted types round-trip through JSON without data loss, including the anchor's time-zone offset. (`UserSettings` is deferred to ZOD-SET-007.)
 - [ ] `Crossing` has no storage/persistence code path.
 - [ ] A new `SquareConfig` defaults to the three default highlight rules in the documented priority order.
 
@@ -42,6 +43,9 @@ No direct design reference applies — this is a pure data-model task in `packag
 ## Notes
 
 - `Body` is defined in `packages/astro_core` by [ZOD-FND-002](ZOD-FND-002-define-the-ephemerisport-interface-contract.md). This task adds its `fromJson`/`toJson` and must not redefine it.
+- 2026-11-12 (product-owner decisions):
+  - **`UserSettings` is deferred to [ZOD-SET-007](../settings-persistence/ZOD-SET-007-implement-usersettings-persistence-wiring.md).** The spec gives only a field list, several fields depend on open decisions (D-1, D-3, D-5/D19), and it mixes wheel and square types. The first acceptance criterion was amended accordingly. The task title is kept for traceability.
+  - **The anchor is an `OffsetDateTime` value type**, not a bare `DateTime`. This satisfies DATA-4's "saved with a time zone offset". [ZOD-DAT-009](../settings-persistence/ZOD-DAT-009-persist-anchor-dates-with-time-zone-offset.md) persists it and verifies the DST and zone-change behaviour.
 
 ---
 

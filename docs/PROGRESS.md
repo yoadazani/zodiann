@@ -5,24 +5,32 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** Workspace foundation (ZOD-FND-001) merged. `EphemerisPort` contract (ZOD-FND-002) complete, PR pending merge. 2 of 205 tasks done.
+- **Overall status:** ZOD-FND-001 (workspace) and ZOD-FND-002 (`EphemerisPort`) merged. Planning ZOD-FND-012 (data model). 2 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), pending merge) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
+| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), merged `331c7dc`) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
 | ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), merged `0303645`) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
 
-_None._ ZOD-FND-002 is complete and awaiting PR merge.
+- **ID:** ZOD-FND-012
+- **Name:** Define `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes (`UserSettings` deferred to SET-007)
+- **Status:** Plan written, awaiting user approval
+- **Plan:** [`docs/plans/ZOD-FND-012-data-model.md`](plans/ZOD-FND-012-data-model.md)
+- **Completed steps:**
+  - Read the task and the spec's data model.
+  - Product-owner decisions: `UserSettings` deferred to SET-007; anchor as `OffsetDateTime`.
+  - Task files updated (FND-012, SET-007, DAT-009).
+  - Branch created; plan written.
+- **Remaining steps:** Plan approval → Tasks 1–4 (OffsetDateTime; highlight rules; SquareConfig; Crossing + Body JSON + guard) → Task 5 close-out.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-FND-012 — Define `UserSettings`, `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes (Critical)
-- **Why next:** It depends only on FND-001 (merged) and, together with FND-002, unblocks ZOD-EPH-001 (mean-node formula), which is on the critical path. It adds JSON to the `Body` enum defined in FND-002, so it builds on this branch. **FND-002's PR should be merged first.**
+- **ID:** to be re-evaluated after ZOD-FND-012. Expected next: ZOD-EPH-001 (mean-node formula; FND-002 done, needs FND-012).
 - **Why not FND-003 yet:** the Swiss Ephemeris FFI spike must run a real computation on **both Android and iOS**. An iOS build needs macOS/Xcode, which this Windows machine can't provide. That needs a decision (a Mac, a cloud macOS runner, or splitting the spike) before FND-003 starts. It also benefits from ZOD-FND-010 (license) first.
 - **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research, Critical, no code).
 - **Note for ZOD-EPH-001:** the task file now records the shared `mean_node.dart` location, the `implements` (not `on`) mixin rule, the `x % 360 == 360.0` pitfall, and `T` from UTC.
@@ -82,6 +90,8 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | The import scan covers whole import/export statements, including conditional alternatives. | The code review found that `import 'stub.dart' if (dart.library.ui) 'dart:ui';` was missed. | ARCH-2 guard | Final review fix |
 | 2026-11-12 | ZOD-FND-002 declares the mean-node method and documents its formula; ZOD-EPH-001 implements it; ZOD-TST-002 verifies T-EPH-2. FND-002's node criterion was changed to "declared + contract documented". | The original criterion created a cycle (FND-002 → TST-002 → EPH-001 → FND-002). Product-owner decision. | astro_core, EPH-001, TST-002 | FND-002 / EPH-001 task Notes |
 | 2026-11-12 | `Body` is defined by ZOD-FND-002; ZOD-FND-012 adds JSON only. | Both task files listed it; FND-002 needs it first. | astro_core, FND-012 | FND-002 / FND-012 task Notes |
+| 2026-11-12 | `UserSettings` deferred from ZOD-FND-012 to ZOD-SET-007; FND-012 criterion amended. | The spec gives only a field list; several fields depend on open decisions (D-1, D-3, D-5/D19); it mixes wheel and square types. Product-owner decision. | SET-007, FND-012 | FND-012 / SET-007 task files |
+| 2026-11-12 | `SquareConfig.anchor` is an `OffsetDateTime` (UTC instant + offset minutes, ISO-8601 with offset). | DATA-4 needs the offset saved; Dart `DateTime` cannot hold it. Product-owner decision. | gann_core, DAT-009, GAN-003 | FND-012 / DAT-009 task files |
 
 ## Verification
 
@@ -121,9 +131,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-002-ephemeris-port` (from `main` @ `0303645`)
-- **Relevant commits:** ZOD-FND-001 merged to `main` as `0303645` (PR #2). FND-002: `32da922` value types · `025725e` port contract + sealed results · `4f9db30` FND-001 record correction · `8da2b91` review doc fixes · plus planning/docs commits
-- **Pull request:** FND-001 → https://github.com/yoadazani/zodiann/pull/2 (merged). FND-002 → https://github.com/yoadazani/zodiann/pull/3 (open)
-- **Unmerged task branches others depend on:** `task/ZOD-FND-002-ephemeris-port` (ZOD-FND-012, ZOD-EPH-001, ZOD-FND-003 need it on `main`)
+- **Current task branch:** `task/ZOD-FND-012-data-model` (from `main` @ `331c7dc`)
+- **Relevant commits:** ZOD-FND-001 → `0303645` (PR #2), ZOD-FND-002 → `331c7dc` (PR #3), both merged. FND-012 branch: planning commits only
+- **Pull request:** PR #2 and PR #3 merged. FND-012: not opened yet
+- **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
