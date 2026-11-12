@@ -90,7 +90,7 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 
 | ID | Task | Priority | Status |
 |---|---|---|---|
-| ZOD-EPH-001 | [Implement the mean ascending lunar node formula](computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md) | Critical | Not Started |
+| ZOD-EPH-001 | [Implement the mean ascending lunar node formula](computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md) | Critical | Done |
 | ZOD-EPH-002 | [Implement the Swiss Ephemeris `EphemerisPort` adapter (data-file mode)](computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md) | Critical | Not Started |
 | ZOD-EPH-003 | [Implement the Swiss Ephemeris built-in (Moshier) fallback mode](computation-engine/ZOD-EPH-003-implement-the-swiss-ephemeris-built-in-moshier-fallback-mode.md) | Medium | Not Started |
 | ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Not Started |
