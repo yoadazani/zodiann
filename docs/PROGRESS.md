@@ -5,14 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002 and GAN-001 merged; automatic plan review in place. ZOD-GAN-002 (highlight classification) complete, PR pending merge. 7 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. Planning ZOD-GAN-003 (date/number mapping). 7 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-GAN-002 | Implement Gann highlight classification (blue/yellow/gray) | Done ([PR #9](https://github.com/yoadazani/zodiann/pull/9), pending merge) | `gann_core` highlight 13 + spiral 24: geometric oracle and literal angles over 61×61, Appendix B rings 1–6, 9×9 = 16/16/16, 90° column above (forward mapping), outermost ring, FND-012 default-rule equivalence. Mutants (a)–(e) plus a mirrored spiral all caught. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 2 minors promoted and fixed. Plan: [`docs/plans/ZOD-GAN-002-highlight-classification.md`](plans/ZOD-GAN-002-highlight-classification.md) |
+| ZOD-GAN-002 | Implement Gann highlight classification (blue/yellow/gray) | Done ([PR #9](https://github.com/yoadazani/zodiann/pull/9), merged `1284889`) | `gann_core` highlight 13 + spiral 24: geometric oracle and literal angles over 61×61, Appendix B rings 1–6, 9×9 = 16/16/16, 90° column above (forward mapping), outermost ring, FND-012 default-rule equivalence. Mutants (a)–(e) plus a mirrored spiral all caught. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 2 minors promoted and fixed. Plan: [`docs/plans/ZOD-GAN-002-highlight-classification.md`](plans/ZOD-GAN-002-highlight-classification.md) |
 | ZOD-GAN-001 | Implement the Gann spiral position formulas (k, j, i, θ) | Done ([PR #8](https://github.com/yoadazani/zodiann/pull/8), merged `ef1ea48`) | `gann_core` spiral 23/23: reference table (design-checked), geometric clockwise for rings 1–6, neighbours 1…3721, rings vs the integer definition to 200,000 and at 94906263²+1, Appendix B, corners, round trips 9×9 / 61×61 / top of range, −2^63 rejection. Integer-correction mutation → fail. Plan review: Approve (2 rounds; 1 Critical + 5 Important fixed in the plan). Code review: 19 mutants, all non-equivalent killed; 1 minor promoted and fixed test-first, 2 applied. Plan: [`docs/plans/ZOD-GAN-001-spiral-positions.md`](plans/ZOD-GAN-001-spiral-positions.md) |
 | ZOD-TST-002 | Author the mean-node formula exactness test (T-EPH-2) | Done ([PR #7](https://github.com/yoadazani/zodiann/pull/7), merged `a86e284`) | T-EPH-2 suite 12/12 + fixture shape 6/6. Production matches an independent reference (Meeus JD, literal coefficients) within 1e-9° on 53 reference dates. Max deviation from full Meeus over ±100 years (daily) = 0.0021292° < 0.01°. Mutation proofs: either coefficient → fail; wrong rate → bound fail (0.012077°); impossible fixture date → fail. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 1 minor fixed, 3 deferred. Plan: [`docs/plans/ZOD-TST-002-mean-node-exactness.md`](plans/ZOD-TST-002-mean-node-exactness.md) |
 | ZOD-EPH-001 | Implement the mean ascending lunar node formula | Done ([PR #5](https://github.com/yoadazani/zodiann/pull/5), merged `a21e4ed`) | `astro_core` 41/41 (epoch exact, 1900 / 2100 / 2026 references, normalization incl. the `−1e-15` edge, constant speed, non-UTC rejection, coefficients, "never direct" 1800–2400, node bypasses `coveredRange`) · lint exit 0. Ad-hoc coefficient mutations each fail 3 tests. Review: 0 Critical / 0 Important. The reviewer fuzzed `normalizeDegrees` over the full double range. 4 minor doc/test items fixed. Plan: [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md) |
@@ -22,16 +22,25 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-_None._ ZOD-GAN-002 is complete and awaiting PR merge.
+- **ID:** ZOD-GAN-003
+- **Name:** Implement Gann date/number mapping per mode
+- **Status:** Plan written and reviewed (plan-reviewer: 2 rounds; round-2 corrections applied and verified), awaiting user approval
+- **Plan:** [`docs/plans/ZOD-GAN-003-date-number-mapping.md`](plans/ZOD-GAN-003-date-number-mapping.md)
+- **Completed steps:**
+  - Product-owner decisions:
+    - the T-GAN-4 / T-FMT-1 criteria amended (TST-012/013);
+    - **time-zone rule = device zone** (absolute steps, visible DST jump; dates mode on the anchor's calendar date);
+    - `stepHours` has no upper cap;
+    - the anchor field shows device-zone time (SQR-002 note).
+  - Plan written.
+  - Plan review:
+    - round 1: 7 Important + 9 Minor + 2 user decisions;
+    - round 2: 2 Important (overflow with uncapped `stepHours`; far-range anchors) + 4 Minor, applied and independently verified.
+- **Remaining steps:** Plan approval → Task 1 (mapping, today's cell, distances) → Task 2 (formatting) → Task 3 (review, close-out, propagate the time-zone decision).
 
 ## Next Recommended Task
 
-- **ID:** ZOD-GAN-003 — Implement Gann date/number mapping per mode (Critical)
-- **Why next:** It depends only on GAN-001 (done) and completes the pure-math Square of Nine core (GAN-001 → GAN-002 → GAN-003) that Gate 1's T-GAN-4 and the Square screen need. **GAN-002's PR should be merged first** (shared `gann_core`).
-- **Expect when planning:**
-  - It meets two open items in `TASKS.md` §6.2: the **DST 4-hour-step behaviour** (the working assumption is absolute-time stepping) and the **numeric-anchor interpretation** (highlights fixed to position).
-  - Its T-GAN-4 criterion likely has the same cycle pattern (ZOD-TST-012 depends on it).
-  - It consumes `OffsetDateTime` (FND-012, `wallClock`) and `spiralCell`.
+- **ID:** to be re-evaluated after ZOD-GAN-003. With the pure-math Square of Nine core complete, the candidates are the test suites (TST-010/011/012/013) or the shared UI tokens (FND-013 → UI-001).
 - **Carry into ZOD-TST-010 / ZOD-TST-011:**
   - The GAN-001 review's 19-mutant list (mirrored x/y, no flip, 90° rotation, j/i off by one, `%` vs `remainder`, segment `<` → `<=`, …) is a ready starting point for the mutation proof.
   - Classification is invariant under rotation and mirroring, so **pin orientation through θ or (x, y) via the forward mapping, not through category**. GAN-002's own mirror mutation showed that a check routed through `spiralNumberAt` misses it.
@@ -149,6 +158,8 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | ZOD-GAN-001's criterion "T-GAN-1 passes" was amended to "covered by its own unit tests; T-GAN-1 tracked by ZOD-TST-010" (same resolution as EPH-001). TST-010 gets independence and mutation-proof rules. | Removes the GAN-001 ↔ TST-010 cycle. Product-owner decision. | GAN-001, TST-010 | GAN-001 / TST-010 task Notes |
 | 2026-11-12 | T-GAN-3 wording: **90° is the axis above cell 1** (270° below). The spec's "270 axis (the row above cell 1)" is treated as a typo, and the GAN-002 / TST-010 criteria were corrected. The spec file is unchanged; the notes record the correction. | The formula, SQ-8, Appendix C and the design reference all agree on 90° = North above. Product-owner decision. | GAN-002, TST-010 | GAN-002 / TST-010 task Notes |
 | 2026-11-12 | ZOD-GAN-002: the "T-GAN-2/3 passes" criteria were amended (own unit tests; dedicated suites in TST-011 / TST-010). The classifier is fixed and integer-based (spec rules on `i`, `k`), mapped to default rule ids `axes` / `diagonals` / `eighths`. Evaluating arbitrary user rules is ZOD-EXT-008. | Same cycle resolution as EPH-001 / GAN-001. MVP spec rules are fixed, and user rules are an optional extension. Product-owner decisions. | GAN-002, TST-010/011, EXT-008 | GAN-002 / TST-011 / EXT-008 task Notes |
+| 2026-11-12 | **Time-zone rule (NFR-A3), resolving the spec's open question:** date-and-time cells step in absolute time and are shown in the **device's local zone** (visible one-hour DST jump). Today's cell uses the device zone. Dates mode uses the anchor's own calendar date plus whole days. The anchor field shows device-zone time. | The spec's working assumption (line 74); DATA-4 is satisfied by the saved instant and offset. Product-owner decision. | GAN-003, SQR-002, SET-002, DAT-005/009, TST-012 | GAN-003 / SQR-002 / TST-012 task Notes |
+| 2026-11-12 | ZOD-GAN-003: "T-GAN-4 / T-FMT-1 passes" amended (own unit tests; dedicated suites in TST-012 / TST-013). `stepHours` has **no upper cap** (≥ 1, overflow guarded; SET-004 decides the UI range). | Same cycle resolution as before; a cap isn't needed with the overflow guards. Product-owner decisions. | GAN-003, TST-012/013, SET-004 | GAN-003 plan |
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
@@ -259,9 +270,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-GAN-002-highlight-classification` (from `main` @ `ef1ea48`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), all merged. GAN-002: `4555432` classifier + rule lookup + isCenter · `1b2b02b` review fixes · plus planning/review commits
-- **Pull request:** PRs #2–#8 merged. GAN-002 → https://github.com/yoadazani/zodiann/pull/9 (open)
-- **Unmerged task branches others depend on:** `task/ZOD-GAN-002-highlight-classification` (ZOD-TST-010/011, SQR-006/007 need it on `main`)
+- **Current task branch:** `task/ZOD-GAN-003-date-number-mapping` (from `main` @ `1284889`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), all merged. GAN-003 branch: planning/review commits only
+- **Pull request:** PRs #2–#9 merged. GAN-003: not opened yet
+- **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).

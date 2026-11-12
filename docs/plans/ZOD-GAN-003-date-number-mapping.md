@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-GAN-003-date-number-mapping` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: 2 rounds; round-2 corrections applied and independently verified), awaiting approval · **Branch:** `task/ZOD-GAN-003-date-number-mapping` · **Written:** 2026-11-12
 
 **Goal:** Map a Square of Nine cell's spiral position `n` to the value it displays in each mode (number, calendar date, or date and time in fixed hour steps), find "today's" cell, and format dates as `d.m.yy` and times as `HH:MM`. The mapping follows the spec's "Dates" rules and the product owner's time-zone decision.
 
@@ -62,7 +62,7 @@
 | Calendar date carrier | A date is returned as a **UTC-flagged `DateTime` at 00:00** holding the calendar fields (`DateTime.utc(y, m, d)`), documented as date-only: "never call `toLocal()` on it; the fields are the calendar date". `formatCellDate` / `formatCellTime` **require `isUtc`** (`ArgumentError` otherwise) and read only the fields | No new type. `DateTime.utc` normalises month and leap-year overflow (Feb 29) without any zone involvement |
 | Wall clock | `DateTime localWallClock(DateTime utcInstant, LocalTimeZone zone)` returns a UTC-flagged `DateTime` holding the local fields (instant + offset), like `OffsetDateTime.wallClock`. An out-of-range `add` → `ArgumentError` | One convention for "local fields" across `gann_core` |
 | `stepHours` | **Required** named parameter `{required int stepHours}` (no default). Callers pass `config.stepHours`. **No upper cap** (product-owner decision 2026-11-12): only `≥ 1`, and the overflow guard rejects impossible values. SET-004 decides the UI's allowed range | A default of 4 would silently ignore a square's edited step (SET-004 / T-EX-3) |
-| Overflow guard | `cellDate`: `n − 1 > 100000000` → `ArgumentError` (DateTime's whole range is ±100,000,000 days), then catch any remaining `ArgumentError`. `cellMoment` and `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked **before** multiplying, then catch `ArgumentError` / `RangeError` | `DateTime.utc(…, d + huge)` and `Duration(hours: huge)` wrap silently to wrong dates rather than throwing (verified in review) |
+| Overflow guard | `cellDate`: `n − 1 > 100000000` → `ArgumentError` (DateTime's whole range is ±100,000,000 days), then catch any remaining `ArgumentError`. `cellMoment` and `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked **before** multiplying, then catch `ArgumentError` / `RangeError`, and **reject a result earlier than the anchor** (int64 wrap for anchors near `DateTime`'s limits; the parser accepts 6-digit years). `nowCellInDateTimeMode` divides by hours before `stepHours`, so it never forms an overflowing product | `DateTime.utc(…, d + huge)` and `Duration(hours: huge)` wrap silently to wrong dates rather than throwing (verified in review) |
 | "Now" | Passed in as `DateTime nowUtc` | Pure and deterministic; the UI supplies `DateTime.now().toUtc()` |
 | Before the anchor | The today-cell functions return `null` when today or now is before the anchor | SQ-6 shows a message instead. `null` lets the UI do that, with no exception |
 | Range | `n ≥ 1`, otherwise `ArgumentError`. A result outside `DateTime`'s range → `ArgumentError`. `stepHours ≥ 1`. All `DateTime` inputs must be UTC (`ArgumentError` otherwise) | Same validation conventions as FND-012 / GAN-001 |
@@ -145,7 +145,7 @@
   - `group('LocalTimeZone')`:
     - `'FixedOffsetTimeZone returns its offset; rejects offsets beyond ±1080'`;
     - `'DeviceTimeZone matches DateTime.toLocal for sample instants'` (self-consistent on any machine);
-    - `'rejects non-UTC input'`.
+    - `'rejects non-UTC input'`: `FixedOffsetTimeZone(120).offsetMinutesAt(DateTime(2026))`, `const DeviceTimeZone().offsetMinutesAt(DateTime(2026))` and `localWallClock(DateTime(2026), FixedOffsetTimeZone(0))` → `throwsArgumentError`.
   - `group('numbers mode')`:
     - `'cellNumber(n) == n, rejects n < 1'`.
   - `group('dates mode')`:
@@ -167,26 +167,32 @@
     - `daysAfterAnchor(139) == 138`;
     - `hoursAfterAnchor(52, stepHours: 4) == 204`;
     - n = 1 → 0;
-    - n < 1 rejected.
+    - n < 1 and `hoursAfterAnchor(2, stepHours: 0)` rejected.
   - `group('overflow')`:
-    - `'rejects results beyond DateTime's range (no silent overflow)'`: throws for `cellDate(anchor, 3000000000)`, `cellDate(anchor, 200000002)`, `cellMoment(anchor, 1000000001, stepHours: 4)`, `cellMoment(anchor, 1 << 31, stepHours: 1 << 30)` and `hoursAfterAnchor(1 << 31, stepHours: 1 << 30)`.
+    - `'rejects results beyond DateTime's range (no silent overflow)'`: throws for `cellDate(anchor, 3000000000)`, `cellDate(anchor, 200000002)`, `cellMoment(anchor, 1000000001, stepHours: 4)`, `cellMoment(anchor, 1 << 31, stepHours: 1 << 30)` and `hoursAfterAnchor(1 << 31, stepHours: 1 << 30)`. Also, with the far anchor `OffsetDateTime.parse('+275000-01-01T00:00Z')`: `cellDate(farAnchor, 50000001)` and `cellMoment(farAnchor, 600000001, stepHours: 4)` throw `ArgumentError` (wrap detected).
   - `group('today’s cell')`:
     - `'dates mode uses the local date (00:30 local, UTC date one day earlier)'` → 4;
     - `'dates mode across Feb 29: leap year 4, common year 3'`;
     - `'dates mode design reference: cell 209'`;
     - `'dates mode: the anchor day is cell 1; before the anchor is null'`;
     - `'travel: dates mode and its today cell keep the anchor's own date'` (1, then `null`);
-    - `'the dates-mode today cell displays today's local date'`: for `nowUtc` = 2026-03-27T21:30Z, 2026-03-27T20:30Z and 2026-10-24T22:30Z under `_DstZone`, `cellDate(anchor, todayCell)` equals the local date of `localWallClock(nowUtc, zone)`;
+    - `'the dates-mode today cell displays today's local date'`: anchor `2026-03-25T00:00+02:00`, under `_DstZone`. For `nowUtc` = 2026-03-27T21:30Z, 2026-03-27T20:30Z and 2026-10-24T22:30Z, the expected today cells are **4, 3 and 215**. In each case `cellDate(anchor, todayCell)` equals the local date of `localWallClock(nowUtc, zone)`;
     - `'date-and-time mode: whole blocks elapsed + 1'`: 52, 52, 53, and `now == anchor` → 1;
     - `'date-and-time mode: before the anchor is null'`: −1 min, −30 s and −1 µs;
     - `'date-and-time mode honours stepHours'`: `stepHours: 6`, now = anchor + 12 h → 3;
-    - `'rejects non-UTC now'`.
+    - `'date-and-time mode: huge stepHours does not overflow'`: design anchor, now = anchor + 204 h, `stepHours: 5124095576` → 1, and `stepHours: 1 << 62` → 1;
+    - `'rejects non-UTC now and stepHours: 0'` (for `nowCellInDateTimeMode`).
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/dates`. Expected: compilation FAIL (undefined symbols).
 - [ ] **Step 3: Implement.**
   - `cellDate`: `n − 1 > 100000000` → `ArgumentError`. Otherwise `final w = anchor.wallClock; DateTime.utc(w.year, w.month, w.day + n − 1)`, with a caught `ArgumentError` → `ArgumentError.value(n, 'n', 'date out of range')`.
   - `cellMoment` / `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked before multiplying. Then `anchor.instant.add(Duration(hours: stepHours * (n − 1)))`, catching `ArgumentError` (`RangeError` is a subclass).
   - Today's cell, dates mode: the local today is the date fields of `localWallClock(nowUtc, zone)`. The anchor date is **always** `anchor.wallClock`'s date, never derived through `zone`. Take the `inDays` difference between the two UTC-midnight dates, + 1; `null` if negative.
-  - Today's cell, date-and-time mode: `null` if `nowUtc.isBefore(anchor.instant)`. Otherwise `nowUtc.difference(anchor.instant).inMicroseconds ~/ (stepHours * Duration.microsecondsPerHour) + 1`.
+  - Today's cell, date-and-time mode: `null` if `nowUtc.isBefore(anchor.instant)`. Otherwise `nowUtc.difference(anchor.instant).inMicroseconds ~/ Duration.microsecondsPerHour ~/ stepHours + 1`.
+    - **Divide by hours first, then by `stepHours`.** This equals ⌊Δ / (stepHours · 1 h)⌋ for positive integers and never forms the product `stepHours * microsecondsPerHour`, which overflows int64 for very large uncapped steps. (Verified: the product form gives −6702 for `stepHours` 5124095576 and a division-by-zero error for 2^62; hour-first gives 1.)
+  - **Wrap check** (anchors near `DateTime`'s limits; the strict parser accepts 6-digit years):
+    - In `cellDate`, if the result is before `DateTime.utc(w.year, w.month, w.day)`, throw `ArgumentError.value(n, 'n', 'date out of range')`.
+    - In `cellMoment`, if `result.isBefore(anchor.instant)`, throw the same.
+    - With the absolute caps, any int64 wrap lands before every anchor that can wrap. Verified: anchor `+275000-01-01` wraps to −172659 / −35764 and is detected.
   - **Doc comments** state the decided time-zone rule (device zone, absolute steps, visible DST jump; dates mode calendar-only), the SQ-18 distance meaning, and cite NFR-A3 and the GAN-003 notes.
 - [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0.
 - [ ] **Step 5: Mutation proof.** Each change below must FAIL the suite; then restore:
@@ -233,7 +239,7 @@
   - Set `Status: Done` in the task file and `TASKS.md`, and tick the acceptance criteria. (The GAN-003, TST-012 and TST-013 notes are committed in the planning commits.)
   - Update `docs/PROGRESS.md`: the decided time-zone rule as a convention (NFR-A3), the decision rows, verification, and the next task.
   - **Propagate the time-zone decision:**
-    - In `TASKS.md`, mark the §6.2 DST item and the §5.4 "ZOD-WHL-011, ZOD-GAN-003 | DST-hour-jump planning constraint" row as resolved (2026-11-12, see the GAN-003 notes).
+    - In `TASKS.md`, mark the §6.2 DST item and the §5.4 "ZOD-WHL-011, ZOD-GAN-003 | DST-hour-jump planning constraint" row as resolved (2026-11-12, see the GAN-003 notes). Also update the R-4 row in §6.4, which still points to "§6.2's DST open item", to reference the 2026-11-12 decision.
     - Add a 2026-11-12 note to ZOD-DAT-005 and ZOD-DAT-009: per the GAN-003 time-zone decision, "identical / same anchor moment" means the same instant and offset. In date-and-time mode, the cells re-display in the device's current zone after travel; dates mode is unchanged.
     - Add a note to ZOD-SET-002: its read-only time-zone row is NFR-A3's "shown to the user" part of the decided rule.
   - Update GAN-003's implementation-details line 20 to `stepHours·(n−1)` and "decided 2026-11-12 (see Notes)".
@@ -251,3 +257,36 @@
 
 - **Real-device DST behaviour depends on the OS zone database** used by `DateTime.toLocal`. `DeviceTimeZone` is a thin wrapper, its self-consistency is tested here, and real-device checks belong to NFR/QA.
 - **The Excel export has no time zone** (spec line 256). It may show a different hour than the app on DST days. That's documented in the spec and owned by the XLS tasks.
+
+## Plan review
+
+Automatic plan review (`zodiann-development` → `plan-reviewer`), two rounds. Both rounds independently re-derived:
+- every reference value: design cells 1, 2, 52 and 169; dates-mode cell 139 and today cell 209; spring and autumn DST; leap-year sequences and today cells; block boundaries; travel;
+- the overflow behaviour of `DateTime` and `Duration` on Dart 3.14.
+
+**Round 1.** Verdict: *Needs user decision*.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| I1 | Important | No test for "today's cell … in a leap year" | **Applied:** leap-year today test (4 vs 3) and design today cell 209 / cell 139 |
+| I2 | Important | Large `n` / `stepHours` wrapped silently to wrong dates | **Applied:** guards checked before multiplying, plus an overflow test |
+| I3 | Important | Truncating to minutes returned cell 1 for `anchor − 30 s` | **Applied:** `isBefore` plus microseconds; −1 min / −30 s / −1 µs / equal tests; mutant (e) |
+| I4 | Important | Travel (anchor offset ≠ device zone) not pinned | **Applied:** travel tests, "today cell shows today's local date" invariant, mutant (f) |
+| I5 | Important | SQR-013 needs GAN-003's "N days/hours after the anchor" distance | **Applied:** `daysAfterAnchor` / `hoursAfterAnchor` (SQ-18) |
+| I6 | Important | L-12 English month-first order: owner unstated | **Applied:** owned by L10-010 (Out of scope + doc comment) |
+| I7 | Important | Time-zone decision not propagated to TASKS.md / DAT-005 / DAT-009 / SET-002 | **Applied:** in Task 3 close-out |
+| M1–M8 | Minor | Explicit anchors; required `stepHours`; Task 2 RED expectation; unpadded-year mutant; "05" rationale; `isUtc` carrier; offset/overflow validation; numbers-mode anchor → XLS-003 | **Applied** |
+| U1 | Needs user decision | `stepHours` upper cap | **Product owner:** no cap now (≥ 1, overflow guarded; SET-004 decides the UI range) |
+| U2 | Needs user decision | Which zone the anchor field shows in date-and-time mode | **Product owner:** device zone (recorded in ZOD-SQR-002 Notes) |
+
+**Round 2.** Verdict: *Approve after corrections*. All round-1 findings were confirmed resolved.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| I1 | Important | With uncapped `stepHours` (U1), the today-cell product `stepHours × µs/h` overflows (a negative cell, or division by zero) | **Applied:** divide by hours, then by `stepHours`; huge-`stepHours` test. **Independently verified by the orchestrator** (old form −6702 / `IntegerDivisionByZeroException`, new form 1) |
+| I2 | Important | Absolute guards miss anchors near `DateTime`'s limits (6-digit years wrap silently) | **Applied:** reject a result earlier than the anchor; far-anchor tests. **Independently verified by the orchestrator** (`+275000` anchor wraps to −172659 / −35764, detected) |
+| M1–M4 | Minor | Invariant test anchor and expected cells (4, 3, 215); which functions the non-UTC test covers; `stepHours: 0` rejection for every function; R-4 row in TASKS.md | **Applied** |
+
+Round-2 Important corrections were applied exactly as the reviewer specified, and their effect was verified by the orchestrator in a scratch run. The workflow allows at most two review rounds, so they weren't sent for a third.
+
+**Open items / needs user decision:** none.
