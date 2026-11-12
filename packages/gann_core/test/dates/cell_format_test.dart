@@ -11,6 +11,7 @@ void main() {
       DateTime.utc(2000, 1, 1): '1.1.00',
       DateTime.utc(2026, 11, 1): '1.11.26',
       DateTime.utc(2026, 10, 9): '9.10.26',
+      DateTime.utc(2024, 1, 14): '14.1.24',
     };
     cases.forEach((date, expected) {
       test('$date → $expected', () {

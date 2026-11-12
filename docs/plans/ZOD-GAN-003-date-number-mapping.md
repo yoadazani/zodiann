@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: 2 rounds; round-2 corrections applied and independently verified), awaiting approval · **Branch:** `task/ZOD-GAN-003-date-number-mapping` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: 2 rounds; round-2 corrections applied and independently verified); approved and implemented 2026-11-12 (see PROGRESS.md) · **Branch:** `task/ZOD-GAN-003-date-number-mapping` · **Written:** 2026-11-12
 
 **Goal:** Map a Square of Nine cell's spiral position `n` to the value it displays in each mode (number, calendar date, or date and time in fixed hour steps), find "today's" cell, and format dates as `d.m.yy` and times as `HH:MM`. The mapping follows the spec's "Dates" rules and the product owner's time-zone decision.
 

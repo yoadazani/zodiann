@@ -302,6 +302,18 @@ void main() {
       );
     });
 
+    test('dates mode across a year end', () {
+      // 2026-12-31T22:30Z is 00:30 on 1.1.27 at +02:00.
+      expect(
+        todayCellInDatesMode(
+          at('2026-12-30T00:00+02:00'),
+          DateTime.utc(2026, 12, 31, 22, 30),
+          israelNov,
+        ),
+        3,
+      );
+    });
+
     test('dates mode design reference: cell 209', () {
       expect(
         todayCellInDatesMode(
