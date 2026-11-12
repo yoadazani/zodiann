@@ -64,18 +64,6 @@ final _newYork2026 = _Zone2026(
   DateTime.utc(2026, 11, 1, 6),
 );
 
-final class _Fixed implements LocalTimeZone {
-  const _Fixed(this.offsetMinutes);
-
-  final int offsetMinutes;
-
-  @override
-  int offsetMinutesAt(DateTime utc) {
-    if (!utc.isUtc) throw ArgumentError.value(utc, 'utc', 'must be UTC');
-    return offsetMinutes;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Test-local Gregorian calendar (records, no DateTime date arithmetic).
 
