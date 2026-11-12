@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-TST-002-mean-node-exactness` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), awaiting approval · **Branch:** `task/ZOD-TST-002-mean-node-exactness` · **Written:** 2026-11-12
 
 **Goal:** Independently verify ZOD-EPH-001's production mean-node formula (T-EPH-2). Check it against a separately implemented reference on a shared, versioned reference date set, prove it detects coefficient changes, and confirm the spec's ~0.01° accuracy bound against the full Meeus formula over ±100 years.
 
@@ -73,7 +73,7 @@ packages/astro_core/lib/src/ephemeris/
 
 Both test files carry a header comment: "Run from `packages/astro_core` (as `melos exec` / `melos run test` do). The fixture path is relative to the package."
 
-- [ ] **Step 1: Write the fixture-shape test** (`group('reference_dates.json')`). It loads `File('test/fixtures/reference_dates.json')`, `jsonDecode`s it, and checks:
+- [ ] **Step 1: Write the fixture-shape test** (`group('reference_dates.json')`). It loads `File('test/fixtures/reference_dates.json')`, `jsonDecode`s it, and reads the dates as `(json['dates'] as List<dynamic>).cast<String>()`. Both test files do this, because `strict-casts` is enabled. It checks:
   - `'has an integer version ≥ 1'`.
   - `'contains every v1 shared instant unchanged'`: the test file holds `const _v1Instants` (the 53 strings from the decision table) and asserts `dates.toSet().containsAll(_v1Instants)`. A version bump keeps passing, but dropping or editing a v1 instant fails.
   - `'has at least 50 unique instants'`: `dates.length >= 50` and `dates.toSet().length == dates.length`.
@@ -123,6 +123,8 @@ Both test files carry a header comment: "Run from `packages/astro_core` (as `mel
   - (a) `mean_node.dart`, in `meanAscendingNodeAt`'s "Accuracy" paragraph: "This bound is pending independent verification by T-EPH-2 (ZOD-TST-002)." → "This bound is verified by T-EPH-2 (ZOD-TST-002): the maximum deviation from the full Meeus formula over ±100 years around 2000 (same `T`, sampled daily) is 0.0021°."
   - (b) `ephemeris_port.dart`, in the `meanAscendingNode` bullet: "…around 2000; this bound is pending independent verification by T-EPH-2 (ZOD-TST-002)." → "…around 2000; T-EPH-2 (ZOD-TST-002) verified a maximum deviation of 0.0021°."
   - (c) `ephemeris_port.dart`, at the end of the `meanAscendingNode` doc: "Independent verification of the formula and its accuracy bound: T-EPH-2 (ZOD-TST-002), pending." → "Independent verification of the formula and its accuracy bound: T-EPH-2 (ZOD-TST-002)."
+
+  The "from" text spans several `///` lines in the source. Match it while ignoring line breaks and `///` prefixes. Re-wrap the new text to ≤ 80 columns in the existing `///` style, because `dart format` doesn't re-wrap comments.
 - [ ] **Step 2:** Run `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: both exit 0.
 - [ ] **Step 3:** Whole-branch code review (`requesting-code-review`), then resolve any important findings. Re-run Step 2 (`verification-before-completion`).
 - [ ] **Step 4:**
@@ -143,3 +145,28 @@ Both test files carry a header comment: "Run from `packages/astro_core` (as `mel
 
 - **TST-001 may want more instants.** It edits the same `reference_dates.json` (add-only) and increments `version`. A version bump keeps the path and passes the v1-subset test, while dropping or editing a v1 instant fails it.
 - **Meeus defines T in TT.** It's documented. ΔT (about 64 s) shifts Ω by about 4e-5°, which is irrelevant at the 0.01° bound.
+
+## Plan review
+
+Automatic plan review (`zodiann-development` → `plan-reviewer`), two rounds.
+
+**Round 1.** Verdict: *Approve after corrections*. It ran as a general-purpose fallback with the `plan-reviewer.md` instructions, because the agent type wasn't loaded yet in this session. The reviewer independently re-derived the 53 instants, the JD values, T = ±1, the 0.0021292° maximum, the 8.2e-12° method difference, and every mutation effect.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| I1 | Important | `reference_dates.v1.json` versioning conflicted with TST-001's add-only / version-bump rule, and nothing stopped shared instants being dropped or changed | **Applied:** single path `reference_dates.json` with the version in the content, plus a `'contains every v1 shared instant unchanged'` test |
+| M1 | Minor | Doc replacement text in Task 3 wasn't verbatim | **Applied:** three exact replacements (a)–(c) |
+| M2 | Minor | The 0.0021° figure for the docs wasn't pinned by a test | **Applied:** `closeTo(0.00213, 1e-5)` |
+| M3 | Minor | Fixture shape checks looser than the design (any 1899 date; lenient `DateTime.parse`) | **Applied:** strict canonical regex with re-format equality, the T = ±1 window, chronological order |
+| M4 | Minor | Bound-mutation wording imprecise | **Applied:** "≈ 0.0121° at T = +1" |
+| M5 | Minor | Stale close-out step (notes already committed) | **Applied** |
+| M6 | Minor | Working-directory-relative fixture path | **Applied:** header comment |
+
+**Round 2.** Verdict: **Approve** (dedicated `plan-reviewer` agent). All round-1 findings were confirmed resolved, with no new Critical or Important issues.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| M1 | Minor | Task 3 "from" sentences span several `///` lines, so they need re-wrapping | **Applied:** matching and re-wrapping note added to Task 3 Step 1 |
+| M2 | Minor | `strict-casts` requires an explicit cast of the decoded list | **Applied:** `(json['dates'] as List<dynamic>).cast<String>()` in Task 1 Step 1 |
+
+**Open items / needs user decision:** none.
