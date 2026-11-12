@@ -1,2 +1,8 @@
 /// Shared UI building blocks: buttons, drawer and design tokens.
 library;
+
+export 'src/theme/aspect_colors.dart';
+export 'src/theme/body_colors.dart';
+export 'src/theme/square_colors.dart';
+export 'src/theme/zodiac_colors.dart';
+export 'src/theme/zodiann_surfaces.dart';
