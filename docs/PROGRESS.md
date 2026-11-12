@@ -77,7 +77,11 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 ## Verification
 
 _No implementation verification yet._ Version checks performed on 2026-11-12:
-- Installed: Flutter 3.27.1 / Dart 3.6.0 (global, `C:\Program Files\flutter`). Melos and FVM not installed.
+- Installed: Flutter 3.27.1 / Dart 3.6.0, global at `C:\Program Files\flutter` (verified via `where.exe` and `flutter --version --machine`; `C:\develop\flutter` does not exist, `FLUTTER_ROOT` unset). Melos and FVM are not installed.
+- Symlinks: non-elevated session, no `SeCreateSymbolicLinkPrivilege`, Developer Mode off. `mklink /D` and Dart `Link.createSync` fail (errno 1314); junctions succeed. FVM 4.3.2 has no junction fallback.
+- Melos 8.10.1 source: script `packageFilters` with zero matches throw; an empty `melos exec` selection exits 0; `sdkPath` is applied to child-process `PATH`; `useRootAsPackage` is supported.
+- `dart pub deps --json` workspace format probed on a scratch workspace; closure rule proven (see the plan's Verified fact 4).
+- Flutter 3.50.0 exact pins: `test_api 0.7.14`, `matcher 0.12.20`, `material_color_utilities 0.13.0`. No conflicts with Melos, `lints` or `flutter_lints`; `test` held at 1.32.0.
 - Latest stable: Flutter 3.50.0 / Dart 3.14.0 (official release feed), Melos 8.10.1, FVM 4.3.2, `lints` 6.1.0, `flutter_lints` 6.0.0, `test` 1.33.0 (1.32.0 selected, see Technical Decisions).
 
 ## Git State
