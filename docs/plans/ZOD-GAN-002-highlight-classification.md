@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-GAN-002-highlight-classification` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), awaiting approval · **Branch:** `task/ZOD-GAN-002-highlight-classification` · **Written:** 2026-11-12
 
 **Goal:** Classify every Square of Nine cell into blue (axis), yellow (diagonal) or gray (eighth), or none, exactly as the spec defines it. Do it in strict priority order, using float-free integer arithmetic on the spiral's `i` and `k`. Then link each category to its default highlight rule, so the UI and export take colors from the square's rules.
 
@@ -37,7 +37,7 @@
 - **Position, not value.** Classification is a property of the spiral *position*: `spiralCell(n)`, where `n` is the cell's position index and 1 is the center. It never depends on the displayed number or date.
   - This follows the spec's working assumption that highlights don't move when the numbers-mode anchor changes (spec "Export with live formulas", EX-11; TASKS.md §6.2 open item).
   - It also follows the spec's discrete ring angle (spec "Gann spiral", last paragraph: continuous vs. discrete angle is an open question).
-  - If either open decision is resolved differently, this function's contract changes. That change belongs to XLS-003 and to the decision itself, not to this task.
+  - If either open decision is resolved differently, this function's contract changes. That change belongs to the decision itself (and, for the numeric-anchor question, to XLS-003), not to this task.
 - Out of scope:
   - Drawing / fills / marks (→ SQR-006/007).
   - The center and today markers (→ SQR-008/009).
@@ -138,7 +138,7 @@ packages/gann_core/test/spiral/spiral_test.dart  + isCenter test
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/highlight test/spiral`. Expected: compilation FAIL (`classifyHighlight`, `HighlightCategory`, `highlightRuleFor` and `isCenter` are undefined).
 - [ ] **Step 3: Implement** per the Interfaces and the decision table. The doc comments cite the spec rules (SQ-12 … SQ-15) and the EXT-008 boundary. The `classifyHighlight` doc comment states that the argument is the cell's spiral **position** (n = 1 is the center), not the anchor-shifted displayed value, and cites the open numeric-anchor decision (TASKS.md §6.2).
 - [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0. Expected counts: `test/highlight` has 12 tests (9 `classifyHighlight` + 1 `HighlightCategory` + 2 `highlightRuleFor`), and `test/spiral` has 24 (23 existing + `isCenter`).
-- [ ] **Step 5: Mutation proof** (priority, AC 3). Temporarily make each change below in `classifyHighlight`, confirm the suite FAILS each time, then restore and check that `git diff packages/gann_core/lib` shows only the intended changes:
+- [ ] **Step 5: Mutation proof** ((a)–(c) priority, AC 3; (d)–(e) input and gray-rule coverage). Temporarily make each change below in `classifyHighlight`, confirm the suite FAILS each time, then restore and check that `git diff packages/gann_core/lib` shows only the intended changes:
   - (a) swap the yellow and gray checks;
   - (b) check yellow before blue;
   - (c) change `2*k` to `k` in the blue test;
@@ -169,3 +169,35 @@ packages/gann_core/test/spiral/spiral_test.dart  + isCenter test
 - **EXT-008 rule evaluation:** user rules on arbitrary angles need exact matching on θ = 45°·i/k. Recorded in EXT-008's notes. The default-rule equivalence test here shows today's defaults match the fixed classifier.
 - **A square missing a default rule:** `highlightRuleFor` returns `null`, so no highlight is shown. Defined behaviour, with no crash.
 - **Numeric-anchor / continuous-angle open decisions** (TASKS.md §6.2, spec "Gann spiral"): if the product owner chooses value-based highlights, consumers would need a different input. This is documented on `classifyHighlight`.
+
+## Plan review
+
+Automatic plan review (`zodiann-development` → `plan-reviewer`), two rounds. Both rounds independently re-derived:
+- the geometric oracle (0 mismatches over 61×61);
+- the Appendix B counts;
+- every named cell;
+- the default-rule equivalence.
+
+Round 2 also ran the new literal-angle test against the real `gann_core` (0 mismatches).
+
+**Round 1.** Verdict: *Approve after corrections*.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| I1 | Important | The plan never said that classification is by spiral **position**, not the displayed value. The spec's numeric-anchor working assumption (EX-11, TASKS.md §6.2) and the continuous-angle question are open, so a consumer could classify the displayed number in numbers mode with anchor ≠ 1 | **Applied:** "Position, not value" global constraint, a `classifyHighlight` doc-comment requirement, and a Risks entry |
+| M1 | Minor | No literal-angle assertion for AC 2 | **Applied:** a literal-angle test over 61×61 |
+| M2 | Minor | "Lowest priority first" was ambiguous | **Applied:** ascending `priority`; the first match decides |
+| M3 | Minor | The `highlightRuleFor` partial-list test asserted too little | **Applied:** plus a note that ids are unique |
+| M4 | Minor | Appendix B values weren't literal | **Applied** |
+| M5 | Minor | The mutation proof covered only priority | **Applied:** mutants (d) and (e) |
+| M6 | Minor | No expected test counts | **Applied:** 12 + 24 (the orchestrator corrected its own count from 13 to 12) |
+| M7 | Minor | No Plan review record | **Applied:** this section |
+
+**Round 2.** Verdict: **Approve**. All round-1 findings were confirmed resolved, with no new Critical or Important issues.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| M1 | Minor | The continuous-angle decision isn't XLS-003's; only the numeric-anchor one is | **Applied:** wording corrected |
+| M2 | Minor | The Step 5 heading implied all mutants test priority | **Applied:** heading clarified |
+
+**Open items / needs user decision:** none.
