@@ -40,7 +40,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision): the shared reference **date set** is defined by [ZOD-TST-002](ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md), as a versioned fixture in `packages/astro_core/test/fixtures/`. This task reuses those UTC instants for its JPL Horizons queries, so T-EPH-1 and T-EPH-2 run on the same dates. It may **add** instants (for example inside each body's retrograde windows, which the node's date set doesn't need), but must not drop or change the shared ones. If it does add instants, bump the fixture version.
 
 ---
 

@@ -29,7 +29,9 @@ const _microsecondsPerCentury = 36525 * Duration.microsecondsPerDay;
 ///
 /// **Accuracy:** the spec states an expected deviation of less than 0.01°
 /// from the full formula over two hundred years around 2000. This bound is
-/// pending independent verification by T-EPH-2 (ZOD-TST-002).
+/// verified by T-EPH-2 (ZOD-TST-002): the maximum deviation from the full
+/// Meeus formula over ±100 years around 2000 (same `T`, sampled daily) is
+/// 0.0021°.
 ///
 /// Throws [ArgumentError] if [utc] is not UTC.
 EclipticPosition meanAscendingNodeAt(DateTime utc) {

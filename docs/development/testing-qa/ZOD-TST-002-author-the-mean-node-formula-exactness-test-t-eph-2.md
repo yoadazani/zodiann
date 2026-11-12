@@ -6,12 +6,12 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
 
-Dedicated test verifying [ZOD-EPH-001](../computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md)'s node formula matches the spec's closed form exactly (within the defined accuracy range) on the same date set as T-EPH-1.
+Dedicated test verifying [ZOD-EPH-001](../computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md)'s node formula matches the spec's closed form exactly (within the defined accuracy range) on the same date set as T-EPH-1. **This task defines that shared date set** (a versioned fixture of ≥50 UTC instants across 1900–2100, matching ACC-1's shape), and [ZOD-TST-001](ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md) reuses it. See Notes.
 
 ## Implementation Details
 
@@ -26,9 +26,9 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] Expected values come from a separately implemented reference formula in the test. The production helpers are never called to compute them.
-- [ ] Test fails if the formula's coefficients (`125.04452`, `1934.136261`) are altered in the production code. This is verified by temporarily altering each coefficient and observing the failure.
-- [ ] Passes within the documented ~0.01° accuracy bound against the full Meeus mean-node formula over ±100 years around 2000-01-01 12:00 UTC.
+- [x] Expected values come from a separately implemented reference formula in the test. The production helpers are never called to compute them.
+- [x] Test fails if the formula's coefficients (`125.04452`, `1934.136261`) are altered in the production code. This is verified by temporarily altering each coefficient and observing the failure.
+- [x] Passes within the documented ~0.01° accuracy bound against the full Meeus mean-node formula over ±100 years around 2000-01-01 12:00 UTC.
 
 ## Dependencies
 
@@ -41,6 +41,7 @@ No direct design reference applies.
 ## Notes
 
 - 2026-11-12 (product-owner decision): this task owns the dedicated T-EPH-2 verification of the node formula implemented in ZOD-EPH-001, whose own criterion was amended to point here. It **depends on ZOD-EPH-001** (and not the reverse) and is planned and delivered separately.
+- 2026-11-12 (product-owner decision): T-EPH-1's dataset (ZOD-TST-001) is blocked behind ZOD-EPH-002 and ZOD-FND-003. So instead of waiting for it, **this task defines the shared reference date set**: a versioned JSON fixture of ≥50 UTC instants across 1900–2100, including year boundaries and the J2000 epoch, matching ACC-1's shape. ZOD-TST-001 reuses these instants for its JPL Horizons queries. ZOD-TST-001 is **not** a dependency of this task.
 
 ---
 

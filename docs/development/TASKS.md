@@ -288,7 +288,7 @@ The spec's principle is explicit: **every formula requires an automated test tha
 | ID | Task | Priority | Status |
 |---|---|---|---|
 | ZOD-TST-001 | [Build the JPL Horizons reference dataset (T-EPH-1 / ACC-1)](testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md) | Critical | Not Started |
-| ZOD-TST-002 | [Author the mean-node formula exactness test (T-EPH-2)](testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md) | Critical | Not Started |
+| ZOD-TST-002 | [Author the mean-node formula exactness test (T-EPH-2)](testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md) | Critical | Done |
 | ZOD-TST-003 | [Author the retrograde-marking regression test (T-EPH-3)](testing-qa/ZOD-TST-003-author-the-retrograde-marking-regression-test-t-eph-3.md) | High | Not Started |
 | ZOD-TST-004 | [Author the double-precession regression test (T-EPH-1 guard / ACC-5)](testing-qa/ZOD-TST-004-author-the-double-precession-regression-test-t-eph-1-guard-acc-5.md) | Critical | Not Started |
 | ZOD-TST-005 | [Author the astronomy-engine backup comparison suite (ACC-2)](testing-qa/ZOD-TST-005-author-the-astronomy-engine-backup-comparison-suite-acc-2.md) | High | Not Started |
