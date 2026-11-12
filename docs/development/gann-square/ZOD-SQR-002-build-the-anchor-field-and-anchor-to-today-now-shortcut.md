@@ -42,7 +42,7 @@ Build the mode-dependent anchor input (hidden in numbers mode) and its shortcut 
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision, during ZOD-GAN-003 planning): in **date-and-time mode** the anchor field shows the anchor in the **device's current time zone**, so it always matches the center cell. Follow ZOD-GAN-003's time-zone rule: cells are shown in the device zone, with absolute steps. Example: after travelling to London, a saved `1.11.2026 00:00 (+02:00)` anchor shows as `31.10.2026 22:00`. In **dates mode** the field shows the anchor's own calendar date, which is unaffected by travel.
 
 ---
 

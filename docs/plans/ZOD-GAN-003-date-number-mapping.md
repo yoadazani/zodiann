@@ -29,6 +29,9 @@
    - **Dates mode** uses the anchor's own calendar date plus whole days.
    - The anchor's saved offset (DATA-4) preserves the exact anchor instant.
 
+3. **`stepHours` has no upper cap** (from plan review round 1): GAN-003 requires only `≥ 1`, with overflow guarded. SET-004 decides the UI range later.
+4. **Anchor field in date-and-time mode** (from plan review round 1; built in ZOD-SQR-002, no GAN-003 code): the field shows the anchor in the **device's zone**, so it always matches the center cell. Recorded in ZOD-SQR-002's notes.
+
 ## Global Constraints
 
 - Pure Dart in `gann_core` (ARCH-2), no new dependencies. Follow `docs/PROGRESS.md` → Architecture Conventions (data model, spiral, highlights).
@@ -58,7 +61,7 @@
 | Time-zone abstraction | `abstract interface class LocalTimeZone { int offsetMinutesAt(DateTime utc); }`. Implementations: `DeviceTimeZone` (const; offset of `DateTime.fromMicrosecondsSinceEpoch(utc.microsecondsSinceEpoch).timeZoneOffset`) and `FixedOffsetTimeZone(int offsetMinutes)`, which requires the offset within ±1080 (`OffsetDateTime.maxOffsetMinutes`), otherwise `ArgumentError` | The device zone is the decided rule. Injecting it makes DST behaviour testable with a fake zone. `FixedOffsetTimeZone` serves tests and future consumers |
 | Calendar date carrier | A date is returned as a **UTC-flagged `DateTime` at 00:00** holding the calendar fields (`DateTime.utc(y, m, d)`), documented as date-only: "never call `toLocal()` on it; the fields are the calendar date". `formatCellDate` / `formatCellTime` **require `isUtc`** (`ArgumentError` otherwise) and read only the fields | No new type. `DateTime.utc` normalises month and leap-year overflow (Feb 29) without any zone involvement |
 | Wall clock | `DateTime localWallClock(DateTime utcInstant, LocalTimeZone zone)` returns a UTC-flagged `DateTime` holding the local fields (instant + offset), like `OffsetDateTime.wallClock`. An out-of-range `add` → `ArgumentError` | One convention for "local fields" across `gann_core` |
-| `stepHours` | **Required** named parameter `{required int stepHours}` (no default). Callers pass `config.stepHours` | A default of 4 would silently ignore a square's edited step (SET-004 / T-EX-3) |
+| `stepHours` | **Required** named parameter `{required int stepHours}` (no default). Callers pass `config.stepHours`. **No upper cap** (product-owner decision 2026-11-12): only `≥ 1`, and the overflow guard rejects impossible values. SET-004 decides the UI's allowed range | A default of 4 would silently ignore a square's edited step (SET-004 / T-EX-3) |
 | Overflow guard | `cellDate`: `n − 1 > 100000000` → `ArgumentError` (DateTime's whole range is ±100,000,000 days), then catch any remaining `ArgumentError`. `cellMoment` and `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked **before** multiplying, then catch `ArgumentError` / `RangeError` | `DateTime.utc(…, d + huge)` and `Duration(hours: huge)` wrap silently to wrong dates rather than throwing (verified in review) |
 | "Now" | Passed in as `DateTime nowUtc` | Pure and deterministic; the UI supplies `DateTime.now().toUtc()` |
 | Before the anchor | The today-cell functions return `null` when today or now is before the anchor | SQ-6 shows a message instead. `null` lets the UI do that, with no exception |
