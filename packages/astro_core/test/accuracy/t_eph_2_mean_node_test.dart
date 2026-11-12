@@ -64,6 +64,20 @@ double _wrap180(double degrees) {
   return (r < 0 ? r + 360 : r) - 180;
 }
 
+/// The full Meeus mean-node formula (Astronomical Algorithms, eq. 47.7) — the
+/// "full formula" the spec's < 0.01° claim refers to.
+///
+/// Compared at the same T as production (Julian centuries from the UTC
+/// instant). Meeus defines T in terrestrial time; ΔT (≈ 64 s around 2000)
+/// shifts Ω by ≈ 4e-5°, far below the 0.01° bound, so the formula
+/// comparison is unaffected.
+double _meeusOmega(double t) =>
+    125.0445479 -
+    1934.1362891 * t +
+    0.0020754 * t * t +
+    t * t * t / 467441 -
+    t * t * t * t / 60616000;
+
 List<DateTime> _referenceDates() {
   final json = jsonDecode(
     File('test/fixtures/reference_dates.json').readAsStringSync(),
@@ -104,6 +118,49 @@ void main() {
           -1934.136261 / 36525,
           reason: '$t',
         );
+      }
+    });
+  });
+
+  group('T-EPH-2: accuracy bound vs full Meeus formula', () {
+    final epoch = DateTime.utc(2000, 1, 1, 12);
+    const daysPerCentury = 36525;
+
+    double deviation(DateTime utc) => _wrap180(
+      meanAscendingNodeAt(utc).longitude -
+          _norm360(_meeusOmega(_centuriesSinceJ2000(utc))),
+    ).abs();
+
+    test('the sweep reaches exactly T = −1 and T = +1', () {
+      final first = epoch.add(const Duration(days: -daysPerCentury));
+      final last = epoch.add(const Duration(days: daysPerCentury));
+
+      expect(first, DateTime.utc(1899, 12, 31, 12));
+      expect(last, DateTime.utc(2100, 1, 1, 12));
+      expect(_centuriesSinceJ2000(first), -1.0);
+      expect(_centuriesSinceJ2000(last), 1.0);
+    });
+
+    test('deviates from the full formula by less than 0.01° over ±100 years (daily)', () {
+      var max = 0.0;
+      var atDay = 0;
+      for (var i = -daysPerCentury; i <= daysPerCentury; i++) {
+        final d = deviation(epoch.add(Duration(days: i)));
+        if (d > max) {
+          max = d;
+          atDay = i;
+        }
+      }
+
+      expect(max, lessThan(0.01), reason: 'max $max° at day $atDay');
+      // Pins the figure stated in the production docs (0.0021°) and proves
+      // this is a real comparison, not production against itself.
+      expect(max, closeTo(0.00213, 1e-5), reason: 'max $max° at day $atDay');
+    });
+
+    test('is within the bound on every reference date', () {
+      for (final t in dates) {
+        expect(deviation(t), lessThan(0.01), reason: '$t');
       }
     });
   });
