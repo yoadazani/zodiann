@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), awaiting approval · **Branch:** `task/ZOD-TST-011-gann-ring-counts-suite` (from `main` @ `3a447d5`) · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), approved and implemented 2026-11-12 (see PROGRESS.md) · **Branch:** `task/ZOD-TST-011-gann-ring-counts-suite` (from `main` @ `3a447d5`) · **Written:** 2026-11-12
 
 **Goal:** Verify, independently of production, the blue / yellow / gray counts per ring and the 9×9 total (T-GAN-2) against Appendix B's literal ring table. Back it with a mutation proof that catches any changed classification rule or priority order.
 
