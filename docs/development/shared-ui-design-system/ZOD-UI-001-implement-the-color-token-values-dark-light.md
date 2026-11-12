@@ -42,7 +42,7 @@ Fill the `ThemeExtension` skeleton from [ZOD-FND-013](../foundations-architectur
 
 ## Notes
 
-_No additional notes._
+Prepared by ZOD-FND-013: the extension types (`ZodiannSurfaces`, `SquareColors`, `ZodiacColors`, `AspectColors`, `BodyColors`), their `tokens` maps (exact MASTER names, for the swatch harness) and the theme wiring exist in `packages/shared_ui`. This task replaces the right-hand sides in `packages/shared_ui/lib/src/theme/tokens/graphite_tokens.dart` / `porcelain_tokens.dart` with MASTER §2's literal values and deletes `placeholder_tokens.dart`. `signTintOpacity` already carries MASTER's 0.10 / 0.09 (FND-013); keep them. The color-literal guard allows literals only in that `tokens/` directory.
 
 ---
 

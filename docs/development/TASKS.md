@@ -81,7 +81,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 | ZOD-FND-010 | [Research and document the Swiss Ephemeris license decision](foundations-architecture/ZOD-FND-010-research-and-document-the-swiss-ephemeris-license-decision.md) | Critical | Not Started |
 | ZOD-FND-011 | [Decide and document the ephemeris data-file coverage range](foundations-architecture/ZOD-FND-011-decide-and-document-the-ephemeris-data-file-coverage-range.md) | High | Not Started |
 | ZOD-FND-012 | [Define `UserSettings`, `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes](foundations-architecture/ZOD-FND-012-define-usersettings-squareconfig-highlightrule-crossing-dart-data.md) | Critical | Done |
-| ZOD-FND-013 | [Establish the design-token theme skeleton (dark + light `ColorScheme`)](foundations-architecture/ZOD-FND-013-establish-the-design-token-theme-skeleton-dark-light-colorscheme.md) | Critical | Not Started |
+| ZOD-FND-013 | [Establish the design-token theme skeleton (dark + light `ColorScheme`)](foundations-architecture/ZOD-FND-013-establish-the-design-token-theme-skeleton-dark-light-colorscheme.md) | Critical | Done |
 | ZOD-FND-014 | [Set up `go_router` navigation scaffold](foundations-architecture/ZOD-FND-014-set-up-go-router-navigation-scaffold.md) | High | Not Started |
 
 ### Computation Engine (`computation-engine/`)
