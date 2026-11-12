@@ -37,7 +37,7 @@
 
 | Topic | Decision | Reason |
 |---|---|---|
-| Fixture location and format | `packages/astro_core/test/fixtures/reference_dates.v1.json`: `{"version": 1, "description": "...", "dates": ["<ISO-8601 UTC, …Z>", …]}` | It lives next to the tests that use it. The version is in both the filename and the content, so TST-001 can bump it when it adds instants |
+| Fixture location and format | `packages/astro_core/test/fixtures/reference_dates.json`: `{"version": 1, "description": "...", "dates": ["<ISO-8601 UTC, …Z>", …]}`. The version lives **in the content only**. TST-001 edits this same file, adds instants and increments `version`, so every consumer keeps one path | One path for every consumer. The `version` field records add-only revisions. A test pins the v1 instants so they can't be dropped or changed |
 | Date set (53 instants, all UTC) | Start of every 5th year 1900…2100 at 00:00 (41) · year-end boundaries `YYYY-12-31T23:59:59Z` for 1950, 1999, 2000, 2024, 2099 (5) · J2000 `2000-01-01T12:00:00Z` · the ±100-year ends `1899-12-31T12:00:00Z` (T = −1) and `2100-01-01T12:00:00Z` (T = +1) · four mid-year instants `1912-06-30T06:00:00Z`, `1969-07-20T20:17:00Z`, `2026-11-12T00:00:00Z`, `2061-07-28T18:30:00Z` | ACC-1's shape: ≥ 50 dates, 1900–2100, near year boundaries. J2000 and T = ±1 pin the epoch and the bound's ends. Retrograde windows don't apply to the node; TST-001 adds them for the physical bodies |
 | Independent JD | Meeus *Astronomical Algorithms* ch. 7, the Gregorian calendar-to-JD algorithm from the date fields (`Y`, `M`, `D` + day fraction) | A different method from production's microseconds-since-epoch, so an epoch or unit slip in either one shows up as a mismatch |
 | Exactness tolerance | `1e-9°` | Floating-point differences between the two `T` methods are about 1e-11°. A last-digit change to either coefficient shifts Ω by ≥ 1e-6° at \|T\| ≈ 1 (≥ 1e-5° for the epoch constant) |
@@ -48,7 +48,7 @@
 
 ```
 packages/astro_core/test/
-  fixtures/reference_dates.v1.json        shared reference date set (53 UTC instants), reused by TST-001
+  fixtures/reference_dates.json           shared reference date set (version 1: 53 UTC instants), reused by TST-001
   accuracy/reference_dates_test.dart      validates the fixture's shape
   accuracy/t_eph_2_mean_node_test.dart    T-EPH-2: independent reference + Meeus bound
 packages/astro_core/lib/src/ephemeris/
@@ -58,7 +58,7 @@ packages/astro_core/lib/src/ephemeris/
 ## Review Focus
 
 1. **Self-validation:** a test that derives its expectation from production code can't catch production bugs. The `show meanAscendingNodeAt` import and literal reference coefficients make reuse a compile error. Pinned in Task 1.
-2. **A fixture that silently shrinks or drifts** (fewer than 50 dates, local-time strings, duplicates, out-of-range years) would weaken T-EPH-2 and TST-001. Pinned by the Task 1 fixture-shape test.
+2. **A fixture that silently shrinks or drifts** (a dropped or edited shared instant, fewer than 50 dates, local-time or non-canonical strings, duplicates, instants outside T = ±1) would weaken T-EPH-2 and TST-001. Pinned by the Task 1 fixture-shape tests, including the v1-subset test.
 3. **Coefficient changes slipping through:** the suite must fail when either production coefficient changes by one digit in the last place. Proven by mutation in Task 1.
 4. **A wrong ±100-year sweep** (wrong T range, or comparing without angular wrap near 0°/360°) could falsely pass or fail the bound. Pinned in Task 2: wrapped differences, the T = ±1 endpoints asserted, and a mutation proof.
 5. **Wording drift:** once verified, the docs must state the measured result. Before verification they must not claim it. Covered by Task 3.
@@ -67,20 +67,23 @@ packages/astro_core/lib/src/ephemeris/
 
 ### Task 1: Reference date set + T-EPH-2 exactness against an independent reference
 
-**Files:** create `test/fixtures/reference_dates.v1.json`, `test/accuracy/reference_dates_test.dart`, `test/accuracy/t_eph_2_mean_node_test.dart` (all in `packages/astro_core`).
+**Files:** create `test/fixtures/reference_dates.json`, `test/accuracy/reference_dates_test.dart`, `test/accuracy/t_eph_2_mean_node_test.dart` (all in `packages/astro_core`).
 
 **Interfaces:** consumes `meanAscendingNodeAt(DateTime) → EclipticPosition` (EPH-001) only.
 
-- [ ] **Step 1: Write the fixture-shape test** (`group('reference_dates.v1.json')`). It loads `File('test/fixtures/reference_dates.v1.json')`, `jsonDecode`s it, and checks:
-  - `'is version 1'`: `version == 1`.
-  - `'has at least 50 unique UTC instants'`: `dates.length >= 50` and `dates.toSet().length == dates.length`.
-  - `'every entry is a canonical UTC instant'`: each string ends with `Z` and `DateTime.parse(s).isUtc`.
-  - `'covers 1900–2100 with the J2000 epoch, the ±100-year ends and year boundaries'`:
-    - Every year is in 1899…2100.
-    - It contains `2000-01-01T12:00:00Z`, `1899-12-31T12:00:00Z` and `2100-01-01T12:00:00Z`.
-    - At least 3 entries match `-12-31T23:59:59Z`.
+Both test files carry a header comment: "Run from `packages/astro_core` (as `melos exec` / `melos run test` do). The fixture path is relative to the package."
+
+- [ ] **Step 1: Write the fixture-shape test** (`group('reference_dates.json')`). It loads `File('test/fixtures/reference_dates.json')`, `jsonDecode`s it, and checks:
+  - `'has an integer version ≥ 1'`.
+  - `'contains every v1 shared instant unchanged'`: the test file holds `const _v1Instants` (the 53 strings from the decision table) and asserts `dates.toSet().containsAll(_v1Instants)`. A version bump keeps passing, but dropping or editing a v1 instant fails.
+  - `'has at least 50 unique instants'`: `dates.length >= 50` and `dates.toSet().length == dates.length`.
+  - `'every entry is a canonical UTC instant'`:
+    - Each string matches `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$`.
+    - Re-formatting the parsed value's fields to that pattern gives back the same string. This rejects impossible dates that `DateTime.parse` would silently normalize, such as Feb 30.
+  - `'stays within the T = ±1 window'`: every instant is within [`1899-12-31T12:00:00Z`, `2100-01-01T12:00:00Z`].
+  - `'is in strictly chronological order'`.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=astro_core -- dart test test/accuracy/reference_dates_test.dart`. Expected: FAIL (the fixture file doesn't exist).
-- [ ] **Step 3:** Create the fixture with exactly the 53 instants in the decision table, in chronological order, plus a `description` naming T-EPH-2 / ACC-1, ZOD-TST-002 as owner, and the TST-001 reuse rule.
+- [ ] **Step 3:** Create the fixture with `"version": 1` and exactly the 53 instants in the decision table, in chronological order. Add a `description` naming T-EPH-2 / ACC-1, ZOD-TST-002 as owner, and the TST-001 rule: edit this file, add-only, increment `version`.
 - [ ] **Step 4:** Same command. Expected: PASS.
 - [ ] **Step 5: Write the T-EPH-2 exactness test** (`t_eph_2_mean_node_test.dart`).
   - **File header** explains the independence rules.
@@ -107,21 +110,24 @@ packages/astro_core/lib/src/ephemeris/
 **Files:** modify `packages/astro_core/test/accuracy/t_eph_2_mean_node_test.dart`.
 
 - [ ] **Step 1: Write the bound tests** (`group('T-EPH-2: accuracy bound vs full Meeus formula')`). Add `double _meeusOmega(double t)` (eq. 47.7, literals as in the decision table), with a comment that the comparison uses the same `T` as production and why ΔT is irrelevant at this bound.
-  - `'deviates from the full formula by less than 0.01° over ±100 years (daily)'`: for `i` in −36525…36525, with `t = i / 36525` and `utc = DateTime.utc(2000, 1, 1, 12).add(Duration(days: i))`, compute `dev = _wrap180(production(utc).longitude − _norm360(_meeusOmega(t))).abs()`. Track the maximum, then assert `max < 0.01` and `max > 0.001`. The lower bound proves it's a real comparison: the expected maximum is ≈ 0.00213.
+  - `'deviates from the full formula by less than 0.01° over ±100 years (daily)'`: for `i` in −36525…36525, with `t = i / 36525` and `utc = DateTime.utc(2000, 1, 1, 12).add(Duration(days: i))`, compute `dev = _wrap180(production(utc).longitude − _norm360(_meeusOmega(t))).abs()`. Track the maximum, then assert `max < 0.01`, which is the spec bound. Also assert `max` is `closeTo(0.00213, 1e-5)`. That pins the figure written into the docs in Task 3 and proves it's a real comparison rather than production against itself.
   - `'the sweep reaches exactly T = −1 and T = +1'`: `_julianDay` of the first and last sweep instants gives `T == -1.0` and `T == 1.0`.
   - `'is within the bound on every reference date'`: the same check over the fixture.
-- [ ] **Step 2:** Run `fvm dart run melos exec --scope=astro_core -- dart test test/accuracy`. Expected: PASS, with a maximum ≈ 0.00213° (print it in the test's `reason`).
-- [ ] **Step 3: Bound mutation proof.** Change the production `1934.136261` → `1934.146261` (+0.01°/century). Run and expect **FAIL** of the daily-bound test: deviation ≈ 0.012° at |T| = 1. Restore and confirm `git diff packages/astro_core/lib` is empty. Record it.
+- [ ] **Step 2:** Run `fvm dart run melos exec --scope=astro_core -- dart test test/accuracy`. Expected: PASS. The `closeTo(0.00213, 1e-5)` assertion pins the maximum.
+- [ ] **Step 3: Bound mutation proof.** Change the production `1934.136261` → `1934.146261` (+0.01°/century). Run and expect **FAIL** of the daily-bound test: deviation ≈ 0.0121° at T = +1. Restore and confirm `git diff packages/astro_core/lib` is empty. Record it.
 - [ ] **Step 4:** Commit `test(ZOD-TST-002): verify the 0.01° bound against the full Meeus formula`.
 
 ### Task 3: Record the verified result + close out
 
-- [ ] **Step 1: Doc wording.** In `mean_node.dart` (the `meanAscendingNodeAt` "Accuracy" paragraph) and `ephemeris_port.dart` (the `meanAscendingNode` bullet and the closing "Independent verification … pending" line), replace "pending independent verification by ZOD-TST-002" with "verified by T-EPH-2 (ZOD-TST-002): the maximum deviation from the full Meeus formula over ±100 years around 2000 is 0.0021°". Doc only; no behaviour change.
+- [ ] **Step 1: Doc wording** (doc only; no behaviour change). Make exactly these three replacements:
+  - (a) `mean_node.dart`, in `meanAscendingNodeAt`'s "Accuracy" paragraph: "This bound is pending independent verification by T-EPH-2 (ZOD-TST-002)." → "This bound is verified by T-EPH-2 (ZOD-TST-002): the maximum deviation from the full Meeus formula over ±100 years around 2000 (same `T`, sampled daily) is 0.0021°."
+  - (b) `ephemeris_port.dart`, in the `meanAscendingNode` bullet: "…around 2000; this bound is pending independent verification by T-EPH-2 (ZOD-TST-002)." → "…around 2000; T-EPH-2 (ZOD-TST-002) verified a maximum deviation of 0.0021°."
+  - (c) `ephemeris_port.dart`, at the end of the `meanAscendingNode` doc: "Independent verification of the formula and its accuracy bound: T-EPH-2 (ZOD-TST-002), pending." → "Independent verification of the formula and its accuracy bound: T-EPH-2 (ZOD-TST-002)."
 - [ ] **Step 2:** Run `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: both exit 0.
 - [ ] **Step 3:** Whole-branch code review (`requesting-code-review`), then resolve any important findings. Re-run Step 2 (`verification-before-completion`).
 - [ ] **Step 4:**
   - Set `Status: Done` in the TST-002 task file and `TASKS.md`, and tick its acceptance criteria.
-  - Commit the task-file updates on this branch (TST-002, TST-001 notes).
+  - Commit the status and acceptance-criteria updates to the TST-002 task file and `TASKS.md`. (The TST-002 / TST-001 notes were already committed in `a975ff7`.)
   - Update `docs/PROGRESS.md`: completed task, verification, next task, the shared-fixture convention, and the Automatic Plan Review convention from PR #6.
 - [ ] **Step 5:** Commit, push, open a PR, then record the PR link.
 
@@ -135,5 +141,5 @@ packages/astro_core/lib/src/ephemeris/
 
 ## Risks
 
-- **TST-001 may want more instants.** The fixture is versioned, and TST-001's notes say add-only with a version bump.
+- **TST-001 may want more instants.** It edits the same `reference_dates.json` (add-only) and increments `version`. A version bump keeps the path and passes the v1-subset test, while dropping or editing a v1 instant fails it.
 - **Meeus defines T in TT.** It's documented. ΔT (about 64 s) shifts Ω by about 4e-5°, which is irrelevant at the 0.01° bound.
