@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -26,9 +26,9 @@ No direct design reference applies — this is a tooling/workspace task.
 
 ## Acceptance Criteria
 
-- [ ] `melos bootstrap` succeeds and links all packages.
-- [ ] `packages/astro_core` and `packages/gann_core` have no Flutter/`dart:ui` dependency (verified by `pub deps`).
-- [ ] CI (ZOD-FND-004) can run `melos run test` across the whole workspace.
+- [x] `melos bootstrap` succeeds and links all packages.
+- [x] `packages/astro_core` and `packages/gann_core` have no Flutter/`dart:ui` dependency (verified by `pub deps`).
+- [x] CI (ZOD-FND-004) can run `melos run test` across the whole workspace.
 
 ## Dependencies
 
