@@ -155,6 +155,25 @@ void main() {
       }
     });
 
+    test('fromJson requires the anchor key (null allowed) and strict UTC timestamps', () {
+      final numbers = config().toJson();
+
+      expect(SquareConfig.fromJson(numbers), config());
+      final bad = <Map<String, Object?>>[
+        {...numbers}..remove('anchor'),
+        {...numbers, 'createdAt': '2026-02-30T00:00:00Z'},
+        {...numbers, 'createdAt': '2026-11-01T10:00:00+02:00'},
+        {...numbers, 'updatedAt': '2026-11-12T09:30:00'},
+      ];
+      for (final json in bad) {
+        expect(
+          () => SquareConfig.fromJson(json),
+          throwsFormatException,
+          reason: '$json',
+        );
+      }
+    });
+
     test('copies and freezes its highlights list', () {
       final source = [customRule];
       final c = config(highlights: source);

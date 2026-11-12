@@ -91,7 +91,7 @@ final class SquareConfig {
   /// Throws [FormatException] for any malformed or invalid input.
   static SquareConfig fromJson(Object? json) {
     final map = asJsonObject(json, 'SquareConfig');
-    final anchorJson = map['anchor'];
+    final anchorJson = readNullable(map, 'anchor');
     final OffsetDateTime? anchor = switch (anchorJson) {
       null => null,
       final String text => OffsetDateTime.parse(text),

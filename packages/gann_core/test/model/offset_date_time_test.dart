@@ -66,6 +66,54 @@ void main() {
       expect(() => OffsetDateTime.parse('+02:00'), throwsFormatException);
     });
 
+    test('rejects lenient or non-canonical ISO-8601 forms', () {
+      const bad = [
+        '2026-02-30T09:00:00+02:00', // no Feb 30 (would roll to March)
+        '2026-11-12T25:00:00+02:00', // hour 25
+        '2026-11-12T24:00:00+02:00', // hour 24
+        '2026-11-12T09:61:00+02:00', // minute 61
+        '2026-11-12T09:00:00+05:75', // offset minutes 75
+        '2026-11-12T09:00:00,5+02:00', // comma fraction
+        '2026-11-12T09:00:00 +02:00', // space before offset
+        '20261112T090000+02:00', // basic format
+        ' 2026-11-12T09:00:00+02:00', // leading space
+        '2026-11-12 09:00:00+02:00', // space instead of T
+      ];
+
+      for (final input in bad) {
+        expect(
+          () => OffsetDateTime.parse(input),
+          throwsFormatException,
+          reason: input,
+        );
+      }
+    });
+
+    test(
+      'accepts its own canonical output for extreme years and microseconds',
+      () {
+        final samples = [
+          OffsetDateTime(DateTime.utc(10000, 1, 1, 0, 0, 0, 0, 1), 60),
+          OffsetDateTime(DateTime.utc(999, 6, 1, 12, 0, 0, 123, 456), -330),
+        ];
+
+        for (final value in samples) {
+          expect(OffsetDateTime.parse(value.toIso8601String()), value);
+        }
+      },
+    );
+
+    test('rejects an instant whose wall-clock time is out of range', () {
+      expect(
+        () => OffsetDateTime(DateTime.utc(275760, 9, 13), 1080),
+        throwsArgumentError,
+      );
+      expect(
+        () => OffsetDateTime.parse('+275760-09-13T10:00:00+18:00'),
+        throwsFormatException,
+      );
+    });
+
     test('rejects non-UTC instants and out-of-range offsets', () {
       final utc = DateTime.utc(2026);
 

@@ -50,8 +50,12 @@ final class HighlightRule {
 
   final HighlightMatch match;
 
-  /// A color token name from the design system (e.g. `axis`), never a hex
-  /// value.
+  /// A **color-role family key** from the design system (MASTER.md §2.2),
+  /// never a hex value. The UI resolves it to the family's tokens:
+  /// `<family>-fill` for the cell background and `<family>-ink` for its text,
+  /// plus the bare `<family>` token as the saturated accent where the design
+  /// defines one (`axis` and `diag` do; `eighth` has only `-fill`/`-ink`).
+  /// Defaults: `axis` (blue), `diag` (yellow), `eighth` (gray).
   final String colorToken;
 
   /// Lower number wins when several rules match a cell.
@@ -83,9 +87,9 @@ final class HighlightRule {
 }
 
 /// The default highlight rules a new square gets (spec "Default highlight
-/// rules"), in priority order. Color tokens are the role families from the
-/// design reference (MASTER.md §2.2): `axis` (blue), `diag` (yellow),
-/// `eighth` (gray).
+/// rules"), in priority order. Colors are role-family keys from the design
+/// reference (MASTER.md §2.2): `axis` (blue), `diag` (yellow), `eighth`
+/// (gray); see [HighlightRule.colorToken] for how they resolve.
 final List<HighlightRule> defaultHighlightRules = List.unmodifiable([
   HighlightRule(
     id: 'axes',

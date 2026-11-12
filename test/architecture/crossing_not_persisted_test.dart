@@ -6,7 +6,9 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-const storageLayers = ['packages/shared_storage/lib', 'apps/astro_mobile/lib'];
+/// Persistence code lives behind `packages/shared_storage` (FND-006). Add any
+/// future persistence package here.
+const storageLayers = ['packages/shared_storage/lib'];
 
 final _crossingIdentifier = RegExp(r'\bCrossing\b');
 
@@ -25,6 +27,15 @@ List<String> filesReferencingCrossing(String dirPath) {
 }
 
 void main() {
+  test('scans exactly the persistence package, which must exist', () {
+    // The app shell (apps/astro_mobile) is the composition root, not a
+    // storage layer: it may legitimately route to or compute crossings.
+    expect(storageLayers, ['packages/shared_storage/lib']);
+    for (final layer in storageLayers) {
+      expect(Directory(layer).existsSync(), isTrue, reason: layer);
+    }
+  });
+
   test('storage layers never reference Crossing', () {
     for (final layer in storageLayers) {
       expect(filesReferencingCrossing(layer), isEmpty, reason: layer);

@@ -1,3 +1,5 @@
+import 'iso8601.dart';
+
 /// A moment in time together with the UTC offset it was expressed in.
 ///
 /// DATA-4: anchor dates are saved with a time zone offset, so a square opens
@@ -8,9 +10,14 @@ final class OffsetDateTime {
   /// Creates the moment [instant] (which must be UTC) as seen at
   /// [offsetMinutes] from UTC.
   ///
-  /// Throws [ArgumentError] if [instant] is not UTC or [offsetMinutes] is
-  /// outside ±1080 (±18 hours, the ISO-8601 limit).
-  OffsetDateTime(this.instant, this.offsetMinutes) {
+  /// Throws [ArgumentError] if [instant] is not UTC, [offsetMinutes] is
+  /// outside ±1080 (±18 hours, the ISO-8601 limit), or the resulting
+  /// wall-clock time is outside `DateTime`'s range (it could not be
+  /// serialized).
+  OffsetDateTime(this.instant, this.offsetMinutes)
+    : wallClock = _wallClockOf(instant, offsetMinutes);
+
+  static DateTime _wallClockOf(DateTime instant, int offsetMinutes) {
     if (!instant.isUtc) {
       throw ArgumentError.value(instant, 'instant', 'must be a UTC DateTime');
     }
@@ -21,41 +28,33 @@ final class OffsetDateTime {
         'must be within ±$maxOffsetMinutes',
       );
     }
-  }
-
-  /// Parses an ISO-8601 date-time that carries an explicit offset (`Z` or
-  /// `±HH:MM`), e.g. `2026-11-12T09:00:00+02:00`.
-  ///
-  /// Throws [FormatException] if the input is malformed or has no explicit
-  /// offset: a missing offset is never guessed.
-  static OffsetDateTime parse(String input) {
-    final match = _offsetSuffix.firstMatch(input);
-    if (match == null || match.start == 0) {
-      throw FormatException(
-        'Expected an ISO-8601 date-time with an explicit offset (Z or ±HH:MM)',
-        input,
+    try {
+      return instant.add(Duration(minutes: offsetMinutes));
+    } on ArgumentError {
+      throw ArgumentError.value(
+        instant,
+        'instant',
+        'wall-clock time at offset $offsetMinutes is out of range',
       );
     }
-    final DateTime instant;
+  }
+
+  /// Parses a canonical ISO-8601 date-time with an explicit offset (`Z` or
+  /// `±HH:MM`), e.g. `2026-11-12T09:00:00+02:00`.
+  ///
+  /// Throws [FormatException] if the input is not canonical, has no explicit
+  /// offset (it is never guessed), or has an out-of-range field such as
+  /// February 30 or offset minutes ≥ 60 (never silently normalized).
+  static OffsetDateTime parse(String input) {
+    final parsed = parseStrictIso8601(input);
     try {
-      instant = DateTime.parse(input).toUtc();
-    } on FormatException {
-      throw FormatException('Invalid ISO-8601 date-time', input);
-    }
-    final suffix = match.group(0)!;
-    final offset = suffix == 'Z'
-        ? 0
-        : (suffix.startsWith('-') ? -1 : 1) *
-              (int.parse(match.group(1)!) * 60 + int.parse(match.group(2)!));
-    try {
-      return OffsetDateTime(instant, offset);
+      return OffsetDateTime(parsed.instant, parsed.offsetMinutes);
     } on ArgumentError catch (e) {
       throw FormatException('${e.message}', input);
     }
   }
 
   static const maxOffsetMinutes = 18 * 60;
-  static final _offsetSuffix = RegExp(r'(?:Z|[+-](\d{2}):(\d{2}))$');
 
   /// The moment itself, in UTC.
   final DateTime instant;
@@ -65,7 +64,7 @@ final class OffsetDateTime {
 
   /// The local wall-clock date and time at [offsetMinutes], as a UTC-flagged
   /// [DateTime] whose fields are the wall-clock fields.
-  DateTime get wallClock => instant.add(Duration(minutes: offsetMinutes));
+  final DateTime wallClock;
 
   /// ISO-8601 wall-clock time plus offset, e.g.
   /// `2026-11-12T09:00:00.000+02:00`, or `…Z` when the offset is 0.

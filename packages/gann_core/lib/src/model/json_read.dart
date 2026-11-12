@@ -3,6 +3,8 @@
 /// get one clear failure type (never a stray `TypeError`).
 library;
 
+import 'iso8601.dart';
+
 /// Casts [json] to a JSON object or throws [FormatException].
 Map<String, Object?> asJsonObject(Object? json, String what) {
   if (json is Map<String, Object?>) return json;
@@ -55,18 +57,24 @@ E readEnum<E extends Enum>(
 }
 
 /// Reads [key] as an ISO-8601 string that denotes a UTC instant.
+///
+/// Only the canonical form ending in `Z` is accepted; impossible fields
+/// (e.g. February 30) are rejected rather than normalized.
 DateTime readUtc(Map<String, Object?> json, String key) {
   final text = readField<String>(json, key);
-  final DateTime value;
   try {
-    value = DateTime.parse(text);
-  } on FormatException {
-    throw FormatException('Field "$key" is not an ISO-8601 date-time', text);
+    return parseStrictIso8601(text, requireUtc: true).instant;
+  } on FormatException catch (e) {
+    throw FormatException('Field "$key": ${e.message}', text);
   }
-  if (!value.isUtc) {
-    throw FormatException('Field "$key" must be a UTC date-time (…Z)', text);
+}
+
+/// Reads [key], which must be present, as a value that may be `null`.
+Object? readNullable(Map<String, Object?> json, String key) {
+  if (!json.containsKey(key)) {
+    throw FormatException('Missing field "$key"', json);
   }
-  return value;
+  return json[key];
 }
 
 /// Runs [build] and re-throws any constructor [ArgumentError] as a
