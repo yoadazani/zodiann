@@ -47,10 +47,15 @@ void main() {
 
     test('normalizes negative raw values into [0, 360)', () {
       // Raw Ω is −394.51 (2026-11-12) and −1809.07 (2100-01-01).
-      for (final t in [DateTime.utc(2026, 11, 12), DateTime.utc(2100)]) {
+      final expected = {
+        DateTime.utc(2026, 11, 12): 325.48865621351126,
+        DateTime.utc(2100): 350.93473588242273,
+      };
+      for (final MapEntry(key: t, value: want) in expected.entries) {
         final longitude = meanAscendingNodeAt(t).longitude;
         expect(longitude, greaterThanOrEqualTo(0));
         expect(longitude, lessThan(360));
+        expect(longitude, closeTo(want, tolerance));
       }
     });
 

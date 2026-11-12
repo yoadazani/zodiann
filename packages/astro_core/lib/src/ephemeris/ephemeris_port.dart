@@ -73,10 +73,11 @@ abstract interface class EphemerisPort {
   ///   since 2000-01-01 12:00 UTC, and `JD` is the Julian Day of the UTC
   ///   instant [utc] itself. Do **not** convert to terrestrial time (no ΔT);
   ///   the spec defines `T` from UTC.
-  /// * The longitude is normalized to `[0, 360)`. Beware: in Dart, `x % 360`
-  ///   returns exactly `360.0` for tiny negative `x` (e.g. `-1e-15 % 360`),
-  ///   which [EclipticPosition] rejects with an [ArgumentError]. Map a
-  ///   `360.0` result to `0.0`.
+  /// * The longitude is normalized to `[0, 360)`. Use `normalizeDegrees`
+  ///   (this package) rather than a bare `x % 360`: in Dart, `x % 360` returns
+  ///   exactly `360.0` for tiny negative `x` (e.g. `-1e-15 % 360`), which
+  ///   [EclipticPosition] rejects with an [ArgumentError]. The same applies to
+  ///   adapters normalizing physical-body longitudes.
   /// * The speed is the constant `−1934.136261 / 36525` degrees per day.
   /// * This is a linear approximation. The spec states an expected deviation
   ///   of less than 0.01° from the full formula over two hundred years
@@ -89,6 +90,7 @@ abstract interface class EphemerisPort {
   /// The formula is implemented once, by ZOD-EPH-001, as
   /// `meanAscendingNodeAt` and the `MeanAscendingNodeFormula` mixin in this
   /// package; implementations should mix in `MeanAscendingNodeFormula`
-  /// rather than re-implement it. It is verified by T-EPH-2 (ZOD-TST-002).
+  /// rather than re-implement it. Independent verification of the formula and
+  /// its accuracy bound: T-EPH-2 (ZOD-TST-002), pending.
   EclipticPosition meanAscendingNode(DateTime utc);
 }
