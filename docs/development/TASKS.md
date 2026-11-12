@@ -101,7 +101,7 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 | ZOD-CRS-004 | [Implement the degree-crossing query API (range, body filter, product limits)](computation-engine/ZOD-CRS-004-implement-the-degree-crossing-query-api-range-body-filter-product.md) | High | Not Started |
 | ZOD-ASP-001 | [Implement aspect detection between body pairs](computation-engine/ZOD-ASP-001-implement-aspect-detection-between-body-pairs.md) | High | Not Started |
 | ZOD-ASP-002 | [Implement aspect-orb configuration data flow](computation-engine/ZOD-ASP-002-implement-aspect-orb-configuration-data-flow.md) | Medium | Not Started |
-| ZOD-GAN-001 | [Implement the Gann spiral position formulas (k, j, i, θ)](computation-engine/ZOD-GAN-001-implement-the-gann-spiral-position-formulas-k-j-i.md) | Critical | Not Started |
+| ZOD-GAN-001 | [Implement the Gann spiral position formulas (k, j, i, θ)](computation-engine/ZOD-GAN-001-implement-the-gann-spiral-position-formulas-k-j-i.md) | Critical | Done |
 | ZOD-GAN-002 | [Implement Gann highlight classification (blue/yellow/gray)](computation-engine/ZOD-GAN-002-implement-gann-highlight-classification-blue-yellow-gray.md) | Critical | Not Started |
 | ZOD-GAN-003 | [Implement Gann date/number mapping per mode](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) | Critical | Not Started |
 

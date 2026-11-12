@@ -5,14 +5,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** ZOD-FND-001, ZOD-FND-002, ZOD-FND-012 and ZOD-EPH-001 merged; automatic plan review added (PR #6). ZOD-TST-002 (T-EPH-2) complete, PR pending merge. 5 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001 and TST-002 merged; automatic plan review in place. ZOD-GAN-001 (spiral positions) complete, PR pending merge. 6 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-TST-002 | Author the mean-node formula exactness test (T-EPH-2) | Done ([PR #7](https://github.com/yoadazani/zodiann/pull/7), pending merge) | T-EPH-2 suite 12/12 + fixture shape 6/6. Production matches an independent reference (Meeus JD, literal coefficients) within 1e-9° on 53 reference dates. Max deviation from full Meeus over ±100 years (daily) = 0.0021292° < 0.01°. Mutation proofs: either coefficient → fail; wrong rate → bound fail (0.012077°); impossible fixture date → fail. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 1 minor fixed, 3 deferred. Plan: [`docs/plans/ZOD-TST-002-mean-node-exactness.md`](plans/ZOD-TST-002-mean-node-exactness.md) |
+| ZOD-GAN-001 | Implement the Gann spiral position formulas (k, j, i, θ) | Done ([PR #8](https://github.com/yoadazani/zodiann/pull/8), pending merge) | `gann_core` spiral 23/23: reference table (design-checked), geometric clockwise for rings 1–6, neighbours 1…3721, rings vs the integer definition to 200,000 and at 94906263²+1, Appendix B, corners, round trips 9×9 / 61×61 / top of range, −2^63 rejection. Integer-correction mutation → fail. Plan review: Approve (2 rounds; 1 Critical + 5 Important fixed in the plan). Code review: 19 mutants, all non-equivalent killed; 1 minor promoted and fixed test-first, 2 applied. Plan: [`docs/plans/ZOD-GAN-001-spiral-positions.md`](plans/ZOD-GAN-001-spiral-positions.md) |
+| ZOD-TST-002 | Author the mean-node formula exactness test (T-EPH-2) | Done ([PR #7](https://github.com/yoadazani/zodiann/pull/7), merged `a86e284`) | T-EPH-2 suite 12/12 + fixture shape 6/6. Production matches an independent reference (Meeus JD, literal coefficients) within 1e-9° on 53 reference dates. Max deviation from full Meeus over ±100 years (daily) = 0.0021292° < 0.01°. Mutation proofs: either coefficient → fail; wrong rate → bound fail (0.012077°); impossible fixture date → fail. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 1 minor fixed, 3 deferred. Plan: [`docs/plans/ZOD-TST-002-mean-node-exactness.md`](plans/ZOD-TST-002-mean-node-exactness.md) |
 | ZOD-EPH-001 | Implement the mean ascending lunar node formula | Done ([PR #5](https://github.com/yoadazani/zodiann/pull/5), merged `a21e4ed`) | `astro_core` 41/41 (epoch exact, 1900 / 2100 / 2026 references, normalization incl. the `−1e-15` edge, constant speed, non-UTC rejection, coefficients, "never direct" 1800–2400, node bypasses `coveredRange`) · lint exit 0. Ad-hoc coefficient mutations each fail 3 tests. Review: 0 Critical / 0 Important. The reviewer fuzzed `normalizeDegrees` over the full double range. 4 minor doc/test items fixed. Plan: [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md) |
 | ZOD-FND-012 | Define `SquareConfig`, `HighlightRule`, `Crossing` data classes (`UserSettings` → SET-007) | Done ([PR #4](https://github.com/yoadazani/zodiann/pull/4), merged `13ea8e6`) | `gann_core` 33/33 · `astro_core` 26/26 · workspace architecture 17/17 · lint exit 0. The `Crossing` guard was proven to fail on an injected reference. Review: 0 Critical, 2 Important fixed, 3 minors promoted and fixed test-first (strict ISO-8601, out-of-range wall clock, required `anchor` key), 2 deferred. Plan: [`docs/plans/ZOD-FND-012-data-model.md`](plans/ZOD-FND-012-data-model.md) |
 | ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), merged `331c7dc`) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
@@ -20,12 +21,17 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-_None._ ZOD-TST-002 is complete and awaiting PR merge.
+_None._ ZOD-GAN-001 is complete and awaiting PR merge.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-GAN-001 — Implement the Gann spiral position formulas (k, j, i, θ) (Critical)
-- **Why next:** It depends only on FND-001 (done). It starts the Square of Nine critical path (GAN-001 → GAN-002 → GAN-003), and Gate 1's T-GAN tests (TST-010/011/012) depend on it. The node track (EPH-001 + TST-002) is now complete. The remaining astro work (EPH-002/004/005, CRS-*, TST-001) is blocked behind FND-003 and the iOS decision.
+- **ID:** ZOD-GAN-002 — Implement Gann highlight classification (blue/yellow/gray) (Critical)
+- **Why next:** It depends only on GAN-001, and it continues the Square of Nine critical path (GAN-002 → GAN-003). GAN-003, TST-010 and TST-011 depend on it. **GAN-001's PR should be merged first.**
+- **Settled for it:** T-GAN-3 wording (90° = cells straight above cell 1).
+- **Expect when planning:**
+  - Its "T-GAN-2 passes" / "T-GAN-3 passes" criteria need the same cycle resolution as EPH-001 / GAN-001 (TST-010/011 depend on GAN-002).
+  - Consider a `SpiralCell.isCenter` getter so consumers don't scatter `!` (review recommendation).
+- **Carry into ZOD-TST-010:** the GAN-001 review's 19-mutant list (mirrored x/y, no flip, 90° rotation, j/i off by one, `%` vs `remainder`, segment `<` → `<=`, …) is a ready starting point for its mutation proof.
 - **Carry into ZOD-TST-001:**
   - Reuse `packages/astro_core/test/fixtures/reference_dates.json` (add-only, bump `version`).
   - Its shape test limits instants to the T = ±1 window (≤ 2100-01-01T12:00Z). If TST-001 adds later-2100 instants (ACC-1 says "1900 to 2100"), move that window check into the T-EPH-2 suite, which only needs it for the bound.
@@ -95,6 +101,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - The mean-node formula exists once (`meanAscendingNodeAt` in `mean_node.dart`). `EphemerisPort` adapters `with MeanAscendingNodeFormula implements EphemerisPort` and answer `Body.node` **before** checking `coveredRange`, because the node is formula-based and not bounded by the data range.
 - The node's retrograde state is the fixed flag `Body.hasConstantMeanRetrograde` ("℞ Mean"), never derived from speed.
 
+**Square of Nine spiral** (established in ZOD-GAN-001)
+- Use `spiralCell(n)` / `spiralNumberAt(x, y)` from `gann_core`. Never re-derive positions in UI or export code.
+- Coordinates are relative to cell 1, with **x right and y down** (screen). The orientation is SQ-8's fixed one: 2 left of 1, clockwise. 90° (north) is the column of cells straight above cell 1, and 270° straight below.
+- The valid range is `1 … maxSpiralNumber` / rings `0 … maxSpiralRing`, shared by both directions. The center (`n = 1`) has `null` index, steps and angle.
+- Highlight classification works on the integers `i` and `k`, not on the `double` angle `θ`.
+
 **Accuracy tests** (established in ZOD-TST-002)
 - Accuracy and verification suites live in `packages/<pkg>/test/accuracy/`. Their expected values come from an **independent** reference: only the code under test is imported (`show …`), with literal reference coefficients and test-local helpers. Production constants and helpers are never used for expectations.
 - Each verification suite is accompanied by a **mutation proof**: alter each production constant or behaviour it guards, observe the failure, restore, and record it in the commit message.
@@ -126,9 +138,23 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | Public `normalizeDegrees`; T computed from microseconds since 2000-01-01T12:00Z; the mean-℞ state is a fixed `Body` getter; the coefficients are public constants. | The 360.0-edge test needs a directly testable normalizer, and adapters need it too. Microseconds are exact (int64, no overflow at DateTime limits). The flag is a property of the body, not of a source. One production source for the coefficients, for TST-002's mutation proof (TST-002 keeps independent reference values). | astro_core, EPH-002/004/005, TST-002 | EPH-001 plan |
 | 2026-11-12 | Automatic plan review: a `plan-reviewer` subagent integrated into `zodiann-development` (no separate skill; Superpowers `writing-plans` reused unchanged). | Catches plan-level problems (cycles, ownership overlaps, wrong commands, unverified numbers) before the product owner reviews. User request. | All future plans | PR #6 |
 | 2026-11-12 | ZOD-TST-002 defines the shared reference date set (`packages/astro_core/test/fixtures/reference_dates.json`, version in the content). ZOD-TST-001 reuses it add-only and bumps the version. | TST-001 is blocked behind EPH-002 / FND-003; T-EPH-1 and T-EPH-2 must share dates. Product-owner decision. | TST-001, TST-002 | TST-001 / TST-002 task Notes, TST-002 plan |
+| 2026-11-12 | ZOD-GAN-001's criterion "T-GAN-1 passes" was amended to "covered by its own unit tests; T-GAN-1 tracked by ZOD-TST-010" (same resolution as EPH-001). TST-010 gets independence and mutation-proof rules. | Removes the GAN-001 ↔ TST-010 cycle. Product-owner decision. | GAN-001, TST-010 | GAN-001 / TST-010 task Notes |
+| 2026-11-12 | T-GAN-3 wording: **90° is the axis above cell 1** (270° below). The spec's "270 axis (the row above cell 1)" is treated as a typo, and the GAN-002 / TST-010 criteria were corrected. The spec file is unchanged; the notes record the correction. | The formula, SQ-8, Appendix C and the design reference all agree on 90° = North above. Product-owner decision. | GAN-002, TST-010 | GAN-002 / TST-010 task Notes |
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-GAN-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| AC1: own unit tests (2 left of 1, clockwise, Appendix B ring ends, 9×9 round trip); T-GAN-1 → TST-010 | `fvm dart run melos exec --scope=gann_core -- dart test test/spiral` | 23/23: reference table (16 rows, design-checked), first-ring order, geometric clockwise for rings 1–6 (one wrap at index k−2), θ = geometric angle on axes and diagonals, neighbours for 1…3721 |
+| AC2: ring 1 ends at 9, ring 4 at 81 | same | All six Appendix B rows; ring boundaries 9/10, 25/26, 81/82, 3721/3722 |
+| AC3: (x, y) round trip over 9×9 | same | Both directions over 9×9 and 61×61, all four corners for rings 1–5, top of range (`maxSpiralNumber`) |
+| Robustness | same + mutation | Rings match the integer definition to 200,000 and at 94906263² ± 1. Removing the correction → fail. n out of range, k out of range and −2^63 coordinates all rejected |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 / `gann_core` 56, `astro_core` 53, workspace 17 |
+| Plan review | `plan-reviewer`, 2 rounds | Approve (round 1: 1 Critical + 5 Important + 6 Minor applied; round 2: 2 Minor applied) |
+| Code review | Fresh reviewer, whole branch | With fixes: 0 Critical / 0 Important. 19 mutants, all non-equivalent killed (2 equivalent). −2^63 `abs()` overflow promoted and fixed RED→GREEN. 2 minors applied |
 
 ZOD-TST-002, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -210,9 +236,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-TST-002-mean-node-exactness` (from `main` @ `83ee377`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), all merged. TST-002: `7003b39` date set + exactness · `da6937c` Meeus bound · `8305933` verified wording · `52b5a99` review fix · plus planning/review commits
-- **Pull request:** PRs #2–#6 merged. TST-002 → https://github.com/yoadazani/zodiann/pull/7 (open)
-- **Unmerged task branches others depend on:** `task/ZOD-TST-002-mean-node-exactness` (ZOD-TST-001 reuses its fixture)
+- **Current task branch:** `task/ZOD-GAN-001-spiral-positions` (from `main` @ `a86e284`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), all merged. GAN-001: `9cabd57` spiralCell + ring helpers · `fa2c8bc` inverse · `41111ce` review fix · plus planning/review commits
+- **Pull request:** PRs #2–#7 merged. GAN-001 → https://github.com/yoadazani/zodiann/pull/8 (open)
+- **Unmerged task branches others depend on:** `task/ZOD-GAN-001-spiral-positions` (ZOD-GAN-002, ZOD-TST-010 need it on `main`)
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
