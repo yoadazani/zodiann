@@ -132,6 +132,46 @@ SpiralCell spiralCell(int n) {
   );
 }
 
+/// The cell number at screen position ([x], [y]) relative to the center
+/// (x right, y down) — the inverse of [spiralCell].
+///
+/// The spec defines only `n → (x, y)`; this inverts it segment by segment.
+/// With `k = max(|x|, |y|)` and the flip undone, `(a, b) = (−x, −y)`:
+///
+/// * `a == k && b > −k` → `j = b + k − 1` (first segment);
+/// * `b == k` → `j = 3k − 1 − a`;
+/// * `a == −k` → `j = 5k − 1 − b`;
+/// * otherwise (`b == −k`) → `j = a + 7k − 1` (last segment, which owns the
+///   pre-flip corner `(k, −k)` — on screen `(−k, k)`, the ring's last cell).
+///
+/// Then `n = (2k − 1)² + 1 + j`; the center is 1.
+///
+/// Throws [ArgumentError] if `max(|x|, |y|) > maxSpiralRing`.
+int spiralNumberAt(int x, int y) {
+  final k = math.max(x.abs(), y.abs());
+  if (k > maxSpiralRing) {
+    throw ArgumentError.value(
+      (x, y),
+      '(x, y)',
+      'ring $k is outside 0…$maxSpiralRing',
+    );
+  }
+  if (k == 0) return 1;
+
+  final a = -x, b = -y;
+  final int j;
+  if (a == k && b > -k) {
+    j = b + k - 1;
+  } else if (b == k) {
+    j = 3 * k - 1 - a;
+  } else if (a == -k) {
+    j = 5 * k - 1 - b;
+  } else {
+    j = a + 7 * k - 1;
+  }
+  return (2 * k - 1) * (2 * k - 1) + 1 + j;
+}
+
 /// `ceil((√n − 1) / 2)` from the spec, corrected in integer arithmetic so a
 /// rounded `sqrt` can never place a cell in the wrong ring: the result is
 /// the smallest `k` with `(2k+1)² ≥ n`.

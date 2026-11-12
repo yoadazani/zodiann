@@ -180,6 +180,90 @@ void main() {
     });
   });
 
+  group('spiralNumberAt', () {
+    test('center and the first ring', () {
+      expect(spiralNumberAt(0, 0), 1);
+      expect(spiralNumberAt(-1, 0), 2);
+      expect(spiralNumberAt(0, -1), 4);
+      expect(spiralNumberAt(1, 0), 6);
+      expect(spiralNumberAt(0, 1), 8);
+      expect(spiralNumberAt(-1, 1), 9);
+    });
+
+    test('design reference spot values', () {
+      expect(spiralNumberAt(-2, -2), 13);
+      expect(spiralNumberAt(-3, 3), 49);
+      expect(spiralNumberAt(-4, 4), 81);
+    });
+
+    test('corners of ring k map to the expected segments', () {
+      for (var k = 1; k <= 5; k++) {
+        final inner = (2 * k - 1) * (2 * k - 1);
+        expect(
+          spiralNumberAt(-k, k),
+          (2 * k + 1) * (2 * k + 1),
+          reason: 'k=$k',
+        );
+        expect(spiralNumberAt(-k, -k), inner + 2 * k, reason: 'k=$k');
+        expect(spiralNumberAt(k, -k), inner + 4 * k, reason: 'k=$k');
+        expect(spiralNumberAt(k, k), inner + 6 * k, reason: 'k=$k');
+      }
+      expect(
+        [for (var k = 1; k <= 5; k++) spiralNumberAt(-k, -k)],
+        [3, 13, 31, 57, 91],
+      );
+      expect(
+        [for (var k = 1; k <= 5; k++) spiralNumberAt(k, -k)],
+        [5, 17, 37, 65, 101],
+      );
+      expect(
+        [for (var k = 1; k <= 5; k++) spiralNumberAt(k, k)],
+        [7, 21, 43, 73, 111],
+      );
+    });
+
+    void expectRoundTrip(int side) {
+      final half = side ~/ 2;
+      for (var n = 1; n <= side * side; n++) {
+        final c = spiralCell(n);
+        expect(spiralNumberAt(c.x, c.y), n, reason: 'n=$n');
+      }
+      for (var x = -half; x <= half; x++) {
+        for (var y = -half; y <= half; y++) {
+          final c = spiralCell(spiralNumberAt(x, y));
+          expect((c.x, c.y), (x, y), reason: '($x, $y)');
+        }
+      }
+    }
+
+    test('round-trips with spiralCell for every cell of a 9×9 square', () {
+      expectRoundTrip(9);
+    });
+
+    test('round-trips over the full 61×61 square', () {
+      expectRoundTrip(61);
+    });
+
+    test('round-trips at the top of the range', () {
+      expect(spiralNumberAt(-47453132, 47453132), 9007199136250225);
+      expect(spiralNumberAt(-47453132, 47453132), maxSpiralNumber);
+    });
+
+    test('rejects coordinates outside the supported range', () {
+      for (final (x, y) in [
+        (47453133, 0),
+        (0, -47453133),
+        (-47453133, 47453133),
+      ]) {
+        expect(
+          () => spiralNumberAt(x, y),
+          throwsArgumentError,
+          reason: '($x, $y)',
+        );
+      }
+    });
+  });
+
   group('ring helpers', () {
     test('match Appendix B for rings 1–6', () {
       expect(
