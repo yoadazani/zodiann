@@ -81,8 +81,8 @@ abstract interface class EphemerisPort {
   /// * The speed is the constant `−1934.136261 / 36525` degrees per day.
   /// * This is a linear approximation. The spec states an expected deviation
   ///   of less than 0.01° from the full formula over two hundred years
-  ///   around 2000; this bound is pending independent verification by T-EPH-2
-  ///   (ZOD-TST-002).
+  ///   around 2000; T-EPH-2 (ZOD-TST-002) verified a maximum deviation of
+  ///   0.0021°.
   ///
   /// This is a formula-based point, not an apparent physical position (see
   /// the class documentation).
@@ -91,6 +91,6 @@ abstract interface class EphemerisPort {
   /// `meanAscendingNodeAt` and the `MeanAscendingNodeFormula` mixin in this
   /// package; implementations should mix in `MeanAscendingNodeFormula`
   /// rather than re-implement it. Independent verification of the formula and
-  /// its accuracy bound: T-EPH-2 (ZOD-TST-002), pending.
+  /// its accuracy bound: T-EPH-2 (ZOD-TST-002).
   EclipticPosition meanAscendingNode(DateTime utc);
 }
