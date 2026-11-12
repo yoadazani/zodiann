@@ -57,6 +57,10 @@ final class SpiralCell {
   /// Row offset from the center; positive downward.
   final int y;
 
+  /// Whether this is the center cell (n = 1), which has no index, steps or
+  /// angle.
+  bool get isCenter => n == 1;
+
   @override
   bool operator ==(Object other) =>
       other is SpiralCell &&
