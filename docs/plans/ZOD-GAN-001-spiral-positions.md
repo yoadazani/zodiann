@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), awaiting approval · **Branch:** `task/ZOD-GAN-001-spiral-positions` · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: Approve, 2 rounds), approved and implemented (2026-11-12) · **Branch:** `task/ZOD-GAN-001-spiral-positions` · **Written:** 2026-11-12
 
 **Goal:** Implement the Square of Nine's core spiral math in `gann_core`. For a cell number `n`, compute its ring `k`, its index in the ring `j`, its steps from the west axis `i`, its discrete angle `θ` and its grid position `(x, y)`. Also implement the inverse, `(x, y) → n`.
 

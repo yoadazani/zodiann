@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -27,9 +27,9 @@ No direct design reference applies — pure computation; verified visually again
 
 ## Acceptance Criteria
 
-- [ ] The spiral position formulas are implemented and covered by GAN-001's own unit tests (cell 2 left of cell 1, clockwise order, Appendix B ring ends, round-trip over 9×9). Dedicated T-GAN-1 verification against explicit expected coordinates is tracked by [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
-- [ ] Ring 1 has last number 9, ring 4 has last number 81 (Appendix B).
-- [ ] The (x, y) inverse mapping round-trips with the forward `n → (k, j, i)` mapping for every cell in a 9×9 square.
+- [x] The spiral position formulas are implemented and covered by GAN-001's own unit tests (cell 2 left of cell 1, clockwise order, Appendix B ring ends, round-trip over 9×9). Dedicated T-GAN-1 verification against explicit expected coordinates is tracked by [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
+- [x] Ring 1 has last number 9, ring 4 has last number 81 (Appendix B).
+- [x] The (x, y) inverse mapping round-trips with the forward `n → (k, j, i)` mapping for every cell in a 9×9 square.
 
 ## Dependencies
 
