@@ -249,6 +249,17 @@ void main() {
       expect(spiralNumberAt(-47453132, 47453132), maxSpiralNumber);
     });
 
+    test('rejects the most negative int, where abs() overflows', () {
+      const minInt = -9223372036854775808;
+      for (final (x, y) in [(minInt, 0), (0, minInt), (minInt, 5)]) {
+        expect(
+          () => spiralNumberAt(x, y),
+          throwsArgumentError,
+          reason: '($x, $y)',
+        );
+      }
+    });
+
     test('rejects coordinates outside the supported range', () {
       for (final (x, y) in [
         (47453133, 0),

@@ -148,14 +148,19 @@ SpiralCell spiralCell(int n) {
 ///
 /// Throws [ArgumentError] if `max(|x|, |y|) > maxSpiralRing`.
 int spiralNumberAt(int x, int y) {
-  final k = math.max(x.abs(), y.abs());
-  if (k > maxSpiralRing) {
+  // Range-check the raw values first: `abs()` of the most negative 64-bit
+  // int overflows (stays negative), which would bypass a check on `k`.
+  if (x < -maxSpiralRing ||
+      x > maxSpiralRing ||
+      y < -maxSpiralRing ||
+      y > maxSpiralRing) {
     throw ArgumentError.value(
       (x, y),
       '(x, y)',
-      'ring $k is outside 0…$maxSpiralRing',
+      'both coordinates must be within ±$maxSpiralRing',
     );
   }
+  final k = math.max(x.abs(), y.abs());
   if (k == 0) return 1;
 
   final a = -x, b = -y;
@@ -180,6 +185,9 @@ int _ringOf(int n) {
   while ((2 * k + 1) * (2 * k + 1) < n) {
     k++;
   }
+  // Defensive only: for n ≤ 2^53 the double conversion is exact and `sqrt`
+  // is correctly rounded, so the formula can only undershoot and this loop
+  // is unreachable (removing it is an equivalent mutant, not a test gap).
   while (k > 0 && (2 * k - 1) * (2 * k - 1) >= n) {
     k--;
   }

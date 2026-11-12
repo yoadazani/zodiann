@@ -16,7 +16,7 @@ Verify the spiral's direction/position (T-GAN-1) and the axis/diagonal angle ass
 ## Implementation Details
 
 - T-GAN-1: assert cell 2 is left of cell 1 and the spiral moves clockwise through at least the first several dozen cells (explicit positions, not just "it looks right").
-- T-GAN-3: assert the 90° axis (the row above cell 1) and the 270° axis (the row below cell 1) are blue (corrected 2026-11-12; see Notes), and only 45/135/225/315 are yellow — directly exercising the Appendix C table.
+- T-GAN-3: assert the 90° axis (the cells straight above cell 1: x = 0, y < 0) and the 270° axis (straight below: x = 0, y > 0) are blue (corrected 2026-11-12; see Notes), and only 45/135/225/315 are yellow — directly exercising the Appendix C table.
 
 ## Design Reference
 
