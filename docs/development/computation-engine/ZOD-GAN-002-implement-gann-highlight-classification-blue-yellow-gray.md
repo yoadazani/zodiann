@@ -28,7 +28,7 @@ No direct design reference applies to the classification math itself; the result
 ## Acceptance Criteria
 
 - [ ] T-GAN-2 passes: a 9×9 square (rings 1–4) totals 16 blue, 16 yellow, 16 gray.
-- [ ] T-GAN-3 passes: angle 270° (the row above cell 1) is blue; only 45/135/225/315 are yellow.
+- [ ] T-GAN-3 passes: the 90° axis (the row above cell 1) and the 270° axis (the row below cell 1) are blue; only 45/135/225/315 are yellow. (Corrected 2026-11-12; see Notes.)
 - [ ] Priority order is verified with a cell that would otherwise match more than one category conceptually (none should, if the math is right — this test guards the *order* of the `if` chain itself).
 
 ## Dependencies
@@ -46,7 +46,7 @@ No direct design reference applies to the classification math itself; the result
 
 ## Notes
 
-- 2026-11-12 (flagged during ZOD-GAN-001 planning, **not decided**): this task's T-GAN-3 criterion says "angle 270° (the row above cell 1) is blue". The spiral formula, SQ-8, Appendix C (90° = North axis, 270° = South axis) and the design reference all put **90°** on the row above cell 1. The same open item is recorded in [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md)'s Notes. It needs a product-owner decision before this task's criteria are finalised.
+- 2026-11-12 (flagged during ZOD-GAN-001 planning): this task's T-GAN-3 criterion said "angle 270° (the row above cell 1) is blue". The spiral formula, SQ-8, Appendix C (90° = North axis, 270° = South axis) and the design reference all put **90°** on the row above cell 1. **Product-owner decision (2026-11-12): 90° is the axis above cell 1.** The T-GAN-3 wording is treated as a typo, and the criterion above is corrected to "the 90° axis (the row above cell 1) and the 270° axis (the row below cell 1) are blue". The spec file itself isn't edited; this note records the correction. The same correction is applied in [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
 - Expect the same cycle resolution as ZOD-EPH-001 and ZOD-GAN-001 when this task is planned: its criteria "T-GAN-2 passes" / "T-GAN-3 passes" name tests owned by ZOD-TST-011 / ZOD-TST-010, which depend on this task.
 
 ---

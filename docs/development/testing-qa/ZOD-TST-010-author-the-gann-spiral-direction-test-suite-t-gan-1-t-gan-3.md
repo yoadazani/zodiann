@@ -16,7 +16,7 @@ Verify the spiral's direction/position (T-GAN-1) and the axis/diagonal angle ass
 ## Implementation Details
 
 - T-GAN-1: assert cell 2 is left of cell 1 and the spiral moves clockwise through at least the first several dozen cells (explicit positions, not just "it looks right").
-- T-GAN-3: assert angle 270° (the row above cell 1) is blue, and only 45/135/225/315 are yellow — directly exercising the Appendix C table.
+- T-GAN-3: assert the 90° axis (the row above cell 1) and the 270° axis (the row below cell 1) are blue (corrected 2026-11-12; see Notes), and only 45/135/225/315 are yellow — directly exercising the Appendix C table.
 
 ## Design Reference
 
@@ -43,7 +43,8 @@ No direct design reference applies.
 - 2026-11-12 (product-owner decision): this task owns the dedicated T-GAN-1 verification of the spiral formulas implemented in ZOD-GAN-001, whose criterion was amended to point here. As with ZOD-TST-002:
   - expected coordinates come from an independent source (explicit literal coordinates and/or the design reference), never from production helpers;
   - add a mutation proof showing the suite fails on a flipped direction or a moved cell.
-- **Open spec conflict, to decide when this task is planned:** T-GAN-3's text says "the 270 axis (the row above cell 1 on screen) is blue". But the spiral formula (x right, y down, signs flipped), SQ-8, Appendix C (90° = North axis, 270° = South axis) and the design reference (`02-square-of-nine_numbers_desktop_en_dark.png`: "90° N" above the square, "270° S" below) all put **90°** on the row above cell 1 and 270° below. Flagged during ZOD-GAN-001 planning; GAN-001 follows the formula and Appendix C.
+- **Spec conflict (resolved 2026-11-12, see the decision below):** T-GAN-3's text says "the 270 axis (the row above cell 1 on screen) is blue". But the spiral formula (x right, y down, signs flipped), SQ-8, Appendix C (90° = North axis, 270° = South axis) and the design reference (`02-square-of-nine_numbers_desktop_en_dark.png`: "90° N" above the square, "270° S" below) all put **90°** on the row above cell 1 and 270° below. Flagged during ZOD-GAN-001 planning; GAN-001 follows the formula and Appendix C.
+  - **Product-owner decision (2026-11-12): 90° is the axis above cell 1.** The T-GAN-3 wording is treated as a typo, and this task's T-GAN-3 implementation detail is corrected accordingly: the 90° axis is above cell 1 and the 270° axis below, both blue. The spec file itself isn't edited; this note records the correction. Same correction in ZOD-GAN-002.
 
 ---
 

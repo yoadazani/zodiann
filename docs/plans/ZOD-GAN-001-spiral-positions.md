@@ -23,9 +23,9 @@
 
 1. **GAN-001 and TST-010 stay separate**, with the same resolution as EPH-001/TST-002. GAN-001's criterion "T-GAN-1 passes" was amended to "covered by GAN-001's own unit tests; dedicated T-GAN-1 tracked by ZOD-TST-010". TST-010 gets the independence and mutation-proof rules. (GAN-001 / TST-010 task Notes.)
 
-## Spec observation (recorded, not decided here)
+## Spec observation (resolved by the product owner, 2026-11-12)
 
-T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision. It doesn't change any GAN-001 output. The **same wording is GAN-002's second criterion**, and GAN-002 is planned before TST-010. So a matching note pointing to TST-010's open item has been added to GAN-002's Notes (planning commits). When to decide it is a product-owner question raised with this plan.
+T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision. It doesn't change any GAN-001 output. The **same wording is GAN-002's second criterion**, and GAN-002 is planned before TST-010. So a matching note pointing to TST-010's open item has been added to GAN-002's Notes (planning commits). **Resolved 2026-11-12 (product owner): 90° is the axis above cell 1.** The T-GAN-3 wording is a typo. GAN-002's and TST-010's criteria were corrected, with dated notes; the spec file itself is unchanged. GAN-001 is unaffected.
 
 ## Global Constraints
 
@@ -200,4 +200,4 @@ Automatic plan review (`zodiann-development` → `plan-reviewer`), two rounds. B
 | M2 | Minor | Clockwise test didn't say how to detect the single wrap | **Applied:** wrap-count rule (0 for k = 1, exactly 1 for k ≥ 2) |
 | D1 | Needs user decision | Carried over (see above). GAN-001's output is unaffected either way | Raised with the product owner |
 
-**Open items:** D1 only (product owner).
+**Open items:** none. D1 was resolved by the product owner on 2026-11-12: 90° is the axis above cell 1, T-GAN-3 wording is a typo, and GAN-002 / TST-010 criteria were corrected.

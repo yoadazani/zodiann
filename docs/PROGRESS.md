@@ -29,12 +29,12 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
   - The T-GAN-3 wording conflict was recorded in the TST-010 and GAN-002 notes.
   - Plan written.
   - Automatic plan review: round 1 had 1 Critical + 5 Important + 6 Minor, all applied. Round 2 approved, with 2 Minor applied.
-- **Open item (product owner):** when to decide the T-GAN-3 wording conflict (270° vs 90° "above cell 1"). It doesn't affect GAN-001.
+- **Resolved (product owner, 2026-11-12):** the T-GAN-3 wording conflict. 90° is the axis above cell 1; GAN-002 and TST-010 criteria corrected.
 - **Remaining steps:** Plan approval → Task 1 (`spiralCell` + ring helpers) → Task 2 (inverse `spiralNumberAt`) → Task 3 close-out.
 
 ## Next Recommended Task
 
-- **ID:** to be re-evaluated after ZOD-GAN-001. Expected: ZOD-GAN-002 (highlight classification). It needs the T-GAN-3 wording decision and the same cycle resolution for its T-GAN-2/3 criteria.
+- **ID:** to be re-evaluated after ZOD-GAN-001. Expected: ZOD-GAN-002 (highlight classification). Its T-GAN-3 wording is now settled (90° above cell 1); its T-GAN-2/3 criteria need the same cycle resolution as EPH-001 and GAN-001.
 - **Carry into ZOD-TST-001:**
   - Reuse `packages/astro_core/test/fixtures/reference_dates.json` (add-only, bump `version`).
   - Its shape test limits instants to the T = ±1 window (≤ 2100-01-01T12:00Z). If TST-001 adds later-2100 instants (ACC-1 says "1900 to 2100"), move that window check into the T-EPH-2 suite, which only needs it for the bound.
@@ -136,6 +136,7 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | Automatic plan review: a `plan-reviewer` subagent integrated into `zodiann-development` (no separate skill; Superpowers `writing-plans` reused unchanged). | Catches plan-level problems (cycles, ownership overlaps, wrong commands, unverified numbers) before the product owner reviews. User request. | All future plans | PR #6 |
 | 2026-11-12 | ZOD-TST-002 defines the shared reference date set (`packages/astro_core/test/fixtures/reference_dates.json`, version in the content). ZOD-TST-001 reuses it add-only and bumps the version. | TST-001 is blocked behind EPH-002 / FND-003; T-EPH-1 and T-EPH-2 must share dates. Product-owner decision. | TST-001, TST-002 | TST-001 / TST-002 task Notes, TST-002 plan |
 | 2026-11-12 | ZOD-GAN-001's criterion "T-GAN-1 passes" was amended to "covered by its own unit tests; T-GAN-1 tracked by ZOD-TST-010" (same resolution as EPH-001). TST-010 gets independence and mutation-proof rules. | Removes the GAN-001 ↔ TST-010 cycle. Product-owner decision. | GAN-001, TST-010 | GAN-001 / TST-010 task Notes |
+| 2026-11-12 | T-GAN-3 wording: **90° is the axis above cell 1** (270° below). The spec's "270 axis (the row above cell 1)" is treated as a typo, and the GAN-002 / TST-010 criteria were corrected. The spec file is unchanged; the notes record the correction. | The formula, SQ-8, Appendix C and the design reference all agree on 90° = North above. Product-owner decision. | GAN-002, TST-010 | GAN-002 / TST-010 task Notes |
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
