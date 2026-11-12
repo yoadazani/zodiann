@@ -48,14 +48,18 @@
   - Persisting the anchor (→ DAT-009).
   - The Excel export's time handling (spec line 256: "the file has no time zone" → XLS-*).
   - Localized weekday/month names (→ L10).
+  - **Month-first order for English (L-12) and the app-wide date-format utility → ZOD-L10-010**, which wraps or extends `formatCellDate`. GAN-003's formatter is the day-first `d.m.yy` form required by SQ-3 / T-FMT-1 and used in Hebrew.
+  - **The numbers-mode anchor** (EX-8/9, TASKS §6.2 numeric-anchor item) → ZOD-XLS-003. In the app, numbers mode has no anchor (D15, SQR-002), so `cellNumber(n) = n`.
 
 ## Design decisions (mine, for your confirmation)
 
 | Topic | Decision | Reason |
 |---|---|---|
-| Time-zone abstraction | `abstract interface class LocalTimeZone { int offsetMinutesAt(DateTime utc); }`. Implementations: `DeviceTimeZone` (const; offset of `DateTime.fromMicrosecondsSinceEpoch(utc.microsecondsSinceEpoch).timeZoneOffset`) and `FixedOffsetTimeZone(int offsetMinutes)` | The device zone is the decided rule. Injecting it makes DST behaviour testable with a fake zone. `FixedOffsetTimeZone` serves tests and future consumers |
-| Calendar date carrier | A date is returned as a **UTC-flagged `DateTime` at 00:00** holding the calendar fields (`DateTime.utc(y, m, d)`), documented as date-only | No new type. `DateTime.utc` normalises month and leap-year overflow (Feb 29) without any zone involvement |
-| Wall clock | `DateTime localWallClock(DateTime utcInstant, LocalTimeZone zone)` returns a UTC-flagged `DateTime` holding the local fields (instant + offset), like `OffsetDateTime.wallClock` | One convention for "local fields" across `gann_core` |
+| Time-zone abstraction | `abstract interface class LocalTimeZone { int offsetMinutesAt(DateTime utc); }`. Implementations: `DeviceTimeZone` (const; offset of `DateTime.fromMicrosecondsSinceEpoch(utc.microsecondsSinceEpoch).timeZoneOffset`) and `FixedOffsetTimeZone(int offsetMinutes)`, which requires the offset within ±1080 (`OffsetDateTime.maxOffsetMinutes`), otherwise `ArgumentError` | The device zone is the decided rule. Injecting it makes DST behaviour testable with a fake zone. `FixedOffsetTimeZone` serves tests and future consumers |
+| Calendar date carrier | A date is returned as a **UTC-flagged `DateTime` at 00:00** holding the calendar fields (`DateTime.utc(y, m, d)`), documented as date-only: "never call `toLocal()` on it; the fields are the calendar date". `formatCellDate` / `formatCellTime` **require `isUtc`** (`ArgumentError` otherwise) and read only the fields | No new type. `DateTime.utc` normalises month and leap-year overflow (Feb 29) without any zone involvement |
+| Wall clock | `DateTime localWallClock(DateTime utcInstant, LocalTimeZone zone)` returns a UTC-flagged `DateTime` holding the local fields (instant + offset), like `OffsetDateTime.wallClock`. An out-of-range `add` → `ArgumentError` | One convention for "local fields" across `gann_core` |
+| `stepHours` | **Required** named parameter `{required int stepHours}` (no default). Callers pass `config.stepHours` | A default of 4 would silently ignore a square's edited step (SET-004 / T-EX-3) |
+| Overflow guard | `cellDate`: `n − 1 > 100000000` → `ArgumentError` (DateTime's whole range is ±100,000,000 days), then catch any remaining `ArgumentError`. `cellMoment` and `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked **before** multiplying, then catch `ArgumentError` / `RangeError` | `DateTime.utc(…, d + huge)` and `Duration(hours: huge)` wrap silently to wrong dates rather than throwing (verified in review) |
 | "Now" | Passed in as `DateTime nowUtc` | Pure and deterministic; the UI supplies `DateTime.now().toUtc()` |
 | Before the anchor | The today-cell functions return `null` when today or now is before the anchor | SQ-6 shows a message instead. `null` lets the UI do that, with no exception |
 | Range | `n ≥ 1`, otherwise `ArgumentError`. A result outside `DateTime`'s range → `ArgumentError`. `stepHours ≥ 1`. All `DateTime` inputs must be UTC (`ArgumentError` otherwise) | Same validation conventions as FND-012 / GAN-001 |
@@ -66,10 +70,11 @@
 - `cell_values.dart`:
   - `int cellNumber(int n)` (numbers mode; = n)
   - `DateTime cellDate(OffsetDateTime anchor, int n)` (dates mode; date-only)
-  - `DateTime cellMoment(OffsetDateTime anchor, int n, {int stepHours = 4})` (UTC instant)
+  - `DateTime cellMoment(OffsetDateTime anchor, int n, {required int stepHours})` (UTC instant)
   - `DateTime localWallClock(DateTime utcInstant, LocalTimeZone zone)`
   - `int? todayCellInDatesMode(OffsetDateTime anchor, DateTime nowUtc, LocalTimeZone zone)`
-  - `int? nowCellInDateTimeMode(OffsetDateTime anchor, DateTime nowUtc, {int stepHours = 4})`
+  - `int? nowCellInDateTimeMode(OffsetDateTime anchor, DateTime nowUtc, {required int stepHours})`
+  - `int daysAfterAnchor(int n)` (= n − 1) and `int hoursAfterAnchor(int n, {required int stepHours})` (= stepHours·(n − 1), absolute hours, same overflow guard). This is the **SQ-18 "N days/hours after the anchor" distance** that ZOD-SQR-013 must match exactly (design: cell 52 → 204 hours, cell 139 → 138 days).
 - `cell_format.dart`: `String formatCellDate(DateTime date)` (`d.m.yy`), `String formatCellTime(DateTime wallClock)` (`HH:MM`).
 
 ## Reference values
@@ -93,68 +98,101 @@
 - Anchor `2026-02-27`: n = 3 → `1.3.26`.
 
 **Today's cell:**
-- **Dates mode, DST fake zone, anchor date 2026-03-25.** `nowUtc = 2026-03-27T21:30Z` is local 00:30 on 28.3 → cell **4**. Taking the UTC date would give 3, so the zone matters.
-- **Date-and-time mode, design anchor.**
-  - now = anchor + 204 h → **52**.
-  - now = anchor + 207 h 59 m → 52.
-  - now = anchor + 208 h → 53.
-  - now = anchor − 1 min → `null`.
+- **Dates mode, DST fake zone, anchor `2026-03-25T00:00+02:00`.** `nowUtc = 2026-03-27T21:30Z` is local 00:30 on 28.3 → cell **4**. Taking the UTC date would give 3, so the zone matters.
+- **Dates mode across Feb 29**, `FixedOffsetTimeZone(120)`:
+  - anchor `2024-02-27T00:00+02:00`, `nowUtc = 2024-03-01T10:00Z` → **4** (leap year);
+  - anchor `2026-02-27T00:00+02:00`, `nowUtc = 2026-03-01T10:00Z` → **3**.
+- **Dates mode, design reference** (`02-square-of-nine_dates_desktop_en_dark.png`): anchor `2026-04-15T00:00+03:00`, `nowUtc = 2026-11-09T10:00Z`, `FixedOffsetTimeZone(120)` → **209** ("Today — Cell 209"). Also `cellDate(that anchor, 139)` → `31.8.26` ("138 days after the anchor").
+- **Date-and-time mode, design anchor:**
+  - now = anchor + 204 h → **52**;
+  - now = anchor + 207 h 59 m → 52;
+  - now = anchor + 208 h → 53;
+  - now = anchor → 1;
+  - now = anchor − 1 min, − 30 s or − 1 µs → `null`.
+- **Travel** (anchor offset ≠ device zone):
+  - Anchor `2026-11-01T00:00+02:00` shown in `FixedOffsetTimeZone(0)`: cell 1 = `31.10.26 22:00`, cell 2 = `1.11.26 02:00`.
+  - Dates mode keeps the anchor's own date. Anchor `2026-03-25T00:30+03:00` in `FixedOffsetTimeZone(0)`:
+    - cell 1 = 25.3;
+    - today at `2026-03-25T12:00Z` → 1;
+    - today at `2026-03-24T23:00Z` (local 24.3) → `null`.
 
 ## Review Focus
 
 1. **DST:** dates mode must never shift a date. Date-and-time mode must show the documented one-hour jump in both directions, never a silently corrected time. Pinned by the spring and autumn DST tests.
-2. **Leap years and month ends:** Feb 29 is present in 2024 and absent in 2026, and month and year rollovers are right (31.12 → 1.1). Pinned by the leap-year tests.
-3. **Today near local midnight:** the dates-mode today cell uses the **local** date, not the UTC date. Pinned by the 00:30 test, where the UTC date would be wrong.
-4. **Before the anchor and block boundaries:** `null` before the anchor; exact 4-hour boundaries (207 h 59 m vs 208 h). Pinned in the today-cell tests.
-5. **Format edges:** single- and double-digit days and months, years 2000–2009 (`05`), and midnight `00:00`. Pinned by the format tests.
+2. **Leap years and month ends:** Feb 29 present in 2024 and absent in 2026, for both the dates and the today cell; month and year rollovers (31.12 → 1.1). Pinned by the leap-year tests.
+3. **Today near local midnight and when travelling:**
+   - The dates-mode today cell uses the **local** date, not the UTC date.
+   - The anchor's date is always its own calendar date, never re-derived through the device zone.
+   - The today cell always displays today's local date.
+
+   Pinned by the 00:30, travel and invariant tests.
+4. **Before the anchor and block boundaries:** `null` for anything before the anchor, including sub-minute gaps, which truncating to minutes would mishandle. Exact block boundaries (207 h 59 m vs 208 h), and `stepHours` honoured. Pinned in the today-cell tests.
+5. **No silent overflow:** huge `n` or `stepHours` throw `ArgumentError` rather than wrapping to a wrong date. Pinned by the overflow test.
+6. **Format edges:** single- and double-digit days and months, years 2000–2009 (`05`), and midnight `00:00`. Pinned by the format tests.
 
 ---
 
-### Task 1: `LocalTimeZone` + date mapping + today's cell (TDD)
+### Task 1: `LocalTimeZone` + date mapping + today's cell + distances (TDD)
 
 **Files:** create `packages/gann_core/lib/src/dates/{local_time_zone,cell_values}.dart`; modify `packages/gann_core/lib/gann_core.dart`; test `packages/gann_core/test/dates/cell_values_test.dart`.
 
-**Interfaces:** consumes `OffsetDateTime` (FND-012) and `maxSpiralNumber` (GAN-001); produces the API above, minus formatting.
+**Interfaces:** consumes `OffsetDateTime` (FND-012); produces the API above, minus formatting.
 
 - [ ] **Step 1: Write the failing tests.** The file defines a test-only `_DstZone implements LocalTimeZone` with the Israel-2026-like transitions above.
   - `group('LocalTimeZone')`:
-    - `'FixedOffsetTimeZone returns its offset'`;
+    - `'FixedOffsetTimeZone returns its offset; rejects offsets beyond ±1080'`;
     - `'DeviceTimeZone matches DateTime.toLocal for sample instants'` (self-consistent on any machine);
     - `'rejects non-UTC input'`.
   - `group('numbers mode')`:
     - `'cellNumber(n) == n, rejects n < 1'`.
   - `group('dates mode')`:
     - `'the anchor cell is the anchor date'`;
-    - `'consecutive calendar days, across a month and a year end'`: anchor `2026-12-30+02:00` → 30.12, 31.12, 1.1.2027;
-    - `'leap year includes Feb 29; a common year does not'` (reference values);
+    - `'design reference: cell 139 is 31.8.26'`;
+    - `'consecutive calendar days, across a month and a year end'`: anchor `2026-12-30T00:00+02:00` → 30.12, 31.12, 1.1.2027;
+    - `'leap year includes Feb 29; a common year does not'`;
     - `'is unaffected by DST'`: anchor `2026-03-25T00:00+02:00`, n = 1…5 → 25.3 … 29.3 with no gap or duplicate;
     - `'uses the anchor’s own calendar date, not UTC'`: anchor `2026-03-25T00:30+03:00` (UTC date 24.3) → cell 1 is 25.3;
     - `'rejects n < 1'`.
   - `group('date-and-time mode')`:
-    - `'design reference: 1.11.2026 00:00 anchor'`: cells 1, 2, 52 and 169 → the local wall clocks in the table, using `FixedOffsetTimeZone(120)`;
+    - `'design reference: 1.11.2026 00:00 anchor'`: cells 1, 2, 52 and 169 using `FixedOffsetTimeZone(120)`;
     - `'spring DST: the displayed hour jumps forward by one'`;
     - `'autumn DST: the displayed hour jumps back by one'`;
+    - `'travel: date-and-time cells show the anchor instant in the device zone'`: `FixedOffsetTimeZone(0)` → `31.10.26 22:00`, `1.11.26 02:00`;
     - `'honours stepHours'`: `stepHours: 6`, n = 2 → +6 h;
     - `'rejects stepHours < 1 and n < 1'`.
+  - `group('distance from the anchor (SQ-18)')`:
+    - `daysAfterAnchor(139) == 138`;
+    - `hoursAfterAnchor(52, stepHours: 4) == 204`;
+    - n = 1 → 0;
+    - n < 1 rejected.
+  - `group('overflow')`:
+    - `'rejects results beyond DateTime's range (no silent overflow)'`: throws for `cellDate(anchor, 3000000000)`, `cellDate(anchor, 200000002)`, `cellMoment(anchor, 1000000001, stepHours: 4)`, `cellMoment(anchor, 1 << 31, stepHours: 1 << 30)` and `hoursAfterAnchor(1 << 31, stepHours: 1 << 30)`.
   - `group('today’s cell')`:
     - `'dates mode uses the local date (00:30 local, UTC date one day earlier)'` → 4;
+    - `'dates mode across Feb 29: leap year 4, common year 3'`;
+    - `'dates mode design reference: cell 209'`;
     - `'dates mode: the anchor day is cell 1; before the anchor is null'`;
-    - `'date-and-time mode: whole blocks elapsed + 1'`: 52, 52, 53;
-    - `'date-and-time mode: before the anchor is null'`;
+    - `'travel: dates mode and its today cell keep the anchor's own date'` (1, then `null`);
+    - `'the dates-mode today cell displays today's local date'`: for `nowUtc` = 2026-03-27T21:30Z, 2026-03-27T20:30Z and 2026-10-24T22:30Z under `_DstZone`, `cellDate(anchor, todayCell)` equals the local date of `localWallClock(nowUtc, zone)`;
+    - `'date-and-time mode: whole blocks elapsed + 1'`: 52, 52, 53, and `now == anchor` → 1;
+    - `'date-and-time mode: before the anchor is null'`: −1 min, −30 s and −1 µs;
+    - `'date-and-time mode honours stepHours'`: `stepHours: 6`, now = anchor + 12 h → 3;
     - `'rejects non-UTC now'`.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/dates`. Expected: compilation FAIL (undefined symbols).
 - [ ] **Step 3: Implement.**
-  - `cellDate`: `final w = anchor.wallClock; DateTime.utc(w.year, w.month, w.day + n − 1)`.
-  - `cellMoment`: `anchor.instant.add(Duration(hours: stepHours * (n − 1)))`. Catch `DateTime` range errors → `ArgumentError`.
-  - Today's cell, dates mode: the day difference between `DateTime.utc` dates of the local today and the anchor date, via `inDays` on UTC midnights, + 1.
-  - Today's cell, date-and-time mode: `(now − anchor.instant).inMinutes ~/ (60·stepHours) + 1`, floored, with `null` when negative.
-  - **Doc comments** state the decided time-zone rule (device zone, absolute steps, visible DST jump; dates mode calendar-only) and cite NFR-A3 and the GAN-003 notes.
+  - `cellDate`: `n − 1 > 100000000` → `ArgumentError`. Otherwise `final w = anchor.wallClock; DateTime.utc(w.year, w.month, w.day + n − 1)`, with a caught `ArgumentError` → `ArgumentError.value(n, 'n', 'date out of range')`.
+  - `cellMoment` / `hoursAfterAnchor`: `n − 1 > 2400000000 ~/ stepHours` → `ArgumentError`, checked before multiplying. Then `anchor.instant.add(Duration(hours: stepHours * (n − 1)))`, catching `ArgumentError` (`RangeError` is a subclass).
+  - Today's cell, dates mode: the local today is the date fields of `localWallClock(nowUtc, zone)`. The anchor date is **always** `anchor.wallClock`'s date, never derived through `zone`. Take the `inDays` difference between the two UTC-midnight dates, + 1; `null` if negative.
+  - Today's cell, date-and-time mode: `null` if `nowUtc.isBefore(anchor.instant)`. Otherwise `nowUtc.difference(anchor.instant).inMicroseconds ~/ (stepHours * Duration.microsecondsPerHour) + 1`.
+  - **Doc comments** state the decided time-zone rule (device zone, absolute steps, visible DST jump; dates mode calendar-only), the SQ-18 distance meaning, and cite NFR-A3 and the GAN-003 notes.
 - [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0.
 - [ ] **Step 5: Mutation proof.** Each change below must FAIL the suite; then restore:
   - (a) date-and-time mode uses wall-clock addition instead of absolute (`anchor.wallClock + hours`): the DST tests fail;
   - (b) dates mode uses `anchor.instant` (UTC date) instead of `anchor.wallClock`: the anchor-date test fails;
   - (c) today's cell (dates mode) uses the UTC date instead of the local one: the 00:30 test fails;
-  - (d) the today-cell formula drops the `+ 1`.
+  - (d) the today-cell formula drops the `+ 1`;
+  - (e) hard-code 4 in `nowCellInDateTimeMode`: the stepHours test fails;
+  - (f) the dates-mode today cell derives the anchor date via `zone`: the travel test fails.
 
   Record the results in the commit message.
 - [ ] **Step 6:** Commit `feat(ZOD-GAN-003): map cells to dates and moments; today's cell; device-zone rule`.
@@ -169,14 +207,20 @@
     - `(2024, 1, 4)` → `4.1.24`;
     - `(1999, 12, 31)` → `31.12.99`;
     - `(2005, 1, 5)` → `5.1.05`;
+    - `(2000, 1, 1)` → `1.1.00`;
     - `(2026, 11, 1)` → `1.11.26`;
     - `(2026, 10, 9)` → `9.10.26`.
   - `formatCellTime`: 00:00 → `00:00`; 04:00 → `04:00`; 12:05 → `12:05`; 23:59 → `23:59`.
   - `'formats the design reference cells'`: cells 2, 52 and 169 combine to `1.11.26 / 04:00`, `9.11.26 / 12:00`, `29.11.26 / 00:00`.
-- [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/dates`. Expected: compilation FAIL.
-- [ ] **Step 3: Implement.** The date is `'${d.day}.${d.month}.${(d.year % 100).toString().padLeft(2, '0')}'`. The time pads hours and minutes to 2 digits. The doc comments cite SQ-3 / SQ-4 / T-FMT-1 and MASTER.md §8.2.
+  - `'rejects non-UTC-flagged carriers'`: `formatCellDate(DateTime(2026))` and `formatCellTime(DateTime(2026))` → `throwsArgumentError`.
+- [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/dates`. Expected: `cell_format_test.dart` fails to load (`formatCellDate` / `formatCellTime` undefined), `cell_values_test.dart` passes, and the exit code is non-zero.
+- [ ] **Step 3: Implement.**
+  - The date is `'${d.day}.${d.month}.${(d.year % 100).toString().padLeft(2, '0')}'`. The time pads hours and minutes to 2 digits. Both require `isUtc`.
+  - The doc comments cite SQ-3 / SQ-4 / T-FMT-1 and MASTER.md §8.2.
+  - They state that "two digits" applies to the **year** (2005 → `05`) and "no leading zero" to day and month, matching `yy` in MASTER §8.2/§13 and Excel's `d.m.yy` (EX-1).
+  - They note that **English month-first order (L-12) is ZOD-L10-010**, which wraps this formatter.
 - [ ] **Step 4:** Same command, then lint and the full test run. Expected: all PASS / exit 0.
-- [ ] **Step 5: Mutation proof.** Padding the day, padding the month, or using a 4-digit year must each FAIL. Restore afterwards and record the results.
+- [ ] **Step 5: Mutation proof.** Each of these must FAIL: padding the day, padding the month, a 4-digit year, and an unpadded year (`5.1.5`). Restore afterwards and record the results.
 - [ ] **Step 6:** Commit `feat(ZOD-GAN-003): format cell dates d.m.yy and times HH:MM`.
 
 ### Task 3: Close out (zodiann-development workflow)
@@ -185,13 +229,18 @@
 - [ ] **Step 2:**
   - Set `Status: Done` in the task file and `TASKS.md`, and tick the acceptance criteria. (The GAN-003, TST-012 and TST-013 notes are committed in the planning commits.)
   - Update `docs/PROGRESS.md`: the decided time-zone rule as a convention (NFR-A3), the decision rows, verification, and the next task.
+  - **Propagate the time-zone decision:**
+    - In `TASKS.md`, mark the §6.2 DST item and the §5.4 "ZOD-WHL-011, ZOD-GAN-003 | DST-hour-jump planning constraint" row as resolved (2026-11-12, see the GAN-003 notes).
+    - Add a 2026-11-12 note to ZOD-DAT-005 and ZOD-DAT-009: per the GAN-003 time-zone decision, "identical / same anchor moment" means the same instant and offset. In date-and-time mode, the cells re-display in the device's current zone after travel; dates mode is unchanged.
+    - Add a note to ZOD-SET-002: its read-only time-zone row is NFR-A3's "shown to the user" part of the decided rule.
+  - Update GAN-003's implementation-details line 20 to `stepHours·(n−1)` and "decided 2026-11-12 (see Notes)".
 - [ ] **Step 3:** Commit, push, open a PR, then record the PR link.
 
 ## Acceptance Criteria → Evidence
 
 | AC (as amended 2026-11-12) | Proven by |
 |---|---|
-| Implemented and covered by own unit tests: anchor cell = anchor date; today's cell correct across a DST boundary and in a leap year; T-GAN-4 → TST-012 | Task 1: anchor-date tests, dates-mode DST test, today's cell at 00:30 local in the DST zone, the leap-year sequence, block boundaries |
+| Implemented and covered by own unit tests: anchor cell = anchor date; today's cell correct across a DST boundary and in a leap year; T-GAN-4 → TST-012 | Task 1: anchor-date tests, dates-mode DST test, today's cell at 00:30 local in the DST zone, **the leap-year today-cell test (4 vs 3)**, the design's today cell 209, the travel tests, block boundaries |
 | Own unit tests: `d.m.yy`, no leading zero, single- and double-digit day/month; T-FMT-1 → TST-013 | Task 2 literal format tests plus mutation proof |
 | A 4-hour date-and-time square crossing DST shows the documented one-hour jump, not a corrected time | Task 1 spring and autumn DST tests (05:00 and 03:00 where 04:00 would be "corrected"), mutation (a) |
 
