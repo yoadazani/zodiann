@@ -41,7 +41,7 @@ No direct design reference applies — this is a pure data-model task in `packag
 
 ## Notes
 
-_No additional notes._
+- `Body` is defined in `packages/astro_core` by [ZOD-FND-002](ZOD-FND-002-define-the-ephemerisport-interface-contract.md). This task adds its `fromJson`/`toJson` and must not redefine it.
 
 ---
 

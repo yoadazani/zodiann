@@ -12,18 +12,21 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), pending merge) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
+| ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), merged `0303645`) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
 
-_None._ ZOD-FND-001 is complete and awaiting PR merge.
+- **ID:** ZOD-FND-002
+- **Name:** Define the `EphemerisPort` interface contract
+- **Status:** Plan written, awaiting user approval
+- **Plan:** [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md)
+- **Completed steps:** Read the task, its consumers and the spec sections. Resolved the node-formula ownership conflict with the product owner. Updated task files (FND-002 criterion and description, EPH-001, FND-012). Branch created; plan written.
+- **Remaining steps:** Plan approval → Task 1 (value types), Task 2 (result types + port contract), Task 3 (review, verification, docs, PR).
 
 ## Next Recommended Task
 
-- **ID:** ZOD-FND-002 — Define the `EphemerisPort` interface contract
-- **Why next:** It's next on the critical path. It depends only on FND-001 and unblocks FND-003 (Swiss Ephemeris FFI spike) and EPH-001.
-- **Dependency status:** Needs ZOD-FND-001's PR merged into `main` first (it builds on the workspace).
-- **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research). It has no dependencies and needs no code.
+- **ID:** to be re-evaluated after ZOD-FND-002. Candidates on the critical path: ZOD-FND-003 (Swiss Ephemeris FFI spike, needs FND-002) and ZOD-EPH-001 (mean node formula, needs FND-002 + FND-012).
+- **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research), ZOD-FND-012 (data model, needs only FND-001).
 - **Note for ZOD-FND-004 (CI):** Melos `sdkPath: .fvm/flutter_sdk` must resolve on the runner. CI has to install the `.fvmrc` SDK and provide `.fvm/flutter_sdk`, or an equivalent `MELOS_SDK_PATH`.
 
 ## Blockers
@@ -77,6 +80,8 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | ARCH-2 guard lives once in the workspace root (`useRootAsPackage: true`) as fixture unit tests plus a live `pub deps --json` check. | Avoids copying the check into each core package. Fixture tests permanently prove that indirect Flutter is detected via regular and dev paths. | `test/architecture/` | ZOD-FND-001 plan, Task 3 |
 | 2026-11-12 | Closure rule: start node uses `directDependencies ∪ devDependencies`, every later node uses `directDependencies` only. | In workspace `pub deps --json`, a member's `dependencies` is the union with dev dependencies, so following it would count other packages' dev dependencies (false positives). `root` is the workspace, not the member. | ARCH-2 guard | ZOD-FND-001 plan, Verified fact 4 |
 | 2026-11-12 | The import scan covers whole import/export statements, including conditional alternatives. | The code review found that `import 'stub.dart' if (dart.library.ui) 'dart:ui';` was missed. | ARCH-2 guard | Final review fix |
+| 2026-11-12 | ZOD-FND-002 declares the mean-node method and documents its formula; ZOD-EPH-001 implements it; ZOD-TST-002 verifies T-EPH-2. FND-002's node criterion was changed to "declared + contract documented". | The original criterion created a cycle (FND-002 → TST-002 → EPH-001 → FND-002). Product-owner decision. | astro_core, EPH-001, TST-002 | FND-002 / EPH-001 task Notes |
+| 2026-11-12 | `Body` is defined by ZOD-FND-002; ZOD-FND-012 adds JSON only. | Both task files listed it; FND-002 needs it first. | astro_core, FND-012 | FND-002 / FND-012 task Notes |
 
 ## Verification
 
@@ -104,9 +109,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-001-melos-workspace` (from `main` @ `5f7797f`)
-- **Relevant commits:** `2c66f9b` FVM pin · `2d810e3` workspace + skeletons · `0063563` ARCH-2 guard · `aeccc8e` README · `4733e36` conditional-import fix · plus planning/docs commits
-- **Pull request:** https://github.com/yoadazani/zodiann/pull/2 (open)
-- **Unmerged task branches others depend on:** `task/ZOD-FND-001-melos-workspace` (ZOD-FND-002 and later need it on `main`)
+- **Current task branch:** `task/ZOD-FND-002-ephemeris-port` (from `main` @ `0303645`)
+- **Relevant commits:** ZOD-FND-001 merged to `main` as `0303645` (PR #2). FND-002 branch: planning commits only
+- **Pull request:** FND-001 → https://github.com/yoadazani/zodiann/pull/2 (merged). FND-002: not opened yet
+- **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
