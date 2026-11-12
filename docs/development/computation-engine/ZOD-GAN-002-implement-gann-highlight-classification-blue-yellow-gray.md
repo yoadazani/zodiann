@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -27,9 +27,9 @@ No direct design reference applies to the classification math itself; the result
 
 ## Acceptance Criteria
 
-- [ ] Classification is implemented and covered by GAN-002's own unit tests: a 9×9 square (rings 1–4) totals 16 blue, 16 yellow, 16 gray; Appendix B per-ring counts. Dedicated T-GAN-2 verification is tracked by [ZOD-TST-011](../testing-qa/ZOD-TST-011-author-the-ring-highlight-count-test-t-gan-2.md).
-- [ ] Own unit tests cover the axes and diagonals per Appendix C: the 90° axis (the cells straight above cell 1: x = 0, y < 0) and the 270° axis (straight below: x = 0, y > 0) are blue; only 45/135/225/315 are yellow (corrected 2026-11-12; see Notes). Dedicated T-GAN-3 verification is tracked by [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
-- [ ] Priority order is verified with a cell that would otherwise match more than one category conceptually (none should, if the math is right — this test guards the *order* of the `if` chain itself).
+- [x] Classification is implemented and covered by GAN-002's own unit tests: a 9×9 square (rings 1–4) totals 16 blue, 16 yellow, 16 gray; Appendix B per-ring counts. Dedicated T-GAN-2 verification is tracked by [ZOD-TST-011](../testing-qa/ZOD-TST-011-author-the-ring-highlight-count-test-t-gan-2.md).
+- [x] Own unit tests cover the axes and diagonals per Appendix C: the 90° axis (the cells straight above cell 1: x = 0, y < 0) and the 270° axis (straight below: x = 0, y > 0) are blue; only 45/135/225/315 are yellow (corrected 2026-11-12; see Notes). Dedicated T-GAN-3 verification is tracked by [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
+- [x] Priority order is verified with a cell that would otherwise match more than one category conceptually (none should, if the math is right — this test guards the *order* of the `if` chain itself).
 
 ## Dependencies
 
