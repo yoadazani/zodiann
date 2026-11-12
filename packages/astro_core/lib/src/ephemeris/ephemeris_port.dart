@@ -78,8 +78,10 @@ abstract interface class EphemerisPort {
   ///   which [EclipticPosition] rejects with an [ArgumentError]. Map a
   ///   `360.0` result to `0.0`.
   /// * The speed is the constant `−1934.136261 / 36525` degrees per day.
-  /// * This is a linear approximation that deviates from the full formula by
-  ///   less than 0.01° over two hundred years around 2000.
+  /// * This is a linear approximation. The spec states an expected deviation
+  ///   of less than 0.01° from the full formula over two hundred years
+  ///   around 2000; this bound is pending independent verification by T-EPH-2
+  ///   (ZOD-TST-002).
   ///
   /// This is a formula-based point, not an apparent physical position (see
   /// the class documentation).

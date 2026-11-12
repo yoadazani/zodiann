@@ -7,4 +7,5 @@ export 'src/ephemeris/body.dart';
 export 'src/ephemeris/ecliptic_position.dart';
 export 'src/ephemeris/ephemeris_port.dart';
 export 'src/ephemeris/ephemeris_result.dart';
+export 'src/ephemeris/mean_node.dart';
 export 'src/ephemeris/utc_range.dart';
