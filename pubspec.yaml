@@ -36,8 +36,10 @@ melos:
   # zero packages, while an empty `melos exec` selection is a successful no-op.
   # Nested calls use `dart run melos` (the lock-pinned Melos on the pinned SDK,
   # which Melos puts first on the child PATH via sdkPath), never a global melos.
-  # The command is passed as ONE quoted argument: `dart run` strips a `--`
-  # separator, which would let melos parse the command's own flags.
+  # `melos exec <filters> -- <command>` passes the command through intact. The
+  # quoted single-argument form used below also works. It is REQUIRED only when
+  # the command contains `--version` or `-v`: Melos treats those as its own
+  # flags wherever they appear, even after `--` (command_runner.dart:120).
   scripts:
     analyze:
       description: Analyze every package; infos are fatal.
