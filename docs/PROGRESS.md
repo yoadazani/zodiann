@@ -12,7 +12,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done (PR pending merge) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
+| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), pending merge) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
 | ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), merged `0303645`) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
@@ -123,7 +123,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 - **Current task branch:** `task/ZOD-FND-002-ephemeris-port` (from `main` @ `0303645`)
 - **Relevant commits:** ZOD-FND-001 merged to `main` as `0303645` (PR #2). FND-002: `32da922` value types · `025725e` port contract + sealed results · `4f9db30` FND-001 record correction · `8da2b91` review doc fixes · plus planning/docs commits
-- **Pull request:** FND-001 → https://github.com/yoadazani/zodiann/pull/2 (merged). FND-002: to be opened (link recorded after push)
+- **Pull request:** FND-001 → https://github.com/yoadazani/zodiann/pull/2 (merged). FND-002 → https://github.com/yoadazani/zodiann/pull/3 (open)
 - **Unmerged task branches others depend on:** `task/ZOD-FND-002-ephemeris-port` (ZOD-FND-012, ZOD-EPH-001, ZOD-FND-003 need it on `main`)
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
