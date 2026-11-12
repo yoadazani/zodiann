@@ -5,13 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 (T-GAN-2 ring counts suite) merged — the Square of Nine core and all its verification suites are complete. 12 of 205 tasks done. ZOD-FND-005 (Flutter app shell) is in planning.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) done, PR open; iOS build/runtime verification outstanding (needs a Mac). 13 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) (PR pending) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
 | ZOD-TST-011 | Author the ring highlight-count test (T-GAN-2) | Done ([PR #14](https://github.com/yoadazani/zodiann/pull/14), merged `30ea9eb`) | `gann_core` T-GAN-2 suite 8: Appendix B rows 1–6 with every column asserted (cells placed geometrically, angle per cell, blue/yellow/gray/unhighlighted, side, last number), named 9×9 total 16/16/16 with unhighlighted center, T-GAN-2 rule for rings 7–30. Mutants H1–H7 caught exactly as planned. Plan review: Approve (2 rounds, 3 Important applied). Code review: Ready to merge, comment minors fixed, 1 deferred. Plan: [`docs/plans/ZOD-TST-011-gann-ring-counts-suite.md`](plans/ZOD-TST-011-gann-ring-counts-suite.md) |
 | ZOD-TST-010 | Author the Gann spiral direction test suite (T-GAN-1, T-GAN-3) | Done ([PR #13](https://github.com/yoadazani/zodiann/pull/13), merged `3a447d5`) | `gann_core` T-GAN-1 6 + T-GAN-3 11: all 169 cells of the 13×13 design grid (literal, re-checked by two reviewers), 2 left of 1, unit-step + clockwise over 61×61 (3690 same-ring pairs), ring corners k ≤ 30, inverse round-trip 61×61; Appendix C rows over 30-cell rays (angle, category, `isNot` others), "only" over 61×61, 48 design highlight literals, angles in [0, 360). Mutants S1–S9, C1–C4 all caught. Plan review: Approve (2 rounds, 4 Important applied). Code review: Ready to merge, 2 minors promoted, 1 deferred. Plan: [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md) |
 | ZOD-TST-013 | Author the date-format test (T-FMT-1) | Done ([PR #12](https://github.com/yoadazani/zodiann/pull/12), merged `c5e442f`) | `gann_core` T-FMT-1 suite 20: 15 literal spot checks (all single/double day-month combinations, `00`/`05`/`09` years, design references), parse-back over every valid date of 2024/2026 at 00:00 and 23:59:59.999 UTC (366/365 per time of day), two-digit year 1900–2100. Mutants F1–F8 all caught with the planned counts. Plan review: Approve (2 rounds, 1 Important applied). Code review: Ready to merge, 3 minors promoted and fixed. Plan: [`docs/plans/ZOD-TST-013-date-format-suite.md`](plans/ZOD-TST-013-date-format-suite.md) |
@@ -27,15 +28,11 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **ID:** ZOD-FND-005 — Flutter app shell bootstrap (`apps/astro_mobile`)
-- **Status:** Plan written and reviewed, awaiting approval
-- **Plan:** [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md)
-- **Completed steps:** plan, plan review, product-owner decisions (app ID `com.zodiann.app`, placeholder theme seam, widget test + APK with on-device runs deferred, criterion 3 handed to WHL-001/SQR-001)
-- **Remaining steps:** Tasks 1–4 of the plan (scaffold, DI, root widget, APK build + close-out)
+- **None in progress.** ZOD-FND-005 is done on `task/ZOD-FND-005-flutter-app-shell`, PR open (see Git State). Next: ZOD-FND-013 (planning requested).
 
 ## Next Recommended Task
 
-- **ID:** ZOD-FND-005 — Flutter app shell bootstrap (`apps/astro_mobile`). Critical; its dependencies (FND-001, FND-002) are done. It unblocks FND-013 (design-token theme skeleton) → UI-001 and the rest of the UI track. Alternative with no code: ZOD-FND-010 (Swiss Ephemeris license research).
+- **ID:** ZOD-FND-013 — Establish the design-token theme skeleton (dark + light `ColorScheme`). Critical; its dependency FND-005 is done (PR open). It replaces FND-005's placeholder `AppTheme` seam (`apps/astro_mobile/lib/src/theme/app_theme.dart`) and unblocks UI-001 and the UI track. Note for it: on Flutter 3.50 import `package:material_ui/material_ui.dart`, never `package:flutter/material.dart` (deprecated, fails `--fatal-infos`). Alternatives: ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code).
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
@@ -55,7 +52,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Blockers
 
-- **iOS build environment for ZOD-FND-003** (and later iOS work): development runs on Windows, and iOS builds need macOS/Xcode. A decision is needed before FND-003.
+- **iOS build environment for ZOD-FND-003** (and later iOS work): development runs on Windows, and iOS builds need macOS/Xcode. A decision is needed before FND-003. It also blocks **ZOD-FND-005's outstanding iOS build + runtime verification** (ZOD-FND-004's task file includes no macOS runner). When the Mac run happens, also check two iOS items no task owns (FND-005 review minors): the launch screen is hard-coded white (`ios/Runner/Base.lproj/LaunchScreen.storyboard`, white flash in dark mode; use `systemBackgroundColor`), and `Info.plist` lacks `CFBundleLocalizations` (en, he), which iOS needs to treat the bundle as Hebrew-capable and to show the per-app language picker (L-3).
 - Open product decisions D-1…D-5 and design approvals D6–D19 (`TASKS.md` §6) affect later tasks, not the next one.
 
 ## Architecture Conventions
@@ -139,6 +136,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-13 | App ID `com.zodiann.app` (Android `applicationId`/`namespace`, iOS bundle ID), display name "Zodiann". | Store identity; nothing in spec/tasks set it. User decision. | `apps/astro_mobile` android/ios | ZOD-FND-005 plan, decision 1 |
+| 2026-11-13 | Placeholder theme seam `AppTheme.light/dark` (plain `ThemeData`, no color literals, `ThemeMode.system`). | UI-001 → FND-013 → FND-005 makes the token theme unavailable. User decision; FND-013/UI-001 replace it. | `apps/astro_mobile/lib/src/theme` | ZOD-FND-005 plan, decision 2 |
+| 2026-11-13 | Material types and `GlobalMaterialLocalizations.delegates` come from `package:material_ui`; never import `package:flutter/material.dart` or `flutter/cupertino.dart`. | Deprecated since Flutter 3.47; they fail `--fatal-infos`. | All Flutter packages | ZOD-FND-005 plan review C1 |
+| 2026-11-13 | `ephemerisPortProvider` is an app-level placeholder (not exported, not a feature-package contract); unbound read throws a `StateError` naming `appOverrides`; `appOverrides` is the single binding list and deliberately non-const. | Feature packages must not import the app layer; an unbound source must fail loudly; a const list would hide a `main()` that drops `overrides:`. The first feature-side consumer decides the real contract. | `apps/astro_mobile/lib/src/di` | ZOD-FND-005 plan, P2 |
+| 2026-11-13 | ARCH-3 means one Provider per screen, not one `ProviderScope`; single root scope in `main()`. Verification handed to ZOD-WHL-001 and ZOD-SQR-001 (added criteria). | Product-owner correction of FND-005 criterion 3. | Screen tasks | ZOD-FND-005 plan, decision 4 |
+| 2026-11-13 | FND-005 marked `Done (iOS build/runtime verification outstanding)` with criterion 1 unchecked. | Product-owner decision 5: a conscious departure from "never mark complete before criteria are verified", limited to iOS verification this machine cannot perform (Android on-device was verified on emulator-5554). | Task status | ZOD-FND-005 plan, decision 5 + Task 4 ruling |
 | 2026-11-12 | Melos 8 (8.10.1) on Dart pub workspaces, configured in the root `pubspec.yaml`. No `melos.yaml`. | Current Melos model, with one shared resolution and lock file. User decision. | Whole workspace | ZOD-FND-001 plan |
 | 2026-11-12 | Pin Flutter 3.50.0 / Dart 3.14.0 with FVM 4.3.2 (`.fvmrc`). Melos `sdkPath: .fvm/flutter_sdk`. | Latest stable on 2026-11-12, superseding the initially named 3.47.9. Same SDK locally and in CI. User decision. | Whole workspace, CI (FND-004) | ZOD-FND-001 plan |
 | 2026-11-12 | Use `test` 1.32.0 instead of the latest 1.33.0. | 1.33.0 pins `test_api 0.7.15`, which conflicts with Flutter 3.50.0's `flutter_test` pin of `test_api 0.7.14` in the shared workspace resolution. 1.32.0 is the newest compatible release. | Root and pure-Dart packages' tests | ZOD-FND-001 plan, Version Baseline |
@@ -169,6 +172,19 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-FND-005, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| App tests | `fvm dart run melos exec --scope=astro_mobile -- flutter test` | 13/13 (shell 10, DI 3) |
+| Mutation proof | ad-hoc mutants on `lib/`, each confirmed applied against a backup, restored, `diff -r` clean | M1 ThemeMode.light −2, M2 he first −1, M3 no delegates −2, M4 ShellHome watches port −9, M5 unbound returns stub −1, M6 `main()` without overrides −1, M7 Widgets delegate only −2, M8 English Material delegate −1 (he Material only). No compile errors |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 (analyze clean in 11 packages; root 17, astro_core 53, gann_core 189, astro_mobile 13) |
+| Android build | `fvm flutter build apk --debug` | ✓ `app-debug.apk` (first Gradle run ~595 s; NDK/CMake auto-installed) |
+| Android on-device | `adb install` + `am start` on emulator-5554 (AOSP Android 9, API 28, x86, ARM translation) | Blank light screen; blank dark screen with `cmd uimode night yes`; process alive, no crash |
+| Code review | Fresh opus reviewer, whole branch | Ready to merge: 0 Critical / 0 Important; 5 minors deferred (iOS launch screen white, `CFBundleLocalizations`, duplicated test fake, machine path in plan, task-file spec refs) |
+
+**Known failures / outstanding:** iOS build + runtime not verified (needs a Mac; ZOD-FND-004's task file includes no macOS runner). Native x86_64 Android not exercised.
 
 ZOD-TST-011, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -341,7 +357,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 ## Git State
 
 - **Current task branch:** `task/ZOD-FND-005-flutter-app-shell` (from `main` @ `30ea9eb`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), all merged. FND-005 branch: plan
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), all merged. FND-005 branch: plan `2c9b0b6`, `170072f`; `f96390d` (scaffold), `679691d` (DI), `96a163b` (root widget + mutation proof), close-out
 - **Pull request:** PRs #2–#14 merged. FND-005: none yet
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none

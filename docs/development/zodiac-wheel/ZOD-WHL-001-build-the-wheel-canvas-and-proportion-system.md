@@ -29,6 +29,7 @@ Create the `CustomPainter` foundation every other wheel-drawing task paints onto
 - [ ] A test harness renders the empty proportion grid (rings only, no content) matching the radius fractions in the table at both desktop and compact sizes.
 - [ ] The painter never mirrors when the app's text direction is RTL.
 - [ ] Rendering uses one `CustomPainter`/`RepaintBoundary`, verified by inspecting the widget tree (no per-degree-tick or per-body widget).
+- [ ] ARCH-3 (handed over from ZOD-FND-005): this screen's state is kept in exactly one Riverpod provider, and its derived values are pure functions of that state, verified by a test. The screen adds no nested `ProviderScope`; it uses the app's root scope.
 
 ## Dependencies
 
@@ -41,10 +42,11 @@ Create the `CustomPainter` foundation every other wheel-drawing task paints onto
 - ARCH-8
 - L-6
 - MASTER.md §7.2
+- ARCH-3
 
 ## Notes
 
-_No additional notes._
+Handed over from ZOD-FND-005 criterion 3. ARCH-3 requires one Provider per screen, not one ProviderScope per screen. This task owns verifying it for its screen.
 
 ---
 

@@ -27,6 +27,7 @@ Build the Numbers/Dates/Date-and-time segmented control, preserving size and the
 
 - [ ] T-UI-3 passes (mode-switch portion): switching mode preserves size and selected cell when still valid.
 - [ ] Switching from a larger to a smaller size and back does not crash if the previous selection is out of range.
+- [ ] ARCH-3 (handed over from ZOD-FND-005): this screen's state is kept in exactly one Riverpod provider, and its derived values are pure functions of that state, verified by a test. The screen adds no nested `ProviderScope`; it uses the app's root scope.
 
 ## Dependencies
 
@@ -37,10 +38,11 @@ Build the Numbers/Dates/Date-and-time segmented control, preserving size and the
 
 - SQ-1
 - T-UI-3
+- ARCH-3
 
 ## Notes
 
-_No additional notes._
+Handed over from ZOD-FND-005 criterion 3. ARCH-3 requires one Provider per screen, not one ProviderScope per screen. This task owns verifying it for its screen.
 
 ---
 
