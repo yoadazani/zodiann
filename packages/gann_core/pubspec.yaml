@@ -1,0 +1,10 @@
+name: gann_core
+description: "Gann Square of Nine core: spiral, angles and date mapping (pure Dart)."
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0
+
+dev_dependencies:
+  test: ^1.32.0

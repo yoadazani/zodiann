@@ -1,0 +1,63 @@
+name: zodiann_workspace
+description: "Zodiann monorepo workspace root (Melos + pub workspace). Not shipped."
+publish_to: none
+
+environment:
+  sdk: ^3.14.0
+
+workspace:
+  - apps/astro_mobile
+  - packages/astro_core
+  - packages/ephemeris_swiss
+  - packages/ephemeris_astronomy
+  - packages/gann_core
+  - packages/feature_wheel
+  - packages/feature_square
+  - packages/shared_ui
+  - packages/shared_storage
+  - packages/shared_export_xlsx
+
+dev_dependencies:
+  lints: ^6.1.0
+  melos: ^8.10.1
+  # Held below the latest (1.33.0): it pins test_api 0.7.15, while Flutter
+  # 3.50.0's flutter_test pins test_api 0.7.14 in the shared workspace
+  # resolution. See docs/PROGRESS.md → Technical Decisions.
+  test: ^1.32.0
+
+melos:
+  sdkPath: .fvm/flutter_sdk
+  useRootAsPackage: true
+  ide:
+    intellij:
+      enabled: false
+  # Scripts select packages with `melos exec` CLI filters, never with
+  # script-level `packageFilters`: Melos 8 fails a script whose filters match
+  # zero packages, while an empty `melos exec` selection is a successful no-op.
+  # Nested calls use `dart run melos` (the lock-pinned Melos on the pinned SDK,
+  # which Melos puts first on the child PATH via sdkPath), never a global melos.
+  # The command is passed as ONE quoted argument: `dart run` strips a `--`
+  # separator, which would let melos parse the command's own flags.
+  scripts:
+    analyze:
+      description: Analyze every package; infos are fatal.
+      run: dart run melos exec "dart analyze --fatal-infos ."
+    format:check:
+      description: Fail if any package is not formatted.
+      run: dart run melos exec "dart format --output=none --set-exit-if-changed ."
+    lint:
+      description: analyze + format:check.
+      steps:
+        - analyze
+        - format:check
+    test:dart:
+      description: Run tests in pure-Dart packages that have a test/ directory.
+      run: dart run melos exec --dir-exists=test --no-flutter "dart test"
+    test:flutter:
+      description: Run tests in Flutter packages that have a test/ directory.
+      run: dart run melos exec --dir-exists=test --flutter "flutter test"
+    test:
+      description: Run all tests across the workspace.
+      steps:
+        - test:dart
+        - test:flutter

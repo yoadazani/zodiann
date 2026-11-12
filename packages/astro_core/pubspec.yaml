@@ -1,0 +1,10 @@
+name: astro_core
+description: "Zodiann computation core: crossings, aspects and the EphemerisPort interface (pure Dart)."
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0
+
+dev_dependencies:
+  test: ^1.32.0

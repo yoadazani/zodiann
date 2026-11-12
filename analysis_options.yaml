@@ -1,0 +1,10 @@
+# Shared analyzer configuration for the whole workspace.
+# Pure-Dart packages inherit this file; Flutter packages include it together
+# with package:flutter_lints/flutter.yaml.
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
