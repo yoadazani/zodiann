@@ -69,7 +69,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 
 | ID | Task | Priority | Status |
 |---|---|---|---|
-| ZOD-FND-001 | [Set up the Melos monorepo workspace](foundations-architecture/ZOD-FND-001-set-up-the-melos-monorepo-workspace.md) | Critical | Not Started |
+| ZOD-FND-001 | [Set up the Melos monorepo workspace](foundations-architecture/ZOD-FND-001-set-up-the-melos-monorepo-workspace.md) | Critical | Done |
 | ZOD-FND-002 | [Define the `EphemerisPort` interface contract](foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md) | Critical | Not Started |
 | ZOD-FND-003 | [Spike: Swiss Ephemeris FFI binding on Android and iOS](foundations-architecture/ZOD-FND-003-spike-swiss-ephemeris-ffi-binding-on-android-and-ios.md) | Critical | Not Started |
 | ZOD-FND-004 | [Set up the CI pipeline](foundations-architecture/ZOD-FND-004-set-up-the-ci-pipeline.md) | High | Not Started |

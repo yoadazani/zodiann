@@ -1,0 +1,145 @@
+{
+  "root": "ws",
+  "packages": [
+    {
+      "name": "core_fp",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "devonly"
+      ],
+      "directDependencies": [
+        "devonly"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "devonly",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "uipkg"
+      ],
+      "directDependencies": [],
+      "devDependencies": [
+        "uipkg"
+      ]
+    },
+    {
+      "name": "uipkg",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "flutter"
+      ],
+      "directDependencies": [
+        "flutter"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "flutter",
+      "version": "0.0.0",
+      "kind": "transitive",
+      "source": "sdk",
+      "dependencies": [
+        "sky_engine"
+      ],
+      "directDependencies": [
+        "sky_engine"
+      ]
+    },
+    {
+      "name": "sky_engine",
+      "version": "0.0.0",
+      "kind": "transitive",
+      "source": "sdk",
+      "dependencies": [],
+      "directDependencies": []
+    },
+    {
+      "name": "helper",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "uipkg"
+      ],
+      "directDependencies": [
+        "uipkg"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "mid",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "uipkg"
+      ],
+      "directDependencies": [
+        "uipkg"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "core_clean",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [],
+      "directDependencies": [],
+      "devDependencies": []
+    },
+    {
+      "name": "core_dev",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "helper"
+      ],
+      "directDependencies": [],
+      "devDependencies": [
+        "helper"
+      ]
+    },
+    {
+      "name": "core_reg",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [
+        "mid"
+      ],
+      "directDependencies": [
+        "mid"
+      ],
+      "devDependencies": []
+    },
+    {
+      "name": "ws",
+      "version": "0.0.0",
+      "kind": "root",
+      "source": "root",
+      "dependencies": [],
+      "directDependencies": [],
+      "devDependencies": []
+    }
+  ],
+  "sdks": [
+    {
+      "name": "Dart",
+      "version": "3.6.0"
+    },
+    {
+      "name": "Flutter",
+      "version": "3.27.1"
+    }
+  ],
+  "executables": []
+}
