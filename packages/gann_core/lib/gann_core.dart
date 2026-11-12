@@ -4,3 +4,5 @@ library;
 export 'src/model/highlight_match.dart';
 export 'src/model/highlight_rule.dart';
 export 'src/model/offset_date_time.dart';
+export 'src/model/square_config.dart';
+export 'src/model/square_enums.dart';
