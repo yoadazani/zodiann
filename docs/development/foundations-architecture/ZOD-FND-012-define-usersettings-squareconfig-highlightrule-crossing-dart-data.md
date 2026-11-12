@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -17,7 +17,7 @@ Implement the four core immutable data classes from the spec's data model, with 
 
 - Implement exactly the `SquareMode`, `SpiralStart`, `SpiralRotation`, `SquareConfig`, `HighlightMatch`/`AnglesMatch`/`MultipleOfMatch`, `HighlightRule` and `Crossing` types as specified (code block in "Data model and user settings"), and add JSON to the existing `Body` enum (defined by ZOD-FND-002). `UserSettings` is **not** part of this task (deferred to [ZOD-SET-007](../settings-persistence/ZOD-SET-007-implement-usersettings-persistence-wiring.md)).
 - Model `SquareConfig.anchor` as a pure-Dart `OffsetDateTime` (UTC instant + offset in minutes, serialized as ISO-8601 with offset), so the offset required by DATA-4 is held and serialized. Dart's `DateTime` can't hold an arbitrary offset.
-- Add `fromJson`/`toJson` for every class (used by DATA-1 storage and DATA-3 backup export).
+- Add `fromJson`/`toJson` for every persisted class (used by DATA-1 storage and DATA-3 backup export). `Crossing` deliberately has none, because it is never persisted (see Notes and the "Crossing has no storage/persistence code path" criterion).
 - `Crossing` is explicitly **not** persisted — ensure no storage code path attempts to save it (it's derived/recomputed only).
 - Document the default highlight rules (Axes/Diagonals/Eighths, priorities 1/2/3) as the default `List<HighlightRule>` a new `SquareConfig` gets.
 
@@ -27,9 +27,9 @@ No direct design reference applies — this is a pure data-model task in `packag
 
 ## Acceptance Criteria
 
-- [ ] `SquareConfig`, `HighlightRule` (with `HighlightMatch`) and `Crossing` compile, and the persisted types round-trip through JSON without data loss, including the anchor's time-zone offset. (`UserSettings` is deferred to ZOD-SET-007.)
-- [ ] `Crossing` has no storage/persistence code path.
-- [ ] A new `SquareConfig` defaults to the three default highlight rules in the documented priority order.
+- [x] `SquareConfig`, `HighlightRule` (with `HighlightMatch`) and `Crossing` compile, and the persisted types round-trip through JSON without data loss, including the anchor's time-zone offset. (`UserSettings` is deferred to ZOD-SET-007.)
+- [x] `Crossing` has no storage/persistence code path.
+- [x] A new `SquareConfig` defaults to the three default highlight rules in the documented priority order.
 
 ## Dependencies
 

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-FND-012-data-model` · **Written:** 2026-11-12
+**Status:** Approved and implemented (2026-11-12) · **Branch:** `task/ZOD-FND-012-data-model` · **Written:** 2026-11-12
 
 **Goal:** Implement the spec's immutable data classes for the Square of Nine and degree crossings, with strict hand-written JSON, as the shared contract between computation, storage and UI.
 
