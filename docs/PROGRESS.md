@@ -5,14 +5,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003 merged; ZOD-TST-012 (T-GAN-4 date-mapping suite) done, PR open. 9 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003 and ZOD-TST-012 merged; ZOD-TST-013 (T-FMT-1 date-format suite) done, PR open. 10 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-TST-012 | Author the Gann date-mapping test suite (T-GAN-4) | Done ([PR #11](https://github.com/yoadazani/zodiann/pull/11), open) | `gann_core` T-GAN-4 suite 28: independent record-based Gregorian oracle (self-checked), fake zones mirroring real 2026 Israel / New York DST, full 61×61 chains in both modes, the one-hour jump (exactly one in 169 cells), R-4 duplicate/skip with 1-hour steps, today marking (literals, travel, 30-min sweeps at all four transitions), leap years incl. 2000/2100. Mutants M1–M9 all caught. Plan review: Approve (2 rounds). Code review: With fixes, 1 Important + 3 minors fixed test-first (probe mutants), 1 deferred. Plan: [`docs/plans/ZOD-TST-012-gann-date-mapping-suite.md`](plans/ZOD-TST-012-gann-date-mapping-suite.md) |
+| ZOD-TST-013 | Author the date-format test (T-FMT-1) | Done ([PR #12](https://github.com/yoadazani/zodiann/pull/12), open) | `gann_core` T-FMT-1 suite 20: 15 literal spot checks (all single/double day-month combinations, `00`/`05`/`09` years, design references), parse-back over every valid date of 2024/2026 at 00:00 and 23:59:59.999 UTC (366/365 per time of day), two-digit year 1900–2100. Mutants F1–F8 all caught with the planned counts. Plan review: Approve (2 rounds, 1 Important applied). Code review: Ready to merge, 3 minors promoted and fixed. Plan: [`docs/plans/ZOD-TST-013-date-format-suite.md`](plans/ZOD-TST-013-date-format-suite.md) |
+| ZOD-TST-012 | Author the Gann date-mapping test suite (T-GAN-4) | Done ([PR #11](https://github.com/yoadazani/zodiann/pull/11), merged `718edf1`) | `gann_core` T-GAN-4 suite 28: independent record-based Gregorian oracle (self-checked), fake zones mirroring real 2026 Israel / New York DST, full 61×61 chains in both modes, the one-hour jump (exactly one in 169 cells), R-4 duplicate/skip with 1-hour steps, today marking (literals, travel, 30-min sweeps at all four transitions), leap years incl. 2000/2100. Mutants M1–M9 all caught. Plan review: Approve (2 rounds). Code review: With fixes, 1 Important + 3 minors fixed test-first (probe mutants), 1 deferred. Plan: [`docs/plans/ZOD-TST-012-gann-date-mapping-suite.md`](plans/ZOD-TST-012-gann-date-mapping-suite.md) |
 | ZOD-GAN-003 | Implement Gann date/number mapping per mode | Done ([PR #10](https://github.com/yoadazani/zodiann/pull/10), merged `8655a9d`) | `gann_core` dates 47 (values 32, format 15): design references (cell 139 = 31.8.26; 52 = 9.11.26 12:00; today 209), spring/autumn DST jumps (05:00 / 03:00) via an injected zone, leap and year-end rollovers, local-midnight and travel today cells, sub-minute before-anchor → null, block boundaries, overflow guards, `d.m.yy` / `HH:MM` literals. Mutants (a)–(f) and 4 format mutants all caught. Plan review: 2 rounds. Code review: Ready to merge, 0 Critical / 0 Important; 2 test minors promoted, 3 deferred. Plan: [`docs/plans/ZOD-GAN-003-date-number-mapping.md`](plans/ZOD-GAN-003-date-number-mapping.md) |
 | ZOD-GAN-002 | Implement Gann highlight classification (blue/yellow/gray) | Done ([PR #9](https://github.com/yoadazani/zodiann/pull/9), merged `1284889`) | `gann_core` highlight 13 + spiral 24: geometric oracle and literal angles over 61×61, Appendix B rings 1–6, 9×9 = 16/16/16, 90° column above (forward mapping), outermost ring, FND-012 default-rule equivalence. Mutants (a)–(e) plus a mirrored spiral all caught. Plan review: Approve (2 rounds). Code review: 0 Critical / 0 Important, 2 minors promoted and fixed. Plan: [`docs/plans/ZOD-GAN-002-highlight-classification.md`](plans/ZOD-GAN-002-highlight-classification.md) |
 | ZOD-GAN-001 | Implement the Gann spiral position formulas (k, j, i, θ) | Done ([PR #8](https://github.com/yoadazani/zodiann/pull/8), merged `ef1ea48`) | `gann_core` spiral 23/23: reference table (design-checked), geometric clockwise for rings 1–6, neighbours 1…3721, rings vs the integer definition to 200,000 and at 94906263²+1, Appendix B, corners, round trips 9×9 / 61×61 / top of range, −2^63 rejection. Integer-correction mutation → fail. Plan review: Approve (2 rounds; 1 Critical + 5 Important fixed in the plan). Code review: 19 mutants, all non-equivalent killed; 1 minor promoted and fixed test-first, 2 applied. Plan: [`docs/plans/ZOD-GAN-001-spiral-positions.md`](plans/ZOD-GAN-001-spiral-positions.md) |
@@ -24,12 +25,12 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-TST-012 is done on `task/ZOD-TST-012-gann-date-mapping-suite`, with its PR open (see Git State); merge on approval.
+- **None in progress.** ZOD-TST-013 is done on `task/ZOD-TST-013-date-format-suite`, with its PR open (see Git State); merge on approval.
 
 ## Next Recommended Task
 
-- **ID:** to be selected next. Candidates: the remaining Square of Nine suites (TST-013, TST-010/011) or the shared UI tokens (FND-013 → UI-001).
-- **Carry into ZOD-TST-013** (TST-012 applied this pattern, see its plan):
+- **ID:** to be selected next. Candidates: the remaining Square of Nine suites (TST-010/011) or the shared UI tokens (FND-013 → UI-001).
+- **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
 - **Carry into ZOD-TST-010 / ZOD-TST-011:**
@@ -123,6 +124,7 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 **Accuracy tests** (established in ZOD-TST-002)
 - Accuracy and verification suites live in `packages/<pkg>/test/accuracy/`. Their expected values come from an **independent** reference: only the code under test is imported (`show …`), with literal reference coefficients and test-local helpers. Production constants and helpers are never used for expectations.
+- Format and display oracles **parse the output back** and compare against the inputs, rather than rebuilding the expected string the way production does (T-FMT-1). Wall-clock carriers are checked at both ends of the day, to catch a stray `toLocal()` (effective on a non-UTC machine).
 - `gann_core` suites live in `packages/gann_core/test/accuracy/` too. DST cases use **test-local fake zones mirroring real rules** (Israel / New York 2026 in T-GAN-4) and never the machine zone; calendar oracles work on records, not `DateTime` date arithmetic. Large-square properties are checked over all 3,721 cells, not samples.
 - Each verification suite is accompanied by a **mutation proof**: alter each production constant or behaviour it guards, observe the failure, restore, and record it in the commit message.
 - The shared reference date set is `packages/astro_core/test/fixtures/reference_dates.json`. It's add-only: increment `version` when adding; never drop or change an instant. A v1-subset test enforces this.
@@ -161,6 +163,16 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-TST-013, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM; machine zone +02:00):
+
+| Check | Command | Result |
+|---|---|---|
+| AC: single- and double-digit day/month (e.g. `4.1.24`, `14.11.24`) | `fvm dart run melos exec --scope=gann_core -- dart test test/accuracy` | Literals `4.1.24`, `14.11.24`, `4.11.24`, `14.1.24`; parse-back over all 731 dates of 2024/2026 at both ends of the day |
+| T-FMT-1: two-digit year, no leading zero, period separator | same | `1.1.00`, `5.1.05`, `9.9.09`, `1.3.00`; years 1900–2100 (201); separator regex |
+| Mutation proof | ad-hoc mutants on `cell_format.dart`, restored, `git diff --exit-code` clean | F1 padded day −12, F2 padded month −13, F3 4-digit year −18, F4 unpadded year −6, F5 swapped −13, F6 `/` −18, F7 century −18, F8 `toLocal()` −2 (all as planned) |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 |
+| Code review | Fresh reviewer, whole branch | Ready to merge: 0 Critical / 0 Important. 3 minors promoted and fixed (per-time-of-day counts proven by dropping the 23:59 input → −2; value-comparison self-check; UTC-machine note) |
 
 ZOD-TST-012, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -297,9 +309,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-TST-012-gann-date-mapping-suite` (from `main` @ `8655a9d`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), all merged. TST-012 branch: plan, `98eb9a2`/`789f0e8` (Task 1), `d37cca8` (Task 2), `cc97e90` (review fixes), close-out
-- **Pull request:** PRs #2–#10 merged. TST-012: [PR #11](https://github.com/yoadazani/zodiann/pull/11) (open)
+- **Current task branch:** `task/ZOD-TST-013-date-format-suite` (from `main` @ `718edf1`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), all merged. TST-013 branch: plan, `4e9c991` (suite), review fixes, close-out
+- **Pull request:** PRs #2–#11 merged. TST-013: [PR #12](https://github.com/yoadazani/zodiann/pull/12) (open)
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
