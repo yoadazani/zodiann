@@ -207,6 +207,10 @@ Review:
 
 Address important findings before considering the task complete.
 
+## Finishing a Branch
+
+If `finishing-a-development-branch` is invoked, choose the "push and create a PR" path automatically — this project's Git workflow (Section 8) already decides it. Do not merge locally into `main`.
+
 ## Verification
 
 Use `verification-before-completion` before declaring any task completed.
@@ -311,6 +315,7 @@ Present the plan to the user and wait for approval.
 
 After approval:
 
+- Create or switch to the task branch before changing any code (see Section 8). Never implement on `main`.
 - Follow the approved plan.
 - Use TDD.
 - Keep changes focused.
@@ -355,11 +360,28 @@ Only after successful verification:
 
 Do not rewrite task requirements or acceptance criteria.
 
-## Step 8 — Recommend Next Task
+## Step 8 — Commit and Push
+
+Once verification passes and documentation is updated, commit and push the task branch. This is pre-authorized for every completed task; do not ask for separate permission.
+
+1. Confirm you are on the task branch, not `main`.
+2. Review `git status` and `git diff` — stage only files belonging to this task (code, tests, plan, task docs, `TASKS.md`, `PROGRESS.md`). Never stage unrelated user changes, secrets, or build artifacts.
+3. Commit using the format in Section 8.
+4. Push: `git push -u origin <task-branch>`.
+5. Open a pull request into `main` with `gh pr create` if the GitHub CLI is available and authenticated; otherwise report the branch name so the user can open one.
+6. Add the PR link to the Git State section of `docs/PROGRESS.md` (the branch name should already be recorded before the commit), then commit it as a small follow-up (`docs(<TASK-ID>): record PR link`) and push again. Do not amend or rewrite pushed commits.
+
+Never merge into `main` or push directly to `main` without explicit user approval.
+
+If the commit or push fails (hook failure, rejected push, auth error), stop, report the exact error, and fix the root cause. Never use `--no-verify`, `--force`, or skip signing.
+
+## Step 9 — Recommend Next Task
 
 Re-evaluate dependencies and identify the next eligible task.
 
 Present its ID, title, reason for selection, dependencies, and relevant risks.
+
+State whether it depends on the just-pushed task branch, and if so whether that PR needs to be merged into `main` first.
 
 Wait for user approval before starting another task.
 
@@ -425,8 +447,10 @@ The file must contain:
 - Known failures.
 
 ### Git State
-- Current branch.
+- Current task branch.
 - Relevant commits.
+- Pull request link and status (open / merged).
+- Unmerged task branches that later tasks depend on.
 - Uncommitted changes.
 - Any work that must be preserved.
 
@@ -453,8 +477,8 @@ Development must be resumable across Claude Code sessions and computer restarts.
 At the beginning of every new development session:
 
 1. Read `docs/PROGRESS.md`.
-2. Inspect the current Git branch and working tree.
-3. Inspect recent relevant commits.
+2. Inspect the current Git branch and working tree. If on `main` with an in-progress task, switch to that task's branch before doing anything else.
+3. Inspect recent relevant commits, open task branches, and the status of their PRs (`gh pr list` when available) — a task whose PR is merged is on `main`; one with an open PR is complete but not yet integrated.
 4. Verify the last completed task against the actual code.
 5. Inspect unfinished implementation work.
 6. Read the relevant task file.
@@ -477,23 +501,53 @@ If the previous session ended during implementation, resume the existing task ra
 
 # 8. Git and Change Management
 
-Keep Git changes organized and reviewable.
+Keep Git changes organized and reviewable. All work happens on task branches — never commit directly to `main`.
 
-Before implementation:
-- Inspect the working tree.
-- Identify unrelated existing changes.
-- Do not overwrite user changes.
+## Branching
 
-During implementation:
-- Keep changes focused.
-- Avoid mixing unrelated tasks.
+- One branch per task (or per approved task group).
+- Branch naming: `task/<TASK-ID>-<short-kebab-description>`
+  - Example: `task/FOUNDATION-001-project-initialization`
+  - Task group: `task/<FIRST-ID>-<LAST-ID>-<short-description>`
+- Planning-only work (saving a plan, updating `PROGRESS.md` before approval) also goes on the task branch, not on `main`.
+
+## Before Implementation
+
+1. Inspect the working tree. Identify unrelated existing changes and do not overwrite them. If uncommitted changes would be carried onto the new branch, stop and ask the user how to handle them.
+2. Update `main`: `git checkout main` then `git pull --ff-only origin main`.
+3. Create the task branch from the updated `main`: `git checkout -b task/<TASK-ID>-<description>`.
+   - If the branch already exists (e.g. resuming), check it out instead of creating a new one.
+   - If the task depends on work that is still on an unmerged task branch, do not silently branch from it. Tell the user and recommend either merging the dependency PR first (preferred) or branching from the dependency branch (stacked branch), and wait for their choice.
+4. Record the branch name in the Git State section of `docs/PROGRESS.md`.
+
+## During Implementation
+
+- Keep changes focused; avoid mixing unrelated tasks.
 - Preserve a clear relationship between task IDs and code changes.
+- Intermediate commits on the task branch are allowed at meaningful milestones (e.g. a passing TDD cycle). Pushing them is optional until the task is complete.
 
-After verification:
-- Keep the changes commit-ready.
-- Report the relevant Git state.
+## Commit Format
 
-Do not create commits, push branches, or discard changes unless explicitly authorized by the user or an existing project-specific instruction.
+```
+<type>(<TASK-ID>): <concise summary>
+
+<optional body: what changed and why, notable decisions>
+```
+
+- `type` is one of: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `build`.
+- Example: `feat(FOUNDATION-001): initialize project structure and tooling`
+- Append any attribution trailer required by the current environment.
+
+## After Verification
+
+Follow Task Execution Workflow Step 8 — commit, push the task branch, and open a PR into `main`.
+
+## Hard Rules
+
+- Never commit or push directly to `main`.
+- Never merge a PR or merge into `main` without explicit user approval.
+- Never force-push, rewrite pushed history, or use `--no-verify` without explicit user approval.
+- Never discard or reset changes without explicit user approval.
 
 ---
 
@@ -567,9 +621,10 @@ When the user returns after a break:
 When the user asks to plan a task:
 
 - Read the task and its dependencies.
+- Create or switch to the task branch (Section 8).
 - Use brainstorming when necessary.
 - Invoke writing-plans.
-- Save the completed plan under `docs/plans/`.
+- Save the completed plan under `docs/plans/` on the task branch.
 - Update progress documentation.
 - Wait for approval before implementation.
 
@@ -577,11 +632,13 @@ When the user asks to plan a task:
 
 When the user explicitly approves an implementation plan:
 
+- Ensure you are on the task branch.
 - Follow the approved plan.
 - Use TDD.
 - Use appropriate Superpowers skills.
 - Verify all acceptance criteria.
 - Update progress and task documentation.
+- Commit, push the task branch, and open a PR (Step 8).
 
 ## Review
 
