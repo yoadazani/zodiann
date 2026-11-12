@@ -38,7 +38,9 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision): this task owns the dedicated T-GAN-2 verification of the classification implemented in [ZOD-GAN-002](../computation-engine/ZOD-GAN-002-implement-gann-highlight-classification-blue-yellow-gray.md), whose criterion was amended to point here. As with ZOD-TST-002:
+  - expected counts come from Appendix B's literal table, never from production helpers;
+  - add a mutation proof showing the suite fails if a classification rule or the priority order is altered.
 
 ---
 
