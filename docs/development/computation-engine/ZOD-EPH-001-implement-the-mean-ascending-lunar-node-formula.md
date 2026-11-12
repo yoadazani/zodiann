@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -41,9 +41,9 @@ No direct design reference applies — pure computation.
 
 ## Acceptance Criteria
 
-- [ ] Output matches the formula to floating-point precision on a spot-checked date.
-- [ ] The production mean-node formula is implemented and covered by its own unit tests (see "Required unit tests" above). Dedicated T-EPH-2 accuracy verification is tracked by [ZOD-TST-002](../testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md).
-- [ ] The node is never reported as "direct" — always the constant mean-℞ state.
+- [x] Output matches the formula to floating-point precision on a spot-checked date.
+- [x] The production mean-node formula is implemented and covered by its own unit tests (see "Required unit tests" above). Dedicated T-EPH-2 accuracy verification is tracked by [ZOD-TST-002](../testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md).
+- [x] The node is never reported as "direct" — always the constant mean-℞ state.
 
 ## Dependencies
 

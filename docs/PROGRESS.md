@@ -5,32 +5,34 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** ZOD-FND-001, ZOD-FND-002 and ZOD-FND-012 merged. Planning ZOD-EPH-001 (mean node). 3 of 205 tasks done.
+- **Overall status:** ZOD-FND-001, ZOD-FND-002 and ZOD-FND-012 merged. ZOD-EPH-001 (mean node) complete, PR pending merge. 4 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-EPH-001 | Implement the mean ascending lunar node formula | Done (PR pending merge) | `astro_core` 41/41 (epoch exact, 1900 / 2100 / 2026 references, normalization incl. the `−1e-15` edge, constant speed, non-UTC rejection, coefficients, "never direct" 1800–2400, node bypasses `coveredRange`) · lint exit 0. Ad-hoc coefficient mutations each fail 3 tests. Review: 0 Critical / 0 Important. The reviewer fuzzed `normalizeDegrees` over the full double range. 4 minor doc/test items fixed. Plan: [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md) |
 | ZOD-FND-012 | Define `SquareConfig`, `HighlightRule`, `Crossing` data classes (`UserSettings` → SET-007) | Done ([PR #4](https://github.com/yoadazani/zodiann/pull/4), merged `13ea8e6`) | `gann_core` 33/33 · `astro_core` 26/26 · workspace architecture 17/17 · lint exit 0. The `Crossing` guard was proven to fail on an injected reference. Review: 0 Critical, 2 Important fixed, 3 minors promoted and fixed test-first (strict ISO-8601, out-of-range wall clock, required `anchor` key), 2 deferred. Plan: [`docs/plans/ZOD-FND-012-data-model.md`](plans/ZOD-FND-012-data-model.md) |
 | ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), merged `331c7dc`) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
 | ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), merged `0303645`) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
 
-- **ID:** ZOD-EPH-001
-- **Name:** Implement the mean ascending lunar node formula
-- **Status:** Plan revision 2 written, awaiting user approval
-- **Plan:** [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md)
-- **Completed steps:** Task definitions amended (EPH-001 criterion; TST-002 rules), with product-owner confirmation. Branch created; plan written.
-- **Remaining steps:** Plan approval → Task 1 (`normalizeDegrees` + mean-℞ flag) → Task 2 (formula + mixin) → Task 3 close-out.
+_None._ ZOD-EPH-001 is complete and awaiting PR merge.
 
 ## Next Recommended Task
 
-- **ID:** to be re-evaluated after ZOD-EPH-001. Candidate: ZOD-TST-002 (T-EPH-2, depends on EPH-001). Its date-set reference to T-EPH-1 (ZOD-TST-001) must be settled when it's planned.
+- **ID:** ZOD-TST-002 — Author the mean-node formula exactness test (T-EPH-2) (Critical, Gate 1)
+- **Why next:** Its only dependency (EPH-001) is done, it's small, and it closes the node formula's independent verification (the accuracy bound is still documented as "pending TST-002"). **EPH-001's PR should be merged first.**
+- **Decision needed when planning:** its description says "on the same date set as T-EPH-1", but T-EPH-1's dataset is ZOD-TST-001 (not done, not a dependency). Either TST-002 defines its own dates and TST-001 reuses them, or TST-001 becomes a dependency.
+- **Strong alternative:** ZOD-GAN-001 (Gann spiral formulas, Critical, depends only on FND-001). It starts the Square of Nine critical path and Gate 1's T-GAN tests.
+- **Carry into ZOD-EPH-002/004 (adapters):**
+  - Reuse the "node at 1900 succeeds while the Moon is out of range" check in each adapter's tests.
+  - Consider an architecture guard so the coefficient literals `125.04452` / `1934.136261` appear only in `mean_node.dart`. Test files stay exempt for TST-002's independent coefficients.
+  - Normalize with `normalizeDegrees`.
 - **Why not FND-003 yet:** the Swiss Ephemeris FFI spike must run a real computation on **both Android and iOS**. An iOS build needs macOS/Xcode, which this Windows machine can't provide. That needs a decision (a Mac, a cloud macOS runner, or splitting the spike) before FND-003 starts. It also benefits from ZOD-FND-010 (license) first.
 - **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research, Critical, no code).
-- **Note for ZOD-EPH-001:** the task file now records the shared `mean_node.dart` location, the `implements` (not `on`) mixin rule, the `x % 360 == 360.0` pitfall, and `T` from UTC.
 - **Note for ZOD-FND-004 (CI):** Melos `sdkPath: .fvm/flutter_sdk` must resolve on the runner. CI has to install the `.fvmrc` SDK and provide `.fvm/flutter_sdk`, or an equivalent `MELOS_SDK_PATH`.
 
 ## Blockers
@@ -80,6 +82,11 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - `HighlightRule.colorToken` is a MASTER.md §2.2 **role-family key** (`axis`, `diag`, `eighth`, …). The UI resolves it to `<family>-fill` / `<family>-ink`, plus the bare `<family>` accent where the design defines one.
 - Derived results (e.g. `Crossing`) have no JSON and are never persisted. `test/architecture/crossing_not_persisted_test.dart` scans the persistence packages, currently `packages/shared_storage/lib`. **Add any new persistence package to its `storageLayers` list.**
 
+**Angles and the node** (established in ZOD-EPH-001)
+- Normalize every longitude with `normalizeDegrees` (`astro_core`), never a bare `x % 360`. Dart's `%` can return exactly `360.0` for tiny negatives, and `EclipticPosition` rejects that.
+- The mean-node formula exists once (`meanAscendingNodeAt` in `mean_node.dart`). `EphemerisPort` adapters `with MeanAscendingNodeFormula implements EphemerisPort` and answer `Body.node` **before** checking `coveredRange`, because the node is formula-based and not bounded by the data range.
+- The node's retrograde state is the fixed flag `Body.hasConstantMeanRetrograde` ("℞ Mean"), never derived from speed.
+
 ## Technical Decisions
 
 | Date | Decision | Reason | Impacted components | Reference |
@@ -103,8 +110,21 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | Strict canonical ISO-8601 parsing instead of `DateTime.parse`. | `DateTime.parse` silently normalizes Feb 30 → Mar 2, `+05:75`, etc., so a hand-edited backup would load a different date (review finding). | gann_core | FND-012 review fix |
 | 2026-11-12 | `stepHours` only required ≥ 1 (default 4); no upper cap yet. | The spec says "4 in date and time mode" but SET-004 makes it editable. A cap is a product choice for GAN-003 / SET-004. | gann_core, GAN-003, SET-004 | FND-012 plan, deferred review minor |
 | 2026-11-12 | ZOD-EPH-001's criterion "T-EPH-2 passes" was amended to "implemented and covered by its own unit tests; T-EPH-2 tracked by ZOD-TST-002". TST-002 gains explicit rules: a separate reference formula, a coefficient-mutation proof, and the 0.01° bound against the full Meeus formula over ±100 years. | Removes the EPH-001 ↔ TST-002 cycle while keeping EPH-001 → TST-002 and separate delivery. Product-owner decision. | EPH-001, TST-002 | EPH-001 / TST-002 task Notes |
+| 2026-11-12 | Public `normalizeDegrees`; T computed from microseconds since 2000-01-01T12:00Z; the mean-℞ state is a fixed `Body` getter; the coefficients are public constants. | The 360.0-edge test needs a directly testable normalizer, and adapters need it too. Microseconds are exact (int64, no overflow at DateTime limits). The flag is a property of the body, not of a source. One production source for the coefficients, for TST-002's mutation proof (TST-002 keeps independent reference values). | astro_core, EPH-002/004/005, TST-002 | EPH-001 plan |
+| 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-EPH-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| AC1: matches the formula on spot-checked dates | `fvm dart run melos exec --scope=astro_core -- dart test` | Epoch exactly 125.04452; 1900 → 259.15430411757734, 2100 → 350.93473588242273, 2026-11-12 → 325.48865621351126 (1e-9°). Independently re-derived from JD by the reviewer |
+| AC2: implemented and covered by own unit tests | same | All six required areas covered: epoch, before/after, normalization incl. `−1e-15 → 0.0`, constant speed `−1934.136261/36525`, non-UTC rejection, coefficients. Ad-hoc mutations of either coefficient fail 3 tests |
+| AC3: never reported as direct | same | Speed < 0 for every year 1800–2400; `hasConstantMeanRetrograde` true only for the node |
+| Contract: node bypasses `coveredRange` | same | Adapter with range 2000–2100: node at 1900 succeeds, Moon at 1900 out of range |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 / `astro_core` 41, `gann_core` 33, workspace 17 |
+| Code review | Fresh reviewer, whole branch | 0 Critical, 0 Important, 4 Minor (all fixed: 1 promoted to match the accuracy-wording instruction) |
 
 ZOD-FND-012, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -159,8 +179,8 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 ## Git State
 
 - **Current task branch:** `task/ZOD-EPH-001-mean-node` (from `main` @ `13ea8e6`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), all merged. EPH-001 branch: planning/docs commits only
-- **Pull request:** PRs #2–#4 merged. EPH-001: not opened yet
-- **Unmerged task branches others depend on:** none
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), all merged. EPH-001: `76a5b8d` normalizeDegrees + flag · `98e665a` formula + mixin · `d3e99b5` review doc/test fixes · plus planning/docs commits
+- **Pull request:** PRs #2–#4 merged. EPH-001: to be opened (link recorded after push)
+- **Unmerged task branches others depend on:** `task/ZOD-EPH-001-mean-node` (ZOD-TST-002 and ZOD-EPH-005 need it on `main`)
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
