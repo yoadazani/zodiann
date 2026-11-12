@@ -73,7 +73,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 | ZOD-FND-002 | [Define the `EphemerisPort` interface contract](foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md) | Critical | Done |
 | ZOD-FND-003 | [Spike: Swiss Ephemeris FFI binding on Android and iOS](foundations-architecture/ZOD-FND-003-spike-swiss-ephemeris-ffi-binding-on-android-and-ios.md) | Critical | Not Started |
 | ZOD-FND-004 | [Set up the CI pipeline](foundations-architecture/ZOD-FND-004-set-up-the-ci-pipeline.md) | High | Not Started |
-| ZOD-FND-005 | [Flutter app shell bootstrap (`apps/astro_mobile`)](foundations-architecture/ZOD-FND-005-flutter-app-shell-bootstrap-apps-astro-mobile.md) | Critical | Not Started |
+| ZOD-FND-005 | [Flutter app shell bootstrap (`apps/astro_mobile`)](foundations-architecture/ZOD-FND-005-flutter-app-shell-bootstrap-apps-astro-mobile.md) | Critical | Done (iOS build/runtime verification outstanding) |
 | ZOD-FND-006 | [Local storage infrastructure: `shared_preferences` + SQLite (drift) schema v1](foundations-architecture/ZOD-FND-006-local-storage-infrastructure-shared-preferences-sqlite-drift-schema-v1.md) | High | Not Started |
 | ZOD-FND-007 | [Bundle offline fonts and verify no network dependency](foundations-architecture/ZOD-FND-007-bundle-offline-fonts-and-verify-no-network-dependency.md) | Medium | Not Started |
 | ZOD-FND-008 | [Package and integrate the app icon / logo asset set](foundations-architecture/ZOD-FND-008-package-and-integrate-the-app-icon-logo-asset-set.md) | Medium | Not Started |
@@ -530,7 +530,7 @@ Confirms every category of actionable requirement in the spec is converted into 
 
 **Data model and storage (DATA-1–DATA-10):** [x] all ten → `foundations-architecture/` ZOD-FND-006, 012; `settings-persistence/` ZOD-DAT-001 through 012; ZOD-NFR-014
 
-**Architecture (ARCH-1–ARCH-8):** [x] all eight → ZOD-FND-001 (workspace/ARCH-2), ZOD-NFR-001 (ARCH-1), ZOD-FND-005 (ARCH-3), ZOD-EPH adapters (ARCH-4), ZOD-WHL-001/ZOD-SQR-005 (ARCH-5), ZOD-FND-003/ZOD-REL-002 (ARCH-6), ZOD-FND-013/ZOD-UI-001 (ARCH-7), noted throughout as "logical pixels" (ARCH-8)
+**Architecture (ARCH-1–ARCH-8):** [x] all eight → ZOD-FND-001 (workspace/ARCH-2), ZOD-NFR-001 (ARCH-1), ZOD-FND-005 (ARCH-3 root scope) / ZOD-WHL-001, ZOD-SQR-001 (ARCH-3 verification), ZOD-EPH adapters (ARCH-4), ZOD-WHL-001/ZOD-SQR-005 (ARCH-5), ZOD-FND-003/ZOD-REL-002 (ARCH-6), ZOD-FND-013/ZOD-UI-001 (ARCH-7), noted throughout as "logical pixels" (ARCH-8)
 
 **Localization (L-1–L-19):** [x] all nineteen → `localization/` ZOD-L10-001 through 015, plus ZOD-XLS-016 for export-specific L-15/16/17
 
