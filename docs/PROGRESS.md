@@ -5,13 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012 and ZOD-TST-013 merged. Planning ZOD-TST-010 (T-GAN-1 / T-GAN-3 spiral and axes suite). 10 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012 and ZOD-TST-013 merged; ZOD-TST-010 (T-GAN-1 / T-GAN-3 spiral and axes suite) done, PR open. 11 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-TST-010 | Author the Gann spiral direction test suite (T-GAN-1, T-GAN-3) | Done (PR open, see Git State) | `gann_core` T-GAN-1 6 + T-GAN-3 11: all 169 cells of the 13×13 design grid (literal, re-checked by two reviewers), 2 left of 1, unit-step + clockwise over 61×61 (3690 same-ring pairs), ring corners k ≤ 30, inverse round-trip 61×61; Appendix C rows over 30-cell rays (angle, category, `isNot` others), "only" over 61×61, 48 design highlight literals, angles in [0, 360). Mutants S1–S9, C1–C4 all caught. Plan review: Approve (2 rounds, 4 Important applied). Code review: Ready to merge, 2 minors promoted, 1 deferred. Plan: [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md) |
 | ZOD-TST-013 | Author the date-format test (T-FMT-1) | Done ([PR #12](https://github.com/yoadazani/zodiann/pull/12), merged `c5e442f`) | `gann_core` T-FMT-1 suite 20: 15 literal spot checks (all single/double day-month combinations, `00`/`05`/`09` years, design references), parse-back over every valid date of 2024/2026 at 00:00 and 23:59:59.999 UTC (366/365 per time of day), two-digit year 1900–2100. Mutants F1–F8 all caught with the planned counts. Plan review: Approve (2 rounds, 1 Important applied). Code review: Ready to merge, 3 minors promoted and fixed. Plan: [`docs/plans/ZOD-TST-013-date-format-suite.md`](plans/ZOD-TST-013-date-format-suite.md) |
 | ZOD-TST-012 | Author the Gann date-mapping test suite (T-GAN-4) | Done ([PR #11](https://github.com/yoadazani/zodiann/pull/11), merged `718edf1`) | `gann_core` T-GAN-4 suite 28: independent record-based Gregorian oracle (self-checked), fake zones mirroring real 2026 Israel / New York DST, full 61×61 chains in both modes, the one-hour jump (exactly one in 169 cells), R-4 duplicate/skip with 1-hour steps, today marking (literals, travel, 30-min sweeps at all four transitions), leap years incl. 2000/2100. Mutants M1–M9 all caught. Plan review: Approve (2 rounds). Code review: With fixes, 1 Important + 3 minors fixed test-first (probe mutants), 1 deferred. Plan: [`docs/plans/ZOD-TST-012-gann-date-mapping-suite.md`](plans/ZOD-TST-012-gann-date-mapping-suite.md) |
 | ZOD-GAN-003 | Implement Gann date/number mapping per mode | Done ([PR #10](https://github.com/yoadazani/zodiann/pull/10), merged `8655a9d`) | `gann_core` dates 47 (values 32, format 15): design references (cell 139 = 31.8.26; 52 = 9.11.26 12:00; today 209), spring/autumn DST jumps (05:00 / 03:00) via an injected zone, leap and year-end rollovers, local-midnight and travel today cells, sub-minute before-anchor → null, block boundaries, overflow guards, `d.m.yy` / `HH:MM` literals. Mutants (a)–(f) and 4 format mutants all caught. Plan review: 2 rounds. Code review: Ready to merge, 0 Critical / 0 Important; 2 test minors promoted, 3 deferred. Plan: [`docs/plans/ZOD-GAN-003-date-number-mapping.md`](plans/ZOD-GAN-003-date-number-mapping.md) |
@@ -25,20 +26,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **ID:** ZOD-TST-010
-- **Name:** Author the Gann axes test suite (T-GAN-1, T-GAN-3)
-- **Status:** Plan written and reviewed (plan-reviewer: 2 rounds, Approve; 4 Important + 6 Minor applied), awaiting user approval
-- **Plan:** [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md)
-- **Completed steps:** plan written; the 13×13 design-grid transcription, ring corners, design highlight literals and clockwise property verified by a scratch run against `main` @ `c5e442f`.
-- **Remaining steps:** approval → Task 1 (two suites) → Task 2 (mutation proof S1–S9, C1–C4) → Task 3 (review, close-out).
+- **None in progress.** ZOD-TST-010 is done on `task/ZOD-TST-010-gann-axes-suite`, with its PR open (see Git State); merge on approval.
 
 ## Next Recommended Task
 
-- **ID:** to be selected next. Candidates: the remaining Square of Nine suites (TST-010/011) or the shared UI tokens (FND-013 → UI-001).
+- **ID:** to be selected next. Candidates: ZOD-TST-011 (T-GAN-2 ring counts, the last Square of Nine suite) or the shared UI tokens (FND-013 → UI-001).
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
-- **Carry into ZOD-TST-010 / ZOD-TST-011:**
+- **Carry into ZOD-TST-011** (TST-010 applied the first two points; see its plan):
   - The GAN-001 review's 19-mutant list (mirrored x/y, no flip, 90° rotation, j/i off by one, `%` vs `remainder`, segment `<` → `<=`, …) is a ready starting point for the mutation proof.
   - Classification is invariant under rotation and mirroring, so **pin orientation through θ or (x, y) via the forward mapping, not through category**. GAN-002's own mirror mutation showed that a check routed through `spiralNumberAt` misses it.
 - **Carry into ZOD-TST-001:**
@@ -168,6 +164,18 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-TST-010, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| AC1: T-GAN-1 against explicit (x, y) for the first ~40 cells | `fvm dart run melos exec --scope=gann_core -- dart test test/accuracy` | All 169 cells of the 13×13 design grid; 2 at (−1, 0); unit steps and clockwise cross product over 61×61 (3690 same-ring pairs); ring entry/exit corners k = 1…30; inverse on the grid and round-trip over 61×61 |
+| AC2: T-GAN-3 every Appendix C angle, positive and negative | same | 8 rows × 30 ray cells: angle literal, category, `isNot` the other two; "only" (geometric) over 61×61; 48 design literals; angles in [0, 360) |
+| Mutation proof | ad-hoc mutants on `spiral.dart` / `highlight_classification.dart`, restored, `git diff --exit-code` clean | S1 mirrored x −10, S2 mirrored y −9, S3 no flip −11, S4 rotation −11, S5 moved cell −4, S6 i off by one −10, S7 j off by one −7, S8 segment −4, S9 remainder −1, C1 axis rule −6, C2 priority −6, C3 mirrored angle ("270 above") −7, C4 diagonal rule −1 (of 64) |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 |
+| Code review | Fresh reviewer, whole branch | Ready to merge: 0 Critical / 0 Important. Its own probes beyond the 13×13 grid (mirror, mirrored angle, moved cell, outer-ring highlight) were all caught. 2 minors promoted (inverse round-trip proven by a ring-20 probe; consistency-check comment), 1 deferred |
+
+**Deferred review minor (TST-010):** style consistency between the two suites (`_abs` vs `.abs()`, a shared geometric-ring helper).
 
 ZOD-TST-013, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM; machine zone +02:00):
 
@@ -315,7 +323,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 ## Git State
 
 - **Current task branch:** `task/ZOD-TST-010-gann-axes-suite` (from `main` @ `c5e442f`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), all merged. TST-010 branch: planning commits only
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), all merged. TST-010 branch: plan, `b534509` (suites + mutation proof), review fixes, close-out
 - **Pull request:** PRs #2–#12 merged. TST-010: not opened yet
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none

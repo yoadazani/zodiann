@@ -6,7 +6,7 @@
 - **Category:** [Testing & QA](../README.md#testing-qa) (`testing-qa/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -24,8 +24,8 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] T-GAN-1 passes against explicit expected (x,y) coordinates for the first ~40 cells.
-- [ ] T-GAN-3 passes for every angle in Appendix C's table, both the positive (is this color) and negative (is not another color) assertions.
+- [x] T-GAN-1 passes against explicit expected (x,y) coordinates for the first ~40 cells.
+- [x] T-GAN-3 passes for every angle in Appendix C's table, both the positive (is this color) and negative (is not another color) assertions.
 
 ## Dependencies
 

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), awaiting approval · **Branch:** `task/ZOD-TST-010-gann-axes-suite` (from `main` @ `c5e442f`) · **Written:** 2026-11-12
+**Status:** Reviewed (plan-reviewer: 2 rounds, Approve), approved and implemented 2026-11-12 (see PROGRESS.md) · **Branch:** `task/ZOD-TST-010-gann-axes-suite` (from `main` @ `c5e442f`) · **Written:** 2026-11-12
 
 **Goal:** Verify, independently of production, the spiral's direction and positions (T-GAN-1: 2 left of 1, clockwise, explicit coordinates) and the Appendix C axis and diagonal assignments (T-GAN-3: 0/90/180/270 blue, with 90° above cell 1 and 270° below; only 45/135/225/315 yellow). Back this with a mutation proof that catches a flipped direction or a moved cell.
 
