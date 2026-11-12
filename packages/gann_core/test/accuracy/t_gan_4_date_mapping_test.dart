@@ -328,6 +328,27 @@ void main() {
       }
     });
 
+    test('every cell of a 61×61 square is an absolute 4-hour step', () {
+      final cases = [
+        (dtIlSpring, DateTime.utc(2026, 3, 26, 18)),
+        (dtIlAutumn, DateTime.utc(2026, 10, 24, 17)),
+        (dtNySpring, DateTime.utc(2026, 3, 8, 1)),
+        (dtNyAutumn, DateTime.utc(2026, 11, 1)),
+      ];
+      const stepMicros = 4 * Duration.microsecondsPerHour;
+      for (final (anchor, anchorInstant) in cases) {
+        final bad = <int>[];
+        for (var n = 1; n <= _fullSquare; n++) {
+          final expected = DateTime.fromMicrosecondsSinceEpoch(
+            anchorInstant.microsecondsSinceEpoch + (n - 1) * stepMicros,
+            isUtc: true,
+          );
+          if (cellMoment(anchor, n, stepHours: 4) != expected) bad.add(n);
+        }
+        expect(bad, isEmpty, reason: '${anchor.toIso8601String()} wrong cells');
+      }
+    });
+
     test('travel: the same instant shown in another zone', () {
       expect(_shown(cellMoment(dtIlAutumn, 1, stepHours: 4), _newYork2026), (
         2026,
@@ -439,6 +460,7 @@ void main() {
       int? cell(DateTime now) =>
           nowCellInDateTimeMode(dtIlSpring, now, stepHours: 4);
       expect(cell(DateTime.utc(2026, 3, 27, 1, 59)), 2);
+      expect(cell(DateTime.utc(2026, 3, 27, 1, 59, 59, 999, 999)), 2);
       expect(cell(DateTime.utc(2026, 3, 27, 2)), 3);
       expect(cell(DateTime.utc(2026, 3, 27, 3)), 3);
     });
@@ -447,6 +469,13 @@ void main() {
       final cases = [
         (dIl, (2026, 3, 20), _israel2026, DateTime.utc(2026, 3, 27)),
         (dNy, (2026, 10, 30), _newYork2026, DateTime.utc(2026, 11, 1, 6)),
+        (
+          dtIlAutumn,
+          (2026, 10, 24),
+          _israel2026,
+          DateTime.utc(2026, 10, 24, 23),
+        ),
+        (dtNySpring, (2026, 3, 7), _newYork2026, DateTime.utc(2026, 3, 8, 7)),
       ];
       for (final (anchor, anchorDate, zone, transition) in cases) {
         for (final now in _sweep(transition)) {
@@ -472,6 +501,16 @@ void main() {
             DateTime.utc(2026, 3, 27),
           ),
           (dtNyAutumn, DateTime.utc(2026, 11, 1), DateTime.utc(2026, 11, 1, 6)),
+          (
+            dtIlAutumn,
+            DateTime.utc(2026, 10, 24, 17),
+            DateTime.utc(2026, 10, 24, 23),
+          ),
+          (
+            dtNySpring,
+            DateTime.utc(2026, 3, 8, 1),
+            DateTime.utc(2026, 3, 8, 7),
+          ),
         ];
         for (final (anchor, anchorInstant, transition) in cases) {
           for (final now in _sweep(transition)) {
@@ -552,6 +591,21 @@ void main() {
       expect(
         todayCellInDatesMode(leap, DateTime.utc(2024, 2, 28, 22, 30), plus2),
         29,
+      );
+      // Century years: 2100 has no Feb 29, 2000 has one.
+      final y2100 = _at('2100-02-01T00:00+02:00');
+      expect(
+        todayCellInDatesMode(y2100, DateTime.utc(2100, 2, 28, 10), plus2),
+        28,
+      );
+      expect(
+        todayCellInDatesMode(y2100, DateTime.utc(2100, 3, 1, 10), plus2),
+        29,
+      );
+      final y2000 = _at('2000-02-01T00:00+02:00');
+      expect(
+        todayCellInDatesMode(y2000, DateTime.utc(2000, 3, 1, 10), plus2),
+        30,
       );
       final common = _at('2026-02-01T00:00+02:00');
       expect(
