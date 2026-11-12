@@ -64,6 +64,18 @@ final _newYork2026 = _Zone2026(
   DateTime.utc(2026, 11, 1, 6),
 );
 
+final class _Fixed implements LocalTimeZone {
+  const _Fixed(this.offsetMinutes);
+
+  final int offsetMinutes;
+
+  @override
+  int offsetMinutesAt(DateTime utc) {
+    if (!utc.isUtc) throw ArgumentError.value(utc, 'utc', 'must be UTC');
+    return offsetMinutes;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Test-local Gregorian calendar (records, no DateTime date arithmetic).
 
@@ -475,5 +487,77 @@ void main() {
         }
       },
     );
+  });
+  group('leap years: Feb 29 present exactly when Gregorian rules say', () {
+    const plus2 = _Fixed(120);
+
+    test('dates mode: 2024 and 2000 have Feb 29; 2026 and 2100 do not', () {
+      List<_Ymd> dates(String iso, List<int> cells) => [
+        for (final n in cells) _dateOf(cellDate(_at(iso), n)),
+      ];
+      expect(dates('2024-02-25T00:00+02:00', [1, 5, 6]), [
+        (2024, 2, 25),
+        (2024, 2, 29),
+        (2024, 3, 1),
+      ]);
+      expect(dates('2026-02-25T00:00+02:00', [4, 5]), [
+        (2026, 2, 28),
+        (2026, 3, 1),
+      ]);
+      expect(dates('2100-02-27T00:00+02:00', [2, 3]), [
+        (2100, 2, 28),
+        (2100, 3, 1),
+      ]);
+      expect(dates('2000-02-28T00:00+02:00', [2, 3]), [
+        (2000, 2, 29),
+        (2000, 3, 1),
+      ]);
+    });
+
+    test('every cell of a 61×61 square across 2024–2034 and 2096–2106', () {
+      final a = _at('2023-12-01T00:00+02:00');
+      final b = _at('2096-01-01T00:00+02:00');
+      expect(_dateOf(cellDate(a, _fullSquare)), (2034, 2, 6));
+      expect(_dateOf(cellDate(b, _fullSquare)), (2106, 3, 10));
+      expect(_chainMismatches(a, (2023, 12, 1), _fullSquare), isEmpty);
+      expect(_chainMismatches(b, (2096, 1, 1), _fullSquare), isEmpty);
+    });
+
+    test('date-and-time mode crosses Feb 29', () {
+      final anchor = _at('2024-02-28T16:00+02:00');
+      expect(
+        [1, 3, 8, 9]
+            .map((n) => _shown(cellMoment(anchor, n, stepHours: 4), plus2))
+            .toList(),
+        [
+          (2024, 2, 28, 16, 0),
+          (2024, 2, 29, 0, 0),
+          (2024, 2, 29, 20, 0),
+          (2024, 3, 1, 0, 0),
+        ],
+      );
+    });
+
+    test('today across Feb 29', () {
+      final leap = _at('2024-02-01T00:00+02:00');
+      expect(
+        todayCellInDatesMode(leap, DateTime.utc(2024, 2, 29, 10), plus2),
+        29,
+      );
+      expect(
+        todayCellInDatesMode(leap, DateTime.utc(2024, 3, 1, 10), plus2),
+        30,
+      );
+      // 00:30 local on 29.2 while the UTC date is still 28.2.
+      expect(
+        todayCellInDatesMode(leap, DateTime.utc(2024, 2, 28, 22, 30), plus2),
+        29,
+      );
+      final common = _at('2026-02-01T00:00+02:00');
+      expect(
+        todayCellInDatesMode(common, DateTime.utc(2026, 3, 1, 10), plus2),
+        29,
+      );
+    });
   });
 }
