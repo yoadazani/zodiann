@@ -5,14 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) done, PR open. 14 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. 14 of 205 tasks done. ZOD-UI-001 (colour token values) is in planning.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), open) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
+| ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), merged `ae666da`) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
 | ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) ([PR #15](https://github.com/yoadazani/zodiann/pull/15), merged `e4a8859`) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
 | ZOD-TST-011 | Author the ring highlight-count test (T-GAN-2) | Done ([PR #14](https://github.com/yoadazani/zodiann/pull/14), merged `30ea9eb`) | `gann_core` T-GAN-2 suite 8: Appendix B rows 1–6 with every column asserted (cells placed geometrically, angle per cell, blue/yellow/gray/unhighlighted, side, last number), named 9×9 total 16/16/16 with unhighlighted center, T-GAN-2 rule for rings 7–30. Mutants H1–H7 caught exactly as planned. Plan review: Approve (2 rounds, 3 Important applied). Code review: Ready to merge, comment minors fixed, 1 deferred. Plan: [`docs/plans/ZOD-TST-011-gann-ring-counts-suite.md`](plans/ZOD-TST-011-gann-ring-counts-suite.md) |
 | ZOD-TST-010 | Author the Gann spiral direction test suite (T-GAN-1, T-GAN-3) | Done ([PR #13](https://github.com/yoadazani/zodiann/pull/13), merged `3a447d5`) | `gann_core` T-GAN-1 6 + T-GAN-3 11: all 169 cells of the 13×13 design grid (literal, re-checked by two reviewers), 2 left of 1, unit-step + clockwise over 61×61 (3690 same-ring pairs), ring corners k ≤ 30, inverse round-trip 61×61; Appendix C rows over 30-cell rays (angle, category, `isNot` others), "only" over 61×61, 48 design highlight literals, angles in [0, 360). Mutants S1–S9, C1–C4 all caught. Plan review: Approve (2 rounds, 4 Important applied). Code review: Ready to merge, 2 minors promoted, 1 deferred. Plan: [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md) |
@@ -29,7 +29,11 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-FND-013 is done on `task/ZOD-FND-013-theme-token-skeleton`, PR open (see Git State); merge on approval.
+- **ID:** ZOD-UI-001 — Implement the color token values (dark + light)
+- **Status:** Plan written and reviewed (2 rounds), awaiting approval
+- **Plan:** [`docs/plans/ZOD-UI-001-color-token-values.md`](plans/ZOD-UI-001-color-token-values.md)
+- **Completed steps:** reference swatch grid measured (43 tiles; opaque pixels equal MASTER exactly), plan written
+- **Remaining steps:** plan review, approval, Tasks 1–4
 
 ## Next Recommended Task
 
@@ -376,9 +380,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-013-theme-token-skeleton` (from `main` @ `e4a8859`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), all merged. FND-013 branch: plan `a13006f`; `47e19b0` (extensions), `9d776d1` (themes), `19a420d` (app), `47fd3e6` (guard), review fix, close-out
-- **Pull request:** PRs #2–#15 merged. FND-013: [PR #16](https://github.com/yoadazani/zodiann/pull/16) (open)
+- **Current task branch:** `task/ZOD-UI-001-color-token-values` (from `main` @ `ae666da`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), all merged. UI-001 branch: plan
+- **Pull request:** PRs #2–#16 merged. UI-001: none yet
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
