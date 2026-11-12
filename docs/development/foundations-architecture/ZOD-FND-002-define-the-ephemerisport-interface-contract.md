@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -27,10 +27,10 @@ No direct design reference applies — this is a pure-Dart interface in `package
 
 ## Acceptance Criteria
 
-- [ ] Interface compiles with zero Flutter/UI dependencies.
-- [ ] The mean-node method signature is declared, and its formula contract (coefficients, T definition, [0, 360) normalization, constant daily speed) is documented on the interface. Implementation and T-EPH-2 coverage are tracked by ZOD-EPH-001 and ZOD-TST-002.
-- [ ] Interface exposes both apparent-position output and speed, sufficient for retrograde and crossing-solver consumers.
-- [ ] Interface documents the "out of data-file range" failure mode.
+- [x] Interface compiles with zero Flutter/UI dependencies.
+- [x] The mean-node method signature is declared, and its formula contract (coefficients, T definition, [0, 360) normalization, constant daily speed) is documented on the interface. Implementation and T-EPH-2 coverage are tracked by ZOD-EPH-001 and ZOD-TST-002.
+- [x] Interface exposes both apparent-position output and speed, sufficient for retrograde and crossing-solver consumers.
+- [x] Interface documents the "out of data-file range" failure mode.
 
 ## Dependencies
 

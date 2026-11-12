@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Revision 2, awaiting approval · **Branch:** `task/ZOD-FND-002-ephemeris-port` · **Written:** 2026-11-12
+**Status:** Revision 2, approved and implemented (2026-11-12) · **Branch:** `task/ZOD-FND-002-ephemeris-port` · **Written:** 2026-11-12
 
 **Goal:** Define, in pure Dart, the single contract that every position source implements, so sources can be swapped by one injection (ARCH-4) and no caller can silently use an out-of-range result (R-2).
 
