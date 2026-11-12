@@ -73,6 +73,15 @@ void main() {
     }
   });
 
+  test('the inverse round-trips every cell of 61×61', () {
+    final bad = <int>[];
+    for (var n = 1; n <= _lastCell; n++) {
+      final (x, y) = _pos(n);
+      if (spiralNumberAt(x, y) != n) bad.add(n);
+    }
+    expect(bad, isEmpty);
+  });
+
   test('moves clockwise, one step at a time, through 61×61', () {
     final bad = <String>[];
     var sameRingPairs = 0;

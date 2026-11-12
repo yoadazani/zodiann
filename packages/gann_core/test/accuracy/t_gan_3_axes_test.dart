@@ -86,6 +86,8 @@ void main() {
       if ((category == HighlightCategory.axis) != onAxis) {
         bad.add('$n (${cell.x}, ${cell.y}): $category, axis=$onAxis');
       }
+      // Consistency only: category and angle both come from production's
+      // steps. The geometric checks above are the independent oracle.
       if ((category == HighlightCategory.diagonal) !=
           diagonalAngles.contains(cell.angle)) {
         bad.add('$n angle ${cell.angle}: $category');
