@@ -103,7 +103,7 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 | ZOD-ASP-002 | [Implement aspect-orb configuration data flow](computation-engine/ZOD-ASP-002-implement-aspect-orb-configuration-data-flow.md) | Medium | Not Started |
 | ZOD-GAN-001 | [Implement the Gann spiral position formulas (k, j, i, θ)](computation-engine/ZOD-GAN-001-implement-the-gann-spiral-position-formulas-k-j-i.md) | Critical | Done |
 | ZOD-GAN-002 | [Implement Gann highlight classification (blue/yellow/gray)](computation-engine/ZOD-GAN-002-implement-gann-highlight-classification-blue-yellow-gray.md) | Critical | Done |
-| ZOD-GAN-003 | [Implement Gann date/number mapping per mode](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) | Critical | Not Started |
+| ZOD-GAN-003 | [Implement Gann date/number mapping per mode](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) | Critical | Done |
 
 ### Shared UI & Design System (`shared-ui-design-system/`)
 
@@ -410,7 +410,7 @@ Settings and persistence (`settings-persistence/`) depend on nearly everything u
 | ZOD-SQR-008 (partially) | D11 (light-theme selection border) | §6.2 |
 | ZOD-SQR-020 (partially) | D14 (tablet-portrait "wide screen" interpretation) | §6.2 |
 | ZOD-XLS-003 | The EX open decision (numeric-anchor interpretation) | §6.2 |
-| ZOD-WHL-011, ZOD-GAN-003 | The DST-hour-jump planning constraint | §6.2 |
+| ~~ZOD-WHL-011, ZOD-GAN-003~~ | ~~The DST-hour-jump planning constraint~~ — **resolved 2026-11-12** (see the ZOD-GAN-003 Notes) | §6.2 |
 | ZOD-SET-006 (Sidereal row) | D19 (whether to show disabled planned options at all) | §6.2 |
 | ZOD-EXT-005 | D-2 (location/privacy for houses) | §6.1 |
 | ZOD-EXT-004 | D-5 (tropical-only default) | §6.1 |
@@ -450,7 +450,7 @@ These are places the design reference made a judgment call that stretches or int
 Two more spec-level open items, not from `DESIGN_DECISIONS.md`, also need resolution:
 
 - **The Excel numeric-anchor interpretation** ("Export with live formulas" → "One open decision for approval"): does changing a numbers-mode anchor keep highlights fixed to position (the document's working assumption, EX-11) or recompute them from the new value's square root? Blocks ZOD-XLS-003's exact formula semantics.
-- **The DST 4-hour-step behavior** (planning constraints: "a decision is needed on whether this is the desired behavior"): the spec's working assumption (absolute-time stepping, so the displayed local hour jumps across a DST change) is implemented as the default throughout `computation-engine/`/`gann-square/`/`excel-export/`, but is explicitly flagged as needing confirmation, not a settled requirement.
+- **Resolved 2026-11-12** (product-owner decision, see the [ZOD-GAN-003](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) Notes): absolute-time stepping shown in the device's current zone, with the visible one-hour DST jump; dates mode is calendar-only. Original item: **The DST 4-hour-step behavior** (planning constraints: "a decision is needed on whether this is the desired behavior"): the spec's working assumption (absolute-time stepping, so the displayed local hour jumps across a DST change) is implemented as the default throughout `computation-engine/`/`gann-square/`/`excel-export/`, but is explicitly flagged as needing confirmation, not a settled requirement.
 
 ## 6.3 Gate-level blockers
 
@@ -467,7 +467,7 @@ These don't block a specific task the way the decisions above do, but each has a
 | R-1 | Missed degree crossing near a retrograde station | ZOD-CRS-001, ZOD-TST-007 |
 | R-2 | Silent accuracy loss outside the ephemeris's covered date range | ZOD-FND-011, ZOD-NFR-017 |
 | R-3 | Formula regressions when splitting code into packages | ZOD-TST-001 through ZOD-TST-013 (tests as source of truth, written before/alongside the split) |
-| R-4 | DST causes a skipped/duplicated cell in date-and-time mode | ZOD-TST-012, §6.2's DST open item |
+| R-4 | DST causes a skipped/duplicated cell in date-and-time mode | ZOD-TST-012; DST rule decided 2026-11-12 (ZOD-GAN-003 Notes, §6.2) |
 | R-5 | A result mistaken for financial/astrological advice | ZOD-ABT-005, ZOD-XLS-006/017 |
 | R-6 | Swiss Ephemeris licensing blocks store distribution | ZOD-FND-010, ZOD-REL-003 |
 | R-7 | FFI build complexity on iOS/Android | ZOD-FND-003, ZOD-REL-002 |

@@ -38,7 +38,10 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision): this task owns the dedicated T-GAN-4 verification of the mapping implemented in [ZOD-GAN-003](../computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md), whose criterion was amended to point here. As with ZOD-TST-002:
+  - expected dates come from an independent source (literal dates), never from production helpers;
+  - add a mutation proof.
+- 2026-11-12 (product-owner decision): date-and-time cells are shown in the **device's local time zone** (absolute 4-hour steps, with a visible one-hour jump at DST). Dates mode uses calendar-day arithmetic on the anchor's own date. Use an injected fake zone with a known DST transition, so the suite doesn't depend on the test machine's zone. See GAN-003's Notes.
 
 ---
 

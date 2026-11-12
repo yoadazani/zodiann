@@ -38,7 +38,7 @@ No direct design reference applies — data-integrity requirement.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (per the [ZOD-GAN-003](../computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) time-zone decision): "identical / same anchor moment" means the same instant **and** offset. In date-and-time mode, the loaded cells re-display in the device's current zone after travel; dates mode is unchanged.
 
 ---
 
