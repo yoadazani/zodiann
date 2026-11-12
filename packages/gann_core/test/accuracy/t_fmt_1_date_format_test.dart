@@ -11,6 +11,8 @@
 //   properties and the numbers against the loop variables.
 // * Each grid date is checked at 00:00 and 23:59:59.999 UTC, so reading the
 //   carrier through the machine's zone (east or west of UTC) is caught.
+//   That guard is only effective on a machine whose zone is not UTC; on a
+//   UTC machine a `toLocal()` regression is indistinguishable.
 //
 // Out of scope: HH:MM (GAN-003 tests), English month-first order (L-12,
 // ZOD-L10-010), Excel number formats (XLS tasks).
@@ -70,6 +72,8 @@ void main() {
         contains('year has 4 characters'),
       );
       expect(_checkShape('4/1/24', 4, 1, 2024), isNotEmpty);
+      expect(_checkShape('1.4.24', 4, 1, 2024), contains('day 1 ≠ 4'));
+      expect(_checkShape('4.1.25', 4, 1, 2024), isNotEmpty);
     });
   });
 
@@ -115,6 +119,11 @@ void main() {
                 DateTime.utc(year, m, d, 23, 59, 59, 999),
               ];
               for (final input in inputs) {
+                if (input.hour == 0) {
+                  startOfDay++;
+                } else {
+                  endOfDay++;
+                }
                 if (input.day != d || input.month != m) {
                   problems.add('$input normalised away from $d.$m');
                 }
@@ -123,8 +132,6 @@ void main() {
                   problems.add('$input → "$out": $p');
                 }
               }
-              startOfDay++;
-              endOfDay++;
             }
           }
           expect(problems, isEmpty);
