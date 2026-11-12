@@ -83,6 +83,16 @@ void main() {
       expect(names(), unorderedEquals(['a.dart', 'b.dart']));
     });
 
+    test('reports a conditional import whose alternative is dart:ui', () {
+      write(
+        'platform.dart',
+        "import 'stub.dart'\n"
+            "    if (dart.library.ui) 'dart:ui';\n",
+      );
+
+      expect(names(), ['platform.dart']);
+    });
+
     test('ignores other imports and mid-line mentions', () {
       write(
         'ok.dart',

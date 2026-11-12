@@ -70,13 +70,17 @@ Map<String, List<String>> findForbiddenDependencies(
   return hits;
 }
 
+/// An import/export statement (up to its `;`, possibly spanning lines) that
+/// names `dart:ui` or a `package:flutter/` library anywhere — as its main URI
+/// or as a conditional alternative (`if (dart.library.ui) 'dart:ui'`).
 final _forbiddenImport = RegExp(
-  r'''^\s*(import|export)\s+['"](dart:ui|package:flutter/)''',
+  r'''^\s*(import|export)\s[^;]*['"](dart:ui|package:flutter/)''',
   multiLine: true,
 );
 
 /// Returns the paths of `.dart` files under [libDir] (recursive) that import
-/// or export `dart:ui` or any `package:flutter/` library.
+/// or export `dart:ui` or any `package:flutter/` library, including as a
+/// conditional-import alternative.
 List<String> findForbiddenImports(Directory libDir) => [
   for (final entity in libDir.listSync(recursive: true))
     if (entity is File &&
