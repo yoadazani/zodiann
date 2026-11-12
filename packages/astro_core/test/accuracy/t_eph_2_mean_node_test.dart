@@ -58,11 +58,9 @@ double _norm360(double degrees) {
   return (r == 360 || r == 0) ? 0.0 : r;
 }
 
-/// Signed smallest difference in degrees, in (−180, 180].
-double _wrap180(double degrees) {
-  final r = (degrees + 180) % 360;
-  return (r < 0 ? r + 360 : r) - 180;
-}
+/// Signed smallest difference in degrees, in [−180, 180). (Dart's `%` with a
+/// positive divisor is already non-negative.) Callers compare `.abs()`.
+double _wrap180(double degrees) => (degrees + 180) % 360 - 180;
 
 /// The full Meeus mean-node formula (Astronomical Algorithms, eq. 47.7) — the
 /// "full formula" the spec's < 0.01° claim refers to.
