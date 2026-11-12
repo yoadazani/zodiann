@@ -2,7 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-EPH-001-mean-node` · **Written:** 2026-11-12
+**Status:** Revision 2, awaiting approval · **Branch:** `task/ZOD-EPH-001-mean-node` · **Written:** 2026-11-12
+
+## Revision 2 — clarifications
+
+| # | Review point | Resolution |
+|---|---|---|
+| 1 | Adapter `coveredRange` vs `Body.node` | **Intended contract:** `Body.node` bypasses `coveredRange`. The node is an analytical formula, independent of the source's data files. This is already in the FND-002 `EphemerisPort.position` doc ("for any `utc`… not bounded by `coveredRange`"). EPH-001 restates it on the mixin. The test adapter's node branch runs **before** its range check, and the 1900 test stays because it pins this behaviour. Adapters (EPH-002/003/004) must order their branches the same way; the mixin doc says so. |
+| 2 | Public formula constants | Kept as package API: a single source for the coefficients in production. **ZOD-TST-002 must keep its own independent reference coefficients and never derive expected values from these constants.** Its mutation proof alters each production constant and must see the independent test fail. This is already in the TST-002 task file. |
+| 3 | Accuracy wording | Every doc comment (`mean_node.dart` and the existing `meanAscendingNode` doc in `ephemeris_port.dart`) describes "< 0.01° from the full formula over 200 years around 2000" as the **spec's expected accuracy bound, pending independent verification by ZOD-TST-002**, not as a verified result. |
 
 **Goal:** Implement the mean ascending node formula **once** in `astro_core`, as a pure function plus a mixin that every `EphemerisPort` adapter reuses, and add the fixed "mean ℞" flag for the node.
 
@@ -77,6 +85,7 @@ Hand-check for 1900: 1934.136261 × 0.99998631 ≈ 1934.1098; adding 125.0445 gi
 3. **Local-time input** must throw, never be silently treated as UTC. Pinned in Task 2.
 4. **A ΔT/TT conversion added "for accuracy"** would contradict the contract. The epoch test (exactly 125.04452 at 12:00 UTC) and the dated reference values pin `T` to UTC. Pinned in Task 2.
 5. **The node reported as direct:** speed is negative on every date, and the fixed flag is true only for the node. Pinned in Task 2 (a sweep from 1800 to 2400) and Task 1 (the flag).
+6. **An adapter checking `coveredRange` before the node branch** would wrongly fail the node outside the data range. Pinned in Task 2: the node succeeds at 1900 while the Moon is out of range.
 
 ---
 
@@ -114,7 +123,8 @@ Hand-check for 1900: 1934.136261 × 0.99998631 ≈ 1934.1098; adding 125.0445 gi
   - `const double meanNodeDegreesPerCentury = 1934.136261;`
   - `const double meanNodeSpeedDegreesPerDay = -meanNodeDegreesPerCentury / 36525;`
 
-  The constants are public, so TST-002's mutation proof has one obvious place to alter each coefficient.
+  The constants are public package API and the single production source of the coefficients, so TST-002's mutation proof has one obvious place to alter each one. TST-002 must **not** use them for its expected values (see Revision 2, point 2).
+  - The mixin's doc comment states that `Body.node` is answered by the formula for **any** UTC instant, regardless of `coveredRange`. It tells implementers to put the node branch in `position` **before** the covered-range check.
 
 - [ ] **Step 1: Write the failing tests** (`group('meanAscendingNodeAt')`, tolerance `1e-9` degrees unless stated)
   - `'is exactly 125.04452 at the reference epoch'`: `meanAscendingNodeAt(DateTime.utc(2000, 1, 1, 12)).longitude == 125.04452` (exact equality).
@@ -128,16 +138,20 @@ Hand-check for 1900: 1934.136261 × 0.99998631 ≈ 1934.1098; adding 125.0445 gi
   - `'rejects non-UTC input'`: `meanAscendingNodeAt(DateTime(2026, 11, 12))` → `throwsArgumentError`.
 
   `group('MeanAscendingNodeFormula')`:
-  - `'an adapter mixing it in returns the shared formula'`. The test file declares `final class _Adapter with MeanAscendingNodeFormula implements EphemerisPort`, with `coveredRange` 2000–2100 and `position` that returns `EphemerisSuccess(meanAscendingNode(utc))` for the node, otherwise `OutOfCoveredRange` / a fixed value.
-    - `adapter.meanAscendingNode(t) == meanAscendingNodeAt(t)`
-    - `adapter.position(Body.node, DateTime.utc(1900))` succeeds with that same value.
+  - `'an adapter mixing it in returns the shared formula'`. The test file declares `final class _Adapter with MeanAscendingNodeFormula implements EphemerisPort`, with `coveredRange` 2000–2100. Its `position` checks `body == Body.node` **first** and returns `EphemerisSuccess(meanAscendingNode(utc))`. Only after that does it apply the range check (`OutOfCoveredRange`), and otherwise it returns a fixed value. Expect `adapter.meanAscendingNode(t) == meanAscendingNodeAt(t)`.
+  - `'node bypasses coveredRange because the formula is source-independent'`:
+    - `adapter.position(Body.node, DateTime.utc(1900))`, which is outside 2000–2100, is `EphemerisSuccess` with `meanAscendingNodeAt(DateTime.utc(1900))`.
+    - In the same test, `adapter.position(Body.moon, DateTime.utc(1900))` is `OutOfCoveredRange`, to show the bypass applies only to the node.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=astro_core -- dart test test/ephemeris/mean_node_test.dart`. Expected: compilation FAIL.
 - [ ] **Step 3:** Implement per Interfaces.
   - Check `utc.isUtc` (else `ArgumentError`).
   - `T` per the decision table.
   - `EclipticPosition(longitude: normalizeDegrees(meanNodeEpochLongitude - meanNodeDegreesPerCentury * t), speed: meanNodeSpeedDegreesPerDay)`.
-  - Doc comments: the formula, T from UTC with no ΔT, the "< 0.01° over 200 years around 2000" deviation, a formula-based point rather than an apparent position, and verification by T-EPH-2 (ZOD-TST-002).
-  - Update the `ephemeris_port.dart` doc reference, which already names these symbols.
+  - Doc comments cover:
+    - the formula, and T from UTC with no ΔT
+    - a formula-based point, not an apparent position
+    - **accuracy:** "the spec states an expected deviation of less than 0.01° from the full formula over 200 years around 2000; this bound is pending independent verification by T-EPH-2 (ZOD-TST-002)"
+  - In `ephemeris_port.dart`, reword the existing `meanAscendingNode` bullet ("deviates … by less than 0.01°") the same way, as an expected bound pending ZOD-TST-002. The symbol names it already references stay.
 - [ ] **Step 4:** Same command. Expected: PASS. Then run `fvm dart run melos run lint` and `fvm dart run melos run test`; both exit 0.
 - [ ] **Step 5:** Commit `feat(ZOD-EPH-001): implement the mean ascending node formula and shared mixin`.
 

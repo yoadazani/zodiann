@@ -20,7 +20,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 - **ID:** ZOD-EPH-001
 - **Name:** Implement the mean ascending lunar node formula
-- **Status:** Plan written, awaiting user approval
+- **Status:** Plan revision 2 written, awaiting user approval
 - **Plan:** [`docs/plans/ZOD-EPH-001-mean-node.md`](plans/ZOD-EPH-001-mean-node.md)
 - **Completed steps:** Task definitions amended (EPH-001 criterion; TST-002 rules), with product-owner confirmation. Branch created; plan written.
 - **Remaining steps:** Plan approval → Task 1 (`normalizeDegrees` + mean-℞ flag) → Task 2 (formula + mixin) → Task 3 close-out.
