@@ -12,7 +12,9 @@
 //   cross-checked geometrically with max(|x|, |y|) on the forward mapping.
 //
 // Counts are invariant under rotation and mirroring, so where the highlights
-// sit is T-GAN-3's job (t_gan_3_axes_test.dart, ZOD-TST-010).
+// sit is T-GAN-3's job (t_gan_3_axes_test.dart, ZOD-TST-010). Known survivors
+// here, caught there: a rotated or mirrored spiral, and a classifier reading
+// the ring index j instead of the steps i (each ring rotated by k−1 steps).
 import 'package:gann_core/gann_core.dart'
     show spiralCell, classifyHighlight, HighlightCategory;
 import 'package:test/test.dart';
@@ -87,7 +89,8 @@ void main() {
         expect(c.eighth, gray, reason: 'gray');
         expect(c.none, cells - blue - yellow - gray, reason: 'unhighlighted');
 
-        // Square side up to the ring.
+        // Square side up to the ring (mirrors the table; implied by the ring
+        // check above for a square ring).
         var maxX = 0;
         for (var n = first; n <= last; n++) {
           final x = spiralCell(n).x.abs();
@@ -95,7 +98,8 @@ void main() {
         }
         expect(2 * maxX + 1, side, reason: 'side');
 
-        // Angle per cell: consecutive cells, including the wrap to 0°.
+        // Angle per cell: consecutive cells, including the wrap to 0° (rings ≥ 2;
+        // in ring 1, 0° is the first cell).
         for (var n = first; n < last; n++) {
           final d =
               (spiralCell(n + 1).angle! - spiralCell(n).angle! + 360) % 360;
