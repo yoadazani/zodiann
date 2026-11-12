@@ -40,7 +40,10 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision): this task owns the dedicated T-GAN-1 verification of the spiral formulas implemented in ZOD-GAN-001, whose criterion was amended to point here. As with ZOD-TST-002:
+  - expected coordinates come from an independent source (explicit literal coordinates and/or the design reference), never from production helpers;
+  - add a mutation proof showing the suite fails on a flipped direction or a moved cell.
+- **Open spec conflict, to decide when this task is planned:** T-GAN-3's text says "the 270 axis (the row above cell 1 on screen) is blue". But the spiral formula (x right, y down, signs flipped), SQ-8, Appendix C (90° = North axis, 270° = South axis) and the design reference (`02-square-of-nine_numbers_desktop_en_dark.png`: "90° N" above the square, "270° S" below) all put **90°** on the row above cell 1 and 270° below. Flagged during ZOD-GAN-001 planning; GAN-001 follows the formula and Appendix C.
 
 ---
 

@@ -27,7 +27,7 @@ No direct design reference applies — pure computation; verified visually again
 
 ## Acceptance Criteria
 
-- [ ] T-GAN-1 passes: cell 2 sits left of cell 1, spiral moves clockwise through the first several dozen cells.
+- [ ] The spiral position formulas are implemented and covered by GAN-001's own unit tests (cell 2 left of cell 1, clockwise order, Appendix B ring ends, round-trip over 9×9). Dedicated T-GAN-1 verification against explicit expected coordinates is tracked by [ZOD-TST-010](../testing-qa/ZOD-TST-010-author-the-gann-spiral-direction-test-suite-t-gan-1-t-gan-3.md).
 - [ ] Ring 1 has last number 9, ring 4 has last number 81 (Appendix B).
 - [ ] The (x, y) inverse mapping round-trips with the forward `n → (k, j, i)` mapping for every cell in a 9×9 square.
 
@@ -45,7 +45,7 @@ No direct design reference applies — pure computation; verified visually again
 
 ## Notes
 
-_No additional notes._
+- 2026-11-12 (product-owner decision, same resolution as ZOD-EPH-001 / ZOD-TST-002): the criterion "T-GAN-1 passes: cell 2 sits left of cell 1, spiral moves clockwise through the first several dozen cells" was amended. T-GAN-1 belongs to ZOD-TST-010, which depends on this task, so the original wording was a cycle. GAN-001 is covered by its own unit tests, and TST-010 provides the dedicated T-GAN-1 suite. The tasks stay separate, with the dependency running GAN-001 → TST-010.
 
 ---
 
