@@ -15,7 +15,10 @@ Implement the closed-form mean node longitude, the one body position in the app 
 
 ## Implementation Details
 
-- Implement the mean-node method declared on `EphemerisPort` in [ZOD-FND-002](../foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md), following the contract documented there.
+- Implement the mean-node method declared on `EphemerisPort` in [ZOD-FND-002](../foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md), following the contract documented there. Implement it **once**, in `packages/astro_core/lib/src/ephemeris/mean_node.dart`, exported from `astro_core`:
+  - `EclipticPosition meanAscendingNodeAt(DateTime utc)`: the pure formula function.
+  - `mixin MeanAscendingNodeFormula implements EphemerisPort`: provides `meanAscendingNode(utc) => meanAscendingNodeAt(utc)`.
+  - Every adapter (ZOD-EPH-002/003/004) declares `… with MeanAscendingNodeFormula implements EphemerisPort` and answers `position(Body.node, utc)` with `EphemerisSuccess(meanAscendingNode(utc))`. No adapter re-implements the formula.
 - `Ω = 125.04452 − 1934.136261·T` degrees, where `T` = Julian centuries since 2000-01-01 12:00 UTC.
 - Normalize result into [0, 360).
 - Return the constant daily speed `−1934.136261 / 36525` degrees/day alongside the longitude.

@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** Awaiting approval · **Branch:** `task/ZOD-FND-002-ephemeris-port` · **Written:** 2026-11-12
+**Status:** Revision 2, awaiting approval · **Branch:** `task/ZOD-FND-002-ephemeris-port` · **Written:** 2026-11-12
 
 **Goal:** Define, in pure Dart, the single contract that every position source implements, so sources can be swapped by one injection (ARCH-4) and no caller can silently use an out-of-range result (R-2).
 
@@ -13,6 +13,37 @@
 **Spec:**
 - `docs/development/foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md` (updated 2026-11-12)
 - `assets/zodiann-specification.md`: "Planet position", "Computation settings that must be fixed and documented", CRS-A1, the `Body` enum in "Data model and user settings", NFR-A1, R-2, ARCH-1/2/4
+
+## Revision 2 — changes from revision 1
+
+| # | Review point | Change |
+|---|---|---|
+| 1 | Shared mean-node implementation | Adapters reuse **one** implementation: ZOD-EPH-001 provides `meanAscendingNodeAt(utc)` plus a `MeanAscendingNodeFormula` mixin in `astro_core` (see "Mean-node reuse path"). The EPH-001 task file records the location. FND-002 still only declares and documents. |
+| 2 | Melos test commands | Both targeted commands now use `fvm dart run melos exec --scope=astro_core -- dart test …`. Re-checking this showed that **`dart run` does not strip `--`**, so the FND-001 explanation was wrong. The real cause is in Melos itself (see "Correction to an FND-001 record"). |
+| 3 | Coordinate-system docs | The apparent / geocentric / true-ecliptic-of-date requirements are documented as applying to **physical bodies** (`sun`…`pluto`). `Body.node` is documented as the exception: a formula-based mean ascending node, not an apparent physical position. This is documented on both `EphemerisPort` and `Body`. |
+
+## Mean-node reuse path (FND-002 declares; ZOD-EPH-001 implements)
+
+- **FND-002 (this task):** declares `EclipticPosition meanAscendingNode(DateTime utc)` on `EphemerisPort` and documents the formula contract. No formula code.
+- **ZOD-EPH-001** adds `packages/astro_core/lib/src/ephemeris/mean_node.dart`, exported from `astro_core`:
+  - `EclipticPosition meanAscendingNodeAt(DateTime utc)`: the single implementation of the formula.
+  - `mixin MeanAscendingNodeFormula implements EphemerisPort { @override EclipticPosition meanAscendingNode(DateTime utc) => meanAscendingNodeAt(utc); }`
+- **Adapters (ZOD-EPH-002/003/004)**, in `ephemeris_swiss` / `ephemeris_astronomy` (which depend on `astro_core`), declare `final class XxxPort with MeanAscendingNodeFormula implements EphemerisPort`. They answer `position(Body.node, utc)` with `EphemerisSuccess(meanAscendingNode(utc))`, a one-line branch with no formula. The formula exists exactly once.
+- **Why a mixin, not a default method:** `EphemerisPort` stays a pure `abstract interface class`. A default implementation would put formula code in FND-002, contradicting the agreed split. A mixin is also reusable by test fakes.
+- `EphemerisPort`'s doc for `meanAscendingNode` points implementers to `MeanAscendingNodeFormula` (ZOD-EPH-001).
+
+## Correction to an FND-001 record
+
+FND-001 recorded that "`dart run` strips a `--` separator", and that's why its Melos scripts pass the inner command as one quoted argument. Re-verified on 2026-11-12, that's **wrong**:
+- A scratch program run as `dart run <pkg> exec --scope=x -- dart --version`, directly and via `cmd.exe`, receives `[exec, --scope=x, --, dart, --version]` intact.
+- The real cause is Melos 8.10.1 `lib/src/command_runner.dart:120`: `if (arguments.contains('--version') || arguments.contains('-v'))` prints Melos's own version, wherever the flag appears, even after `--`. The FND-001 check happened to use `dart --version`.
+- `fvm dart run melos exec --scope=astro_core -- dart test --reporter=expanded` passes the full inner command to the package.
+
+**What changes in this task:** only the wrong explanation. Task 3 corrects the comment in the root `pubspec.yaml` and the PROGRESS.md convention to say:
+- Use `melos exec <filters> -- <command>`.
+- Exception: an inner command containing `--version` or `-v` must be passed as one quoted argument.
+
+The existing quoted scripts work either way, so they stay unchanged (no scope expansion).
 
 ## Global Constraints
 
@@ -65,7 +96,7 @@ packages/astro_core/test/ephemeris/
 - Test: `packages/astro_core/test/ephemeris/{body,ecliptic_position,utc_range}_test.dart`
 
 **Interfaces (produced, used by Task 2 and by EPH-001/002/004/005, CRS-*, FND-012):**
-- `enum Body { sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, node }`
+- `enum Body { sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto, node }`. The doc comment says `sun`…`pluto` are physical bodies whose positions are apparent and geocentric. `node` is the formula-based mean ascending lunar node, a mathematical point rather than a physical body (see `EphemerisPort.meanAscendingNode`).
 - `final class EclipticPosition`: `EclipticPosition({required double longitude, required double speed})`, fields `final double longitude` (degrees, [0, 360)) and `final double speed` (degrees/day). Throws `ArgumentError` if longitude isn't finite or is outside [0, 360), or if speed isn't finite. `-0.0` longitude is stored as `0.0`. Value equality, `hashCode`, `toString`.
 - `final class UtcRange`: `UtcRange(DateTime start, DateTime end)`, fields `start`, `end`. Throws `ArgumentError` if either isn't `isUtc` or if `end.isBefore(start)`. `bool contains(DateTime utc)` is inclusive at both ends and throws `ArgumentError` if `!utc.isUtc`. Value equality, `hashCode`, `toString`.
 
@@ -94,7 +125,7 @@ packages/astro_core/test/ephemeris/
 
 - [ ] **Step 2: Run the tests and verify they fail**
 
-Run: `fvm dart run melos exec --scope=astro_core "dart test test/ephemeris"`
+Run: `fvm dart run melos exec --scope=astro_core -- dart test test/ephemeris`
 Expected: compilation FAIL (`Body`, `EclipticPosition` and `UtcRange` aren't defined).
 
 - [ ] **Step 3: Implement the three types per the Interfaces block, and export them from `astro_core.dart`**
@@ -133,7 +164,10 @@ git commit -m "feat(ZOD-FND-002): add Body, EclipticPosition and UtcRange value 
     - `EclipticPosition meanAscendingNode(DateTime utc);`
 
 **Contract to document on `EphemerisPort`** (doc comments; this text *is* the deliverable for AC 3 and 4 and the node AC):
-- Class-level, per "Planet position", "Computation settings" and NFR-A1: positions are **apparent** (light time, aberration, light deflection, nutation), **geocentric**, on the **true ecliptic and equinox of date** (tropical), and implementations **must not apply any extra precession correction** (NFR-A1, mandatory regression test, ZOD-TST-004). Swapping implementations is a single injection (ARCH-4). Calls are synchronous; callers run long scans in an isolate (ARCH-1).
+- Class-level, per "Planet position", "Computation settings" and NFR-A1:
+  - **Physical bodies** (`Body.sun` … `Body.pluto`): positions are **apparent** (light time, aberration, light deflection, nutation), **geocentric**, on the **true ecliptic and equinox of date** (tropical). Implementations **must not apply any extra precession correction** (NFR-A1, mandatory regression test, ZOD-TST-004).
+  - **Exception — `Body.node`:** not a physical body. It's the formula-based **mean ascending lunar node** (see `meanAscendingNode`). The apparent-position requirements (light time, aberration, deflection, nutation) **do not apply** to it, and it must not be computed or "corrected" as an apparent physical position.
+  - Swapping implementations is a single injection (ARCH-4). Calls are synchronous, and callers run long scans in an isolate (ARCH-1).
 - `coveredRange`: the inclusive UTC range in which the source guarantees its stated accuracy. The UI uses it to limit date input (R-2).
 - `position`:
   - `utc` must be UTC (`isUtc`), otherwise `ArgumentError`. Local time is converted by the caller.
@@ -144,7 +178,7 @@ git commit -m "feat(ZOD-FND-002): add Body, EclipticPosition and UtcRange value 
   - `utc` must be UTC, otherwise `ArgumentError`.
   - Formula contract: `Ω = 125.04452 − 1934.136261·T` degrees, `T = (JD_UT − 2451545.0) / 36525` (Julian centuries since 2000-01-01 12:00 UTC), normalized to [0, 360). Speed is the constant `−1934.136261 / 36525` degrees/day.
   - It's a linear approximation, within 0.01° of the full formula over 200 years around 2000.
-  - Implemented by ZOD-EPH-001 and verified by T-EPH-2 (ZOD-TST-002). Not implemented in this task.
+  - Implemented once by ZOD-EPH-001 as `meanAscendingNodeAt` / `MeanAscendingNodeFormula` in `astro_core`. Implementations should mix in `MeanAscendingNodeFormula` rather than re-implement the formula. Verified by T-EPH-2 (ZOD-TST-002). Not implemented in this task.
 
 - [ ] **Step 1: Write the failing contract test**
 
@@ -161,7 +195,7 @@ The fake implements the documented contract. These tests prove the interface is 
 
 - [ ] **Step 2: Run the test and verify it fails**
 
-Run: `fvm dart run melos exec --scope=astro_core "dart test test/ephemeris/ephemeris_port_contract_test.dart"`
+Run: `fvm dart run melos exec --scope=astro_core -- dart test test/ephemeris/ephemeris_port_contract_test.dart`
 Expected: compilation FAIL (`EphemerisPort`, `EphemerisResult` etc. aren't defined).
 
 - [ ] **Step 3: Implement `ephemeris_result.dart` and `ephemeris_port.dart` per Interfaces, with the contract docs above. Export them from `astro_core.dart`.**
@@ -188,8 +222,12 @@ git commit -m "feat(ZOD-FND-002): define EphemerisPort contract and sealed resul
 - [ ] **Step 2:** Re-run `fvm dart run melos run lint` and `… run test` (`verification-before-completion`) and record the results.
 - [ ] **Step 3:**
   - Set `Status: Done` in the FND-002 task file and its `TASKS.md` row, and tick its acceptance criteria.
-  - Commit the task-file updates already made on this branch: FND-002 criterion and description, EPH-001 implementation notes, FND-012 `Body` note.
+  - Commit the task-file updates made on this branch: FND-002 criterion and description, EPH-001 implementation notes including the shared `mean_node.dart` location, FND-012 `Body` note.
   - Update `docs/PROGRESS.md`.
+  - Apply the FND-001 record correction (comment text only):
+    - The root `pubspec.yaml` comment and the PROGRESS.md "Scripts and quality gates" convention say: use `melos exec <filters> -- <command>`, except an inner command containing `--version` / `-v` goes as one quoted argument (Melos `command_runner.dart:120`).
+    - Correct the matching Technical Decisions row.
+    - No script changes.
 - [ ] **Step 4:** Commit, push, open a PR into `main`, then record the PR link in a follow-up commit.
 
 ## Acceptance Criteria → Evidence
@@ -206,7 +244,7 @@ git commit -m "feat(ZOD-FND-002): define EphemerisPort contract and sealed resul
 - **`Body` is defined here.** FND-012 adds its JSON. Task files were updated accordingly.
 - **Sealed result instead of exceptions** for out-of-range. Exhaustiveness makes R-2's "never silently wrong" a compile-time guarantee.
 - **Synchronous interface.** Isolates are the caller's concern (ARCH-1).
-- **`position(Body.node, …)` delegates to `meanAscendingNode`** and is never out-of-range, so consumers can iterate all 11 bodies uniformly.
+- **`position(Body.node, …)` delegates to `meanAscendingNode`** and is never out-of-range, so consumers can iterate all 11 bodies uniformly. Adapters get `meanAscendingNode` from ZOD-EPH-001's `MeanAscendingNodeFormula` mixin, so the formula exists once.
 - **`UtcRange` is our own type**, because Flutter's `DateTimeRange` would break ARCH-2.
 
 ## Risks
