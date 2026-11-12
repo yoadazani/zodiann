@@ -143,3 +143,12 @@ BodyColors copyAllBodyColors(BodyColors a, BodyColors b) => a.copyWith(
   pluto: b.pluto,
   node: b.node,
 );
+
+ZodiannTokens sampleTokens(int seed, Brightness brightness) => ZodiannTokens(
+  brightness: brightness,
+  surfaces: sampleSurfaces(seed),
+  square: sampleSquare(seed),
+  zodiac: sampleZodiac(seed),
+  aspects: sampleAspects(seed),
+  bodies: sampleBodies(seed),
+);
