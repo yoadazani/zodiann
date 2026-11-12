@@ -25,7 +25,7 @@
 
 ## Spec observation (recorded, not decided here)
 
-T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision when TST-010 is planned. It doesn't change any GAN-001 output.
+T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formula, SQ-8, Appendix C (90° = North, 270° = South) and the design reference ("90° N" above, "270° S" below) all put **90°** above cell 1. GAN-001 follows the formula and Appendix C. The conflict is recorded in ZOD-TST-010's Notes for a product-owner decision. It doesn't change any GAN-001 output. The **same wording is GAN-002's second criterion**, and GAN-002 is planned before TST-010. So a matching note pointing to TST-010's open item is added to GAN-002's Notes in the planning commit. When to decide it is a product-owner question raised with this plan.
 
 ## Global Constraints
 
@@ -49,11 +49,11 @@ T-GAN-3's prose says "the 270 axis (the row above cell 1 on screen)". The formul
 
 | Topic | Decision | Reason |
 |---|---|---|
-| API | `final class SpiralCell { final int n; final int ring; final int? indexInRing; final int? stepsFromAxis; final double? angle; final int x; final int y; }` with doc comments naming the spec letters `k`, `j`, `i`, `θ`. Functions: `SpiralCell spiralCell(int n)`, `int spiralNumberAt(int x, int y)`, `int cellsInRing(int k)` (= 8k), `int squareSideForRing(int k)` (= 2k+1), `int lastNumberInRing(int k)` (= (2k+1)²) | Descriptive names for consumers (GAN-002/003, SQR-*). Nullable `j`, `i` and `θ` make "the center has no angle" type-checked rather than a sentinel |
+| API | `final class SpiralCell { final int n; final int ring; final int? indexInRing; final int? stepsFromAxis; final double? angle; final int x; final int y; }` with doc comments naming the spec letters `k`, `j`, `i`, `θ`. **`SpiralCell` has a private constructor (`SpiralCell._`):** instances come only from `spiralCell(n)`, so invariants hold by construction. It's a derived result with no JSON (like `Crossing`), with value equality over all fields and a `toString`. Functions: `SpiralCell spiralCell(int n)`, `int spiralNumberAt(int x, int y)`, `int cellsInRing(int k)` (= 8k for k ≥ 1, and 1 for k = 0, the center), `int squareSideForRing(int k)` (= 2k+1), `int lastNumberInRing(int k)` (= (2k+1)²) | Descriptive names for consumers (GAN-002/003, SQR-*). Nullable `j`, `i` and `θ` make "the center has no angle" type-checked rather than a sentinel. A private constructor stops consumers building inconsistent cells |
 | Ring computation | The spec formula, then a correction loop: increment while `(2k+1)² < n`, decrement while `k > 0 && (2k−1)² ≥ n` | Guards against `sqrt` rounding at perfect squares. Pre-computed: the plain formula agrees with the integer definition for every n in 2…1,000,000, but the guard makes this true by construction for any n |
-| Valid range | `1 ≤ n ≤ 2^53`; otherwise `ArgumentError`. `spiralNumberAt` accepts any `(x, y)` with `max(\|x\|, \|y\|) ≤ 47,453,132` (so the result fits in 2^53) | 61×61 = 3,721 is the UI maximum. Larger n may still occur in date mapping (SQ-6). 2^53 keeps `sqrt` meaningful |
+| Valid range | `1 ≤ n ≤ maxSpiralNumber`, where `maxSpiralNumber = 9007199136250225` (= (2·47453132+1)², the last cell of ring `maxSpiralRing = 47453132`, the largest full ring ≤ 2^53); otherwise `ArgumentError`. `spiralNumberAt` accepts `max(\|x\|, \|y\|) ≤ maxSpiralRing`. The ring helpers accept `0 ≤ k ≤ maxSpiralRing`. Both constants are public, so the forward and inverse ranges are identical by construction. The doc comment notes that the bounds assume 64-bit VM/AOT integers (mobile targets) | 61×61 = 3,721 is the UI maximum. Larger n may still occur in date mapping (SQ-6). Ending on a full ring keeps the forward and inverse round trip valid across the whole range (2^53 itself falls in ring 47,453,133, which the inverse can't represent) |
 | Angle type | `double` degrees: `45 * i / k`. Integer arithmetic before one division | Exact for every k dividing 45·i; otherwise the nearest double. GAN-002 classifies by `i` and `k` (integers), not by `θ` |
-| Inverse algorithm (the spec gives only the forward direction) | `k = max(\|x\|, \|y\|)`; if `k == 0`, return 1. Undo the flip: `(a, b) = (−x, −y)`. Then `j = b + k − 1` if `a == k && b > −k`; else `j = 3k − 1 − a` if `b == k`; else `j = 5k − 1 − b` if `a == −k`; else (`b == −k`) `j = a + 7k − 1`. `n = (2k−1)² + 1 + j` | Each branch inverts one forward segment, and the corner (k, −k) belongs to the last segment (j = 8k−1). Round-trip tests prove it |
+| Inverse algorithm (the spec gives only the forward direction) | `k = max(\|x\|, \|y\|)`; if `k == 0`, return 1. Undo the flip: `(a, b) = (−x, −y)`. Then `j = b + k − 1` if `a == k && b > −k`; else `j = 3k − 1 − a` if `b == k`; else `j = 5k − 1 − b` if `a == −k`; else (`b == −k`) `j = a + 7k − 1`. `n = (2k−1)² + 1 + j` | Each branch inverts one forward segment. The pre-flip corner `(a, b) = (k, −k)` belongs to the last segment (j = 8k−1). **Note:** that corner is in pre-flip coordinates; **on screen it's `(−k, k)`** (bottom-left), the last cell `(2k+1)²`. Round-trip tests prove it |
 
 ## File Structure
 
@@ -92,50 +92,62 @@ packages/gann_core/test/spiral/
 2. **The center:** `n = 1` has no `j` / `i` / `θ`, and n ≤ 0 is rejected rather than producing garbage (`mod 0`). Pinned in Task 1.
 3. **Orientation flips:** a sign error makes the spiral counter-clockwise or puts 2 on the right. Pinned in Task 1 by explicit positions for 2–9 and a geometric clockwise check, independent of `i`, for every cell in rings 1–6.
 4. **The inverse at corners and edges:** each segment boundary and corner (k, −k), (k, k), (−k, k), (−k, −k). Pinned in Task 2 by a full round-trip over the 61×61 square in both directions.
-5. **Large n:** the integer correction keeps `k` right where `sqrt` loses precision, and inputs above 2^53 are rejected. Pinned in Task 1.
+5. **Large n:** the integer correction keeps `k` right where `sqrt` loses precision (n = 94906263² + 1, where the plain formula is wrong). Inputs above `maxSpiralNumber` are rejected, and the forward/inverse round trip holds at the top of the range. Pinned in Tasks 1–2.
 
 ---
 
 ### Task 1: `spiralCell(n)` and the ring helpers (TDD)
 
-**Files:** create `gann_core/lib/src/spiral/spiral.dart`; modify `gann_core/lib/gann_core.dart`; test `gann_core/test/spiral/spiral_test.dart`.
+**Files:** create `packages/gann_core/lib/src/spiral/spiral.dart`; modify `packages/gann_core/lib/gann_core.dart`; test `packages/gann_core/test/spiral/spiral_test.dart`.
 
 **Interfaces (produced):**
+- `const int maxSpiralRing = 47453132;` and `const int maxSpiralNumber = 9007199136250225;`
 - `SpiralCell spiralCell(int n)`
-- `int cellsInRing(int k)`, `int squareSideForRing(int k)`, `int lastNumberInRing(int k)` (each `ArgumentError` for `k < 0`; `cellsInRing(0)` is 1, for the center)
-- `SpiralCell` has value equality and `toString`.
+- `int cellsInRing(int k)`, `int squareSideForRing(int k)`, `int lastNumberInRing(int k)`: each throws `ArgumentError` for `k < 0` or `k > maxSpiralRing`. `cellsInRing(0)` is 1, for the center.
+- `SpiralCell`: private constructor, value equality, `toString`, no JSON.
 
 - [ ] **Step 1: Write the failing tests** (`group('spiralCell')`, `group('ring helpers')`):
   - `'center: n = 1 is ring 0 at (0, 0) with no index, steps or angle'`.
-  - `'rejects n < 1 and n > 2^53'`: inputs 0, −5, `(1 << 53) + 1` → `throwsArgumentError`.
+  - `'rejects n < 1 and n > maxSpiralNumber'`: inputs 0, −5, `9007199136250226` → `throwsArgumentError`.
+  - `'accepts maxSpiralNumber, the last cell of ring maxSpiralRing'`: `spiralCell(9007199136250225)` has ring 47453132 at (−47453132, 47453132).
   - `'matches the reference table'`: every row of the Reference values table (k, j, i, θ, x, y).
   - `'cell 2 is left of cell 1 and the first ring runs clockwise: left, up, right, down'`: positions of 2–9 in order, as in the table.
   - `'every ring 1–6 runs clockwise on screen'`. For each ring, take the cells in number order and compute the geometric screen angle `ψ = (180 − atan2(−y, x)·180/π) mod 360` (west = 0°, north = 90°, with y down). `ψ` must strictly increase from the ring's first cell to its last, with one wrap through 360 at most.
-  - `'θ equals the geometric angle on axes and diagonals'`: for every cell in rings 1–6 with `i mod k == 0`, `θ == ψ`.
+  - `'θ equals the geometric angle on axes and diagonals'`: for every cell in rings 1–6 with `i mod k == 0`, `θ` is `closeTo(ψ, 1e-9)`, comparing after normalising 360 → 0.
   - `'consecutive cells are grid neighbours'`: for n = 1…3720, `|Δx| + |Δy| == 1` between n and n+1.
   - `'ring boundaries'`: rings of 9, 10, 25, 26, 81, 82, 3721, 3722 are 1, 2, 2, 3, 4, 5, 30, 31.
-  - `'ring agrees with the integer definition'`: for n = 2…200,000, `ring == smallest k with (2k+1)² ≥ n`. Also for a few large n near perfect squares: `(2·10⁷+1)²` and that value ± 1.
-  - Ring helpers per Appendix B for k = 1…6: `cellsInRing` 8, 16, 24, 32, 40, 48; `squareSideForRing` 3…13; `lastNumberInRing` 9, 25, 49, 81, 121, 169. Ring 1 ends at 9 and ring 4 at 81 (AC 2). Negative k → `throwsArgumentError`.
+  - `'ring agrees with the integer definition'`:
+    - For n = 2…200,000, `ring == smallest k with (2k+1)² ≥ n`.
+    - Also n = 94906263² − 1, 94906263², 94906263² + 1 (= 9007198756625168, …169, …170) → rings 47453131, 47453131, 47453132.
+    - The last value is one where the plain sqrt formula returns 47453131, so this test **fails if the integer correction is removed**. Verify that once with a temporary mutation (remove the correction, see FAIL, restore) and record it in the Task 1 commit message.
+  - Ring helpers per Appendix B for k = 1…6: `cellsInRing` 8, 16, 24, 32, 40, 48; `squareSideForRing` 3…13; `lastNumberInRing` 9, 25, 49, 81, 121, 169. Ring 1 ends at 9 and ring 4 at 81 (AC 2).
+  - The center: `cellsInRing(0) == 1`, `squareSideForRing(0) == 1`, `lastNumberInRing(0) == 1`.
+  - `−1` and `maxSpiralRing + 1` → `throwsArgumentError`.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/spiral`. Expected: compilation FAIL (`spiralCell` and the others are undefined).
 - [ ] **Step 3: Implement** per Interfaces and the decision table, with doc comments that cite the spec formula and SQ-8/SQ-11.
-- [ ] **Step 4:** Same command. Expected: PASS.
-- [ ] **Step 5:** Commit `feat(ZOD-GAN-001): implement spiral position formulas (k, j, i, θ, x, y)`.
+- [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0. Then the integer-correction mutation check from Step 1.
+- [ ] **Step 5:** Commit `feat(ZOD-GAN-001): implement spiral position formulas (k, j, i, θ, x, y)`. The message records the mutation check.
 
 ### Task 2: Inverse mapping `spiralNumberAt(x, y)` (TDD)
 
-**Files:** modify `gann_core/lib/src/spiral/spiral.dart`; test `gann_core/test/spiral/spiral_test.dart`.
+**Files:** modify `packages/gann_core/lib/src/spiral/spiral.dart`; test `packages/gann_core/test/spiral/spiral_test.dart`.
 
 **Interfaces:**
-- Consumes `spiralCell` (Task 1).
-- Produces `int spiralNumberAt(int x, int y)`: `ArgumentError` if `max(|x|, |y|) > 47453132`.
+- Consumes `spiralCell` and `maxSpiralRing` (Task 1).
+- Produces `int spiralNumberAt(int x, int y)`: `ArgumentError` if `max(|x|, |y|) > maxSpiralRing`.
 
 - [ ] **Step 1: Write the failing tests** (`group('spiralNumberAt')`):
   - `'center and the first ring'`: `(0, 0)` → 1, `(−1, 0)` → 2, `(0, −1)` → 4, `(1, 0)` → 6, `(0, 1)` → 8, `(−1, 1)` → 9.
   - `'design reference spot values'`: `(−2, −2)` → 13, `(−3, 3)` → 49, `(−4, 4)` → 81.
-  - `'corners of ring k map to the expected segments'`: for k = 1…5, `(k, −k)` (after the flip, the last cell of the ring) → `(2k+1)²`; the other three corners → `spiralCell(n)` with matching position.
+  - `'corners of ring k map to the expected segments'`: for k = 1…5, in **screen** coordinates:
+    - `spiralNumberAt(−k, k) == (2k+1)²` (bottom-left: the last cell of the ring, j = 8k−1)
+    - `spiralNumberAt(−k, −k) == (2k−1)² + 2k` (top-left: 3, 13, 31, 57, 91)
+    - `spiralNumberAt(k, −k) == (2k−1)² + 4k` (top-right: 5, 17, 37, 65, 101)
+    - `spiralNumberAt(k, k) == (2k−1)² + 6k` (bottom-right: 7, 21, 43, 73, 111)
   - `'round-trips with spiralCell for every cell of a 9×9 square'` (AC 3). For n = 1…81, `spiralNumberAt(spiralCell(n).x, spiralCell(n).y) == n`. For every (x, y) in [−4, 4]², `spiralCell(spiralNumberAt(x, y))` has that (x, y).
   - `'round-trips over the full 61×61 square'`: the same in both directions for n = 1…3721 and (x, y) in [−30, 30]².
-  - `'rejects coordinates outside the supported range'`: `(47453133, 0)` → `throwsArgumentError`.
+  - `'round-trips at the top of the range'`: `spiralNumberAt(−47453132, 47453132) == 9007199136250225` (= `maxSpiralNumber`).
+  - `'rejects coordinates outside the supported range'`: `(47453133, 0)`, `(0, −47453133)` and `(−47453133, 47453133)` → `throwsArgumentError`.
 - [ ] **Step 2:** Run `fvm dart run melos exec --scope=gann_core -- dart test test/spiral`. Expected: compilation FAIL (`spiralNumberAt` is undefined).
 - [ ] **Step 3: Implement** the inverse algorithm from the decision table, with a doc comment on the segment mapping.
 - [ ] **Step 4:** Same command, then `fvm dart run melos run lint` and `fvm dart run melos run test`. Expected: all PASS / exit 0.
@@ -160,4 +172,5 @@ packages/gann_core/test/spiral/
 ## Risks
 
 - **Configurable spiral start and rotation** (EXT-010) will need these functions parameterised. They're fixed now and documented as SQ-8's orientation, so EXT-010 can generalise them.
-- **The T-GAN-3 wording conflict** is recorded for TST-010 (see "Spec observation").
+- **The T-GAN-3 wording conflict** is recorded for TST-010 and GAN-002 (see "Spec observation").
+- **Heads-up for ZOD-GAN-002 planning:** its criteria "T-GAN-2 passes" / "T-GAN-3 passes" have the same cycle pattern resolved here (TST-010 and TST-011 depend on GAN-002). Expect to apply the same resolution.
