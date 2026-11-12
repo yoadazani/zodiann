@@ -5,24 +5,25 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** Workspace foundation (ZOD-FND-001) merged. `EphemerisPort` contract (ZOD-FND-002) complete, PR pending merge. 2 of 205 tasks done.
+- **Overall status:** ZOD-FND-001 (workspace) and ZOD-FND-002 (`EphemerisPort`) merged. ZOD-FND-012 (data model) complete, PR pending merge. 3 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), pending merge) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
+| ZOD-FND-012 | Define `SquareConfig`, `HighlightRule`, `Crossing` data classes (`UserSettings` → SET-007) | Done ([PR #4](https://github.com/yoadazani/zodiann/pull/4), pending merge) | `gann_core` 33/33 · `astro_core` 26/26 · workspace architecture 17/17 · lint exit 0. The `Crossing` guard was proven to fail on an injected reference. Review: 0 Critical, 2 Important fixed, 3 minors promoted and fixed test-first (strict ISO-8601, out-of-range wall clock, required `anchor` key), 2 deferred. Plan: [`docs/plans/ZOD-FND-012-data-model.md`](plans/ZOD-FND-012-data-model.md) |
+| ZOD-FND-002 | Define the `EphemerisPort` interface contract | Done ([PR #3](https://github.com/yoadazani/zodiann/pull/3), merged `331c7dc`) | `astro_core`: 20/20 tests (value types, sealed results, fake-port contract). The exhaustive switch was proven by a mutation that failed to compile. Lint exit 0. ARCH-2 guard 15/15. Review: 0 Critical / 0 Important. 3 doc minors were promoted and fixed, 1 deferred. Plan: [`docs/plans/ZOD-FND-002-ephemeris-port.md`](plans/ZOD-FND-002-ephemeris-port.md) |
 | ZOD-FND-001 | Set up the Melos monorepo workspace | Done ([PR #2](https://github.com/yoadazani/zodiann/pull/2), merged `0303645`) | Bootstrap links 11 packages; `melos run lint` exit 0; `melos run test` exit 0 (15/15 architecture tests); `astro_core` / `gann_core` depend only on `test` (dev), with no Flutter in their transitive closure. See Verification. Plan: [`docs/plans/ZOD-FND-001-melos-workspace.md`](plans/ZOD-FND-001-melos-workspace.md) |
 
 ## Current Task
 
-_None._ ZOD-FND-002 is complete and awaiting PR merge.
+_None._ ZOD-FND-012 is complete and awaiting PR merge.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-FND-012 — Define `UserSettings`, `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes (Critical)
-- **Why next:** It depends only on FND-001 (merged) and, together with FND-002, unblocks ZOD-EPH-001 (mean-node formula), which is on the critical path. It adds JSON to the `Body` enum defined in FND-002, so it builds on this branch. **FND-002's PR should be merged first.**
+- **ID:** ZOD-EPH-001 — Implement the mean ascending lunar node formula (Critical)
+- **Why next:** It's on the critical path, and both its dependencies (FND-002, FND-012) are done. It's pure Dart in `astro_core`, implementing the method FND-002 declared. Its task file already records the shared `mean_node.dart` location, the `implements` mixin rule, the `x % 360 == 360.0` pitfall and `T` from UTC. **FND-012's PR should be merged first.**
 - **Why not FND-003 yet:** the Swiss Ephemeris FFI spike must run a real computation on **both Android and iOS**. An iOS build needs macOS/Xcode, which this Windows machine can't provide. That needs a decision (a Mac, a cloud macOS runner, or splitting the spike) before FND-003 starts. It also benefits from ZOD-FND-010 (license) first.
 - **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research, Critical, no code).
 - **Note for ZOD-EPH-001:** the task file now records the shared `mean_node.dart` location, the `implements` (not `on`) mixin rule, the `x % 360 == 360.0` pitfall, and `T` from UTC.
@@ -66,6 +67,15 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - The root `analysis_options.yaml` (`package:lints/recommended.yaml` + strict-casts / strict-inference / strict-raw-types) applies to everything. Flutter members add `package:flutter_lints/flutter.yaml` via a multi-include. The Flutter tool also maintains an `analyzer: exclude: [build/**]` entry there. Leave it.
 - Pure-Dart members inherit `lints` through the shared workspace resolution (it's a root dev dependency).
 
+**Data model and JSON** (established in ZOD-FND-012)
+- Model classes are immutable `final class`es with hand-written `toJson` / `static fromJson(Object?)`, value equality and `toString`. No codegen, no `equatable` / `collection`.
+- Constructors validate invariants and throw `ArgumentError`. `fromJson` throws **only** `FormatException` for any invalid input, using `gann_core`'s internal strict readers (`json_read.dart`) and `buildOrFormatError`. Missing keys are errors; a nullable field must still be present (explicit `null`).
+- JSON shape: camelCase keys equal to field names. Enums as their `name`. Sealed variants carry a `"type"` discriminator. Doubles accept any JSON number.
+- Date-times: UTC timestamps are canonical ISO-8601 ending in `Z`. Moments with an offset use `OffsetDateTime` (canonical ISO-8601 `±HH:MM`). Parsing is strict (`iso8601.dart`): impossible fields are rejected, never normalized.
+- Lists held by models are unmodifiable copies.
+- `HighlightRule.colorToken` is a MASTER.md §2.2 **role-family key** (`axis`, `diag`, `eighth`, …). The UI resolves it to `<family>-fill` / `<family>-ink`, plus the bare `<family>` accent where the design defines one.
+- Derived results (e.g. `Crossing`) have no JSON and are never persisted. `test/architecture/crossing_not_persisted_test.dart` scans the persistence packages, currently `packages/shared_storage/lib`. **Add any new persistence package to its `storageLayers` list.**
+
 ## Technical Decisions
 
 | Date | Decision | Reason | Impacted components | Reference |
@@ -82,8 +92,30 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | The import scan covers whole import/export statements, including conditional alternatives. | The code review found that `import 'stub.dart' if (dart.library.ui) 'dart:ui';` was missed. | ARCH-2 guard | Final review fix |
 | 2026-11-12 | ZOD-FND-002 declares the mean-node method and documents its formula; ZOD-EPH-001 implements it; ZOD-TST-002 verifies T-EPH-2. FND-002's node criterion was changed to "declared + contract documented". | The original criterion created a cycle (FND-002 → TST-002 → EPH-001 → FND-002). Product-owner decision. | astro_core, EPH-001, TST-002 | FND-002 / EPH-001 task Notes |
 | 2026-11-12 | `Body` is defined by ZOD-FND-002; ZOD-FND-012 adds JSON only. | Both task files listed it; FND-002 needs it first. | astro_core, FND-012 | FND-002 / FND-012 task Notes |
+| 2026-11-12 | `UserSettings` deferred from ZOD-FND-012 to ZOD-SET-007; FND-012 criterion amended. | The spec gives only a field list; several fields depend on open decisions (D-1, D-3, D-5/D19); it mixes wheel and square types. Product-owner decision. | SET-007, FND-012 | FND-012 / SET-007 task files |
+| 2026-11-12 | `SquareConfig.anchor` is an `OffsetDateTime` (UTC instant + offset minutes, ISO-8601 with offset). | DATA-4 needs the offset saved; Dart `DateTime` cannot hold it. Product-owner decision. | gann_core, DAT-009, GAN-003 | FND-012 / DAT-009 task files |
+| 2026-11-12 | Hand-written JSON and equality for the data model; `fromJson` raises only `FormatException`. | About 7 small types; no build_runner or new dependencies; one failure type for storage and backup import. | gann_core, astro_core, future SET-007/DAT-* | FND-012 plan |
+| 2026-11-12 | `Crossing` has no JSON; "not persisted" is enforced by a root guard over `packages/shared_storage/lib`. | The task's JSON purpose is storage/backup, and the spec marks `Crossing` "Saved? No". The app shell is the composition root, not storage (review fix). | astro_core, shared_storage | FND-012 plan + review |
+| 2026-11-12 | Strict canonical ISO-8601 parsing instead of `DateTime.parse`. | `DateTime.parse` silently normalizes Feb 30 → Mar 2, `+05:75`, etc., so a hand-edited backup would load a different date (review finding). | gann_core | FND-012 review fix |
+| 2026-11-12 | `stepHours` only required ≥ 1 (default 4); no upper cap yet. | The spec says "4 in date and time mode" but SET-004 makes it editable. A cap is a product choice for GAN-003 / SET-004. | gann_core, GAN-003, SET-004 | FND-012 plan, deferred review minor |
 
 ## Verification
+
+ZOD-FND-012, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| AC1: types compile; persisted types round-trip incl. anchor offset | `fvm dart run melos exec --scope=gann_core -- dart test` | 33/33: round-trip per mode with `+05:30` / `-03:30` anchors; offsets `+02:00`, `+05:30`, `+05:45`, `-03:30`, `Z`; extreme years and microseconds |
+| AC2: `Crossing` not persisted | Root guard + `Crossing` has no JSON | 17/17 workspace architecture tests. The guard fails on an injected reference in `shared_storage` (then removed) |
+| AC3: default highlight rules | `square_config_test` + `highlight_rule_test` | Axes / Diagonals / Eighths, priorities 1/2/3, angles per spec, tokens `axis` / `diag` / `eighth` |
+| Robustness | `fromJson` rejection suites | Every malformed / tampered input → `FormatException` (reviewer probed nulls, non-maps, `1e400`, huge ints, `9.0` sizes, unknown enums, lenient dates) |
+| `astro_core` | `… --scope=astro_core -- dart test` | 26/26 (`Body` JSON, `Crossing`) |
+| Lint | `fvm dart run melos run lint` | Exit 0 |
+| Code review | Fresh reviewer, whole branch | With fixes: 0 Critical, 2 Important (fixed), 7 Minor (3 promoted and fixed test-first, 1 folded in, 1 doc fix, 2 deferred) |
+
+**Deferred review minors (FND-012):**
+- `stepHours` has no upper bound (a cap belongs to GAN-003 / SET-004).
+- `AnglesMatch` equality is order-sensitive and allows duplicates (revisit with EXT-008).
 
 ZOD-FND-002, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -121,9 +153,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-002-ephemeris-port` (from `main` @ `0303645`)
-- **Relevant commits:** ZOD-FND-001 merged to `main` as `0303645` (PR #2). FND-002: `32da922` value types · `025725e` port contract + sealed results · `4f9db30` FND-001 record correction · `8da2b91` review doc fixes · plus planning/docs commits
-- **Pull request:** FND-001 → https://github.com/yoadazani/zodiann/pull/2 (merged). FND-002 → https://github.com/yoadazani/zodiann/pull/3 (open)
-- **Unmerged task branches others depend on:** `task/ZOD-FND-002-ephemeris-port` (ZOD-FND-012, ZOD-EPH-001, ZOD-FND-003 need it on `main`)
+- **Current task branch:** `task/ZOD-FND-012-data-model` (from `main` @ `331c7dc`)
+- **Relevant commits:** ZOD-FND-001 → `0303645` (PR #2), ZOD-FND-002 → `331c7dc` (PR #3), both merged. FND-012: `3c73c88` OffsetDateTime · `318ab44` highlight rules · `c609fc0` SquareConfig · `323de32` Crossing + Body JSON + guard · `b9354bf` review hardening · plus planning/docs commits
+- **Pull request:** PR #2 and PR #3 merged. FND-012 → https://github.com/yoadazani/zodiann/pull/4 (open)
+- **Unmerged task branches others depend on:** `task/ZOD-FND-012-data-model` (ZOD-EPH-001 needs it on `main`)
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).

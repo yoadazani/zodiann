@@ -15,7 +15,7 @@ Store every saved anchor with its time-zone offset at save time, so a square ope
 
 ## Implementation Details
 
-- `SquareConfig.anchor` stores the offset alongside the moment (per the `DateTime?` field's documented "with time zone offset" requirement in the data model).
+- `SquareConfig.anchor` stores the offset alongside the moment (per the `DateTime?` field's documented "with time zone offset" requirement in the data model). Since ZOD-FND-012 (2026-11-12), the anchor is an `OffsetDateTime` (UTC instant + offset minutes, JSON as ISO-8601 with offset), so this task persists that value and verifies the behaviour below. It does not need to change the class.
 - Verify this specifically across a DST boundary and a simulated time-zone change.
 
 ## Design Reference

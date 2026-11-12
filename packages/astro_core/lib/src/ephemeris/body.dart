@@ -20,5 +20,20 @@ enum Body {
   pluto,
 
   /// The mean ascending lunar node (formula-based, not a physical body).
-  node,
+  node;
+
+  /// Parses the JSON form produced by [toJson] (the value's `name`).
+  ///
+  /// Throws [FormatException] for a non-string or an unknown name.
+  static Body fromJson(Object? json) {
+    if (json is String) {
+      for (final body in values) {
+        if (body.name == json) return body;
+      }
+    }
+    throw FormatException('Unknown Body', json);
+  }
+
+  /// The stable, language-independent key used in JSON (L-9).
+  String toJson() => name;
 }

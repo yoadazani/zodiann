@@ -17,4 +17,17 @@ void main() {
       'node',
     ]);
   });
+
+  test('round-trips every value through JSON', () {
+    for (final body in Body.values) {
+      expect(Body.fromJson(body.toJson()), body);
+    }
+    expect(Body.node.toJson(), 'node');
+  });
+
+  test('rejects unknown names and non-strings', () {
+    for (final bad in <Object?>['chiron', 'Sun', 3, null]) {
+      expect(() => Body.fromJson(bad), throwsFormatException, reason: '$bad');
+    }
+  });
 }
