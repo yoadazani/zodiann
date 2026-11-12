@@ -17,10 +17,15 @@ void main() {
       '"#1A2B3CFF"',
       'Color(4278190080)',
       'CupertinoColors.white',
+      'Color(0xFF_11_22_33)',
+      'Color(0XFF112233)',
+      'HSLColor.fromAHSL(1, 0, 0, 0)',
+      'HSVColor.fromAHSV(1, 0, 0, 0)',
+      'Color(0xFF112233,)',
     ];
     final source = ['// header', ...flagged.map((f) => 'x($f);')].join('\n');
     final found = findColorLiterals(source);
-    expect(found.map((l) => l.line), [for (var i = 2; i <= 12; i++) i]);
+    expect(found.map((l) => l.line), [for (var i = 2; i <= 17; i++) i]);
     for (final (i, literal) in found.indexed) {
       expect(flagged[i], contains(literal.text), reason: flagged[i]);
     }

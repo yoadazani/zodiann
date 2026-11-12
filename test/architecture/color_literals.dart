@@ -15,10 +15,13 @@ final class ColorLiteral {
 }
 
 final _patterns = [
-  // Color(0xFF112233), Color(4278190080)
-  RegExp(r'\bColor\(\s*(0x[0-9a-fA-F]+|\d+)\s*\)'),
+  // Color(0xFF112233), Color(0XFF112233), Color(0xFF_11_22_33),
+  // Color(4278190080), with an optional trailing comma.
+  RegExp(r'\bColor\(\s*(0[xX][0-9a-fA-F_]+|[\d_]+)\s*,?\s*\)'),
   // Color.fromARGB(, Color.fromRGBO(, Color.from(
   RegExp(r'\bColor\.from(ARGB|RGBO)?\('),
+  // HSLColor.fromAHSL(, HSVColor.fromAHSV(
+  RegExp(r'\bHS[LV]Color\.fromAHS[LV]\('),
   // Material / Cupertino named colours. The word boundary keeps token use
   // such as `squareColors.axis` or `BodyColors.new` legal.
   RegExp(r'\b(?:Cupertino)?Colors\.\w+'),
@@ -29,7 +32,10 @@ final _patterns = [
 /// Every colour literal in [source], ignoring text after `//` on a line.
 ///
 /// Known false negative: a `//` inside a string literal hides the rest of
-/// that line.
+/// that line. Known false positive: a literal inside a `/* … */` block
+/// comment is flagged (it fails loudly; reword or drop the comment). A
+/// literal split across lines (`Color(\n0x…\n)`) is not seen; the formatter
+/// normally joins it.
 List<ColorLiteral> findColorLiterals(String source) {
   final found = <ColorLiteral>[];
   final lines = source.split('\n');
