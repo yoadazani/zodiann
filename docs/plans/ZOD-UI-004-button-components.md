@@ -30,7 +30,7 @@
 - **Product-owner decisions (2026-11-13):**
   - **D1 icons:** the 33-icon set (ZOD-FND-009) isn't built yet. Buttons take an optional leading `Widget? icon`, laid out in a 16 × 16 slot with an 8 px gap. Tests use a transparent 16 × 16 placeholder. FND-009 supplies the real icons later.
   - **D2 solid danger ink:** white text on `danger`, as designed. In dark that's 3.37:1 (fails AA for 14 px text); in light it's 4.53:1. This is recorded as a ZOD-NFR-009 handoff, as UI-001 did for `text-3`.
-  - **D3 touch target:** the button is drawn at 40 / 32, but its layout height is `max(drawn, 44)`, with transparent margins centred above and below that also take taps. Vertically, screens place buttons 8 apart (layout) to get the sheet's 12 px visual gap (2 + 8 + 2), which meets MASTER §14's "at least 8 between targets". Horizontally the visual gap equals the layout gap: the dialog's Cancel→Delete gap is 8.
+  - **D3 touch target:** the button is drawn at 40 / 32, but its layout (and hit) box is at least 44 × 44: `max(drawn height, 44)` high and `max(drawn width, 44)` wide. The transparent margins around the centred drawn box also take taps. The drawn box's dimensions never change. Labels of about two narrow characters or fewer are narrower than 44 when drawn, measured with the bundled Plex Sans (regular '1' = 42.4, small 'OK' = 43.8, small '1' = 33.8). Their drawn box is centred in a 44-wide target. Vertically, screens place buttons 8 apart (layout) to get the sheet's 12 px visual gap (2 + 8 + 2), which meets MASTER §14's "at least 8 between targets". Horizontally, for buttons at least 44 wide when drawn, the visual gap equals the layout gap: the dialog's Cancel→Delete gap is 8. A narrower button adds (44 − drawn width) / 2 of transparent margin on each side.
   - **U1 hover animation:** MASTER §12's "Hover: 150 ms" is implemented. The brightness factor eases 1 ↔ 1.12 over 150 ms (`Curves.ease`, CSS's default timing). It's instant under reduced motion (`MediaQuery.disableAnimationsOf`, NFR-X6, MASTER §12). Press is instant: §12 times only hover.
   - **U2 dense containers:** D3 applies everywhere. Containers sized by their content grow by 6 (small) / 2 (regular) px per side compared with the mockups, unless their padding absorbs the margin. Example: the crossings panel head goes from 56 to 68 (`wheel.html:55, 154`). This is handed to ZOD-WHL-021, ZOD-SET-005 and ZOD-DAT-001.
 - **The sheet's states are CSS filters on the button element** (`components.html:52–55`), not kit.css's `:hover` rules:
@@ -126,10 +126,14 @@
    - The ring shows for keyboard focus only, not after a tap.
    
    Covered by Task 3's keyboard tests.
-5. **A tap in the invisible hit margin** (2 px above a regular button, 6 px above a small one) must activate the button. Hit testing must go through ordinary parents (`Row`, `Padding`), because the margin is real layout, not a hit-test trick. Covered by Task 3's `hit margin taps activate` test.
+5. **A tap in the invisible hit margin** (2 px above a regular button, 6 px above a small one, and 1 px inside the left / right edge of a narrow button's target) must activate the button. Hit testing must go through ordinary parents (`Row`, `Padding`), because the margin is real layout, not a hit-test trick. Covered by Task 3's `hit margin taps activate` test.
 6. **Screen-reader activation:** TalkBack / VoiceOver must announce a button with its label, enabled state and focusability, and double-tap must activate it. A disabled button has no tap action. Covered by Task 3's semantics tests.
 7. **A mouse on a touch device** (a tablet with a mouse after a touch) still shows hover. Covered by Task 3's `hover shows in touch highlight mode`.
-8. **Clipping ancestors:** the focus ring extends 4 px beyond the box (2 px beyond the 44 layout vertically). A clipping parent within that distance hides it, which breaks MASTER §14 "focus always visible". This is documented in the widget's doc comment and handed to UI-013 / UI-014.
+8. **Focus-ring clipping contract:** the ring extends 4 px beyond the drawn box. Beyond the layout, that's 2 px vertically for regular, none vertically for small, and horizontally 4 − (44 − drawn width) / 2 px when positive. `ZodiannButton` paints the complete ring whenever no ancestor clips it. It cannot override an ancestor's clip, and doesn't try to.
+   - **Consumer contract:** wherever the ring can appear, consuming screens and components keep at least 4 px of clear, unclipped space around the drawn button.
+   - **When a layout must clip** (a scroll view, a rounded panel), it adjusts its own padding or insets so that keyboard focus stays fully visible (MASTER §14).
+   - **Where it's recorded:** the widget's doc comment, the UI-013 / UI-014 hand-offs and PROGRESS's Architecture Conventions.
+   - **Covered by** Task 3's `focus ring is painted completely when unclipped` test.
 
 ---
 
@@ -204,7 +208,7 @@
   2. `FocusableActionDetector(enabled: enabled, focusNode, autofocus, onShowFocusHighlight → _focusHighlight, mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden, actions: {ActivateIntent: CallbackAction(onInvoke: → onPressed)})`;
   3. `MouseRegion(onEnter / onExit → _hovered)`, which always tracks. The effective hover is `enabled && _hovered`, so re-enabling under a resting mouse shows hover. Hover isn't taken from `onShowHoverHighlight`, which is suppressed in touch highlight mode;
   4. `GestureDetector(behavior: HitTestBehavior.opaque, excludeFromSemantics: true, onTapDown / onTapUp / onTapCancel → _pressed, onTap → onPressed)`. Pass null callbacks when disabled;
-  5. `ConstrainedBox(constraints: BoxConstraints(minHeight: ZodiannSize.minTouchTarget), child: Align(widthFactor: 1, heightFactor: 1, child: …))` (D3). The layout is exactly max(drawn, 44) high and content-wide, with the drawn box centred. A plain `Center` would fill bounded parents;
+  5. `ConstrainedBox(constraints: BoxConstraints(minWidth: ZodiannSize.minTouchTarget, minHeight: ZodiannSize.minTouchTarget), child: Align(widthFactor: 1, heightFactor: 1, child: …))` (D3). The layout is exactly max(drawn width, 44) × max(drawn height, 44), with the drawn box centred and its own size unchanged. A plain `Center` would fill bounded parents;
   6. `ExcludeSemantics(child: Opacity(opacity: enabled ? 1.0 : ZodiannStates.disabledOpacity, …))`, so the `Text` doesn't add the label a second time;
   7. `Transform.translate(offset: Offset(0, _pressed ? ZodiannStates.pressedOffset : 0))`;
   8. `CustomPaint(foregroundPainter: ZodiannFocusRingPainter(show: _focusHighlight, color: s.focus))`. `ZodiannFocusRingPainter` is a public `@visibleForTesting final class … extends CustomPainter` in `zodiann_button.dart` (`const ZodiannFocusRingPainter({required this.show, required this.color})`), with `shouldRepaint` comparing both fields. `shared_ui.dart` exports the file with `hide ZodiannFocusRingPainter`. Tests import `package:shared_ui/src/widgets/zodiann_button.dart`. Compute `final outset = ZodiannStates.focusRingGap + ZodiannStates.focusRingWidth / 2;` first. Then stroke `RRect.fromRectAndRadius(bounds.inflate(outset), Radius.circular(ZodiannRadius.md + outset))` at width `ZodiannStates.focusRingWidth`, outside the child's bounds;
@@ -218,13 +222,19 @@
 - **The doc comment states:**
   - at most one primary per region;
   - the 44 layout (D3);
-  - the focus ring extends 4 px beyond the drawn box, so parents must not clip within that distance.
+  - **The focus-ring contract (Review Focus 8):** the button paints the complete ring, 4 px beyond the drawn box, whenever no ancestor clips it, and it cannot override an ancestor's clip. Consumers keep at least 4 px of clear, unclipped space around the button wherever the ring can appear. A layout that must clip adjusts its own padding so keyboard focus stays visible.
 
 - [ ] **Step 1: Write the failing tests.** All widget tests pump `MaterialApp(theme: ZodiannTheme.graphite / porcelain, home: Material(child: Center(child: …)))`. **The Hebrew harness** keeps the `MaterialApp` and adds `builder: (c, w) => Theme(data: withZodiannScript(Theme.of(c), ZodiannScript.hebrew), child: Directionality(textDirection: TextDirection.rtl, child: w!))`. `shared_ui` has no `flutter_localizations`, so `locale: Locale('he')` alone would resolve to en_US / LTR. Tests also assert that `Directionality.of` the button's context is `rtl`. Use `setUpAll(loadBundledFonts)`.
-  - **`regular is drawn 40 high in a 44 layout; small 32 in 44`:**
-    - `tester.getSize(find.byType(ZodiannButton)).height == 44` for both sizes;
-    - the decorated box (the `Container`'s `DecoratedBox`) heights are 40 and 32.
-    - Inside `Center(child: SizedBox(height: 300, child: Row(children: [button])))`, the `ZodiannButton` is still 44 high and exactly as wide as its decorated box.
+  - **`the target is at least 44 × 44 and the drawn box is unchanged`:** for regular and small, each with the labels 'Save', 'OK' and '1':
+    - `tester.getSize(find.byType(ZodiannButton))` is exactly `Size(max(drawnWidth, 44), 44)`, so width ≥ 44 and height == 44;
+    - the drawn box (the `Container`'s `DecoratedBox`) is 40 / 32 high, and its width equals 2 × (1 + padding) + the label's width, regardless of the 44 minimum. Compare with `closeTo(…, 0.01)`, using `tester.getSize(find.byType(Text)).width` for the label;
+    - the drawn box is centred in the target (equal margins on each side, within 0.5 px);
+    - inside `Center(child: SizedBox(height: 300, child: Row(children: [button])))`, for each case the `ZodiannButton` is still 44 high and exactly max(decorated box width, 44) wide.
+    
+    **Which cases exercise which path:**
+    - **Narrower than 44 when drawn,** pinning the `minWidth` path: regular '1' (42.4), small 'OK' (43.8) and small '1' (33.8 = 13 + 13 + 7.8, tabular figures).
+    - **Wider than 44,** pinning "target = drawn width": 'Save' in both sizes and regular 'OK'.
+    - **The margin tap is tested on small '1' only.** First assert the precondition `targetRect.left + 1 < drawnRect.left` (the margin is ≈ 5.1). Then `tester.tapAt(Offset(targetRect.left + 1, targetRect.center.dy))` calls `onPressed` once.
   - **`border-box padding, gap and icon slot`:**
     - the label's start edge minus the box's outer start edge is 1 + 16 + 16 + 8 = 41 with an icon, 17 without, and 13 for small without;
     - the icon slot starts at 17 (13 small) and is 16 × 16;
@@ -241,6 +251,7 @@
   - **B3:** drop the 44 `ConstrainedBox`. Fails the layout test.
   - **B8:** `DecoratedBox` + `Padding` instead of `Container`, so the border isn't included. Fails the padding test (16 ≠ 17).
   - **B9:** a plain `Center` instead of `Align(widthFactor: 1, heightFactor: 1)`. Fails the `Row` in the 300-high box.
+  - **B15:** drop `minWidth`. Fails the regular '1', small 'OK' and small '1' target widths.
 - [ ] **Step 6: Gates, then commit.** Commit as `feat(ZOD-UI-004): ZodiannButton variants, sizes and layout`.
 
 ### Task 3: States and behaviour (criteria 2 and 3)
@@ -254,7 +265,7 @@
 
 - [ ] **Step 1: Write the failing tests.**
   - **`tap calls onPressed once`.**
-  - **`hit margin taps activate`:** `tester.tapAt(topCentre + Offset(0, 1))` on a regular button inside `Row(children: [button])` calls onPressed, and the same works at offset 3 on a small one. A tap 1 px outside the 44 box doesn't.
+  - **`hit margin taps activate`:** `tester.tapAt(topCentre + Offset(0, 1))` on a regular button inside `Row(children: [button])` calls onPressed, and the same works at offset 3 on a small one. A tap 1 px outside the 44 box doesn't. For a small '1' inside `Row(mainAxisSize: MainAxisSize.min, children: [SizedBox(width: 10), button, SizedBox(width: 8)])`, a tap at the target's left edge + 1 at mid-height also activates it.
   - **`hover lightens over 150 ms`:**
     - move a mouse `TestGesture` onto the button and `await tester.pump()`. This starts the animation, so the filter is still identity;
     - after `pump(const Duration(milliseconds: 75))` the filter equals neither the identity matrix nor the 1.12 matrix. Parse the diagonal k from `colorFilter.toString()`: it is within 1e-3 of `1 + 0.12 * Curves.ease.transform(0.5)` (≈ 1.0963; linear would give 1.06);
@@ -269,6 +280,15 @@
     1. Pump `Row(children: [button, ZodiannButton(label: 'Next', onPressed: () {})])`. `sendKeyEvent(LogicalKeyboardKey.tab)` focuses the button. `ZodiannFocusRingPainter.show` is true, found via `find.byWidgetPredicate((w) => w is CustomPaint && w.foregroundPainter is ZodiannFocusRingPainter)`. The painter's colour equals `surfaces.focus` in both themes.
     2. `tester.tap` it: `focusNode.hasFocus` is still true and `show` is false.
     3. Tab moves focus to 'Next', then Shift+Tab returns: `show` is true again.
+  - **`focus ring is painted completely when unclipped`:**
+    - **Setup:** for regular 'Save', small 'Save' and small '1' (the last is centred inside the 44 target at a fractional x), in both themes:
+      - place the button at a whole-pixel origin, `Align(alignment: Alignment.topLeft, child: Padding(padding: EdgeInsets.all(8), child: button))`, inside a `RepaintBoundary` on `surface`;
+      - Tab-focus it, then render to RGBA inside `runAsync`.
+    - **Edges:** let L, R, T, B be the drawn box's global left / right / top / bottom (from `tester.getRect` of the `DecoratedBox`). Text widths are fractional, so the edges usually are too.
+    - **Sampling:** for each side, sample the one pixel that lies wholly inside the ring band and the one that lies wholly inside the gap, whatever the subpixel alignment:
+      - at the drawn box's mid-row: left ring x = ceil(L) − 4, left gap x = ceil(L) − 2; right ring x = floor(R) + 3, right gap x = floor(R) + 1;
+      - at its mid-column: top ring y = ceil(T) − 4, top gap y = ceil(T) − 2; bottom ring y = floor(B) + 3, bottom gap y = floor(B) + 1.
+    - **Expected:** each ring pixel equals `focus` exactly, and each gap pixel equals `surface` exactly. This pins the "complete ring when unclipped" half of the contract; ancestor clipping is the consumer's responsibility (Review Focus 8).
   - **`Enter and Space activate the focused button`.**
   - **`semantics`:**
     - Enabled: `tester.getSemantics(find.byType(ZodiannButton))` `matchesSemantics(isButton: true, hasEnabledState: true, isEnabled: true, isFocusable: true, hasTapAction: true, hasFocusAction: true, label: 'Save')`. The test platform is Android. The label is exactly 'Save', appearing once.
@@ -296,6 +316,7 @@
   - **B12:** duration always 150 ms. Fails reduced motion.
   - **B13:** `Curves.linear`. Fails the 75 ms value.
   - **B14:** `excludeSemantics: true` on the outer `Semantics`. Fails `hasFocusAction`.
+  - **B16:** ring outset `focusRingGap + focusRingWidth` (1 px further out). Fails the ring / gap pixels.
 - [ ] **Step 6: Gates, then commit.** Commit as `feat(ZOD-UI-004): button hover, press, focus ring, semantics and disabled behaviour`.
 
 ### Task 4: Component-sheet cross-check (criterion 1)
@@ -380,16 +401,17 @@
   - **Notes in other task files:**
     - **ZOD-NFR-009:** the dark solid-danger 3.37:1 shortfall (D2).
     - **ZOD-FND-009:** pass real icons through `ZodiannButton.icon`, at 16.
-    - **ZOD-UI-013:** use `ZodiannButtonVariant.dangerSolid` for destructive confirmation; actions are 8 apart horizontally. Do not clip within 4 px of a button (focus ring).
-    - **ZOD-UI-014:** do not clip within 4 px of a button (focus ring).
-    - **ZOD-WHL-021, ZOD-SET-005, ZOD-DAT-001:** `ZodiannButton` takes max(drawn, 44) layout height (D3 / U2). A container sized by content grows by 6 (small) / 2 (regular) px per side compared with the mockup (crossings panel head 56 → 68) unless its padding absorbs the margin.
+    - **ZOD-UI-013:** use `ZodiannButtonVariant.dangerSolid` for destructive confirmation; actions are 8 apart horizontally. Focus-ring contract: keep at least 4 px of clear, unclipped space around each button. If the dialog must clip, adjust its padding so keyboard focus stays visible. The button can't override an ancestor's clip.
+    - **ZOD-UI-014:** the same focus-ring contract for buttons in panels (panel heads, panel bodies, scrolled content).
+    - **ZOD-WHL-021, ZOD-SET-005, ZOD-DAT-001:** `ZodiannButton` takes max(drawn, 44) layout height and max(drawn width, 44) width (D3 / U2). Very short labels (e.g. small 'OK', '1') get transparent side margins. A container sized by content grows by 6 (small) / 2 (regular) px per side compared with the mockup (crossings panel head 56 → 68) unless its padding absorbs the margin.
     - **ZOD-NFR-010:** the button hover animates over 150 ms and is instant under `disableAnimations` (tested in UI-004).
     - **NAV-001, WHL-016, WHL-017:** icon buttons follow the same state model (`ZodiannStates`, brightness filters, focus ring).
   - **PROGRESS:**
     - Architecture Conventions:
       - buttons are `ZodiannButton`; at most one primary per region;
       - interactive states use `ZodiannStates`;
-      - hit targets are ≥ 44, with buttons laid out 8 apart.
+      - hit targets are ≥ 44 × 44 (drawn size unchanged), with buttons laid out 8 apart vertically;
+      - focus-ring contract: consumers keep ≥ 4 px of clear, unclipped space around buttons; a layout that must clip adjusts its padding so keyboard focus stays visible.
     - Technical Decisions: D1, D2, D3, U1, U2, and the filter semantics.
     - Verification, Git State, next task.
   - **TASKS.md:** UI-004 Done.
@@ -450,3 +472,24 @@ The reviewer confirmed that every round-1 correction and U1 / U2 are applied con
 - **M5:** the ease curve is checked at 75 ms (≈ 1.0963), with mutant B13.
 
 No open items remain after two rounds.
+
+### Material revision (2026-11-13): product-owner clarifications, round 1
+
+**Clarifications applied** (no other product-owner decision changed, no scope added):
+- **Focus-ring clipping contract:**
+  - `ZodiannButton` paints the complete ring when no ancestor clips it, and doesn't claim to override an ancestor's clip.
+  - Consumers keep ≥ 4 px of clear, unclipped space wherever the ring can appear. A layout that must clip adjusts its own padding so keyboard focus stays visible.
+  - Recorded in D3, Review Focus 8, the Task 2 doc comment, a new Task 3 pixel test, the UI-013 / UI-014 hand-offs and the PROGRESS conventions.
+- **Complete 44 × 44 target:** the hit box gets `minWidth: 44` as well as `minHeight: 44`. A new Task 2 test covers 'Save' / 'OK' / '1' in both sizes and checks the exact target size, the unchanged drawn size, centring and a margin tap. Mutant B15 added.
+
+**Reviewer verdict:** approve after corrections (1 Critical, 2 Important, 5 Minor, 0 Needs user decision). The reviewer probed the layer stack on Flutter 3.50 with the bundled Plex Sans. All findings applied:
+- **C1:** the ring-pixel test sampled fixed offsets at fractional edges. It now samples the one wholly covered ring pixel and gap pixel per side (ceil / floor of the edge), from a whole-pixel origin, for regular 'Save', small 'Save' and small '1'. Mutant B16 added.
+- **I1:** narrow-label claims were corrected with measured widths (regular '1' 42.4, small 'OK' 43.8, small '1' 33.8). The horizontal-gap wording now accounts for a narrow button's side margins.
+- **I2:** the `Row`-in-300 assertion is now max(drawn width, 44).
+- **M1:** the margin tap is limited to small '1', with an explicit precondition.
+- **M2:** a horizontal margin tap inside a `Row` was added to Task 3, and Review Focus 5 now covers it.
+- **M3:** drawn widths are compared with `closeTo(…, 0.01)`.
+- **M4:** Review Focus 8 states the per-size overhang beyond the layout.
+- **M5:** the U2 hand-off covers width too.
+
+Task 4 is unaffected: every sheet cell is wider than 44 when drawn.
