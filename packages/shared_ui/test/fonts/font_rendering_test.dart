@@ -9,32 +9,11 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
-const _families = {
-  ZodiannFonts.plexSans: [
-    'ibm-plex-sans/IBMPlexSans-Light.ttf',
-    'ibm-plex-sans/IBMPlexSans-Regular.ttf',
-    'ibm-plex-sans/IBMPlexSans-Medium.ttf',
-    'ibm-plex-sans/IBMPlexSans-SemiBold.ttf',
-  ],
-  ZodiannFonts.plexSansHebrew: [
-    'ibm-plex-sans-hebrew/IBMPlexSansHebrew-Light.ttf',
-    'ibm-plex-sans-hebrew/IBMPlexSansHebrew-Regular.ttf',
-    'ibm-plex-sans-hebrew/IBMPlexSansHebrew-Medium.ttf',
-    'ibm-plex-sans-hebrew/IBMPlexSansHebrew-SemiBold.ttf',
-  ],
-  ZodiannFonts.notoSansSymbols: [
-    'noto-sans-symbols/NotoSansSymbols-Regular.ttf',
-  ],
-  ZodiannFonts.notoSansSymbols2: [
-    'noto-sans-symbols-2/NotoSansSymbols2-Regular.ttf',
-  ],
-  ZodiannFonts.notoSans: ['noto-sans/NotoSans-Regular.ttf'],
-};
+import '../support/load_bundled_fonts.dart';
 
 const _latin = 'Zodiann 0123456789';
 const _hebrew = 'זודיאן 0123456789';
@@ -67,21 +46,10 @@ double _width(String text, String family, [FontWeight w = FontWeight.w400]) {
   return width;
 }
 
-Future<void> _loadFonts() async {
-  for (final MapEntry(key: family, value: files) in _families.entries) {
-    final loader = FontLoader('packages/${ZodiannFonts.package}/$family');
-    for (final file in files) {
-      final bytes = File('assets/fonts/$file').readAsBytesSync();
-      loader.addFont(Future.value(ByteData.sublistView(bytes)));
-    }
-    await loader.load();
-  }
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(_loadFonts);
+  setUpAll(loadBundledFonts);
 
   test('IBM Plex Sans renders four distinct weights', () {
     final widths = {
