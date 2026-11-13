@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 
 import 'tokens/graphite_tokens.dart';
 import 'tokens/porcelain_tokens.dart';
+import 'zodiann_surfaces.dart';
+import 'zodiann_text_styles.dart';
 import 'zodiann_tokens.dart';
 
 /// Builds a `ThemeData` from [t]: the `ColorScheme` and the scaffold colour
@@ -13,8 +15,15 @@ import 'zodiann_tokens.dart';
 /// `primaryContainer` → `primary`, `tertiary` → `secondary`, and
 /// `surfaceTint` → `primary` (an accent tint on M3 elevated surfaces, which
 /// ZOD-UI-003/UI-004 should revisit).
-ThemeData buildZodiannTheme(ZodiannTokens t) {
+///
+/// The typography (ZOD-UI-002) is [script]'s `ZodiannTextStyles`, installed
+/// as an extension and as all 15 `TextTheme` slots.
+ThemeData buildZodiannTheme(
+  ZodiannTokens t, {
+  ZodiannScript script = ZodiannScript.latin,
+}) {
   final s = t.surfaces;
+  final styles = buildZodiannTextStyles(s, script);
   return ThemeData(
     brightness: t.brightness,
     colorScheme: ColorScheme(
@@ -38,7 +47,28 @@ ThemeData buildZodiannTheme(ZodiannTokens t) {
       scrim: s.scrim,
     ),
     scaffoldBackgroundColor: s.bg,
-    extensions: t.extensions,
+    textTheme: buildZodiannTextTheme(styles),
+    extensions: [...t.extensions, styles],
+  );
+}
+
+/// [theme] with its typography rebuilt for [script] from its own
+/// `ZodiannSurfaces`; colours and the other extensions are unchanged. The
+/// text theme gets the same Material typography merge the `ThemeData`
+/// constructor applies, so switching back yields an equal text theme.
+ThemeData withZodiannScript(ThemeData theme, ZodiannScript script) {
+  final s = theme.extension<ZodiannSurfaces>();
+  assert(s != null, 'withZodiannScript needs a Zodiann theme');
+  final styles = buildZodiannTextStyles(s!, script);
+  final base = theme.brightness == Brightness.dark
+      ? theme.typography.white
+      : theme.typography.black;
+  return theme.copyWith(
+    textTheme: base.merge(buildZodiannTextTheme(styles)),
+    extensions: [
+      ...theme.extensions.values.where((e) => e is! ZodiannTextStyles),
+      styles,
+    ],
   );
 }
 

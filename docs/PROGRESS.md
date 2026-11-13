@@ -5,14 +5,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) merged. ZOD-FND-007 (offline fonts) done, PR open. 16 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) and ZOD-FND-007 (offline fonts) merged. ZOD-UI-002 (typography scale) done, PR open. 17 of 205 tasks done.
 - **Last updated:** 2026-11-13
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-007 | Bundle offline fonts and verify no network dependency | Done ([PR #18](https://github.com/yoadazani/zodiann/pull/18), open) | `shared_ui` 59/59: registration table, OS/2 weights, name-table families, SHA-256s vs `SOURCES.md`, OFL licences shipped as assets; exact cmap coverage of the 29 MASTER glyphs (Symbols / Symbols 2 / Noto Sans for ℞), Hebrew and Latin coverage; in-host `FontLoader` rendering (four distinct weights, not the fallback font) + specimen PNG reviewed. Architecture 28/28 incl. `no_network_test.dart` (main manifest, iOS, runtime closures, `lib/` network APIs). On device (emulator-5554): online run fails only the offline check; airplane mode → all pass; F6 caught. Release APK: no network permission (`aapt2`), 11 TTF + 5 OFL. Mutants F1–F6, N1–N4 caught. Plan review: 2 rounds (9 Important applied, 3 PO decisions). Code review: Ready to merge, 0 Critical / 0 Important; run-instructions minor fixed, 4 minors deferred. Plan: [`docs/plans/ZOD-FND-007-bundle-offline-fonts.md`](plans/ZOD-FND-007-bundle-offline-fonts.md) |
+| ZOD-UI-002 | Implement the typography scale | Done ([PR #19](https://github.com/yoadazani/zodiann/pull/19), open) | `shared_ui` 112/112: typed MASTER §3 table (13 roles × both themes × both scripts: size, line height, weight, em × size tracking), families and fallback chains, tabular figures, even leading, colour, 15-slot `TextTheme`, `==`/`hashCode`, `withZodiannScript` round trip, Material's localized geometry kept; glyphs (29 × U+FE0E, Body map); rendering with the real fonts (line height, tracking, weight, digit jitter over 100 readouts in both scripts, Hebrew ′ ″ from Plex Sans, invisible selector); specimen PNG reviewed against the reference board. App 20/20 (en / he / live locale switch / mid-animation). Architecture 29/29 (sentence-case guard). Emulator-5554: all 29 glyphs monochrome; E1 detector proof (system-font ♈ = colour emoji). Mutants T1–T8, G1–G2, R1, A1–A2, S1, E1 caught; R2 caught by the value test. Plan review: 2 rounds (2 Critical + 3 Important applied). Code review: Ready to merge, 0 Critical / 0 Important; handoff wording + test comment applied, 3 minors deferred. Plan: [`docs/plans/ZOD-UI-002-typography-scale.md`](plans/ZOD-UI-002-typography-scale.md) |
+| ZOD-FND-007 | Bundle offline fonts and verify no network dependency | Done ([PR #18](https://github.com/yoadazani/zodiann/pull/18), merged `fe012e6`) | `shared_ui` 59/59: registration table, OS/2 weights, name-table families, SHA-256s vs `SOURCES.md`, OFL licences shipped as assets; exact cmap coverage of the 29 MASTER glyphs (Symbols / Symbols 2 / Noto Sans for ℞), Hebrew and Latin coverage; in-host `FontLoader` rendering (four distinct weights, not the fallback font) + specimen PNG reviewed. Architecture 28/28 incl. `no_network_test.dart` (main manifest, iOS, runtime closures, `lib/` network APIs). On device (emulator-5554): online run fails only the offline check; airplane mode → all pass; F6 caught. Release APK: no network permission (`aapt2`), 11 TTF + 5 OFL. Mutants F1–F6, N1–N4 caught. Plan review: 2 rounds (9 Important applied, 3 PO decisions). Code review: Ready to merge, 0 Critical / 0 Important; run-instructions minor fixed, 4 minors deferred. Plan: [`docs/plans/ZOD-FND-007-bundle-offline-fonts.md`](plans/ZOD-FND-007-bundle-offline-fonts.md) |
 | ZOD-UI-001 | Implement the color token values (dark + light) | Done ([PR #17](https://github.com/yoadazani/zodiann/pull/17), merged `4d207d7`) | `shared_ui` 44/44: all 52 × 2 values against MASTER's tables and against `_source/kit.css` (second source); the 43 reference tiles per theme pixel-exact against `components_{dark,light}.png` (translucent over `surface` ±1, uniformity, per-theme rows, exact sizes); WCAG AA sanity (text roles, on-accent); test-only `TokenSwatchGrid` harness whose rendered pixels equal the same oracle. Mutants V1–V5 as planned. Harness PNGs match the reference crops side by side. Emulator-5554: bg exactly `#F5F6F8` / `#08080A`. Plan review: 2 rounds (7 Important applied). Code review: Ready to merge, all 104 values re-checked by hand; 3 minors deferred. Plan: [`docs/plans/ZOD-UI-001-color-token-values.md`](plans/ZOD-UI-001-color-token-values.md) |
 | ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), merged `ae666da`) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
 | ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) ([PR #15](https://github.com/yoadazani/zodiann/pull/15), merged `e4a8859`) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
@@ -31,11 +32,11 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-FND-007 is done on `task/ZOD-FND-007-bundle-offline-fonts`, PR open (see Git State); merge on approval.
+- **None in progress.** ZOD-UI-002 is done on `task/ZOD-UI-002-typography-scale`, PR open (see Git State); merge on approval.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-UI-002 — Implement the typography scale (next in the Shared UI token track: tokens 001–003 before any component). Depends on FND-013 (merged) and FND-007 (PR open; merge first). Its task Notes carry FND-007's handoff: `ZodiannFonts` + `package:`, the three-font glyph fallback, Plex Sans as Hebrew fallback for ′ ″, digits already equal width. Alternatives: ZOD-UI-003 (spacing/radius/elevation/sizing tokens), ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code). Handoff from UI-001: dark `text-3` is below 4.5:1 on `surface-2` / `surface-3` / `accent-soft` (4.48 / 4.05 / 4.03): avoid it there, or ZOD-NFR-009 decides.
+- **ID:** ZOD-UI-003 — Implement spacing, radius, elevation and sizing tokens (the last of the Shared UI token track, tokens 001–003 before any component; also the natural owner of the 700 / 1100 breakpoint values the typography's phone variants wait on). Depends on FND-013 (merged) only, so it does not need the UI-002 PR merged. UI-002 handoffs for later components/screens are in its task Notes (`maxLines: 1` for single-line Hebrew labels with ′; glyph rows ~2 px taller). Alternatives: ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code). Handoff from UI-001: dark `text-3` is below 4.5:1 on `surface-2` / `surface-3` / `accent-soft` (4.48 / 4.05 / 4.03): avoid it there, or ZOD-NFR-009 decides.
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
@@ -55,7 +56,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Blockers
 
-- **iOS build environment for ZOD-FND-003** (and later iOS work): development runs on Windows, and iOS builds need macOS/Xcode. A decision is needed before FND-003. It also blocks **ZOD-FND-005's outstanding iOS build + runtime verification** (ZOD-FND-004's task file includes no macOS runner). When the Mac run happens, also check two iOS items no task owns (FND-005 review minors): the launch screen is hard-coded white (`ios/Runner/Base.lproj/LaunchScreen.storyboard`, white flash in dark mode; use `systemBackgroundColor`), and `Info.plist` lacks `CFBundleLocalizations` (en, he), which iOS needs to treat the bundle as Hebrew-capable and to show the per-app language picker (L-3).
+- **iOS build environment for ZOD-FND-003** (and later iOS work): development runs on Windows, and iOS builds need macOS/Xcode. A decision is needed before FND-003. It also blocks **ZOD-FND-005's outstanding iOS build + runtime verification** (ZOD-FND-004's task file includes no macOS runner). When the Mac run happens, also check two iOS items no task owns (FND-005 review minors): the launch screen is hard-coded white (`ios/Runner/Base.lproj/LaunchScreen.storyboard`, white flash in dark mode; use `systemBackgroundColor`), and `Info.plist` lacks `CFBundleLocalizations` (en, he), which iOS needs to treat the bundle as Hebrew-capable and to show the per-app language picker (L-3). Also run ZOD-UI-002's glyph monochrome test (`apps/astro_mobile/integration_test/glyph_presentation_test.dart`) on iOS (Apple Color Emoji).
 - Open product decisions D-1…D-5 and design approvals D6–D19 (`TASKS.md` §6) affect later tasks, not the next one.
 
 ## Architecture Conventions
@@ -85,6 +86,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - Text styles name bundled fonts only through `ZodiannFonts` constants plus `package: ZodiannFonts.package`. Font files are byte-for-byte official releases recorded in `packages/shared_ui/assets/fonts/SOURCES.md` (SHA-256 checked by tests).
 - A new dependency must keep `test/architecture/no_network_test.dart` green (DATA-7/8): no network permission in the main manifest, no network package in any member's runtime closure, no network API in `lib/`. Release builds leave out dev-dependency plugins (`integration_test` is marked `dev_dependency: true` in `.flutter-plugins-dependencies`; the release APK has no integration_test files).
 - On-device tests on emulator-5554 run as a debug APK built with `-t <test>` and read from logcat (Flutter 3.50 refuses `flutter test -d` there).
+
+**Typography** (established in ZOD-UI-002)
+- Derive every text style from a `ZodiannTextStyles` role (`Theme.of(context).extension<ZodiannTextStyles>()!`) or a `textTheme` slot, using `copyWith` for size, weight or colour; never build a `TextStyle` from scratch.
+- Astrological glyphs come only from `ZodiannGlyphs` (U+FE0E included).
+- Sentence case everywhere: no `toUpperCase(` in UI code (`test/architecture/sentence_case_test.dart`).
+- The script follows the locale via `MaterialApp.builder` + `withZodiannScript`; don't set fonts per screen.
 
 **Planning** (established 2026-11-12, PR #6)
 - Every implementation plan, and every material revision of one, goes through the **Automatic Plan Review** in `zodiann-development` before the user sees it.
@@ -144,6 +151,9 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-13 | Typography is a `ThemeExtension` (`ZodiannTextStyles`, MASTER §3 roles + phone sizes + glyph) **and** a full 15-slot `TextTheme` built from it; no Material default sizes remain. | Screens need MASTER's role names; Material widgets read `TextTheme`. | `shared_ui`, all text | ZOD-UI-002 plan |
+| 2026-11-13 | The script (Plex Sans / Plex Sans Hebrew) is resolved from the locale in `MaterialApp.builder` via `withZodiannScript`, which repeats the `ThemeData` constructor's typography merge. | `MaterialApp` resolves the locale; the builder sits below `AnimatedTheme`, so the swap holds mid-animation. | `apps/astro_mobile/lib/src/app.dart` | ZOD-UI-002 plan |
+| 2026-11-13 | Astrological glyph strings are centralised in `ZodiannGlyphs` (each + U+FE0E); UI font stacks end with the glyph fonts. | No task owned a glyph map; one source guarantees text presentation and bundled-font rendering. | `shared_ui`, WHL-*, SQR-* | ZOD-UI-002 plan |
 | 2026-11-13 | Noto Sans Regular is bundled as the third glyph fallback (`ZodiannFonts.glyphFallback` = Symbols, Symbols 2, Noto Sans). | ℞ (U+211E) is in neither Noto Symbols font nor Plex; Noto Sans has it. Product-owner decision. | `shared_ui` fonts, UI-002, ABT-007 | ZOD-FND-007 plan, decision 1 |
 | 2026-11-13 | FND-007 criterion 3 applies to the release manifest; debug/profile keep Flutter's tooling-only `INTERNET`; release verified with `aapt2 dump permissions`. | Hot reload, DevTools and on-device tests need it; it never ships. Product-owner decision. | `apps/astro_mobile/android` | ZOD-FND-007 plan, decision 2 |
 | 2026-11-13 | The five font `OFL.txt` files ship in the app as `shared_ui` assets. | OFL §2 requires the licence with every copy; ABT-007 displays them. Product-owner decision. | `shared_ui`, ABT-007 | ZOD-FND-007 plan, decision 3 |
@@ -190,6 +200,21 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-UI-002, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| shared_ui | `cd packages/shared_ui && fvm flutter test` | 112/112 (typography values 37, glyphs 5, rendering 11; earlier 59) |
+| App | `cd apps/astro_mobile && fvm flutter test` | 20/20 (locale typography 4; earlier 16) |
+| Architecture | `fvm dart test test/architecture` | 29/29 (sentence case 1) |
+| Mutation proof | ad-hoc mutants, each confirmed applied, restored | T1 tracking, T2 Hebrew family, T3 leading, T4 slot, T5 extensions dropped, T6 `==`, T7 no merge, T8 null tracking (incl. localized geometry); G1 no FE0E, G2 venus/mars; R1 Hebrew fallback without Plex → ′ ″ test; R2 glyph family → caught by the value test (host rendering can't see it: engine-wide fallback); A1 always Latin, A2 fixed theme in builder; S1 `toUpperCase` |
+| Visual | specimen PNG (`ZODIANN_TYPE_DIR`) vs `components_dark.png` board | Same relative sizes and weights, light tight Display, Hebrew right-aligned with ′ drawn, aligned Cell digits, all 29 glyphs |
+| On device | debug APK `-t integration_test/glyph_presentation_test.dart`, adb + logcat, emulator-5554 | All tests passed (+3). E1 (system font, no FE0E): FAILED, ♈ 3470 coloured pixels |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 (root 29, astro_core 53, gann_core 189, shared_ui 112, astro_mobile 20) |
+| Code review | Fresh opus reviewer, whole branch | Ready to merge: 0 Critical / 0 Important; reproduced the RTL wrap (`maxLines: 1` fixes, `softWrap: false` doesn't) — handoff recorded; line-height test comment added. Deferred: sentence-case scan cuts at the first `//`, cosmetic (long comment line, `hashCode` builds a map, assert + `!` in `withZodiannScript`) |
+
+**Known failures / outstanding:** iOS not run (needs a Mac).
 
 ZOD-FND-007, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -417,9 +442,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-007-bundle-offline-fonts` (from `main` @ `4d207d7`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), UI-001 → `4d207d7` (PR #17), all merged. FND-007 branch: plan `589607a`; `fb50b55` (fonts), `4076378` (rendering), `2c4db22` (no-network guard), `c1dcca4` (on-device + APK), close-out
-- **Pull request:** PRs #2–#17 merged. FND-007: [PR #18](https://github.com/yoadazani/zodiann/pull/18) (open)
+- **Current task branch:** `task/ZOD-UI-002-typography-scale` (from `main` @ `fe012e6`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), UI-001 → `4d207d7` (PR #17), FND-007 → `fe012e6` (PR #18), all merged. UI-002 branch: plan `0edac26`; `b81b0ed` (styles), `1c307f0` (glyphs), `908829d` (rendering + specimen), `5d3899c` (app + sentence case), `f47f9fa` (on-device), close-out
+- **Pull request:** PRs #2–#18 merged. UI-002: [PR #19](https://github.com/yoadazani/zodiann/pull/19) (open)
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
