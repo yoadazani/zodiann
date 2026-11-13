@@ -5,14 +5,15 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) done, PR open. 14 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) done, PR open. 15 of 205 tasks done.
 - **Last updated:** 2026-11-12
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
-| ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), open) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
+| ZOD-UI-001 | Implement the color token values (dark + light) | Done ([PR #17](https://github.com/yoadazani/zodiann/pull/17), open) | `shared_ui` 44/44: all 52 × 2 values against MASTER's tables and against `_source/kit.css` (second source); the 43 reference tiles per theme pixel-exact against `components_{dark,light}.png` (translucent over `surface` ±1, uniformity, per-theme rows, exact sizes); WCAG AA sanity (text roles, on-accent); test-only `TokenSwatchGrid` harness whose rendered pixels equal the same oracle. Mutants V1–V5 as planned. Harness PNGs match the reference crops side by side. Emulator-5554: bg exactly `#F5F6F8` / `#08080A`. Plan review: 2 rounds (7 Important applied). Code review: Ready to merge, all 104 values re-checked by hand; 3 minors deferred. Plan: [`docs/plans/ZOD-UI-001-color-token-values.md`](plans/ZOD-UI-001-color-token-values.md) |
+| ZOD-FND-013 | Establish the design-token theme skeleton (dark + light `ColorScheme`) | Done ([PR #16](https://github.com/yoadazani/zodiann/pull/16), merged `ae666da`) | `shared_ui` 26/26 (5 extensions × MASTER key lists typed literally + values pinned to constructor order, lerp 0/0.5/1/null, copyWith one/all; `BodyColors.of` per `Body`; themes: brightness, all five extensions, ColorScheme mapping, no hidden defaults, sign tint 10 %/9 %). `astro_mobile` 16/16 (FND-005's 13 unchanged + device default, set dark/light/system without restart, mid-animation interpolated instance). Architecture 23/23 incl. the ARCH-7 colour-literal guard (only `shared_ui/lib/src/theme/tokens/` exempt). Mutants G1–G8 all caught. Emulator-5554: light unchanged from FND-005, dark OK. Plan review: Approve (2 rounds, 7 Important applied). Code review: Ready to merge; scanner gaps re-graded Important and fixed test-first; 3 minors deferred. Plan: [`docs/plans/ZOD-FND-013-theme-token-skeleton.md`](plans/ZOD-FND-013-theme-token-skeleton.md) |
 | ZOD-FND-005 | Flutter app shell bootstrap (`apps/astro_mobile`) | Done (iOS build/runtime verification outstanding) ([PR #15](https://github.com/yoadazani/zodiann/pull/15), merged `e4a8859`) | `astro_mobile` 13/13 (shell 10: blank boot with no overrides, light/dark/live switch, Scaffold surface, fr → en, he → RTL, he Material strings, fake port by one override, `main()` single root `ProviderScope` wired to `appOverrides`; DI 3). Mutants M1–M8 all caught as planned (M8 proves the Hebrew Material test is independent of RTL). `flutter build apk --debug` ✓. Android on-device: emulator-5554 (Android 9, x86 + ARM translation), blank light and dark screens, no crash. iOS: project scaffolded, static checks only; build/runtime **outstanding**. Plan review: 4 rounds (2 + 2 after product-owner review), Approve. Code review: Ready to merge, 0 Critical / 0 Important, 5 minors deferred. Plan: [`docs/plans/ZOD-FND-005-flutter-app-shell.md`](plans/ZOD-FND-005-flutter-app-shell.md) |
 | ZOD-TST-011 | Author the ring highlight-count test (T-GAN-2) | Done ([PR #14](https://github.com/yoadazani/zodiann/pull/14), merged `30ea9eb`) | `gann_core` T-GAN-2 suite 8: Appendix B rows 1–6 with every column asserted (cells placed geometrically, angle per cell, blue/yellow/gray/unhighlighted, side, last number), named 9×9 total 16/16/16 with unhighlighted center, T-GAN-2 rule for rings 7–30. Mutants H1–H7 caught exactly as planned. Plan review: Approve (2 rounds, 3 Important applied). Code review: Ready to merge, comment minors fixed, 1 deferred. Plan: [`docs/plans/ZOD-TST-011-gann-ring-counts-suite.md`](plans/ZOD-TST-011-gann-ring-counts-suite.md) |
 | ZOD-TST-010 | Author the Gann spiral direction test suite (T-GAN-1, T-GAN-3) | Done ([PR #13](https://github.com/yoadazani/zodiann/pull/13), merged `3a447d5`) | `gann_core` T-GAN-1 6 + T-GAN-3 11: all 169 cells of the 13×13 design grid (literal, re-checked by two reviewers), 2 left of 1, unit-step + clockwise over 61×61 (3690 same-ring pairs), ring corners k ≤ 30, inverse round-trip 61×61; Appendix C rows over 30-cell rays (angle, category, `isNot` others), "only" over 61×61, 48 design highlight literals, angles in [0, 360). Mutants S1–S9, C1–C4 all caught. Plan review: Approve (2 rounds, 4 Important applied). Code review: Ready to merge, 2 minors promoted, 1 deferred. Plan: [`docs/plans/ZOD-TST-010-gann-axes-suite.md`](plans/ZOD-TST-010-gann-axes-suite.md) |
@@ -29,11 +30,11 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-FND-013 is done on `task/ZOD-FND-013-theme-token-skeleton`, PR open (see Git State); merge on approval.
+- **None in progress.** ZOD-UI-001 is done on `task/ZOD-UI-001-color-token-values`, PR open (see Git State); merge on approval.
 
 ## Next Recommended Task
 
-- **ID:** ZOD-UI-001 — Implement the color token values (dark + light). Critical; its dependency FND-013 is done (PR open). Replace the right-hand sides of `packages/shared_ui/lib/src/theme/tokens/graphite_tokens.dart` / `porcelain_tokens.dart` with MASTER §2's literal values, delete `placeholder_tokens.dart`, and add the swatch harness (the `tokens` maps are keyed by MASTER names). Alternatives: ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code).
+- **ID:** ZOD-UI-002 — Implement the typography scale (next in the Shared UI token track: tokens 001–003 before any component). Depends on UI-001 (PR open). Alternatives: ZOD-UI-003 (spacing/radius/elevation/sizing tokens), ZOD-FND-014 (go_router scaffold), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code). Handoff from UI-001: dark `text-3` is below 4.5:1 on `surface-2` / `surface-3` / `accent-soft` (4.48 / 4.05 / 4.03): avoid it there, or ZOD-NFR-009 decides.
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
@@ -137,8 +138,9 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-13 | Token values verified three ways: MASTER's tables (typed), `_source/kit.css` (parsed) and the reference PNG pixels (43 shown tiles); swatch-grid harness is test-only (`shared_ui/test/support/`), no committed goldens (platform font rendering), PNGs written on demand via `ZODIANN_SWATCH_DIR`. | Independent oracles for a transcription task; UI-015 owns the gallery; goldens would be fragile in Linux CI. | `packages/shared_ui` tests | ZOD-UI-001 plan |
 | 2026-11-13 | Theme lives in `shared_ui`: five `ThemeExtension`s (one per MASTER §2 group, fields = MASTER tokens, `tokens` map keyed by MASTER names), `ZodiannTokens`, `buildZodiannTheme` (ColorScheme + scaffold derived from `ZodiannSurfaces`), `ZodiannTheme.graphite/porcelain`. | Feature packages can import `shared_ui`, not the app; one source per colour. | `packages/shared_ui`, all UI | ZOD-FND-013 plan |
-| 2026-11-13 | Token values are placeholders from Material's default `ColorScheme` (no literals; `bg` = default `surface` so the shell is unchanged); UI-001 fills MASTER values in `tokens/`. | User decision; keeps the FND-013 / UI-001 boundary exact. | `shared_ui/lib/src/theme/tokens` | ZOD-FND-013 plan, decision 1 |
+| 2026-11-13 | Token values are placeholders from Material's default `ColorScheme` (no literals; `bg` = default `surface` so the shell is unchanged); UI-001 fills MASTER values in `tokens/`. | User decision; keeps the FND-013 / UI-001 boundary exact. | `shared_ui/lib/src/theme/tokens` | ZOD-FND-013 plan, decision 1 | **Superseded by ZOD-UI-001** (MASTER values).
 | 2026-11-13 | `themeModeProvider` (app, default system) drives `MaterialApp.themeMode`; app-level placeholder, not a feature contract (SET-003/SET-007 decide). | Runtime toggle without restart; feature packages can't import the app. | `apps/astro_mobile/lib/src/theme` | ZOD-FND-013 plan |
 | 2026-11-13 | ARCH-7 guard: `test/architecture/no_color_literals_test.dart` fails on any colour literal in `apps/*/lib` or `packages/*/lib` outside `packages/shared_ui/lib/src/theme/tokens/`. | "Enforced by lint or review" made automatic; runs in `melos run test` (and in FND-004's CI once it exists). | All Flutter packages | ZOD-FND-013 plan |
 | 2026-11-13 | App ID `com.zodiann.app` (Android `applicationId`/`namespace`, iOS bundle ID), display name "Zodiann". | Store identity; nothing in spec/tasks set it. User decision. | `apps/astro_mobile` android/ios | ZOD-FND-005 plan, decision 1 |
@@ -177,6 +179,19 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-UI-001, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| shared_ui | `fvm dart run melos exec --scope=shared_ui -- flutter test` | 44/44 (values 4, reference 4, contrast 2, harness 8, FND-013's 26) |
+| Mutation proof | V1–V5 on the token files, each confirmed applied, restored | V1 −3, V2 −3, V3 −3, V4 −4 (incl. contrast), V5 −2 (unshown token: MASTER + kit.css only). No compile errors |
+| Workspace | `fvm dart run melos run lint` / `… run test` | Exit 0 (root 23, astro_core 53, gann_core 189, shared_ui 44, astro_mobile 16) |
+| Visual | harness PNGs (`ZODIANN_SWATCH_DIR`) vs reference crops | Same sections, order and colours in both themes |
+| On device | debug APK on emulator-5554 | Background `#F5F6F8` light, `#08080A` dark; no crash |
+| Code review | Fresh opus reviewer | Ready to merge; all 104 values re-checked by hand; 3 minors deferred (harness doesn't assert full token set, harness hex text from token, duplicated test helpers) |
+
+**Known failures:** none.
 
 ZOD-FND-013, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -376,9 +391,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-FND-013-theme-token-skeleton` (from `main` @ `e4a8859`)
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), all merged. FND-013 branch: plan `a13006f`; `47e19b0` (extensions), `9d776d1` (themes), `19a420d` (app), `47fd3e6` (guard), review fix, close-out
-- **Pull request:** PRs #2–#15 merged. FND-013: [PR #16](https://github.com/yoadazani/zodiann/pull/16) (open)
+- **Current task branch:** `task/ZOD-UI-001-color-token-values` (from `main` @ `ae666da`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), all merged. UI-001 branch: plan `ce39ba5`; `f5668e8` (values), Task 2 oracles, `3bf3533` (harness), close-out
+- **Pull request:** PRs #2–#16 merged. UI-001: [PR #17](https://github.com/yoadazani/zodiann/pull/17) (open)
 - **Unmerged task branches others depend on:** none
 - **Uncommitted changes:** none
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).

@@ -93,7 +93,7 @@ void main() {
     expect(theme.extension<BodyColors>(), same(tokens.bodies));
   });
 
-  test("placeholder signTintOpacity is MASTER's 10 % / 9 %", () {
+  test("signTintOpacity is MASTER's 10 % / 9 %", () {
     expect(graphiteTokens.zodiac.signTintOpacity, 0.10);
     expect(porcelainTokens.zodiac.signTintOpacity, 0.09);
   });
