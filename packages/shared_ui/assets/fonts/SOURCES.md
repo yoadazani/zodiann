@@ -1,0 +1,19 @@
+# Bundled font sources (ZOD-FND-007)
+
+Every file is copied byte-for-byte from an official release, licensed under the SIL Open Font License 1.1 (`OFL.txt` in each folder, shipped with the app). `test/fonts/font_assets_test.dart` checks each SHA-256 below.
+
+| File | Release | Path in the release zip | Bytes | SHA-256 |
+|---|---|---|---|---|
+| `IBMPlexSansHebrew-Light.ttf` | [`@ibm/plex-sans-hebrew@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans-hebrew%401.1.0/ibm-plex-sans-hebrew.zip) | `ibm-plex-sans-hebrew/fonts/complete/ttf/IBMPlexSansHebrew-Light.ttf` | 98992 | `856be8cefe8ccae2a6b2ad838dd7c4a83decc746c775a55d06d769431d0e22f3` |
+| `IBMPlexSansHebrew-Medium.ttf` | [`@ibm/plex-sans-hebrew@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans-hebrew%401.1.0/ibm-plex-sans-hebrew.zip) | `ibm-plex-sans-hebrew/fonts/complete/ttf/IBMPlexSansHebrew-Medium.ttf` | 97484 | `acecc14c42eb520254699450d4de991dec423e70583bdaef8bb1e8ef0d9b6185` |
+| `IBMPlexSansHebrew-Regular.ttf` | [`@ibm/plex-sans-hebrew@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans-hebrew%401.1.0/ibm-plex-sans-hebrew.zip) | `ibm-plex-sans-hebrew/fonts/complete/ttf/IBMPlexSansHebrew-Regular.ttf` | 96976 | `98cd8ca13fef47fb57c20faed17a346639bb418b7abeb096fd9693ea3eecc445` |
+| `IBMPlexSansHebrew-SemiBold.ttf` | [`@ibm/plex-sans-hebrew@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans-hebrew%401.1.0/ibm-plex-sans-hebrew.zip) | `ibm-plex-sans-hebrew/fonts/complete/ttf/IBMPlexSansHebrew-SemiBold.ttf` | 97632 | `7d90b813182ef463b1e7cf8515699e94946003c6e3b2d0ceebc1825c4fc5b955` |
+| `IBMPlexSans-Light.ttf` | [`@ibm/plex-sans@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans%401.1.0/ibm-plex-sans.zip) | `ibm-plex-sans/fonts/complete/ttf/IBMPlexSans-Light.ttf` | 203240 | `2218b5f3f1fc9d3a793343f45c3be5ee7eae9584a7a52391bb8cf2d37622b3e0` |
+| `IBMPlexSans-Medium.ttf` | [`@ibm/plex-sans@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans%401.1.0/ibm-plex-sans.zip) | `ibm-plex-sans/fonts/complete/ttf/IBMPlexSans-Medium.ttf` | 202460 | `331c8639d7598b2cde62a911a71db195e30cb655cd6bdf2e324a7e984955f907` |
+| `IBMPlexSans-Regular.ttf` | [`@ibm/plex-sans@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans%401.1.0/ibm-plex-sans.zip) | `ibm-plex-sans/fonts/complete/ttf/IBMPlexSans-Regular.ttf` | 200500 | `975dcda37d80f038dcd143c22e33ca2d97a0cc5a929aace1c749153b0fe1afa5` |
+| `IBMPlexSans-SemiBold.ttf` | [`@ibm/plex-sans@1.1.0`](https://github.com/IBM/plex/releases/download/%40ibm%2Fplex-sans%401.1.0/ibm-plex-sans.zip) | `ibm-plex-sans/fonts/complete/ttf/IBMPlexSans-SemiBold.ttf` | 202632 | `a20caf8286023a6a7a85e40b1d2a4ae9fc3e3b1f9eda8f4c542dd4986af67bb1` |
+| `NotoSansSymbols2-Regular.ttf` | [`NotoSansSymbols2-v2.008`](https://github.com/notofonts/symbols/releases/download/NotoSansSymbols2-v2.008/NotoSansSymbols2-v2.008.zip) | `NotoSansSymbols2/unhinted/ttf/NotoSansSymbols2-Regular.ttf` | 671568 | `c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d` |
+| `NotoSansSymbols-Regular.ttf` | [`NotoSansSymbols-v2.003`](https://github.com/notofonts/symbols/releases/download/NotoSansSymbols-v2.003/NotoSansSymbols-v2.003.zip) | `NotoSansSymbols/unhinted/ttf/NotoSansSymbols-Regular.ttf` | 145508 | `6eea9cb4cd39269ea9f95ba5c2735f80ae74049dfc9e1a7c932a5cfc8f0c3030` |
+| `NotoSans-Regular.ttf` | [`NotoSans-v2.015`](https://github.com/notofonts/latin-greek-cyrillic/releases/download/NotoSans-v2.015/NotoSans-v2.015.zip) | `NotoSans/unhinted/ttf/NotoSans-Regular.ttf` | 431364 | `f3961a9cde016d41a4879aecda1474d3a36d6bf54fa0e4643de029cc2248b0e8` |
+
+Licences: IBM Plex releases ship the OFL as `LICENSE.txt` (copied here as `OFL.txt`); Noto releases ship `OFL.txt`.
