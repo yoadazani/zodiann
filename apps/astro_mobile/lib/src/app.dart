@@ -19,6 +19,16 @@ class ZodiannApp extends ConsumerWidget {
       // Placeholder until ZOD-L10-001's generated supportedLocales. English is
       // first, so Flutter's default resolution falls back to it (L-2).
       supportedLocales: const [Locale('en'), Locale('he')],
+      // The typography follows the resolved locale (ZOD-UI-002): Plex Sans
+      // for Latin, Plex Sans Hebrew for Hebrew. The builder sits below the
+      // theme animation, so the swap also applies mid-animation.
+      builder: (context, child) => Theme(
+        data: withZodiannScript(
+          Theme.of(context),
+          ZodiannScript.forLocale(Localizations.localeOf(context)),
+        ),
+        child: child!,
+      ),
       home: const ShellHome(),
     );
   }

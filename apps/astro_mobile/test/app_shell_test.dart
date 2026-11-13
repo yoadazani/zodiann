@@ -6,6 +6,7 @@ import 'package:astro_mobile/src/di/ephemeris_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 /// Identity is all these tests check; every member is unused.
 class _FakePort implements EphemerisPort {
@@ -149,4 +150,56 @@ void main() {
       expect(find.byType(ZodiannApp), findsOneWidget);
     },
   );
+
+  group('ZOD-UI-002 typography by locale', () {
+    String? family(BuildContext ctx) =>
+        Theme.of(ctx).textTheme.bodyMedium!.fontFamily;
+    String? extFamily(BuildContext ctx) =>
+        Theme.of(ctx).extension<ZodiannTextStyles>()!.body.fontFamily;
+    const latin = 'packages/shared_ui/IBM Plex Sans';
+    const hebrew = 'packages/shared_ui/IBM Plex Sans Hebrew';
+
+    testWidgets('English locale gets Plex Sans', (tester) async {
+      final ctx = await _pumpShell(tester, locales: const [Locale('en')]);
+      expect(family(ctx), latin);
+      expect(extFamily(ctx), latin);
+    });
+
+    testWidgets('Hebrew locale gets Plex Sans Hebrew', (tester) async {
+      final ctx = await _pumpShell(tester, locales: const [Locale('he', 'IL')]);
+      expect(family(ctx), hebrew);
+      expect(extFamily(ctx), hebrew);
+    });
+
+    testWidgets('changing the device locale re-resolves the typography without '
+        'restart', (tester) async {
+      await _pumpShell(tester, locales: const [Locale('en')]);
+      expect(family(tester.element(find.byType(ShellHome))), latin);
+      tester.platformDispatcher.localesTestValue = const [Locale('he', 'IL')];
+      await tester.pumpAndSettle();
+      expect(family(tester.element(find.byType(ShellHome))), hebrew);
+    });
+
+    testWidgets(
+      'the theme-mode animation keeps the script and interpolates colour',
+      (tester) async {
+        await _pumpShell(
+          tester,
+          brightness: Brightness.light,
+          locales: const [Locale('he', 'IL')],
+        );
+        tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+        await tester.pump(); // animation starts at t = 0
+        await tester.pump(const Duration(milliseconds: 100)); // t = 0.5
+        expect(tester.takeException(), isNull);
+        final mid = Theme.of(tester.element(find.byType(ShellHome)))
+            .textTheme
+            .bodyMedium!;
+        expect(mid.fontFamily, hebrew);
+        expect(mid.color, isNot(porcelainTokens.surfaces.text));
+        expect(mid.color, isNot(graphiteTokens.surfaces.text));
+        await tester.pumpAndSettle();
+      },
+    );
+  });
 }
