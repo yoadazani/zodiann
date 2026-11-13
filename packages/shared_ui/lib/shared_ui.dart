@@ -10,6 +10,7 @@ export 'src/theme/tokens/zodiann_dimensions.dart';
 export 'src/theme/zodiac_colors.dart';
 export 'src/theme/zodiann_fonts.dart';
 export 'src/theme/zodiann_glyphs.dart';
+export 'src/theme/zodiann_layout.dart';
 export 'src/theme/zodiann_surfaces.dart';
 export 'src/theme/zodiann_text_styles.dart';
 export 'src/theme/zodiann_theme.dart';
