@@ -34,7 +34,7 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Current Task
 
 - **ID:** ZOD-UI-004 — Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states
-- **Status:** Plan written and reviewed (2 rounds: 6 Critical + 8 Important applied, no open items); awaiting approval. Decisions U1 (hover 150 ms) and U2 (44 everywhere) added. Product-owner decisions (2026-11-13): D1 icon slot now (real icons with FND-009); D2 solid danger keeps white text, dark 3.37:1 handed to NFR-009; D3 drawn 40/32 inside a 44 tappable layout box.
+- **Status:** Approved; implementing (Tasks 1–5).
 - **Plan:** [`docs/plans/ZOD-UI-004-button-components.md`](plans/ZOD-UI-004-button-components.md)
 - **Remaining steps:** plan review, approval, Tasks 1–5.
 - **Deferred review minors (UI-003):** the guard does not scan `Border.all(width:)`, `Material`/`Card(elevation:)`, `Positioned`, grid `mainAxisSpacing`, `CircleAvatar(radius:)`, file-local consts or `.5`/hex/exponent literals; `Size.lerp`/`EdgeInsets.lerp` `t` arguments are false positives; nested block comments are not handled; the harness checks padding horizontally only; `floatingOutline` could use `strokeAlignOutside` instead of a doc-comment rule. Consider the `elevation:` and `Border.all` patterns when a component task first needs them (a hairline-width token would be needed for `Border.all(width: 1)`).
