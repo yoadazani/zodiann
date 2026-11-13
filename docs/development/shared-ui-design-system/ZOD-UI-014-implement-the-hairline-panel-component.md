@@ -39,7 +39,8 @@ Build the base panel shell (border + radius + padding + optional 56/52px head) t
 
 ## Notes
 
-_No additional notes._
+- **Layout tokens (ZOD-UI-003):** take gutter, panel gap, panel padding and head height from `ZodiannLayout.of(context)`, and the corner from `ZodiannRadius.panel`. Measure as the CSS border-box does: padding sits inside the 1 px border, and the head height includes its 1 px rule (see `packages/shared_ui/test/support/token_panel_harness.dart`).
+- **Mobile reference mismatch:** `settings_mobile_he_dark.png` shows a phone panel gap of 20 and a head of 56, because `_source/settings.html` never applies the phone values. MASTER §4's 16 / 52 apply.
 
 ---
 

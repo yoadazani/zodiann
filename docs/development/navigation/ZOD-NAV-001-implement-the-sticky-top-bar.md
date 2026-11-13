@@ -44,7 +44,7 @@ Build the top bar every screen sits under: hamburger, title/subtitle, and screen
 
 ## Notes
 
-_No additional notes._
+- **Surface tint (ZOD-UI-003):** if the top bar builds on `AppBar`, set `surfaceTintColor: Colors.transparent` (or an `appBarTheme`). `AppBar` is the one Material 3 component whose scrolled-under state falls back to `colorScheme.surfaceTint`, which is the accent in both Zodiann themes.
 
 ---
 
