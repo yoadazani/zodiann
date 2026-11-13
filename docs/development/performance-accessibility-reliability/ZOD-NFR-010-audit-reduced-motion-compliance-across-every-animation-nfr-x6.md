@@ -41,7 +41,7 @@ Confirm every animated behavior in the app — not just the two explicitly spec'
 
 ## Notes
 
-_No additional notes._
+- **Button hover (ZOD-UI-004):** `ZodiannButton` animates hover (brightness 1 → 1.12) over 150 ms (`ZodiannStates.hoverDuration`, `Curves.ease`) and is instant when `MediaQuery.disableAnimationsOf` is true; covered by `button_behavior_test.dart`. Press is instant.
 
 ---
 

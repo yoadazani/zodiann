@@ -45,6 +45,8 @@ Build the modal dialog shell used for delete confirmation, save-square naming, a
 
 - **Floating layer (ZOD-UI-003):** use `ZodiannElevation.floating` (the theme extension) for the shadow, plus `floatingOutline` (1 px `line`) painted *outside* the box, e.g. as `BoxShadow(color: side.color, spreadRadius: side.width)` after `floating`. The outline applies in both themes (product-owner decision, 2026-11-13).
 
+- **Buttons (ZOD-UI-004):** use `ZodiannButtonVariant.dangerSolid` for the destructive confirmation and `quiet` / `secondary` for Cancel; actions sit 8 apart horizontally. Focus-ring contract: the button paints its complete focus ring, 4 px beyond the drawn box, whenever no ancestor clips it, and it cannot override an ancestor's clip. Keep at least 4 px of clear, unclipped space around each button wherever the ring can appear; if the layout must clip, adjust its padding so keyboard focus stays visible.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

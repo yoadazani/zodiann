@@ -134,6 +134,9 @@ abstract final class ZodiannSize {
   /// Panel head: height at phone width, including its 1 px bottom rule.
   static const double panelHeadPhone = 52.0;
 
+  /// Minimum touch target (MASTER §14), in both axes.
+  static const double minTouchTarget = 44.0;
+
   /// Icons in controls.
   static const double icon = 20.0;
 

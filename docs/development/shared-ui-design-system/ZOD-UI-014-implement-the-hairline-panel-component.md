@@ -42,6 +42,8 @@ Build the base panel shell (border + radius + padding + optional 56/52px head) t
 - **Layout tokens (ZOD-UI-003):** take gutter, panel gap, panel padding and head height from `ZodiannLayout.of(context)`, and the corner from `ZodiannRadius.panel`. Measure as the CSS border-box does: padding sits inside the 1 px border, and the head height includes its 1 px rule (see `packages/shared_ui/test/support/token_panel_harness.dart`).
 - **Mobile reference mismatch:** `settings_mobile_he_dark.png` shows a phone panel gap of 20 and a head of 56, because `_source/settings.html` never applies the phone values. MASTER §4's 16 / 52 apply.
 
+- **Buttons in panels (ZOD-UI-004):** focus-ring contract for panel heads, bodies and scrolled content: the button paints its complete focus ring, 4 px beyond the drawn box, whenever no ancestor clips it, and it cannot override an ancestor's clip. Keep at least 4 px of clear, unclipped space around each button wherever the ring can appear; if the layout must clip, adjust its padding so keyboard focus stays visible.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

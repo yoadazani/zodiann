@@ -107,6 +107,10 @@ void main() {
     });
   });
 
+  test("the minimum touch target is MASTER §14's 44", () {
+    expect(ZodiannSize.minTouchTarget, 44);
+  });
+
   test("breakpoints are MASTER §6's", () {
     expect(ZodiannBreakpoints.tablet, 700);
     expect(ZodiannBreakpoints.desktop, 1100);
