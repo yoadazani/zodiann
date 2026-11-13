@@ -46,6 +46,8 @@ Build the top bar every screen sits under: hamburger, title/subtitle, and screen
 
 - **Surface tint (ZOD-UI-003):** if the top bar builds on `AppBar`, set `surfaceTintColor: Colors.transparent` (or an `appBarTheme`). `AppBar` is the one Material 3 component whose scrolled-under state falls back to `colorScheme.surfaceTint`, which is the accent in both Zodiann themes.
 
+- **Icon buttons (ZOD-UI-004):** follow the button state model: `ZodiannStates` (hover brightness 1.12 over 150 ms, pressed 0.94 + 1 px down, disabled 0.42), the keyboard-only 2 px `focus` ring at offset 2 (`ZodiannFocusRingPainter` pattern) and a ≥ 44 × 44 hit target.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Navigation & App Shell" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

@@ -40,7 +40,7 @@ Wire the existing icon set (already fully designed) into the app via `flutter_sv
 
 ## Notes
 
-_No additional notes._
+- **Buttons (ZOD-UI-004):** pass real icons through `ZodiannButton.icon`; the button lays them out in a 16 × 16 slot (`ZodiannSize.iconSmall`) and tints them with the label colour via `IconTheme`.
 
 ---
 

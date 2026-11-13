@@ -5,13 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) and ZOD-FND-007 (offline fonts) merged. ZOD-UI-002 (typography scale) merged. ZOD-UI-003 (spacing, radius, elevation, sizing tokens) merged — the Shared UI token track (UI-001…003) is complete. ZOD-UI-004 (buttons) in planning. 18 of 205 tasks done.
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) and ZOD-FND-007 (offline fonts) merged. ZOD-UI-002 (typography scale) merged. ZOD-UI-003 (spacing, radius, elevation, sizing tokens) merged — the Shared UI token track (UI-001…003) is complete. ZOD-UI-004 (button components) done, PR open. 19 of 205 tasks done.
 - **Last updated:** 2026-11-13
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-UI-004 | Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states | Done (PR pending) | `shared_ui` 235/235. Colours: 6 variants × 2 themes from `ZodiannSurfaces`, state constants, contrast (all AA except dark solid danger 3.37:1, pinned as the D2 hand-off). Widget: 44 × 44 target around the unchanged 40 / 32 box (Save / OK / 1, narrow labels centred, margin taps), border-box inset 17 / 13, icon slot, label styles, decoration, RTL, tight-width stretch. Behaviour: tap, vertical and horizontal hit margins, hover 150 ms eased (75 ms ≈ 1.0963), reduced motion instant, hover in touch mode, press 1 px / 0.94, keyboard-only ring (Tab → tap → Shift+Tab), complete ring pixels on all four sides, Enter / Space, one semantics node with tap + focus actions, disabled inert / unfocusable / 42 %, disable mid-press, ellipsis (en / he), text scale 2. Sheet: 25 cells × 2 themes + small row + dialog solid danger rendered with real input and compared with the PNGs by one extractor. Mutants C1–C3, B1–B16, S1–S4 caught. Plan review: 2 rounds + 1 on the PO clarifications (7 Critical + 10 Important applied). Code review: With fixes, 0 Critical / 1 Important (tight-width slot; fixed test-first), 6 minors deferred. Plan: [`docs/plans/ZOD-UI-004-button-components.md`](plans/ZOD-UI-004-button-components.md) |
 | ZOD-UI-003 | Implement spacing, radius, elevation, and sizing tokens | Done ([PR #20](https://github.com/yoadazani/zodiann/pull/20), merged `6dca326`) | `shared_ui` 140/140: MASTER §4/§6 typed in and cross-checked with kit.css (custom properties + `.seg`/`.stepper`/`.switch`/`.tbl td` rules); layout values and breakpoint boundaries (699.9/700/1099.9/1100), `of(context)`; `ZodiannElevation` per theme (colour, offset, σ 32/28 via `blurFromCss`, outline = `line` in both themes, lerp/copyWith/==), in both themes and through `withZodiannScript`; measured panel harness at 1440 and 390 (gutter, padding, gap, head exact), reference PNG cross-check (desktop/tablet gap, head, padding, gutter; mobile gutter, padding; within 1 px). App 20/20 (mid-animation lerp of 7 extensions). Architecture 79/79 (magic-number guard + 50 scanner tests). Mutants D1–D3, L1–L2, E1–E4, P1–P3, M1–M3 caught. Plan review: 2 rounds (1 Critical + 9 Important applied). Code review: With fixes, 0 Critical / 1 Important (guard missed `EdgeInsetsGeometry`/`BorderRadius{Directional,Geometry}.circular`; fixed test-first), 5 minors deferred. Plan: [`docs/plans/ZOD-UI-003-spacing-radius-elevation-sizing.md`](plans/ZOD-UI-003-spacing-radius-elevation-sizing.md) |
 | ZOD-UI-002 | Implement the typography scale | Done ([PR #19](https://github.com/yoadazani/zodiann/pull/19), merged) | `shared_ui` 112/112: typed MASTER §3 table (13 roles × both themes × both scripts: size, line height, weight, em × size tracking), families and fallback chains, tabular figures, even leading, colour, 15-slot `TextTheme`, `==`/`hashCode`, `withZodiannScript` round trip, Material's localized geometry kept; glyphs (29 × U+FE0E, Body map); rendering with the real fonts (line height, tracking, weight, digit jitter over 100 readouts in both scripts, Hebrew ′ ″ from Plex Sans, invisible selector); specimen PNG reviewed against the reference board. App 20/20 (en / he / live locale switch / mid-animation). Architecture 29/29 (sentence-case guard). Emulator-5554: all 29 glyphs monochrome; E1 detector proof (system-font ♈ = colour emoji). Mutants T1–T8, G1–G2, R1, A1–A2, S1, E1 caught; R2 caught by the value test. Plan review: 2 rounds (2 Critical + 3 Important applied). Code review: Ready to merge, 0 Critical / 0 Important; handoff wording + test comment applied, 3 minors deferred. Plan: [`docs/plans/ZOD-UI-002-typography-scale.md`](plans/ZOD-UI-002-typography-scale.md) |
 | ZOD-FND-007 | Bundle offline fonts and verify no network dependency | Done ([PR #18](https://github.com/yoadazani/zodiann/pull/18), merged `fe012e6`) | `shared_ui` 59/59: registration table, OS/2 weights, name-table families, SHA-256s vs `SOURCES.md`, OFL licences shipped as assets; exact cmap coverage of the 29 MASTER glyphs (Symbols / Symbols 2 / Noto Sans for ℞), Hebrew and Latin coverage; in-host `FontLoader` rendering (four distinct weights, not the fallback font) + specimen PNG reviewed. Architecture 28/28 incl. `no_network_test.dart` (main manifest, iOS, runtime closures, `lib/` network APIs). On device (emulator-5554): online run fails only the offline check; airplane mode → all pass; F6 caught. Release APK: no network permission (`aapt2`), 11 TTF + 5 OFL. Mutants F1–F6, N1–N4 caught. Plan review: 2 rounds (9 Important applied, 3 PO decisions). Code review: Ready to merge, 0 Critical / 0 Important; run-instructions minor fixed, 4 minors deferred. Plan: [`docs/plans/ZOD-FND-007-bundle-offline-fonts.md`](plans/ZOD-FND-007-bundle-offline-fonts.md) |
@@ -33,15 +34,17 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **ID:** ZOD-UI-004 — Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states
-- **Status:** Approved; implementing (Tasks 1–5).
-- **Plan:** [`docs/plans/ZOD-UI-004-button-components.md`](plans/ZOD-UI-004-button-components.md)
-- **Remaining steps:** plan review, approval, Tasks 1–5.
+- **None in progress.** ZOD-UI-004 is done on `task/ZOD-UI-004-button-components`, PR open (see Git State); merge on approval.
+- **Deferred review minors (UI-004):** a mouse click after Tab leaves the keyboard ring visible (as InkWell); the identity `ColorFiltered` costs a saveLayer per button (revisit if UI-010 / UI-015 profiling flags it); hover and cursor also trigger in the invisible 44 margin; the ellipsis test checks configuration only (add `didExceedMaxLines`); the sheet test uses a blank icon (icon tint not pixel-compared) and doesn't check quiet pressed cells' 1 px drop; the focus ring sits outside the hover / press filter.
 - **Deferred review minors (UI-003):** the guard does not scan `Border.all(width:)`, `Material`/`Card(elevation:)`, `Positioned`, grid `mainAxisSpacing`, `CircleAvatar(radius:)`, file-local consts or `.5`/hex/exponent literals; `Size.lerp`/`EdgeInsets.lerp` `t` arguments are false positives; nested block comments are not handled; the harness checks padding horizontally only; `floatingOutline` could use `strokeAlignOutside` instead of a doc-comment rule. Consider the `elevation:` and `Border.all` patterns when a component task first needs them (a hairline-width token would be needed for `Border.all(width: 1)`).
 
 ## Next Recommended Task
 
-- **ID:** ZOD-UI-004 (now the current task; re-evaluate after it) — Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states. All its dependencies (UI-001, UI-002, UI-003) are merged or done on this branch, so **it needs the UI-003 PR merged first** (or a stacked branch). It is the first component and unblocks ZOD-NAV-001 (Critical; also needs FND-009 icons and FND-014 `go_router`) and ZOD-UI-013. Alternatives with no UI-003 dependency: ZOD-FND-014 (go_router scaffold), ZOD-FND-009 (33-icon SVG set), ZOD-L10-001 (ARB infrastructure), ZOD-FND-010 (license research, no code). Other components now unblocked: UI-005…010, UI-014 (Phase 1). Handoffs: UI-002 single-line Hebrew labels need `maxLines: 1`; dark `text-3` is below 4.5:1 on `surface-2`/`surface-3`/`accent-soft`; UI-003 Notes in UI-011/013/014 and NAV-001/002.
+- **ID:** ZOD-L10-001 — set up the ARB localization infrastructure (Critical, Phase 1). Its only dependency (FND-005) is merged, it doesn't need the UI-004 PR, and every screen and component label (button copy included) depends on en / he strings. It also brings `flutter_localizations`, which `shared_ui` tests currently work around with an explicit RTL harness.
+  - **Path to the top bar (ZOD-NAV-001, Critical):** it needs ZOD-FND-009 (33-icon SVG set, Medium) and ZOD-FND-014 (`go_router` scaffold, High), both unblocked, plus UI-003 / UI-004 (done). FND-009 also puts real icons into `ZodiannButton.icon`.
+  - **Components now unblocked** (need the UI-004 PR merged only where they build on buttons): UI-005 input, UI-006 segmented control, UI-007…010, UI-013 dialog (needs UI-004), UI-014 panel.
+  - **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research, Critical, no code).
+- **Previously (kept for reference):** ZOD-UI-004 was recommended after UI-003; done.
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
   - Inject a fake `LocalTimeZone` for DST cases (never depend on the machine's zone); expected dates and strings are literals.
   - GAN-003's mutants (wall-clock addition, UTC date for today, anchor date via the zone, dropped `+1`, hard-coded 4; padded day/month, 4-digit or unpadded year) are a ready mutation-proof list.
@@ -104,6 +107,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - Floating layers (drawer, dialog, toast) use the `ZodiannElevation` extension: `floating` shadow plus `floatingOutline` painted outside the box. Nothing else casts a shadow; depth below that is the surface ladder.
 - Measure as CSS border-box: padding inside the 1 px border, head height including its rule.
 
+**Buttons** (established in ZOD-UI-004)
+- Buttons are `ZodiannButton` (`ZodiannButtonVariant`, `ZodiannButtonSize`); **at most one primary per screen region** (convention, reviewed in PRs).
+- Interactive states use `ZodiannStates`: hover brightness 1.12 over 150 ms (instant under reduced motion), pressed 0.94 + 1 px down, disabled 0.42, keyboard-only 2 px `focus` ring at offset 2.
+- Hit targets are ≥ 44 × 44 with the drawn size unchanged; stack buttons 8 apart vertically (12 px visual gap).
+- **Focus-ring contract:** keep ≥ 4 px of clear, unclipped space around buttons wherever the ring can appear; a layout that must clip adjusts its padding so keyboard focus stays visible.
+
 **Planning** (established 2026-11-12, PR #6)
 - Every implementation plan, and every material revision of one, goes through the **Automatic Plan Review** in `zodiann-development` before the user sees it.
 - The `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) reviews the plan. Critical and Important corrections are applied, user decisions are surfaced (never auto-resolved), and there are at most two rounds.
@@ -162,6 +171,8 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-13 | ZOD-UI-004 product-owner decisions: D1 button icon slot now (real icons via FND-009); D2 solid danger keeps white text (dark 3.37:1 → NFR-009); D3 drawn 40 / 32 inside a ≥ 44 × 44 tappable box; U1 hover animates 150 ms (instant under reduced motion); U2 44 everywhere; focus-ring clipping contract. | MASTER §10, §12, §14; the component sheet; NFR-X5 / X6. | `shared_ui` buttons, every screen with buttons | UI-004 task Notes, plan |
+| 2026-11-13 | Button states follow the component sheet's CSS filters (brightness 1.12 / 0.94 on the whole layer, +1 px press), not kit.css's `:hover` colour swaps; implemented as an always-present `ColorFiltered`. | MASTER §10 says "+12 %" / "darkens 6 %"; the sheet's pixels match the filter maths exactly. | `ZodiannButton`, later icon buttons (NAV-001, WHL-016 / 017) | `docs/plans/ZOD-UI-004-button-components.md` |
 | 2026-11-13 | Layout constants (`ZodiannSpace`, `ZodiannRadius`, `ZodiannSize`, `ZodiannBreakpoints`) live in `tokens/zodiann_dimensions.dart`; `ZodiannLayout` has two layouts (phone / regular) over three breakpoints. | One exempt directory for literals (ARCH-7), same as colours; MASTER gives tablet and desktop the same values. | `shared_ui`, all components and screens | `docs/plans/ZOD-UI-003-spacing-radius-elevation-sizing.md` |
 | 2026-11-13 | `ZodiannElevation` is the sixth token group (seventh `ThemeData` extension); the 1 px `line` floating outline applies in **both** themes (product-owner decision); shadows follow MASTER, not kit.css; CSS blur converted to equal σ (`blurFromCss`). | MASTER gives the outline to floating layers as a class; kit.css draws it in light too. | UI-011, UI-013, NAV-002 | UI-003 task Notes |
 | 2026-11-13 | Typography is a `ThemeExtension` (`ZodiannTextStyles`, MASTER §3 roles + phone sizes + glyph) **and** a full 15-slot `TextTheme` built from it; no Material default sizes remain. | Screens need MASTER's role names; Material widgets read `TextTheme`. | `shared_ui`, all text | ZOD-UI-002 plan |
@@ -213,6 +224,18 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-UI-004, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
+
+| Check | Command | Result |
+|---|---|---|
+| Gates | `fvm dart run melos run lint && fvm dart run melos run test` | exit 0 (format, analyze; astro_core 53, gann_core 189, workspace 79, astro_mobile 20, shared_ui 235) |
+| shared_ui | `cd packages/shared_ui && fvm flutter test` | 235/235 (button colours 5, button layout 13, behaviour 17, sheet 59; earlier 140 + dimensions 1) |
+| Architecture | `fvm dart test test/architecture` | 79/79 (no colour literal or layout magic number outside `tokens/`) |
+| Mutation proof | ad-hoc mutants, each restored | C1–C3, B1–B16, S1–S4 all caught (B4–B7 / B10–B14 / B16 by their target tests) |
+| Visual | `ZODIANN_BUTTON_DIR` renders | reviewed against the sheet: fills, hover, outside ring, 1 px press, 42 % disabled |
+
+**Known failures:** none.
 
 ZOD-UI-003, final run on 2026-11-13 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
@@ -468,9 +491,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-UI-004-button-components` (from `main` @ `6dca326`), not yet pushed
-- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), UI-001 → `4d207d7` (PR #17), FND-007 → `fe012e6` (PR #18), UI-002 → `360279d` (PR #19), all merged. UI-003 branch: plan `79f9685`, `c9a21ae` (progress), `2b2f18c` (constants), `3558a7f` (layout), `e9e1262` (elevation), `1cfb8db` (panel harness + reference), `6bc9794` (guard), `235f351` (review fix), close-out
-- **Pull request:** PRs #2–#20 merged (UI-003 → `6dca326`). UI-004: none yet
-- **Unmerged task branches others depend on:** none
+- **Current task branch:** `task/ZOD-UI-004-button-components` (from `main` @ `6dca326`)
+- **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), UI-001 → `4d207d7` (PR #17), FND-007 → `fe012e6` (PR #18), UI-002 → `360279d` (PR #19), UI-003 → `6dca326` (PR #20), all merged. UI-004 branch: plan `63dd4f5` → `438bd3b` (reviewed + PO clarifications), `7abf2b4` (colours), `01c070c` (widget), `c1e18a2` (behaviour), `2b86c6b` (sheet), `355ee1e` (review fix), close-out
+- **Pull request:** PRs #2–#20 merged (UI-003 → `6dca326`). UI-004: PR pending
+- **Unmerged task branches others depend on:** `task/ZOD-UI-004-button-components` (UI-013, NAV-001 and screen tasks with buttons need it)
 - **Uncommitted changes:** `.fvmrc` lost its trailing newline (tooling touch, not task work; left unstaged)
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).

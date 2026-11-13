@@ -45,7 +45,7 @@ Build the play button that automatically steps time forward at a fixed interval 
 
 ## Notes
 
-_No additional notes._
+- **Icon buttons (ZOD-UI-004):** follow the button state model: `ZodiannStates` (hover brightness 1.12 over 150 ms, pressed 0.94 + 1 px down, disabled 0.42), the keyboard-only 2 px `focus` ring at offset 2 (`ZodiannFocusRingPainter` pattern) and a ≥ 44 × 44 hit target.
 
 ---
 

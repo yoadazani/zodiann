@@ -37,7 +37,7 @@ Systematically verify every text/background token combination meets WCAG AA cont
 
 ## Notes
 
-_No additional notes._
+- **Solid danger button (ZOD-UI-004, product-owner decision D2, 2026-11-13):** `ZodiannButtonVariant.dangerSolid` keeps the design's white label (`ZodiannStates.onDangerSolid`) on `danger`. That is 3.37:1 in the dark theme (fails AA for 14 px text) and 4.53:1 in light. `test/widgets/button_colors_test.dart` pins the shortfall; this audit decides the fix.
 
 ---
 

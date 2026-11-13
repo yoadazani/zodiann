@@ -44,7 +44,7 @@ Build the list of saved squares with mini thumbnail, name, meta tags, update dat
 
 ## Notes
 
-_No additional notes._
+- **Button touch target (ZOD-UI-004, D3 / U2):** `ZodiannButton` takes max(drawn, 44) layout height and max(drawn width, 44) width. A container sized by its content grows by 6 (small) / 2 (regular) px per side compared with the mockup unless its padding absorbs the margin (e.g. the crossings panel head 56 → 68). Very short labels (small "OK", "1") get transparent side margins.
 
 ---
 
