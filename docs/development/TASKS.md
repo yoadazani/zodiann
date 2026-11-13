@@ -111,7 +111,7 @@ Every task in this section implements a component that is **already fully design
 
 | ID | Task | Priority | Status |
 |---|---|---|---|
-| ZOD-UI-001 | [Implement the color token values (dark + light)](shared-ui-design-system/ZOD-UI-001-implement-the-color-token-values-dark-light.md) | Critical | Not Started |
+| ZOD-UI-001 | [Implement the color token values (dark + light)](shared-ui-design-system/ZOD-UI-001-implement-the-color-token-values-dark-light.md) | Critical | Done |
 | ZOD-UI-002 | [Implement the typography scale](shared-ui-design-system/ZOD-UI-002-implement-the-typography-scale.md) | High | Not Started |
 | ZOD-UI-003 | [Implement spacing, radius, elevation, and sizing tokens](shared-ui-design-system/ZOD-UI-003-implement-spacing-radius-elevation-and-sizing-tokens.md) | Medium | Not Started |
 | ZOD-UI-004 | [Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states](shared-ui-design-system/ZOD-UI-004-implement-the-button-components-primary-secondary-accent-outline-quiet.md) | High | Not Started |

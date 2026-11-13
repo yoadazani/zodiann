@@ -6,7 +6,7 @@
 - **Category:** [Shared UI & Design System](../README.md#shared-ui-design-system) (`shared-ui-design-system/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -26,9 +26,9 @@ Fill the `ThemeExtension` skeleton from [ZOD-FND-013](../foundations-architectur
 
 ## Acceptance Criteria
 
-- [ ] Every token in MASTER.md §2 has a corresponding value in both themes.
-- [ ] A rendered swatch grid (test harness) visually matches `components_dark.png`/`components_light.png`'s token section.
-- [ ] No component anywhere references a hex literal instead of a token (ARCH-7).
+- [x] Every token in MASTER.md §2 has a corresponding value in both themes. Evidence: `packages/shared_ui/test/theme/master_values_test.dart` (all 52 × 2 values against MASTER's tables and against `_source/kit.css`; coverage test).
+- [x] A rendered swatch grid (test harness) visually matches `components_dark.png`/`components_light.png`'s token section. Evidence: `reference_swatches_test.dart` (the 43 reference tiles per theme, pixel-exact against the PNGs), the test-only `TokenSwatchGrid` (`test/support/`) whose rendered tile pixels equal the same expectations, and a side-by-side review of its PNGs against the reference crops (2026-11-13).
+- [x] No component anywhere references a hex literal instead of a token (ARCH-7). Evidence: ZOD-FND-013's `test/architecture/no_color_literals_test.dart` stays green; literals live only in `packages/shared_ui/lib/src/theme/tokens/`.
 
 ## Dependencies
 
@@ -43,6 +43,8 @@ Fill the `ThemeExtension` skeleton from [ZOD-FND-013](../foundations-architectur
 ## Notes
 
 Prepared by ZOD-FND-013: the extension types (`ZodiannSurfaces`, `SquareColors`, `ZodiacColors`, `AspectColors`, `BodyColors`), their `tokens` maps (exact MASTER names, for the swatch harness) and the theme wiring exist in `packages/shared_ui`. This task replaces the right-hand sides in `packages/shared_ui/lib/src/theme/tokens/graphite_tokens.dart` / `porcelain_tokens.dart` with MASTER §2's literal values and deletes `placeholder_tokens.dart`. `signTintOpacity` already carries MASTER's 0.10 / 0.09 (FND-013); keep them. The color-literal guard allows literals only in that `tokens/` directory.
+
+Done (plan `docs/plans/ZOD-UI-001-color-token-values.md`): values copied from MASTER §2; the reference grid shows 43 of the 52 tokens (the other 9 are verified against MASTER and kit.css). Known for later tasks: dark `text-3` is below 4.5:1 on `surface-2` / `surface-3` / `accent-soft` (4.48 / 4.05 / 4.03): avoid it there, or ZOD-NFR-009 decides. `sel-outer` / `sel-inner` may change with D11 (ZOD-SQR-008 / Gate 2).
 
 ---
 
