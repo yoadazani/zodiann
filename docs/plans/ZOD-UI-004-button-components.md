@@ -10,26 +10,29 @@
   - `ZodiannSize.minTouchTarget = 44` joins `zodiann_dimensions.dart`.
 - **Colours:** `ZodiannButtonColors.resolve(surfaces, variant)` maps a variant to its fill, border and label colours, from `ZodiannSurfaces` only.
 - **The widget** is a `StatefulWidget` built on `FocusableActionDetector`, not Material's `ButtonStyleButton`, because the design's states are CSS filters on the whole button layer. The layers, outermost first:
-  - `Semantics`;
-  - `FocusableActionDetector` (focus, hover, `ActivateIntent`);
+  - `Semantics`, with its own tap action;
+  - `FocusableActionDetector` (focus and its keyboard-only highlight, `ActivateIntent`);
+  - `MouseRegion` (hover in any highlight mode);
   - a `GestureDetector` that fills the 44 hit box;
   - `Opacity` (disabled);
   - `Transform.translate` (pressed);
   - a `CustomPaint` foreground focus ring, painted outside the box without affecting layout;
-  - `ColorFiltered` brightness (hover / pressed);
-  - the 40 / 32 decorated box.
+  - an always-present `ColorFiltered` brightness, with hover animated over 150 ms;
+  - the 40 / 32 border-box `Container`.
 - **Criterion 1:** a reference test renders every cell of the sheet's Buttons board. It drives each state with real input (mouse hover, held press, Tab key), and measures each render with the same feature extractor it runs on the PNG.
 
 **Tech Stack:** Flutter 3.50.0 / Dart 3.14.0 (FVM), material_ui 1.11.0, flutter_test with `dart:ui` image decoding (as in UI-001/UI-003), bundled IBM Plex fonts (`test/support/load_bundled_fonts.dart`). No new dependencies.
 
-**Spec:** `assets/zodiann-specification.md` NFR-X5 (WCAG AA). Design: `design-reference/zodiann/MASTER.md` §10 "Buttons", §4 (sizes), §14 (touch targets ≥ 44, keyboard focus always visible), `_source/kit.css:186–203`, `_source/components.html:50–55, 87–101`. Task: `docs/development/shared-ui-design-system/ZOD-UI-004-implement-the-button-components-primary-secondary-accent-outline-quiet.md`.
+**Spec:** `assets/zodiann-specification.md` NFR-X5 (WCAG AA), NFR-X6 (reduced motion). Design: `design-reference/zodiann/MASTER.md` §10 "Buttons", §4 (sizes), §12 (hover 150 ms, reduced motion), §14 (touch targets ≥ 44, keyboard focus always visible), `_source/kit.css:188–204` (`.focus` / `.pressed` at 203–204), `_source/components.html:50–55, 87–101` (hover filter at line 52). Task: `docs/development/shared-ui-design-system/ZOD-UI-004-implement-the-button-components-primary-secondary-accent-outline-quiet.md`.
 
 ## Facts established while planning (2026-11-13)
 
 - **Product-owner decisions (2026-11-13):**
   - **D1 icons:** the 33-icon set (ZOD-FND-009) isn't built yet. Buttons take an optional leading `Widget? icon`, laid out in a 16 × 16 slot with an 8 px gap. Tests use a transparent 16 × 16 placeholder. FND-009 supplies the real icons later.
   - **D2 solid danger ink:** white text on `danger`, as designed. In dark that's 3.37:1 (fails AA for 14 px text); in light it's 4.53:1. This is recorded as a ZOD-NFR-009 handoff, as UI-001 did for `text-3`.
-  - **D3 touch target:** the button is drawn at 40 / 32, but its layout height is `max(drawn, 44)`, with transparent margins centred above and below that also take taps. Screens place buttons 8 apart (layout) to get the sheet's 12 px visual gap, which meets MASTER §14's "at least 8 between targets".
+  - **D3 touch target:** the button is drawn at 40 / 32, but its layout height is `max(drawn, 44)`, with transparent margins centred above and below that also take taps. Vertically, screens place buttons 8 apart (layout) to get the sheet's 12 px visual gap (2 + 8 + 2), which meets MASTER §14's "at least 8 between targets". Horizontally the visual gap equals the layout gap: the dialog's Cancel→Delete gap is 8.
+  - **U1 hover animation:** MASTER §12's "Hover: 150 ms" is implemented. The brightness factor eases 1 ↔ 1.12 over 150 ms (`Curves.ease`, CSS's default timing). It's instant under reduced motion (`MediaQuery.disableAnimationsOf`, NFR-X6, MASTER §12). Press is instant: §12 times only hover.
+  - **U2 dense containers:** D3 applies everywhere. Containers sized by their content grow by 6 (small) / 2 (regular) px per side compared with the mockups, unless their padding absorbs the margin. Example: the crossings panel head goes from 56 to 68 (`wheel.html:55, 154`). This is handed to ZOD-WHL-021, ZOD-SET-005 and ZOD-DAT-001.
 - **The sheet's states are CSS filters on the button element** (`components.html:52–55`), not kit.css's `:hover` rules:
   - hover is `filter: brightness(1.12)`;
   - focus is `.focus`, an outline of 2 px `focus` at offset 2;
@@ -53,6 +56,7 @@
 - **Geometry:**
   - **Sizes:** regular is 40 high, padding-inline 16, font 14 (body) at 500, so primary is 14 / 600. Small is 32 high, padding-inline 12, font 13 (small) at 500, so small primary is 13 / 600.
   - **Shared:** radius 8 (`ZodiannRadius.control`), gap 8 between the icon slot and the label, and the icon slot is 16 (`ZodiannSize.iconSmall`) in both sizes. The width is the content width.
+  - **Border-box:** the inline content inset is the 1 px border plus the padding, so 17 (regular) / 13 (small). Verified: quiet "Cancel" is 78 = 2 + 32 + 44 wide, and its ink sits 17 in from each side.
   - **Focus ring:** a 2 px ring at a 2 px gap outside the box. Its outer corner radius is about 12 (Chrome draws the outline radius as 8 + offset), so tests sample straight edges only.
 - **Sheet coordinates** (pixel scans, both PNGs 1440 wide at DPR 1; the board is `surface`):
   - **Column x (the drawn box's left edge):** default 221, hover 455, focus 689 (ring at 685–686, gap 687–688), pressed 923, disabled 1157.
@@ -67,7 +71,9 @@
     - dark y 1989–2020, light y 1972–2003 (32 high);
     - "Export" small secondary with icon at x 614–702 (89 wide);
     - "Small primary" with no icon at x 723–833 (111 wide).
-  - **Solid danger:** `screens/04-settings_delete-dialog_desktop_en_dark.png`, "Delete all data", fill `#F2555A`, box x 779–905, y 491–530 (127 × 40), white label.
+  - **Solid danger:** `screens/04-settings_delete-dialog_desktop_en_dark.png`, "Delete all data", fill `#F2555A`, white label.
+    - **Box:** x 779–905, which includes antialiased edge columns (`#432024`), so it is about 126.x px wide at a fractional x. Rows 491–530 are crisp.
+    - **Neighbours:** Cancel's right border is at 768–770, and the dialog edge is at x 930.
 - **Measured pixel values** (the default column; other states follow the filter maths, to within ±1 per channel):
 
   | Cell | Dark fill / border | Light fill / border |
@@ -121,6 +127,9 @@
    
    Covered by Task 3's keyboard tests.
 5. **A tap in the invisible hit margin** (2 px above a regular button, 6 px above a small one) must activate the button. Hit testing must go through ordinary parents (`Row`, `Padding`), because the margin is real layout, not a hit-test trick. Covered by Task 3's `hit margin taps activate` test.
+6. **Screen-reader activation:** TalkBack / VoiceOver must announce a button with its label, enabled state and focusability, and double-tap must activate it. A disabled button has no tap action. Covered by Task 3's semantics tests.
+7. **A mouse on a touch device** (a tablet with a mouse after a touch) still shows hover. Covered by Task 3's `hover shows in touch highlight mode`.
+8. **Clipping ancestors:** the focus ring extends 4 px beyond the box (2 px beyond the 44 layout vertically). A clipping parent within that distance hides it, which breaks MASTER §14 "focus always visible". This is documented in the widget's doc comment and handed to UI-013 / UI-014.
 
 ---
 
@@ -138,6 +147,8 @@
   abstract final class ZodiannStates {
     static const double hoverBrightness = 1.12, pressedBrightness = 0.94, pressedOffset = 1.0,
         disabledOpacity = 0.42, focusRingWidth = 2.0, focusRingGap = 2.0, dangerBorderOpacity = 0.45;
+    static const Duration hoverDuration = Duration(milliseconds: 150); // MASTER §12
+    static const Color transparent = Color(0x00000000);
     static const Color onDangerSolid = Color(0xFFFFFFFF); // kit .btn.danger.solid; D2 contrast note in the doc comment
   }
   enum ZodiannButtonVariant { primary, secondary, accentOutline, quiet, danger, dangerSolid }
@@ -159,8 +170,8 @@
   Transparent fills and borders use `ZodiannStates.transparent` (`static const Color transparent = Color(0x00000000)`). The colour guard flags `Colors.transparent` outside `tokens/`. `resolve` uses the `ZodiannStates` constants, never inline numbers. For example, the danger border is `s.danger.withValues(alpha: ZodiannStates.dangerBorderOpacity)`.
 
 - [ ] **Step 1: Write the failing tests.** In `button_colors_test.dart`, for both `graphiteTokens.surfaces` and `porcelainTokens.surfaces`, assert the Facts table for all six variants, row by row, with the expected values written as token references. For example, danger's border is `s.danger.withValues(alpha: 0.45)`, and dangerSolid's label is `const Color(0xFFFFFFFF)`. Also assert:
-  - `ZodiannStates`' values against MASTER §10 / kit literals: 1.12, 0.94, 1, 0.42, 2, 2, 0.45;
-  - a contrast test that every enabled default label meets ≥ 4.5:1 against its fill, or against `surface` when the fill is transparent, in both themes. **The one exception is dark `dangerSolid`, asserted to be below 4.5 and above 3.0.** The test name records that the shortfall is the D2 hand-off to NFR-009, so the test fails if a later token change silently fixes or worsens it. Reuse the contrast helper from `test/theme/contrast_test.dart`, or copy its 10-line WCAG function.
+  - `ZodiannStates`' values against MASTER §10 / §12 / kit literals: 1.12, 0.94, 1, 0.42, 2, 2, 0.45, 150 ms;
+  - a contrast test that every enabled default label meets ≥ 4.5:1 against its fill, or against `surface` when the fill is transparent, in both themes. **The one exception is dark `dangerSolid`, asserted to be below 4.5 and above 3.0.** The test name records that the shortfall is the D2 hand-off to NFR-009, so the test fails if a later token change silently fixes or worsens it. Copy the 10-line WCAG function from `test/theme/contrast_test.dart`; its `_contrast` is private.
 - [ ] **Step 2: Run and see it fail.** Run `cmd //c "cd packages\\shared_ui && fvm flutter test test/widgets/button_colors_test.dart test/theme/dimensions_test.dart"`. Expected: compile failure.
 - [ ] **Step 3: Implement** the constants, the enum and `resolve` (a `switch` expression).
 - [ ] **Step 4: Run and see it pass.** Same command.
@@ -188,34 +199,39 @@
     // onPressed == null ⇒ disabled.
   }
   ```
-- **Build tree, outermost first:**
-  1. `Semantics(button: true, enabled: onPressed != null, label: label, excludeSemantics: true)`;
-  2. `FocusableActionDetector(enabled: onPressed != null, focusNode, autofocus, mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden, onShowHoverHighlight, onShowFocusHighlight, actions: {ActivateIntent: CallbackAction(onInvoke: → onPressed)})`;
-  3. `GestureDetector(behavior: HitTestBehavior.opaque, onTapDown / onTapUp / onTapCancel → _pressed, onTap → onPressed)`. Pass null callbacks when disabled.
-  4. `ConstrainedBox(minHeight: ZodiannSize.minTouchTarget)` + `Center` (D3). The hit box is the full 44 layout, and the visual box is centred in it.
-  5. `Opacity(disabled ? 0.42 : 1)`;
-  6. `Transform.translate(Offset(0, pressed ? 1 : 0))`;
-  7. `CustomPaint(foregroundPainter: _FocusRingPainter(show: _focusHighlight, color: s.focus))`. It strokes an `RRect` inflated by gap + width / 2 (3 px), stroke width 2, radius 8 + 3, outside the child's bounds;
-  8. `ColorFiltered(_brightness(pressed ? 0.94 : hovered ? 1.12 : 1))`, or no filter at 1;
-  9. `ConstrainedBox(minHeight: 40 / 32)`;
-  10. `DecoratedBox(fill, Border.all(border), ZodiannRadius.control)`;
-  11. `Padding(horizontal: 16 / 12)`;
-  12. `Row(mainAxisSize: min, spacing: ZodiannSpace.s2, [if icon: SizedBox.square(dimension: ZodiannSize.iconSmall, child: icon), Flexible(Text(label, maxLines: 1, overflow: ellipsis, softWrap: false, style))])`.
+- **Build tree, outermost first** (`enabled = onPressed != null`):
+  1. `Semantics(container: true, button: true, enabled: enabled, focusable: enabled, focused: _focused, label: label, onTap: enabled ? onPressed : null, excludeSemantics: true)`;
+  2. `FocusableActionDetector(enabled: enabled, focusNode, autofocus, onFocusChange → _focused, onShowFocusHighlight → _focusHighlight, mouseCursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.forbidden, actions: {ActivateIntent: CallbackAction(onInvoke: → onPressed)})`;
+  3. `MouseRegion(onEnter / onExit → _hovered, only when enabled)`. Hover isn't taken from `onShowHoverHighlight`, which is suppressed in touch highlight mode;
+  4. `GestureDetector(behavior: HitTestBehavior.opaque, onTapDown / onTapUp / onTapCancel → _pressed, onTap → onPressed)`. Pass null callbacks when disabled;
+  5. `ConstrainedBox(constraints: BoxConstraints(minHeight: ZodiannSize.minTouchTarget), child: Align(widthFactor: 1, heightFactor: 1, child: …))` (D3). The layout is exactly max(drawn, 44) high and content-wide, with the drawn box centred. A plain `Center` would fill bounded parents;
+  6. `Opacity(opacity: enabled ? 1.0 : ZodiannStates.disabledOpacity)`;
+  7. `Transform.translate(offset: Offset(0, _pressed ? ZodiannStates.pressedOffset : 0))`;
+  8. `CustomPaint(foregroundPainter: _FocusRingPainter(show: _focusHighlight, color: s.focus))`. Compute `final outset = ZodiannStates.focusRingGap + ZodiannStates.focusRingWidth / 2;` first. Then stroke `RRect.fromRectAndRadius(bounds.inflate(outset), Radius.circular(ZodiannRadius.md + outset))` at width `ZodiannStates.focusRingWidth`, outside the child's bounds;
+  9. `TweenAnimationBuilder<double>(tween: Tween(end: _hovered ? ZodiannStates.hoverBrightness : 1.0), duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : ZodiannStates.hoverDuration, curve: Curves.ease, builder: (h) → ColorFiltered(colorFilter: _brightness(_pressed ? ZodiannStates.pressedBrightness : h), child: …))`. The `ColorFiltered` is always present, identity at 1, so the subtree's shape never changes. Press is instant;
+  10. `Container(constraints: BoxConstraints(minHeight: ZodiannSize.control / controlSmall), decoration: BoxDecoration(color: fill, border: Border.all(color: border), borderRadius: ZodiannRadius.control), padding: EdgeInsetsDirectional.symmetric(horizontal: ZodiannSpace.s4 / s3), child: …)`. `Container` adds `decoration.padding` (the 1 px border) to `padding`, matching CSS border-box, so the content inset is 17 / 13;
+  11. `Row(mainAxisSize: MainAxisSize.min, spacing: ZodiannSpace.s2, children: [if icon != null: IconTheme(data: IconThemeData(color: colors.label, size: ZodiannSize.iconSmall), child: SizedBox.square(dimension: ZodiannSize.iconSmall, child: icon)), Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false, style: …))])`.
   
-  The label style is `body` / `small` with `color: colors.label` and `fontWeight` 600 for primary, else 500. `IconTheme(color: colors.label, size: 16)` wraps the icon.
-- `_brightness(k)` is `ColorFilter.matrix([k,0,0,0,0, 0,k,0,0,0, 0,0,k,0,0, 0,0,0,1,0])`. These are matrix literals, not layout literals, so the guard doesn't apply.
-- Hover / pressed / focus state is held in `_hovered`, `_pressed` and `_focusHighlight`. `didUpdateWidget` clears `_pressed` and `_hovered` when `onPressed` becomes null.
+  The label style is `body` / `small` with `color: colors.label` and `fontWeight` `w600` for primary, else `w500`.
+- `_brightness(k)` is `ColorFilter.matrix([k,0,0,0,0, 0,k,0,0,0, 0,0,k,0,0, 0,0,0,1,0])`. These are matrix literals, which the guard doesn't scan.
+- `didUpdateWidget` clears `_pressed` and `_hovered` when `onPressed` becomes null.
+- **The doc comment states:**
+  - at most one primary per region;
+  - the 44 layout (D3);
+  - the focus ring extends 4 px beyond the drawn box, so parents must not clip within that distance.
 
-- [ ] **Step 1: Write the failing tests** (`button_test.dart`, under `ZodiannTheme.graphite`, `setUpAll(loadBundledFonts)`):
+- [ ] **Step 1: Write the failing tests.** All widget tests pump `MaterialApp(theme: ZodiannTheme.graphite / porcelain, home: Material(child: Center(child: …)))`. Hebrew cases use `locale: const Locale('he')` and `builder: (c, w) => Theme(data: withZodiannScript(Theme.of(c), ZodiannScript.hebrew), child: w!)`, as in UI-002's app tests. Use `setUpAll(loadBundledFonts)`.
   - **`regular is drawn 40 high in a 44 layout; small 32 in 44`:**
     - `tester.getSize(find.byType(ZodiannButton)).height == 44` for both sizes;
-    - the `DecoratedBox` size heights are 40 and 32.
-  - **`padding, gap and icon slot`:**
-    - the label's left edge minus the box's left edge is 16 + 16 + 8 with an icon, 16 without, and 12 for small;
-    - the icon slot is 16 × 16.
-  - **`label style per variant`:** the `Text` style's colour equals `ZodiannButtonColors.resolve(...).label`, and its weight is 600 for primary and 500 otherwise. Its size is 14 for regular and 13 for small, and its family is the theme's.
+    - the decorated box (the `Container`'s `DecoratedBox`) heights are 40 and 32.
+    - Inside `Center(child: SizedBox(height: 300, child: Row(children: [button])))`, the `ZodiannButton` is still 44 high and exactly as wide as its decorated box.
+  - **`border-box padding, gap and icon slot`:**
+    - the label's start edge minus the box's outer start edge is 1 + 16 + 16 + 8 = 41 with an icon, 17 without, and 13 for small without;
+    - the icon slot starts at 17 (13 small) and is 16 × 16;
+    - the box's outer end edge minus the label's end edge is 17 (13 small).
+  - **`label style per variant`:** the `Text` style's colour equals `ZodiannButtonColors.resolve(...).label`, and its weight is `w600` for primary and `w500` otherwise. Its size is 14 for regular and 13 for small, and its family is the theme's.
   - **`decoration per variant`:** the `BoxDecoration`'s colour and border colour equal `resolve(...)`, with border width 1 and radius `ZodiannRadius.control`.
-  - **`RTL puts the icon on the start side`:** under `Directionality(rtl)`, the icon slot's x is greater than the label's x.
+  - **`RTL puts the icon on the start side`:** with `locale: Locale('he')`, the icon slot's x is greater than the label's x, and the start inset is measured from the right: 17.
 - [ ] **Step 2: Run and see it fail.** Run `cmd //c "cd packages\\shared_ui && fvm flutter test test/widgets/button_test.dart"`. Expected: compile failure.
 - [ ] **Step 3: Implement.**
 - [ ] **Step 4: Run and see it pass.**
@@ -223,94 +239,121 @@
   - **B1:** primary weight 500. Fails the label-style test.
   - **B2:** small padding 16. Fails the padding test.
   - **B3:** drop the 44 `ConstrainedBox`. Fails the layout test.
+  - **B8:** `DecoratedBox` + `Padding` instead of `Container`, so the border isn't included. Fails the padding test (16 ≠ 17).
+  - **B9:** a plain `Center` instead of `Align(widthFactor: 1, heightFactor: 1)`. Fails the `Row` in the 300-high box.
 - [ ] **Step 6: Gates, then commit.** Commit as `feat(ZOD-UI-004): ZodiannButton variants, sizes and layout`.
 
 ### Task 3: States and behaviour (criteria 2 and 3)
 
 **Files:**
-- Test: `packages/shared_ui/test/widgets/button_behavior_test.dart`.
+- Test: `packages/shared_ui/test/widgets/button_behavior_test.dart`, with the same `MaterialApp` harness as Task 2.
 - Modify: `zodiann_button.dart`, only as the tests require.
 
 **Interfaces:**
-- Consumes: Task 2's `ZodiannButton`.
+- Consumes: Task 2's `ZodiannButton`. Tests find the filter with `find.descendant(of: find.byType(ZodiannButton), matching: find.byType(ColorFiltered))` and compare `colorFilter` by equality with `ColorFilter.matrix([...])`, because `ColorFilter` has no matrix getter.
 
-- [ ] **Step 1: Write the failing tests.** These run with `tester.binding.focusManager.highlightStrategy = FocusHighlightStrategy.automatic`; traditional keyboard mode comes from sending a key event.
+- [ ] **Step 1: Write the failing tests.**
   - **`tap calls onPressed once`.**
   - **`hit margin taps activate`:** `tester.tapAt(topCentre + Offset(0, 1))` on a regular button inside `Row(children: [button])` calls onPressed, and the same works at offset 3 on a small one. A tap 1 px outside the 44 box doesn't.
-  - **`hover lightens`:** with a mouse `TestGesture` moved onto the button, the `ColorFiltered` exists with matrix diagonal 1.12. After moving away, no `ColorFiltered` is in the subtree.
-  - **`press moves 1 px down and darkens`:** while the gesture is held (`startGesture`, no `up`), the `Transform`'s translation is (0, 1) and the filter diagonal is 0.94. After `up` both reset and onPressed fired once.
+  - **`hover lightens over 150 ms`:**
+    - move a mouse `TestGesture` onto the button;
+    - at 75 ms the filter equals neither the identity matrix nor the 1.12 matrix;
+    - after 150 ms it equals the 1.12 matrix;
+    - after moving away and 150 ms, it is identity.
+  - **`hover is instant under reduced motion`:** with `MediaQuery(data: MediaQueryData(disableAnimations: true))`, the filter is 1.12 after a single `pump()`.
+  - **`hover shows in touch highlight mode`:** `tester.tap` an empty area first, so the highlight mode is touch. Then hover with a mouse `TestGesture` and pump 150 ms: the filter is 1.12.
+  - **`press moves 1 px down and darkens`:** while the gesture is held (`startGesture`, no `up`), the `Transform`'s translation is (0, 1) and the filter is the 0.94 matrix after one `pump()` (press is instant). After `up` both reset and onPressed fired once.
   - **`keyboard focus shows the focus ring; a tap does not`:**
-    - `sendKeyEvent(LogicalKeyboardKey.tab)` focuses the button and `_FocusRingPainter.show` is true, found via `find.byWidgetPredicate` on `CustomPaint` with a painter of that type. The painter's colour equals `surfaces.focus` in both themes.
-    - After a fresh pump, tapping the button gives `show` false.
+    1. `sendKeyEvent(LogicalKeyboardKey.tab)` focuses the button. `_FocusRingPainter.show` is true, found via `find.byWidgetPredicate` on `CustomPaint` with a painter of that type. The painter's colour equals `surfaces.focus` in both themes.
+    2. `tester.tap` it: `focusNode.hasFocus` is still true and `show` is false.
+    3. Tab away, then Shift+Tab back: `show` is true again.
   - **`Enter and Space activate the focused button`.**
+  - **`semantics`:**
+    - Enabled: `tester.getSemantics(find.byType(ZodiannButton))` `matchesSemantics(isButton: true, hasEnabledState: true, isEnabled: true, isFocusable: true, hasTapAction: true, label: 'Save')`.
+    - `tester.semantics.tap(find.byType(ZodiannButton))` calls onPressed once.
   - **`disabled: 42 % opacity, no feedback, not focusable, no callback`:**
     - `Opacity.opacity == 0.42`;
-    - hover and press give no `ColorFiltered` and a zero translation;
+    - hover and press leave the filter at identity and the translation at zero;
     - the tap callback isn't called;
     - Tab skips it: focus lands on an enabled sibling placed after it;
-    - semantics `isEnabled` is false and `isButton` is true.
-  - **`disabling mid-press clears the pressed state`:** hold a press, rebuild with `onPressed: null`, then release. There's no translation, the opacity is 0.42 and nothing was called.
-  - **`long label ellipsizes`:** in a `SizedBox(width: 120)`, a label 60 characters long (and a Hebrew one under RTL) gives no `tester.takeException()`, and the `Text` has `maxLines` 1 and `overflow` ellipsis.
-  - **`text scale 2.0 grows the button`:** under `MediaQuery(textScaler: TextScaler.linear(2))` there's no exception, and the `DecoratedBox` height is ≥ the label's painted height + 2.
-- [ ] **Step 2: Run and see it fail** wherever Task 2 didn't already implement the behaviour. Run `cmd //c "cd packages\\shared_ui && fvm flutter test test/widgets/button_behavior_test.dart"`. Expected: failures name the missing behaviour. Any test that passes immediately is listed in the commit message and proven by mutants B4–B7.
+    - semantics show `isButton` true, `isEnabled` false and no tap action.
+  - **`disabling mid-press clears the pressed state`:** hold a press, rebuild with `onPressed: null`, then release. There's no translation, the filter is identity, the opacity is 0.42 and nothing was called.
+  - **`long label ellipsizes`:** in a `SizedBox(width: 120)`, a label 60 characters long (and a Hebrew one under `Locale('he')`) gives no `tester.takeException()`, and the `Text` has `maxLines` 1 and `overflow` ellipsis.
+  - **`text scale 2.0 grows the button`:** under `MediaQuery(textScaler: TextScaler.linear(2))` there's no exception, and the decorated box height is ≥ the label's painted height + 2.
+- [ ] **Step 2: Run and see it fail** wherever Task 2 didn't already implement the behaviour. Run `cmd //c "cd packages\\shared_ui && fvm flutter test test/widgets/button_behavior_test.dart"`. Expected: failures name the missing behaviour. Any test that passes immediately is listed in the commit message and proven by mutants B4–B7 and B10–B12.
 - [ ] **Step 3: Implement** whatever is missing.
 - [ ] **Step 4: Run and see it pass.**
 - [ ] **Step 5: Mutation proofs.**
-  - **B4:** the ring is shown whenever the button has focus, ignoring the highlight. Fails the tap case.
+  - **B4:** the ring is shown whenever the button has focus, ignoring the highlight. Fails the tap case (step 2).
   - **B5:** the disabled button stays focusable. Fails Tab-skip.
   - **B6:** `didUpdateWidget` doesn't clear `_pressed`. Fails mid-press.
   - **B7:** `GestureDetector` wraps the visual box, not the 44 box. Fails the hit margin.
-- [ ] **Step 6: Gates, then commit.** Commit as `feat(ZOD-UI-004): button hover, press, focus ring and disabled behaviour`.
+  - **B10:** hover from `onShowHoverHighlight` instead of `MouseRegion`. Fails touch-mode hover.
+  - **B11:** `Semantics` without `onTap`. Fails the semantics tap.
+  - **B12:** duration always 150 ms. Fails reduced motion.
+- [ ] **Step 6: Gates, then commit.** Commit as `feat(ZOD-UI-004): button hover, press, focus ring, semantics and disabled behaviour`.
 
 ### Task 4: Component-sheet cross-check (criterion 1)
 
 **Files:**
-- Create: `packages/shared_ui/test/support/button_features.dart`, a pure-Dart feature extractor over RGBA `ByteData` with width and height.
+- Create: `packages/shared_ui/test/support/button_features.dart`, a pure-Dart feature extractor.
 - Create: `packages/shared_ui/test/widgets/button_sheet_test.dart`.
 
 **Interfaces:**
 - Produces (test-only):
   ```dart
-  final class ButtonFeatures { final int left, top, width, height; final int fill, border, label; final List<int>? ring; }
-  ButtonFeatures measureButton(Rgba img, {required int originX, required int originY, required int spanX, required int board, int? iconSlot});
+  final class Rgba { const Rgba(this.width, this.height, this.data); final int width, height; final ByteData data; int argb(int x, int y); }
+  final class ButtonFeatures { final int? left, top, width, height, fill, border, inkStart; final int label; final List<int>? ring; }
+  ButtonFeatures measureButton(Rgba img, {required int originX, required int originY, required int drawnHeight,
+      required int spanX, required int board, required int focus, required int padding, bool icon = false, bool boxless = false});
   ```
-- **`measureButton`:**
-  - Scan row `originY + 20` (+16 for small) rightward from `originX` to the first non-`board` pixel. That pixel is the box, or the ring when focused.
-  - When a ring is detected (the pixel equals `focus` and the next two are `board`), record `ring` = those 4 pixels and set `left` = ring + 4.
-  - Find the right edge by scanning leftward from `originX + spanX`.
-  - Find `top` and `height` on column `left + 8`, outside the ring.
-  - `fill` is at (`left + 4`, mid).
-  - `border` is at (`left`, mid).
-  - `label` is the pixel with the largest RGB distance from `fill` within the label area. That area starts at x = `left + padding + (iconSlot ?? 0)` and runs to `right − padding`, across rows mid ± 5.
+- **`measureButton` (the same function for the PNG and the render):**
+  - **Scan row** `originY + drawnHeight / 2`. Starting at `originX`, find the first non-`board` pixel x.
+  - **Ring:** a ring is present when pixels x and x + 1 equal `focus` and x + 2 and x + 3 equal `board`. Then `ring` = those 4 pixels and `left` = x + 4. Otherwise `left` = x.
+  - **Right edge:** scan leftward from `originX + spanX` to the first non-`board` pixel. When a ring is present, the right edge is that pixel − 4.
+  - **Top and height:** on column `left + 8`, scan down from `originY − 6`. Skip the ring, if present, until 2 px past its last `focus` row. Then take the first non-`board` pixel run.
+  - **Colours:** `fill` is at (`left + 4`, mid) and `border` at (`left`, mid).
+  - **Label area:** x from `left + 1 + padding + (icon ? 16 + 8 : 0)` to `right − 1 − padding`, rows mid ± 5. `label` is the pixel with the largest RGB distance from the fill (from `board` when `boxless`).
+  - **`boxless` (quiet outside the focus column):** the box is invisible. Only `inkStart` (the first non-board x minus `originX`) and `label` are measured; the other fields are null.
+- **Origins:**
+  - **PNG:** `originX` = the column's box x (Facts) − 8, `originY` = the row top (Facts). The small row uses `drawnHeight` 32 and the Facts' small coordinates.
+  - **Flutter:** pump `RepaintBoundary(child: ColoredBox(color: surface, child: SizedBox(width: 260, height: 60, child: Stack(children: [Positioned(left: 8, top: 8, child: button)]))))`. Then `originX` = 0 (so the box starts at 8, as on the PNG side, and the ring at 4) and `originY` = 8 + (44 − drawn) / 2 = 10 (regular) / 14 (small). The boundary wraps the whole box, so the ring is captured.
 
-- [ ] **Step 1: Write the failing test.** For each theme (`components_dark.png` / `components_light.png`), decode the PNG and assert its size is 1440 × 5586 / 1440 × 5569. Then, for each of the 25 cells plus the 2 small-row buttons, using the Facts' coordinates (`spanX` 218):
+- [ ] **Step 1: Write the failing test.** For each theme (`components_dark.png` / `components_light.png`), decode the PNG and assert its size is 1440 × 5586 / 1440 × 5569. Then, for each of the 25 cells plus the 2 small-row buttons, with `spanX` 218:
   1. **PNG side:** `measureButton` on the PNG.
-  2. **Flutter side:** at DPR 1, pump a `ColoredBox(surface)` 260 × 60 with the button at (8, 8) inside a `RepaintBoundary`. Use the same label, variant, size and a placeholder icon `SizedBox.square(dimension: 16)` where the sheet has an icon. Drive the column's state with real input:
+  2. **Flutter side:** render the same label, variant, size and a placeholder icon (`SizedBox.square(dimension: 16)`) where the sheet has an icon. Drive the column's state with real input, then pump 150 ms so the hover animation settles:
      - hover: a mouse `TestGesture`;
      - focus: Tab;
      - pressed: a held press;
      - disabled: `onPressed: null`.
      
-     Render to RGBA inside `runAsync` and measure it the same way.
+     Render to RGBA inside `runAsync` and measure.
   3. **Compare:**
      - `width` within ±1 (text rendering);
      - `height` exact;
-     - `top − originTop` exact, so pressed is +1;
-     - `fill` and `border` within ±1 per channel (filter rounding);
+     - `top − originY` exact, so pressed is +1;
+     - `fill` and `border` within ±1 per channel (filter rounding; if translucent borders reach ±2, that's a ledgered ruling, never a silent change);
      - `ring` exact;
-     - `label` within ±3 per channel.
+     - `label` within ±3 per channel;
+     - quiet `boxless` cells: `inkStart` within ±1 (expected 8 + 17 = 25) and `label` within ±3.
   
-  The dialog's solid danger "Delete all data" is compared the same way against `04-settings_delete-dialog_desktop_en_dark.png` (origin 760, 480, `spanX` 170, board = dialog `surface`).
+  **Solid danger** is compared against `04-settings_delete-dialog_desktop_en_dark.png` with `originX` 773, `originY` 491, `spanX` 150 and board = the dialog `surface`. That cell sits at a fractional x, so compare only:
+  - `width` within ±1;
+  - `height` exact;
+  - `fill` at `left + 4` within ±1;
+  - `label` within ±3.
+  
+  Don't compare `border` or `left`, because the edge columns are antialiased.
   
   To show the comparison isn't hollow, also assert that the PNG features equal the Facts' measured literals for the default column.
 - [ ] **Step 2: Run and see it fail.** Run `cmd //c "cd packages\\shared_ui && fvm flutter test test/widgets/button_sheet_test.dart"`. Expected: compile failure (no extractor).
 - [ ] **Step 3: Implement `button_features.dart`, then run and see it pass.** If a width differs by more than 1 px:
-  - investigate the label's font, weight, size and letter spacing against kit.css, using `superpowers:systematic-debugging`;
-  - never widen the tolerance silently. A tolerance change is a ledgered ruling.
+  - check the border-box inset (17 / 13) first, then the label's font, weight, size and letter spacing against kit.css, using `superpowers:systematic-debugging`;
+  - never widen a tolerance silently. A tolerance change is a ledgered ruling.
   
   Optionally write the Flutter renders to `ZODIANN_BUTTON_DIR` for visual review against the sheet.
 - [ ] **Step 4: Mutation proofs.**
-  - **S1:** hover factor 1.10. Fails the hover cells (fill ±1).
+  - **S1:** hover factor 1.10. Fails the light secondary hover border (Δ4).
   - **S2:** pressed offset 0. Fails the pressed tops.
   - **S3:** a focus-ring gap of 1. Fails the ring.
   - **S4:** accentOutline label `text`. Fails the label colour.
@@ -321,21 +364,58 @@
 - [ ] **Step 1: Whole-branch code review** (opus) with this plan's Review Focus. Fix Critical and Important findings test-first, and defer minors.
 - [ ] **Step 2: Close out the docs.**
   - **UI-004 task file:** Done, all three criteria ticked. Notes:
-    - D1, D2 and D3 with dates;
+    - D1, D2, D3, U1 (hover 150 ms) and U2 (44 everywhere), with dates;
     - the sheet's filter semantics, with MASTER plus the sheet over kit.css's `:hover`;
     - out-of-scope icon-only buttons and their owners;
     - "at most one primary per region" as a convention.
   - **Notes in other task files:**
     - **ZOD-NFR-009:** the dark solid-danger 3.37:1 shortfall (D2).
     - **ZOD-FND-009:** pass real icons through `ZodiannButton.icon`, at 16.
-    - **ZOD-UI-013:** use `ZodiannButtonVariant.dangerSolid` for destructive confirmation; actions are 8 apart.
+    - **ZOD-UI-013:** use `ZodiannButtonVariant.dangerSolid` for destructive confirmation; actions are 8 apart horizontally. Do not clip within 4 px of a button (focus ring).
+    - **ZOD-UI-014:** do not clip within 4 px of a button (focus ring).
+    - **ZOD-WHL-021, ZOD-SET-005, ZOD-DAT-001:** `ZodiannButton` takes max(drawn, 44) layout height (D3 / U2). A container sized by content grows by 6 (small) / 2 (regular) px per side compared with the mockup (crossings panel head 56 → 68) unless its padding absorbs the margin.
+    - **ZOD-NFR-010:** the button hover animates over 150 ms and is instant under `disableAnimations` (tested in UI-004).
     - **NAV-001, WHL-016, WHL-017:** icon buttons follow the same state model (`ZodiannStates`, brightness filters, focus ring).
   - **PROGRESS:**
     - Architecture Conventions:
       - buttons are `ZodiannButton`; at most one primary per region;
       - interactive states use `ZodiannStates`;
       - hit targets are ≥ 44, with buttons laid out 8 apart.
-    - Technical Decisions: D1, D2, D3, and the filter semantics.
+    - Technical Decisions: D1, D2, D3, U1, U2, and the filter semantics.
     - Verification, Git State, next task.
   - **TASKS.md:** UI-004 Done.
   - Commit as `docs(ZOD-UI-004): close out button components`, then push, open the PR and record its link.
+
+## Plan review
+
+### Round 1: Needs user decision (3 Critical, 6 Important, 9 Minor, 2 Needs user decision)
+
+The reviewer re-scanned both component PNGs and the dialog PNG with its own decoder. It confirmed the filter model, every row top, column x, width and colour in the Facts, the contrast figures, and the existing token, style and guard APIs.
+
+**Critical (all applied):**
+- **C1:** the padding left out the 1 px border. The content inset is 17 / 13 (quiet "Cancel" 78 = 2 + 32 + 44). The build tree now uses `Container` (the border goes into the padding); the test expects 41 / 17 / 13; mutant B8 added.
+- **C2:** a plain `Center` fills bounded parents. It's now `Align(widthFactor: 1, heightFactor: 1)`, with a `Row`-in-300-high-box test and mutant B9.
+- **C3:** the solid-danger origin landed on Cancel, and its edges are antialiased. The origin is now (773, 491), `spanX` 150, with no `border` or `left` comparison.
+
+**Important (all applied):**
+- **I1:** `onShowHoverHighlight` is suppressed in touch highlight mode. Hover now comes from `MouseRegion`, with a touch-mode hover test and mutant B10.
+- **I2:** `excludeSemantics` dropped the tap action. `Semantics` now carries `onTap`, `focusable` and `focused`, with semantics tests, mutant B11 and Review Focus 6.
+- **I3:** the tap half of the ring test couldn't catch B4. The test is now Tab → tap keeps focus with the ring hidden → Shift+Tab shows it again.
+- **I4:** `measureButton` was underspecified (the ring is 2 px; origins; ring top; quiet has no box). It's fully specified now, including the `boxless` mode and the `Rgba` type.
+- **I5:** D3's effect on dense rows is handed to WHL-021, SET-005 and DAT-001 (see U2).
+- **I6:** all widget tests use a `MaterialApp` harness, which keyboard shortcuts need.
+
+**Minor:**
+- **M1** (guard-safe ring radius, constants instead of literals): applied.
+- **M2** (S1 caught by the light secondary hover border): applied.
+- **M3** (copy `_contrast`): applied.
+- **M4** (compare filters by equality): applied.
+- **M5** (line references): applied.
+- **M6** (±2 on translucent borders is a ledgered ruling): applied.
+- **M7** (keep `ColorFiltered` always present): applied, required by U1 anyway.
+- **M8** (focus ring vs clipping): applied as Review Focus 8 and the UI-013 / UI-014 notes.
+- **M9** (D3 gap wording, vertical vs horizontal): applied.
+
+**Needs user decision (resolved 2026-11-13):**
+- **U1:** animate MASTER §12's 150 ms hover, instant under reduced motion. Applied: `TweenAnimationBuilder`, `ZodiannStates.hoverDuration`, tests at 75 / 150 ms, a reduced-motion test, mutant B12, and an NFR-010 note.
+- **U2:** keep the 44 layout everywhere, with notes for WHL-021, SET-005 and DAT-001.
