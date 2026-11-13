@@ -18,7 +18,9 @@ const Set<String> flutterSdkPackages = {
 /// dependency path `[package, …, forbiddenName]`. Empty means clean.
 ///
 /// Closure rule for pub-workspace output: [package]'s own node contributes its
-/// `directDependencies` and `devDependencies`; every node reached after that
+/// `directDependencies` and `devDependencies` (only `directDependencies` when
+/// [includeDevDependencies] is false: its runtime closure); every node
+/// reached after that
 /// contributes `directDependencies` only. A workspace member's `dependencies`
 /// list also contains its dev dependencies, which are not part of a
 /// dependent's closure, so it must not be followed. `pubDepsJson['root']` is
@@ -29,6 +31,7 @@ Map<String, List<String>> findForbiddenDependencies(
   Map<String, Object?> pubDepsJson,
   String package, {
   Set<String> forbidden = flutterSdkPackages,
+  bool includeDevDependencies = true,
 }) {
   final nodes = {
     for (final node
@@ -53,7 +56,7 @@ Map<String, List<String>> findForbiddenDependencies(
   final queue = Queue<List<String>>.of([
     for (final dep in {
       ...listOf(start, 'directDependencies'),
-      ...listOf(start, 'devDependencies'),
+      if (includeDevDependencies) ...listOf(start, 'devDependencies'),
     })
       [package, dep],
   ]);
