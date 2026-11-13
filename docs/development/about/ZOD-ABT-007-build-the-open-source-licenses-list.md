@@ -39,7 +39,7 @@ Build the chip list of every open-source dependency the app ships with attributi
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-007 (2026-11-13):** the bundled fonts are IBM Plex Sans, IBM Plex Sans Hebrew, Noto Sans Symbols, Noto Sans Symbols 2 **and Noto Sans** (third glyph fallback for ℞, product-owner decision), all SIL OFL 1.1. Each licence ships as an asset at `packages/shared_ui/assets/fonts/<family>/OFL.txt` (asset key `packages/shared_ui/assets/fonts/<family>/OFL.txt`); register and show all five. Sources and versions: `packages/shared_ui/assets/fonts/SOURCES.md`.
 
 ---
 

@@ -35,6 +35,26 @@ void main() {
       expect(result['flutter'], ['core_dev', 'helper', 'uipkg', 'flutter']);
     });
 
+    test('includeDevDependencies: false follows regular dependencies only', () {
+      expect(findForbiddenDependencies(deps, 'core_dev'), contains('flutter'));
+      expect(
+        findForbiddenDependencies(
+          deps,
+          'core_dev',
+          includeDevDependencies: false,
+        ),
+        isEmpty,
+      );
+      expect(
+        findForbiddenDependencies(
+          deps,
+          'core_reg',
+          includeDevDependencies: false,
+        )['flutter'],
+        ['core_reg', 'mid', 'uipkg', 'flutter'],
+      );
+    });
+
     test('passes a package with no Flutter in its closure', () {
       expect(findForbiddenDependencies(deps, 'core_clean'), isEmpty);
     });

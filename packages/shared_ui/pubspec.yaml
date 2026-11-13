@@ -15,6 +15,51 @@ dependencies:
   material_ui: ^1.11.0
 
 dev_dependencies:
+  crypto: ^3.0.8
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  yaml: ^3.1.4
+
+# ZOD-FND-007: bundled fonts (offline, DATA-7). Sources, versions and
+# SHA-256s: assets/fonts/SOURCES.md. Each OFL.txt ships with the app.
+flutter:
+  assets:
+    - assets/fonts/ibm-plex-sans/OFL.txt
+    - assets/fonts/ibm-plex-sans-hebrew/OFL.txt
+    - assets/fonts/noto-sans-symbols/OFL.txt
+    - assets/fonts/noto-sans-symbols-2/OFL.txt
+    - assets/fonts/noto-sans/OFL.txt
+  fonts:
+    - family: IBM Plex Sans
+      fonts:
+        - asset: assets/fonts/ibm-plex-sans/IBMPlexSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/ibm-plex-sans/IBMPlexSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/ibm-plex-sans/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.ttf
+          weight: 600
+    - family: IBM Plex Sans Hebrew
+      fonts:
+        - asset: assets/fonts/ibm-plex-sans-hebrew/IBMPlexSansHebrew-Light.ttf
+          weight: 300
+        - asset: assets/fonts/ibm-plex-sans-hebrew/IBMPlexSansHebrew-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/ibm-plex-sans-hebrew/IBMPlexSansHebrew-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/ibm-plex-sans-hebrew/IBMPlexSansHebrew-SemiBold.ttf
+          weight: 600
+    - family: Noto Sans Symbols
+      fonts:
+        - asset: assets/fonts/noto-sans-symbols/NotoSansSymbols-Regular.ttf
+          weight: 400
+    - family: Noto Sans Symbols 2
+      fonts:
+        - asset: assets/fonts/noto-sans-symbols-2/NotoSansSymbols2-Regular.ttf
+          weight: 400
+    - family: Noto Sans
+      fonts:
+        - asset: assets/fonts/noto-sans/NotoSans-Regular.ttf
+          weight: 400
