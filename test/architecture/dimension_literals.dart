@@ -22,10 +22,10 @@ final class DimensionLiteral {
 /// argument list is flagged. `\b` keeps `fromSize(`, `BorderRadius.` and the
 /// like from matching the shorter patterns.
 final _unrestricted = [
-  RegExp(r'\bEdgeInsets(?:Directional)?(?:\.\w+)?\('),
+  RegExp(r'\bEdgeInsets(?:Directional|Geometry)?(?:\.\w+)?\('),
   RegExp(r'\bSizedBox(?:\.\w+)?\('),
   RegExp(r'\bRadius\.\w+\('),
-  RegExp(r'\bBorderRadius\.circular\('),
+  RegExp(r'\bBorderRadius(?:Directional|Geometry)?\.circular\('),
   RegExp(r'\bBoxShadow\('),
   RegExp(r'\bSize(?:\.\w+)?\('),
   RegExp(r'\bBorderSide\('),
