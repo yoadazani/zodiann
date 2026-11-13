@@ -185,6 +185,46 @@ void main() {
     });
   }
 
+  for (final hebrew in [false, true]) {
+    testWidgets('a tight-width slot stretches the drawn box and centres its '
+        'content (${hebrew ? 'RTL' : 'LTR'})', (tester) async {
+      // MASTER §6: at phone width controls go full width (saved.html,
+      // square.html: `.btn { width: 100% }`).
+      for (final withIcon in [false, true]) {
+        await pumpInApp(
+          tester,
+          SizedBox(
+            width: 300,
+            child: ZodiannButton(
+              label: 'Save',
+              onPressed: () {},
+              icon: withIcon ? const SizedBox(key: _iconKey) : null,
+            ),
+          ),
+          hebrew: hebrew,
+        );
+        final why = 'icon: $withIcon';
+        final target = tester.getRect(find.byType(ZodiannButton));
+        final box = tester.getRect(drawnBox());
+        expect(target.size, const Size(300, 44), reason: why);
+        expect(box.width, 300, reason: why);
+        expect(box.height, 40, reason: why);
+        final text = tester.getRect(labelText());
+        final contentLeft = withIcon && !hebrew
+            ? tester.getRect(find.byKey(_iconKey)).left
+            : text.left;
+        final contentRight = withIcon && hebrew
+            ? tester.getRect(find.byKey(_iconKey)).right
+            : text.right;
+        expect(
+          contentLeft - box.left,
+          closeTo(box.right - contentRight, 0.5),
+          reason: '$why: content centred',
+        );
+      }
+    });
+  }
+
   testWidgets('RTL puts the icon on the start side', (tester) async {
     await pumpInApp(
       tester,

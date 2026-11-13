@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart' show BoxParentData, RenderShiftedBox;
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/tokens/zodiann_dimensions.dart';
@@ -128,6 +129,9 @@ class _ZodiannButtonState extends State<ZodiannButton> {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        // A stretched (tight-width) box centres its content, as CSS's
+        // `justify-content: center`.
+        mainAxisAlignment: MainAxisAlignment.center,
         spacing: ZodiannSpace.s2,
         children: [
           if (widget.icon case final icon?)
@@ -202,29 +206,21 @@ class _ZodiannButtonState extends State<ZodiannButton> {
             onTapUp: enabled ? (_) => _setPressed(false) : null,
             onTapCancel: enabled ? () => _setPressed(false) : null,
             onTap: onPressed,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                minWidth: ZodiannSize.minTouchTarget,
-                minHeight: ZodiannSize.minTouchTarget,
-              ),
-              child: Align(
-                widthFactor: 1,
-                heightFactor: 1,
-                child: ExcludeSemantics(
-                  child: Opacity(
-                    opacity: enabled ? 1.0 : ZodiannStates.disabledOpacity,
-                    child: Transform.translate(
-                      offset: Offset(
-                        0,
-                        _pressed ? ZodiannStates.pressedOffset : 0,
+            child: _TouchTarget(
+              child: ExcludeSemantics(
+                child: Opacity(
+                  opacity: enabled ? 1.0 : ZodiannStates.disabledOpacity,
+                  child: Transform.translate(
+                    offset: Offset(
+                      0,
+                      _pressed ? ZodiannStates.pressedOffset : 0,
+                    ),
+                    child: CustomPaint(
+                      foregroundPainter: ZodiannFocusRingPainter(
+                        show: _focusHighlight,
+                        color: s.focus,
                       ),
-                      child: CustomPaint(
-                        foregroundPainter: ZodiannFocusRingPainter(
-                          show: _focusHighlight,
-                          color: s.focus,
-                        ),
-                        child: filtered,
-                      ),
+                      child: filtered,
                     ),
                   ),
                 ),
@@ -235,6 +231,78 @@ class _ZodiannButtonState extends State<ZodiannButton> {
       ),
     );
   }
+}
+
+/// The button's layout and hit box (D3): at least 44 × 44, with the drawn
+/// box centred inside it.
+///
+/// The drawn box keeps its own height (40 / 32, loose), but takes the
+/// incoming width constraint as is: in a tight-width slot (full-width
+/// controls, MASTER §6) it stretches to the slot, otherwise it is
+/// content-wide, and narrower than 44 only for very short labels.
+class _TouchTarget extends SingleChildRenderObjectWidget {
+  const _TouchTarget({required super.child});
+
+  @override
+  _RenderTouchTarget createRenderObject(BuildContext context) =>
+      _RenderTouchTarget();
+}
+
+class _RenderTouchTarget extends RenderShiftedBox {
+  _RenderTouchTarget() : super(null);
+
+  static const double _min = ZodiannSize.minTouchTarget;
+
+  BoxConstraints _childConstraints(BoxConstraints c) => BoxConstraints(
+    minWidth: c.minWidth,
+    maxWidth: c.maxWidth,
+  ).copyWith(maxHeight: c.maxHeight);
+
+  Size _sizeFor(BoxConstraints c, Size child) => c.constrain(
+    Size(
+      child.width < _min ? _min : child.width,
+      child.height < _min ? _min : child.height,
+    ),
+  );
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) {
+    final child = this.child;
+    if (child == null) return constraints.constrain(const Size(_min, _min));
+    return _sizeFor(
+      constraints,
+      child.getDryLayout(_childConstraints(constraints)),
+    );
+  }
+
+  @override
+  void performLayout() {
+    final child = this.child!;
+    child.layout(_childConstraints(constraints), parentUsesSize: true);
+    size = _sizeFor(constraints, child.size);
+    (child.parentData! as BoxParentData).offset = Offset(
+      (size.width - child.size.width) / 2,
+      (size.height - child.size.height) / 2,
+    );
+  }
+
+  double _atLeastMin(double v) => v < _min ? _min : v;
+
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      _atLeastMin(child?.getMinIntrinsicWidth(height) ?? 0);
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _atLeastMin(child?.getMaxIntrinsicWidth(height) ?? 0);
+
+  @override
+  double computeMinIntrinsicHeight(double width) =>
+      _atLeastMin(child?.getMinIntrinsicHeight(width) ?? 0);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      _atLeastMin(child?.getMaxIntrinsicHeight(width) ?? 0);
 }
 
 /// A CSS `brightness(k)` filter: RGB scaled by [k], alpha unchanged.
