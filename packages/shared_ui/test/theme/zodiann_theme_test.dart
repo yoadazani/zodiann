@@ -43,7 +43,7 @@ void main() {
     expect(ZodiannTheme.porcelain.colorScheme.brightness, Brightness.light);
   });
 
-  test('both themes carry all five extensions', () {
+  test('both themes carry all token extensions', () {
     themes.forEach((name, entry) {
       final (theme, tokens) = entry;
       expect(
@@ -67,6 +67,11 @@ void main() {
         reason: name,
       );
       expect(theme.extension<BodyColors>(), same(tokens.bodies), reason: name);
+      expect(
+        theme.extension<ZodiannElevation>(),
+        same(tokens.elevation),
+        reason: name,
+      );
     });
   });
 
@@ -91,6 +96,7 @@ void main() {
     expect(theme.extension<ZodiacColors>(), same(tokens.zodiac));
     expect(theme.extension<AspectColors>(), same(tokens.aspects));
     expect(theme.extension<BodyColors>(), same(tokens.bodies));
+    expect(theme.extension<ZodiannElevation>(), same(tokens.elevation));
   });
 
   test("signTintOpacity is MASTER's 10 % / 9 %", () {

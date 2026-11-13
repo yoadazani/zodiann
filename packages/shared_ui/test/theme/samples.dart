@@ -144,6 +144,17 @@ BodyColors copyAllBodyColors(BodyColors a, BodyColors b) => a.copyWith(
   node: b.node,
 );
 
+ZodiannElevation sampleElevation(int seed) => ZodiannElevation(
+  floating: [
+    BoxShadow(
+      color: sampleColor(seed, 0),
+      offset: Offset(0, seed.toDouble()),
+      blurRadius: seed.toDouble(),
+    ),
+  ],
+  floatingOutline: BorderSide(color: sampleColor(seed, 1)),
+);
+
 ZodiannTokens sampleTokens(int seed, Brightness brightness) => ZodiannTokens(
   brightness: brightness,
   surfaces: sampleSurfaces(seed),
@@ -151,4 +162,5 @@ ZodiannTokens sampleTokens(int seed, Brightness brightness) => ZodiannTokens(
   zodiac: sampleZodiac(seed),
   aspects: sampleAspects(seed),
   bodies: sampleBodies(seed),
+  elevation: sampleElevation(seed),
 );

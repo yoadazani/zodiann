@@ -7,14 +7,21 @@ import 'zodiann_text_styles.dart';
 import 'zodiann_tokens.dart';
 
 /// Builds a `ThemeData` from [t]: the `ColorScheme` and the scaffold colour
-/// derive from `t.surfaces`, and the five groups become the theme's
-/// extensions, so each colour has one source (MASTER.md §2, ARCH-7).
+/// derive from `t.surfaces`, and the six token groups become the theme's
+/// extensions, so each value has one source (MASTER.md §2/§4, ARCH-7).
 ///
 /// MASTER defines no secondary or tertiary colours, so the monochrome accent
 /// fills those roles. Roles left unset fall back to `ColorScheme`'s defaults:
 /// `primaryContainer` → `primary`, `tertiary` → `secondary`, and
-/// `surfaceTint` → `primary` (an accent tint on M3 elevated surfaces, which
-/// ZOD-UI-003/UI-004 should revisit).
+/// `surfaceTint` → `primary`.
+///
+/// Elevation (MASTER §4, ZOD-UI-003) is the surface ladder (the surface
+/// containers above) plus `ZodiannElevation` for floating layers; nothing
+/// rests on a shadow. Material 3 component defaults set a transparent
+/// surface tint, so the accent `surfaceTint` paints nothing, except
+/// `AppBar`, whose scrolled-under state falls back to
+/// `colorScheme.surfaceTint`. ZOD-NAV-001 sets `surfaceTintColor:
+/// Colors.transparent` (or an `appBarTheme`) if it builds on `AppBar`.
 ///
 /// The typography (ZOD-UI-002) is [script]'s `ZodiannTextStyles`, installed
 /// as an extension and as all 15 `TextTheme` slots.

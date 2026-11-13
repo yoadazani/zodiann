@@ -4,6 +4,7 @@ import '../aspect_colors.dart';
 import '../body_colors.dart';
 import '../square_colors.dart';
 import '../zodiac_colors.dart';
+import '../zodiann_elevation.dart';
 import '../zodiann_surfaces.dart';
 import '../zodiann_tokens.dart';
 
@@ -12,27 +13,7 @@ import '../zodiann_tokens.dart';
 /// This directory is the only place colour literals are allowed (ARCH-7).
 final ZodiannTokens graphiteTokens = ZodiannTokens(
   brightness: Brightness.dark,
-  surfaces: const ZodiannSurfaces(
-    bg: Color(0xFF08080A),
-    bgRaised: Color(0xFF0E0E11),
-    surface: Color(0xFF111114),
-    surface2: Color(0xFF18181C),
-    surface3: Color(0xFF212126),
-    line: Color(0xFF2A2A30),
-    lineSoft: Color(0xFF1B1B20),
-    text: Color(0xFFF4F5F7),
-    text2: Color(0xFFA0A4AD),
-    text3: Color(0xFF7C808A),
-    accent: Color(0xFFF4F5F7),
-    accentStrong: Color(0xFFFFFFFF),
-    accentSoft: Color.fromRGBO(255, 255, 255, 0.07),
-    accentLine: Color.fromRGBO(255, 255, 255, 0.24),
-    onAccent: Color(0xFF0A0A0B),
-    focus: Color(0xFFFFFFFF),
-    scrim: Color.fromRGBO(0, 0, 0, 0.72),
-    danger: Color(0xFFF2555A),
-    ok: Color(0xFF34D399),
-  ),
+  surfaces: _surfaces,
   square: const SquareColors(
     axisFill: Color(0xFF16305A),
     axisInk: Color(0xFFD6E4FF),
@@ -75,4 +56,40 @@ final ZodiannTokens graphiteTokens = ZodiannTokens(
     pluto: Color(0xFFB48CF2),
     node: Color(0xFF9CA1AB),
   ),
+  elevation: _elevation,
+);
+
+const ZodiannSurfaces _surfaces = ZodiannSurfaces(
+  bg: Color(0xFF08080A),
+  bgRaised: Color(0xFF0E0E11),
+  surface: Color(0xFF111114),
+  surface2: Color(0xFF18181C),
+  surface3: Color(0xFF212126),
+  line: Color(0xFF2A2A30),
+  lineSoft: Color(0xFF1B1B20),
+  text: Color(0xFFF4F5F7),
+  text2: Color(0xFFA0A4AD),
+  text3: Color(0xFF7C808A),
+  accent: Color(0xFFF4F5F7),
+  accentStrong: Color(0xFFFFFFFF),
+  accentSoft: Color.fromRGBO(255, 255, 255, 0.07),
+  accentLine: Color.fromRGBO(255, 255, 255, 0.24),
+  onAccent: Color(0xFF0A0A0B),
+  focus: Color(0xFFFFFFFF),
+  scrim: Color.fromRGBO(0, 0, 0, 0.72),
+  danger: Color(0xFFF2555A),
+  ok: Color(0xFF34D399),
+);
+
+/// MASTER §4: floating layers cast `0 24 64 rgba(0,0,0,.55)` and carry a
+/// 1 px `line` outline. (kit.css's .6 differs; MASTER wins.)
+final ZodiannElevation _elevation = ZodiannElevation(
+  floating: [
+    BoxShadow(
+      color: const Color.fromRGBO(0, 0, 0, 0.55),
+      offset: const Offset(0, 24),
+      blurRadius: ZodiannElevation.blurFromCss(64),
+    ),
+  ],
+  floatingOutline: BorderSide(color: _surfaces.line),
 );
