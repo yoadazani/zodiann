@@ -44,7 +44,9 @@ Build the `TextTheme`/text-style set for every role in the type scale, with the 
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-007 (2026-11-13):** name the bundled fonts only through `ZodiannFonts` with `package: ZodiannFonts.package` (it also prefixes `fontFamilyFallback`). Glyph styles use `fontFamilyFallback: ZodiannFonts.glyphFallback` — Noto Sans Symbols, Noto Sans Symbols 2, then **Noto Sans**, which FND-007 added for ℞ (U+211E, in neither Symbols font; product-owner decision).
+- IBM Plex Sans Hebrew lacks ′ (U+2032) and ″ (U+2033), used in positions such as `17°03′` (MASTER §7.3). In Hebrew mode add `fontFamilyFallback: [ZodiannFonts.plexSans]`, as the mockup's stack does (`_source/kit.css:108`).
+- Neither Plex family has a `tnum` feature, but digits 0–9 are already equal width (600 units) in all eight files, so figures are tabular by default; keep `FontFeature.tabularFigures()` per the spec, and the jitter test still proves it.
 
 ---
 

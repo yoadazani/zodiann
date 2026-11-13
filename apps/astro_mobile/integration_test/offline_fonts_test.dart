@@ -1,8 +1,15 @@
 // ZOD-FND-007 criterion 1: with the device in airplane mode, both UI
 // families render all four weights from the bundled fonts, resolved through
-// the app's real font manifest (no FontLoader). Run manually:
+// the app's real font manifest (no FontLoader). Run manually, offline:
 //   adb -s emulator-5554 shell cmd connectivity airplane-mode enable
-//   fvm flutter test integration_test -d emulator-5554
+//   fvm flutter test integration_test -d <device>
+// Flutter 3.50 lists emulator-5554 (Android 9, x86) as unsupported for
+// `flutter test -d`; there, run it as an app and read logcat:
+//   fvm flutter build apk --debug -t integration_test/offline_fonts_test.dart
+//   adb install -r build/app/outputs/flutter-apk/app-debug.apk
+//   adb shell am start -n com.zodiann.app/.MainActivity
+//   adb logcat -s flutter   (expect "All tests passed!")
+// Afterwards: airplane-mode disable.
 import 'dart:async';
 import 'dart:io';
 
