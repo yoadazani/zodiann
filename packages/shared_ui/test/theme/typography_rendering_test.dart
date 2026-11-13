@@ -72,6 +72,8 @@ void main() {
               text: TextSpan(text: sample[script]!, style: s),
               textDirection: _dir(script),
             )..layout(maxWidth: 10000);
+            // Whole px, as the engine rounds line boxes; the exact line
+            // height is owned by typography_test.dart's value test.
             expect(
               p.height,
               (s.fontSize! * s.height!).roundToDouble(),

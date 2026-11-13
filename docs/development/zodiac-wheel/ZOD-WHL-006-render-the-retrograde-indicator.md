@@ -41,7 +41,7 @@ Mark a backward-moving body with ℞ next to its degree label on the wheel.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-UI-002 (2026-11-13):** take ℞ from `ZodiannGlyphs.retrograde` (U+211E + U+FE0E) and draw it with a `ZodiannTextStyles` style (the glyph style, or a UI role — both fall back to Noto Sans, which has ℞).
 
 ---
 
