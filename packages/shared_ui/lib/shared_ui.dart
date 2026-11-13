@@ -9,5 +9,6 @@ export 'src/theme/tokens/porcelain_tokens.dart';
 export 'src/theme/zodiac_colors.dart';
 export 'src/theme/zodiann_fonts.dart';
 export 'src/theme/zodiann_surfaces.dart';
+export 'src/theme/zodiann_text_styles.dart';
 export 'src/theme/zodiann_theme.dart';
 export 'src/theme/zodiann_tokens.dart';
