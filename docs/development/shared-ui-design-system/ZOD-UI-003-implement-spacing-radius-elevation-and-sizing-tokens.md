@@ -6,7 +6,7 @@
 - **Category:** [Shared UI & Design System](../README.md#shared-ui-design-system) (`shared-ui-design-system/`)
 - **Phase:** Phase 1
 - **Priority:** Medium
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -27,8 +27,8 @@ Centralize the spacing scale, radius scale, elevation treatment, and standard co
 
 ## Acceptance Criteria
 
-- [ ] All spacing/radius/elevation/sizing constants are defined once and referenced everywhere (no magic numbers in feature code).
-- [ ] A measured screenshot of a built panel matches the specified padding/gap values within 1px.
+- [x] All spacing/radius/elevation/sizing constants are defined once and referenced everywhere (no magic numbers in feature code).
+- [x] A measured screenshot of a built panel matches the specified padding/gap values within 1px.
 
 ## Dependencies
 
@@ -41,7 +41,14 @@ Centralize the spacing scale, radius scale, elevation treatment, and standard co
 
 ## Notes
 
-_No additional notes._
+- **Light outline — product-owner decision (2026-11-13):** the 1 px `line` outline applies to floating layers in **both** themes, not only dark (the "(dark)" above reads too narrowly). MASTER gives the outline to floating layers as a class and replaces only the shadow for light; `kit.css:72` draws it in light too. The reference draws it as a ring *outside* the box (`0 0 0 1px`), so consumers paint `ZodiannElevation.floatingOutline` outside (see its doc comment).
+- **MASTER over kit.css for the shadows:** kit.css has `rgba(0,0,0,.6)` / `rgba(11,12,14,.16)`; MASTER's `.55` / `rgba(21,25,31,.18)` are used, as in UI-001/UI-002.
+- **CSS blur → Flutter:** CSS blur = 2σ and Flutter maps `blurRadius` r to σ = r × 0.57735 + 0.5, so `ZodiannElevation.blurFromCss` converts (64 → 54.5596, 56 → 47.6314). The test pins σ (32 / 28).
+- **Border-box measurement:** panel padding is counted inside the 1 px border, and the head height (56 / 52) includes its 1 px rule (`kit.css`: `box-sizing: border-box`).
+- **Mobile reference mismatch:** `settings_mobile_he_dark.png` shows a phone panel gap of 20 and head of 56, because `_source/settings.html` never applies the phone values. MASTER's 16 / 52 win; the reference test checks only the phone gutter and padding. Phone is < 700 (MASTER §6), not `max-width: 700px`.
+- **Criterion 1 mechanism:** the constants live only in `packages/shared_ui/lib/src/theme/tokens/` (`ZodiannSpace`, `ZodiannRadius`, `ZodiannSize`, `ZodiannBreakpoints`), plus `ZodiannLayout` and `ZodiannElevation`. `test/architecture/no_magic_dimensions_test.dart` flags numeric layout literals in `apps/*/lib` and `packages/*/lib` outside `tokens/`. Its documented gaps (in `dimension_literals.dart`) include `Container(width/height)`, `Divider`, flex factors, `Offset(...)` and default parameter values.
+- **Surface tint:** no change in UI-003. Material 3 defaults set a transparent tint everywhere except `AppBar`, which falls back to `colorScheme.surfaceTint` (the accent); handed to ZOD-NAV-001 in its Notes.
+- **Criterion 2 evidence:** `packages/shared_ui/test/theme/panel_spacing_test.dart` measures a token-built panel pixel by pixel at 1440 and 390 (exact), and `reference_layout_test.dart` measures the same distances in the settings reference PNGs (within 1 px).
 
 ---
 

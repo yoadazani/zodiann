@@ -43,7 +43,7 @@ Build the modal dialog shell used for delete confirmation, save-square naming, a
 
 ## Notes
 
-_No additional notes._
+- **Floating layer (ZOD-UI-003):** use `ZodiannElevation.floating` (the theme extension) for the shadow, plus `floatingOutline` (1 px `line`) painted *outside* the box, e.g. as `BoxShadow(color: side.color, spreadRadius: side.width)` after `floating`. The outline applies in both themes (product-owner decision, 2026-11-13).
 
 ---
 
