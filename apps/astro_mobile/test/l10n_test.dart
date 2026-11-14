@@ -2,6 +2,7 @@
 // title from the generated ZodiannLocalizations (L-8), keeping the English
 // fallback (L-2) and material_ui's Material delegates.
 import 'package:astro_mobile/src/app.dart';
+import 'package:astro_mobile/src/navigation/screen_stub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -17,7 +18,7 @@ Future<BuildContext> _pumpShell(
   addTearDown(tester.platformDispatcher.clearAllTestValues);
   await tester.pumpWidget(const ProviderScope(child: ZodiannApp()));
   await tester.pumpAndSettle();
-  return tester.element(find.byType(ShellHome));
+  return tester.element(find.byType(ScreenStub));
 }
 
 MaterialApp _app(WidgetTester tester) =>
@@ -59,7 +60,7 @@ void main() {
     expect(title, 'Zodiann');
     expect(title, ZodiannLocalizations.of(ctx).appTitle);
     expect(_app(tester).onGenerateTitle, isNotNull);
-    expect(_app(tester).title, '');
+    expect(_app(tester).title, isNull);
   });
 
   testWidgets("the delegates are ZodiannLocalizations plus material_ui's "

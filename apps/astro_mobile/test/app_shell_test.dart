@@ -3,6 +3,8 @@ import 'package:astro_mobile/main.dart' as app;
 import 'package:astro_mobile/src/app.dart';
 import 'package:astro_mobile/src/di/app_overrides.dart';
 import 'package:astro_mobile/src/di/ephemeris_providers.dart';
+import 'package:astro_mobile/src/navigation/app_route.dart';
+import 'package:astro_mobile/src/navigation/screen_stub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -36,7 +38,7 @@ Future<BuildContext> _pumpShell(
   addTearDown(tester.platformDispatcher.clearAllTestValues);
   await tester.pumpWidget(const ProviderScope(child: ZodiannApp()));
   await tester.pumpAndSettle();
-  return tester.element(find.byType(ShellHome));
+  return tester.element(find.byType(ScreenStub));
 }
 
 void main() {
@@ -45,7 +47,11 @@ void main() {
   ) async {
     await _pumpShell(tester);
     expect(tester.takeException(), isNull);
-    expect(find.byType(ShellHome), findsOneWidget);
+    expect(find.byType(ScreenStub), findsOneWidget);
+    expect(
+      tester.widget<ScreenStub>(find.byType(ScreenStub)).route,
+      AppRoute.wheel,
+    );
     expect(find.byType(Text), findsNothing);
   });
 
@@ -65,7 +71,7 @@ void main() {
     await _pumpShell(tester, brightness: Brightness.light);
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     await tester.pumpAndSettle();
-    final ctx = tester.element(find.byType(ShellHome));
+    final ctx = tester.element(find.byType(ScreenStub));
     expect(Theme.of(ctx).brightness, Brightness.dark);
   });
 
@@ -131,7 +137,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     final container = ProviderScope.containerOf(
-      tester.element(find.byType(ShellHome)),
+      tester.element(find.byType(ScreenStub)),
       listen: false,
     );
     expect(container.read(ephemerisPortProvider), same(fake));
@@ -174,10 +180,10 @@ void main() {
     testWidgets('changing the device locale re-resolves the typography without '
         'restart', (tester) async {
       await _pumpShell(tester, locales: const [Locale('en')]);
-      expect(family(tester.element(find.byType(ShellHome))), latin);
+      expect(family(tester.element(find.byType(ScreenStub))), latin);
       tester.platformDispatcher.localesTestValue = const [Locale('he', 'IL')];
       await tester.pumpAndSettle();
-      expect(family(tester.element(find.byType(ShellHome))), hebrew);
+      expect(family(tester.element(find.byType(ScreenStub))), hebrew);
     });
 
     testWidgets(
@@ -192,7 +198,7 @@ void main() {
         await tester.pump(); // animation starts at t = 0
         await tester.pump(const Duration(milliseconds: 100)); // t = 0.5
         expect(tester.takeException(), isNull);
-        final mid = Theme.of(tester.element(find.byType(ShellHome)))
+        final mid = Theme.of(tester.element(find.byType(ScreenStub)))
             .textTheme
             .bodyMedium!;
         expect(mid.fontFamily, hebrew);
