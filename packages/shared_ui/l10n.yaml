@@ -1,0 +1,12 @@
+# ZOD-L10-001: the shared translation files (L-8). See docs/PROGRESS.md →
+# Architecture Conventions → Localization for how to add a string.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: zodiann_localizations.dart
+output-class: ZodiannLocalizations
+nullable-getter: false
+required-resource-attributes: true
+format: true
+# The generated delegate list names flutter_localizations' deprecated
+# delegates; ZodiannApp doesn't use it (material_ui's delegates instead).
+header: "// ignore_for_file: deprecated_member_use"

@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "Zodiann",
+  "@appTitle": {
+    "description": "The app name: window and task-switcher title. Not translated (design kit: app: 'Zodiann' in both languages)."
+  }
+}
