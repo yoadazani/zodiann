@@ -43,7 +43,7 @@ Build the details-panel rows common to all modes.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the "Direction" row uses `CompassDirection.atAngle(cell.angle)` (`gann_core`) plus `ZodiannLocalizations.directionName` for "Axis, west" / "ציר, מערב". The third case, "between the axes and the diagonals", has no direction: `atAngle` returns null, and the screen uses its own key (kit.js `dirBetween`). Build the phrase with an ICU placeholder, not concatenation. The Hebrew highlight-line sentence ("… צפונית למרכז") needs the adjective form, which `directionName` doesn't provide. Add screen keys (an ICU `select` on `direction.name`).
 
 ---
 

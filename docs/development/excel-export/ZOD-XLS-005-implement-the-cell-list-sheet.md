@@ -43,7 +43,7 @@ No visual design reference in `design-reference/` (this is a data sheet, not a s
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the Cell list direction column is a live formula pointing back to the cell (EX-14). `CompassDirection` and `ZodiannLocalizations.directionName` supply the localized labels the formula selects from, not stored values. Localized at export time (XLS-016).
 
 ---
 

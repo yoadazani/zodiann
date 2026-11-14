@@ -3,5 +3,149 @@
   "appTitle": "Zodiann",
   "@appTitle": {
     "description": "The app name: window and task-switcher title. Not translated (design kit: app: 'Zodiann' in both languages)."
+  },
+  "signAries": "Aries",
+  "@signAries": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signTaurus": "Taurus",
+  "@signTaurus": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signGemini": "Gemini",
+  "@signGemini": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signCancer": "Cancer",
+  "@signCancer": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signLeo": "Leo",
+  "@signLeo": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signVirgo": "Virgo",
+  "@signVirgo": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signLibra": "Libra",
+  "@signLibra": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signScorpio": "Scorpio",
+  "@signScorpio": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signSagittarius": "Sagittarius",
+  "@signSagittarius": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signCapricorn": "Capricorn",
+  "@signCapricorn": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signAquarius": "Aquarius",
+  "@signAquarius": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "signPisces": "Pisces",
+  "@signPisces": {
+    "description": "Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "bodySun": "Sun",
+  "@bodySun": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyMoon": "Moon",
+  "@bodyMoon": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyMercury": "Mercury",
+  "@bodyMercury": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyVenus": "Venus",
+  "@bodyVenus": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyMars": "Mars",
+  "@bodyMars": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyJupiter": "Jupiter",
+  "@bodyJupiter": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodySaturn": "Saturn",
+  "@bodySaturn": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyUranus": "Uranus",
+  "@bodyUranus": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyNeptune": "Neptune",
+  "@bodyNeptune": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyPluto": "Pluto",
+  "@bodyPluto": {
+    "description": "Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013)."
+  },
+  "bodyNode": "Mean node",
+  "@bodyNode": {
+    "description": "The mean ascending lunar node (L-9). Hebrew per tradition (D20, L10-013)."
+  },
+  "aspectConjunction": "Conjunction",
+  "@aspectConjunction": {
+    "description": "Aspect name (L-9). Hebrew per the L10-013 decision (the design's names)."
+  },
+  "aspectSextile": "Sextile",
+  "@aspectSextile": {
+    "description": "Aspect name (L-9). Hebrew per the L10-013 decision (the design's names)."
+  },
+  "aspectSquare": "Square",
+  "@aspectSquare": {
+    "description": "Aspect name (L-9). Hebrew per the L10-013 decision (the design's names)."
+  },
+  "aspectTrine": "Trine",
+  "@aspectTrine": {
+    "description": "Aspect name (L-9). Hebrew per the L10-013 decision (the design's names)."
+  },
+  "aspectOpposition": "Opposition",
+  "@aspectOpposition": {
+    "description": "Aspect name (L-9). Hebrew per the L10-013 decision (the design's names)."
+  },
+  "directionWest": "west",
+  "@directionWest": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionNorthWest": "north-west",
+  "@directionNorthWest": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionNorth": "north",
+  "@directionNorth": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionNorthEast": "north-east",
+  "@directionNorthEast": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionEast": "east",
+  "@directionEast": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionSouthEast": "south-east",
+  "@directionSouthEast": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionSouth": "south",
+  "@directionSouth": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "directionSouthWest": "south-west",
+  "@directionSouthWest": {
+    "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
   }
 }

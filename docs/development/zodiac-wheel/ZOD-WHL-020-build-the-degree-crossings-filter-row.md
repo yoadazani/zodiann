@@ -42,7 +42,7 @@ Build the filter controls for the degree table: body, date range (up to 3,660 da
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the sign filter's state stores `ZodiacSign` values (JSON `ZodiacSign.name`), never a display name. Labels come from `signName`.
 
 ---
 

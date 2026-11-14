@@ -41,7 +41,7 @@ Add the date-block fields that appear only in dates and date-and-time modes.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the Hebrew adjective forms of the compass directions (מערבית, צפון-מערבית …, kit.js `HE_ADJ`) aren't provided by `directionName`. Add screen keys, for example an ICU `select` on `CompassDirection.name`.
 
 ---
 

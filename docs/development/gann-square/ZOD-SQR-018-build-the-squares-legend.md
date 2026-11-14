@@ -40,7 +40,7 @@ Build the legend row below the square explaining the highlight colors/marks and 
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the default `HighlightRule.label`s (`axes`, `diagonals`, `eighths`) are stable keys. Translate them for display, and never write a translated label back to the rule.
 
 ---
 

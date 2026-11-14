@@ -51,7 +51,7 @@ No direct design reference applies to the detection logic; the resulting chord-l
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** `AspectKind` already exists in `astro_core` (`conjunction, sextile, square, trine, opposition`, the table order). Add the angle and orb here, and keep the order and the JSON keys (pinned by `astro_core/test/entity_keys_test.dart`). Names come from `ZodiannLocalizations.aspectName` (`shared_ui`).
 
 ---
 

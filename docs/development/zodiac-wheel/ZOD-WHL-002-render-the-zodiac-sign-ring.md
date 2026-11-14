@@ -42,7 +42,7 @@ Draw the outer ring of 12 signs, each a 30° arc from Aries to Pisces, with glyp
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** iterate `ZodiacSign.values` (zodiacal order from Aries, `index * 30°`). `ZodiannGlyphs.signs` is in the same order.
 
 ---
 

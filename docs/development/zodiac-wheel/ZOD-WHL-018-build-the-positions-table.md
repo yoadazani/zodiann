@@ -44,7 +44,7 @@ Build the 11-row table listing every body's glyph, name, sign, position, and mot
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** row names come from `ZodiannLocalizations.bodyName(Body)` and `signName(ZodiacSign)` (`ZodiannEntityNames`, `shared_ui`). Rows are keyed by the enum, never by the translated string.
 
 ---
 

@@ -39,6 +39,8 @@ No direct design reference applies — not shown in any mockup; follow the exist
 
 - 2026-11-12 (product-owner decision during ZOD-GAN-002 planning): GAN-002 implements a **fixed** classifier (the spec's integer tests on `i` and `k`), mapped to the default rule ids `axes` / `diagonals` / `eighths`. Evaluating a square's arbitrary `List<HighlightRule>` against cells belongs to **this** task: priority ordering, and exact matching of user angles against the discrete angle θ = 45°·i/k, for example via rational arithmetic on `i` and `k`.
 
+- **From ZOD-L10-007 (2026-11-14):** the default `HighlightRule.label`s are stable keys that the UI translates. A user-defined rule's label is free text (user content). Never store a translated default label.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Optional Extensions" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

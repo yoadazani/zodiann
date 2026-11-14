@@ -42,7 +42,7 @@ Draw the fixed pointer at 12 o'clock (which never moves — the wheel rotates un
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the sign under the pointer is a `ZodiacSign`; display it with `ZodiannLocalizations.signName`. Never keep or compare a display name.
 
 ---
 

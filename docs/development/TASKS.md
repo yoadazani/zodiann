@@ -257,13 +257,13 @@ Primary design reference: `design-reference/zodiann/screens/04-settings_{desktop
 | ZOD-L10-004 | [Audit and enforce logical (directional) layout properties app-wide](localization/ZOD-L10-004-audit-and-enforce-logical-directional-layout-properties-app-wide.md) | Critical | Not Started |
 | ZOD-L10-005 | [Verify never-mirrored exceptions stay unmirrored](localization/ZOD-L10-005-verify-never-mirrored-exceptions-stay-unmirrored.md) | High | Not Started |
 | ZOD-L10-006 | [Implement bidi isolation for Latin runs inside Hebrew text](localization/ZOD-L10-006-implement-bidi-isolation-for-latin-runs-inside-hebrew-text.md) | High | Not Started |
-| ZOD-L10-007 | [Implement stable, language-independent entity keys](localization/ZOD-L10-007-implement-stable-language-independent-entity-keys.md) | Critical | Not Started |
+| ZOD-L10-007 | [Implement stable, language-independent entity keys](localization/ZOD-L10-007-implement-stable-language-independent-entity-keys.md) | Critical | Done |
 | ZOD-L10-008 | [Implement ICU plural rules for countable UI text](localization/ZOD-L10-008-implement-icu-plural-rules-for-countable-ui-text.md) | Medium | Not Started |
 | ZOD-L10-009 | [Audit for fixed-width labels (flexible-width layout)](localization/ZOD-L10-009-audit-for-fixed-width-labels-flexible-width-layout.md) | Medium | Not Started |
 | ZOD-L10-010 | [Implement the English date-order setting and Hebrew's fixed format](localization/ZOD-L10-010-implement-the-english-date-order-setting-and-hebrews-fixed-format.md) | Medium | Not Started |
 | ZOD-L10-011 | [Verify month/weekday localization and 24-hour time everywhere](localization/ZOD-L10-011-verify-month-weekday-localization-and-24-hour-time-everywhere.md) | Low | Not Started |
 | ZOD-L10-012 | [Enforce Western digits everywhere](localization/ZOD-L10-012-enforce-western-digits-everywhere.md) | Low | Not Started |
-| ZOD-L10-013 | [Resolve and document the symbol-translation open decision](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) | Medium | Not Started |
+| ZOD-L10-013 | [Resolve and document the symbol-translation open decision](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) | Medium | Done |
 | ZOD-L10-014 | [Implement the missing-translation-key CI test](localization/ZOD-L10-014-implement-the-missing-translation-key-ci-test.md) | High | Not Started |
 | ZOD-L10-015 | [Build the EN/HE × phone/tablet screenshot comparison suite](localization/ZOD-L10-015-build-the-en-he-phone-tablet-screenshot-comparison-suite.md) | Medium | Not Started |
 
@@ -447,10 +447,11 @@ These are places the design reference made a judgment call that stretches or int
 | D19 | Sidereal/Topocentric shown as visible (disabled/planned) options rather than hidden entirely | ZOD-SET-006, ZOD-EXT-004 |
 | D16 | Rotating rings and on-square planet positions are deliberately **not** designed yet | ZOD-EXT-006, ZOD-EXT-007 |
 
-Two more spec-level open items, not from `DESIGN_DECISIONS.md`, also need resolution:
+Three more spec-level open items, not from `DESIGN_DECISIONS.md`, also need resolution:
 
 - **The Excel numeric-anchor interpretation** ("Export with live formulas" → "One open decision for approval"): does changing a numbers-mode anchor keep highlights fixed to position (the document's working assumption, EX-11) or recompute them from the new value's square root? Blocks ZOD-XLS-003's exact formula semantics.
 - **Resolved 2026-11-12** (product-owner decision, see the [ZOD-GAN-003](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) Notes): absolute-time stepping shown in the device's current zone, with the visible one-hour DST jump; dates mode is calendar-only. Original item: **The DST 4-hour-step behavior** (planning constraints: "a decision is needed on whether this is the desired behavior"): the spec's working assumption (absolute-time stepping, so the displayed local hour jumps across a DST change) is implemented as the default throughout `computation-engine/`/`gann-square/`/`excel-export/`, but is explicitly flagged as needing confirmation, not a settled requirement.
+- **Resolved 2026-11-14** (product-owner decision, see the [ZOD-L10-013](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) Notes): astrological names are translated per each language's tradition (D20 confirmed). Original item: the spec's "Translation and content" open decision.
 
 ## 6.3 Gate-level blockers
 
