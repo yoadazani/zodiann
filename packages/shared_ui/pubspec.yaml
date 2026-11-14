@@ -14,6 +14,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  gann_core:
+    path: ../gann_core
   intl: ^0.20.3
   material_ui: ^1.11.0
 

@@ -107,6 +107,222 @@ abstract class ZodiannLocalizations {
   /// In en, this message translates to:
   /// **'Zodiann'**
   String get appTitle;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Aries'**
+  String get signAries;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Taurus'**
+  String get signTaurus;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini'**
+  String get signGemini;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancer'**
+  String get signCancer;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Leo'**
+  String get signLeo;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Virgo'**
+  String get signVirgo;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Libra'**
+  String get signLibra;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Scorpio'**
+  String get signScorpio;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Sagittarius'**
+  String get signSagittarius;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Capricorn'**
+  String get signCapricorn;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Aquarius'**
+  String get signAquarius;
+
+  /// Zodiac sign name (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Pisces'**
+  String get signPisces;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get bodySun;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get bodyMoon;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Mercury'**
+  String get bodyMercury;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Venus'**
+  String get bodyVenus;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Mars'**
+  String get bodyMars;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Jupiter'**
+  String get bodyJupiter;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn'**
+  String get bodySaturn;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Uranus'**
+  String get bodyUranus;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Neptune'**
+  String get bodyNeptune;
+
+  /// Body name (L-9). Hebrew per tradition; outer planets per the L10-013 exception (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Pluto'**
+  String get bodyPluto;
+
+  /// The mean ascending lunar node (L-9). Hebrew per tradition (D20, L10-013).
+  ///
+  /// In en, this message translates to:
+  /// **'Mean node'**
+  String get bodyNode;
+
+  /// Aspect name (L-9). Hebrew per the L10-013 decision (the design's names).
+  ///
+  /// In en, this message translates to:
+  /// **'Conjunction'**
+  String get aspectConjunction;
+
+  /// Aspect name (L-9). Hebrew per the L10-013 decision (the design's names).
+  ///
+  /// In en, this message translates to:
+  /// **'Sextile'**
+  String get aspectSextile;
+
+  /// Aspect name (L-9). Hebrew per the L10-013 decision (the design's names).
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get aspectSquare;
+
+  /// Aspect name (L-9). Hebrew per the L10-013 decision (the design's names).
+  ///
+  /// In en, this message translates to:
+  /// **'Trine'**
+  String get aspectTrine;
+
+  /// Aspect name (L-9). Hebrew per the L10-013 decision (the design's names).
+  ///
+  /// In en, this message translates to:
+  /// **'Opposition'**
+  String get aspectOpposition;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'west'**
+  String get directionWest;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'north-west'**
+  String get directionNorthWest;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'north'**
+  String get directionNorth;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'north-east'**
+  String get directionNorthEast;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'east'**
+  String get directionEast;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'south-east'**
+  String get directionSouthEast;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'south'**
+  String get directionSouth;
+
+  /// Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9).
+  ///
+  /// In en, this message translates to:
+  /// **'south-west'**
+  String get directionSouthWest;
 }
 
 class _ZodiannLocalizationsDelegate
