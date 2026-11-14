@@ -7,6 +7,7 @@ export 'src/dates/local_time_zone.dart';
 export 'src/highlight/highlight_classification.dart';
 export 'src/model/highlight_match.dart';
 export 'src/model/highlight_rule.dart';
+export 'src/model/compass_direction.dart';
 export 'src/model/offset_date_time.dart';
 export 'src/model/square_config.dart';
 export 'src/model/square_enums.dart';
