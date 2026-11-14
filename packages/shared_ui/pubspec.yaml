@@ -12,6 +12,9 @@ dependencies:
     path: ../astro_core
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.3
   material_ui: ^1.11.0
 
 dev_dependencies:
@@ -24,6 +27,7 @@ dev_dependencies:
 # ZOD-FND-007: bundled fonts (offline, DATA-7). Sources, versions and
 # SHA-256s: assets/fonts/SOURCES.md. Each OFL.txt ships with the app.
 flutter:
+  generate: true
   assets:
     - assets/fonts/ibm-plex-sans/OFL.txt
     - assets/fonts/ibm-plex-sans-hebrew/OFL.txt

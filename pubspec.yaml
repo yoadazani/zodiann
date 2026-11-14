@@ -44,12 +44,16 @@ melos:
     analyze:
       description: Analyze every package; infos are fatal.
       run: dart run melos exec "dart analyze --fatal-infos ."
+    l10n:check:
+      description: Fail if the committed gen-l10n output is stale (ZOD-L10-001).
+      run: dart run tool/check_l10n.dart
     format:check:
       description: Fail if any package is not formatted.
       run: dart run melos exec "dart format --output=none --set-exit-if-changed ."
     lint:
-      description: analyze + format:check.
+      description: l10n:check + analyze + format:check.
       steps:
+        - l10n:check
         - analyze
         - format:check
     test:dart:

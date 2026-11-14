@@ -39,7 +39,10 @@ No direct design reference applies to the architecture; `design-reference/zodian
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):**
+  - Add the sign, body, aspect and direction names as keys in `packages/shared_ui/lib/l10n/app_en.arb`, each with an `@key` description (`required-resource-attributes`), and add the same keys to `app_he.arb`. Then run `fvm flutter gen-l10n` in `packages/shared_ui`, and commit the ARB files and the generated files (`melos run l10n:check` fails otherwise).
+  - Map the stable keys to the generated getters in code.
+  - Screens and test harnesses register `const [ZodiannLocalizations.delegate, ...GlobalMaterialLocalizations.delegates]` (material_ui), never the generated `localizationsDelegates`.
 
 ---
 

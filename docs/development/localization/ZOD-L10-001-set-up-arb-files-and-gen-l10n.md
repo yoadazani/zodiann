@@ -6,7 +6,7 @@
 - **Category:** [Localization](../README.md#localization) (`localization/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -24,8 +24,8 @@ No direct design reference applies — infrastructure task; the strings themselv
 
 ## Acceptance Criteria
 
-- [ ] Adding a string only to `app_en.arb` (not `app_he.arb`) fails CI.
-- [ ] No string literal appears directly in a widget's `Text()` call anywhere in the codebase (enforced by lint/review).
+- [x] Adding a string only to `app_en.arb` (not `app_he.arb`) fails CI.
+- [x] No string literal appears directly in a widget's `Text()` call anywhere in the codebase (enforced by lint/review).
 
 ## Dependencies
 
@@ -37,7 +37,13 @@ No direct design reference applies — infrastructure task; the strings themselv
 
 ## Notes
 
-_No additional notes._
+- **Done 2026-11-14** (plan: [`docs/plans/ZOD-L10-001-arb-localization.md`](../../plans/ZOD-L10-001-arb-localization.md)).
+- **N1, product-owner decision (2026-11-14):** the ARB files live in `packages/shared_ui/lib/l10n/` (one shared set), and the generated `ZodiannLocalizations` is exported from `package:shared_ui`, so feature packages can use it without importing the app.
+- **N2, product-owner decision (2026-11-14):** criterion 2 is enforced on shipped UI code: the `lib/` of every non-pure-Dart member, generated code included. `test/` and `integration_test/` may use literal text.
+- **"Fails CI":** there is no CI pipeline yet (ZOD-FND-004). Criterion 1 is enforced by `test/architecture/l10n_key_parity_test.dart` in `melos run test`, and criterion 2 by `test/architecture/no_text_literals_test.dart`. FND-004's pipeline will run both gates.
+- **Generated code:** it is committed. `melos run l10n:check` (first in `lint`) fails when it is stale.
+- **Delegates:** register `const [ZodiannLocalizations.delegate, ...GlobalMaterialLocalizations.delegates]` (material_ui). `no_generated_delegates_test.dart` forbids the generated `localizationsDelegates`.
+- **Scanner gaps:** conditional and `??` literals, and named labels (`semanticsLabel:`, `Tooltip(message:)`, `NavigationDestination(label:)` and similar) stay review-enforced.
 
 ---
 

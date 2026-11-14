@@ -1,7 +1,7 @@
 // ZOD-UI-004, test only: pumps widgets inside a MaterialApp with a Zodiann
 // theme (keyboard shortcuts come from WidgetsApp), optionally in Hebrew.
 //
-// shared_ui has no flutter_localizations, so `locale: Locale('he')` alone
+// The harness registers no localization delegates, so `locale: Locale('he')` alone
 // would resolve to en_US / LTR; the Hebrew harness sets RTL explicitly.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';

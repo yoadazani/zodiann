@@ -15,10 +15,17 @@ class ZodiannApp extends ConsumerWidget {
       theme: ZodiannTheme.porcelain,
       darkTheme: ZodiannTheme.graphite,
       themeMode: ref.watch(themeModeProvider),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      // Placeholder until ZOD-L10-001's generated supportedLocales. English is
-      // first, so Flutter's default resolution falls back to it (L-2).
-      supportedLocales: const [Locale('en'), Locale('he')],
+      // Not the generated ZodiannLocalizations.localizationsDelegates: it
+      // lists flutter_localizations' deprecated delegates, which register a
+      // different MaterialLocalizations type than material_ui's widgets read.
+      localizationsDelegates: const [
+        ZodiannLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
+      ],
+      // Generated from the ARB files with English first, so Flutter's default
+      // resolution falls back to it (L-2).
+      supportedLocales: ZodiannLocalizations.supportedLocales,
+      onGenerateTitle: (context) => ZodiannLocalizations.of(context).appTitle,
       // The typography follows the resolved locale (ZOD-UI-002): Plex Sans
       // for Latin, Plex Sans Hebrew for Hebrew. The builder sits below the
       // theme animation, so the swap also applies mid-animation.
