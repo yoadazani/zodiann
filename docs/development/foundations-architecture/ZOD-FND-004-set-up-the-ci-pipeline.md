@@ -41,7 +41,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):** `melos run lint` now starts with `l10n:check`. That step runs `tool/check_l10n.dart`, which calls the pinned SDK's `flutter gen-l10n` (`MELOS_SDK_PATH`, else the running Dart's SDK), so CI needs the `.fvmrc` Flutter SDK, not only Dart. The key-parity test and the `Text()` literal guard run in `melos run test` (root `test/architecture/`).
 
 ---
 

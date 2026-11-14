@@ -36,7 +36,7 @@ No direct design reference applies to the mechanism; the specific counting strin
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):** plurals go into `packages/shared_ui/lib/l10n/app_*.arb` as ICU `{count, plural, ...}` messages. Declare the placeholder (`"placeholders": {"count": {"type": "int"}}`) in the template's `@key` entry. Hebrew needs its `=1` / `two` / `other` forms. The key-parity guard compares keys, not plural forms.
 
 ---
 

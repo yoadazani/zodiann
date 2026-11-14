@@ -36,7 +36,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):** the key-parity test already exists: `test/architecture/l10n_key_parity_test.dart` (helpers in `arb_keys.dart`). It runs on every `melos run test`, checks every `packages/shared_ui/lib/l10n/app_*.arb` against the template, and lists missing and extra keys per file. L10-001 had to build it, because its criterion 1 needs it. This task keeps its own scope: confirm the test meets L-8's "named, runnable test" inside ZOD-FND-004's pipeline, and extend it if needed.
 
 ---
 

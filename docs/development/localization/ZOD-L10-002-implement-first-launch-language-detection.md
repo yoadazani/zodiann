@@ -38,7 +38,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):** `ZodiannLocalizations.supportedLocales` is generated from the ARB files in `packages/shared_ui/lib/l10n/`, with English first, so Flutter's default resolution already falls back to English. `ZodiannApp` uses that default resolution, so this task replaces it with the persisted first-launch choice (for example `MaterialApp.locale` or `localeResolutionCallback`).
 
 ---
 

@@ -39,7 +39,7 @@ Let Settings override the device language, applied immediately with no restart, 
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-001 (2026-11-14):** strings come from `ZodiannLocalizations.of(context)` (`package:shared_ui`), so setting `MaterialApp.locale` re-resolves every visible string with no restart. `withZodiannScript` already re-resolves the typography per locale.
 
 ---
 
