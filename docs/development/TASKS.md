@@ -257,13 +257,13 @@ Primary design reference: `design-reference/zodiann/screens/04-settings_{desktop
 | ZOD-L10-004 | [Audit and enforce logical (directional) layout properties app-wide](localization/ZOD-L10-004-audit-and-enforce-logical-directional-layout-properties-app-wide.md) | Critical | Not Started |
 | ZOD-L10-005 | [Verify never-mirrored exceptions stay unmirrored](localization/ZOD-L10-005-verify-never-mirrored-exceptions-stay-unmirrored.md) | High | Not Started |
 | ZOD-L10-006 | [Implement bidi isolation for Latin runs inside Hebrew text](localization/ZOD-L10-006-implement-bidi-isolation-for-latin-runs-inside-hebrew-text.md) | High | Not Started |
-| ZOD-L10-007 | [Implement stable, language-independent entity keys](localization/ZOD-L10-007-implement-stable-language-independent-entity-keys.md) | Critical | Not Started |
+| ZOD-L10-007 | [Implement stable, language-independent entity keys](localization/ZOD-L10-007-implement-stable-language-independent-entity-keys.md) | Critical | Done |
 | ZOD-L10-008 | [Implement ICU plural rules for countable UI text](localization/ZOD-L10-008-implement-icu-plural-rules-for-countable-ui-text.md) | Medium | Not Started |
 | ZOD-L10-009 | [Audit for fixed-width labels (flexible-width layout)](localization/ZOD-L10-009-audit-for-fixed-width-labels-flexible-width-layout.md) | Medium | Not Started |
 | ZOD-L10-010 | [Implement the English date-order setting and Hebrew's fixed format](localization/ZOD-L10-010-implement-the-english-date-order-setting-and-hebrews-fixed-format.md) | Medium | Not Started |
 | ZOD-L10-011 | [Verify month/weekday localization and 24-hour time everywhere](localization/ZOD-L10-011-verify-month-weekday-localization-and-24-hour-time-everywhere.md) | Low | Not Started |
 | ZOD-L10-012 | [Enforce Western digits everywhere](localization/ZOD-L10-012-enforce-western-digits-everywhere.md) | Low | Not Started |
-| ZOD-L10-013 | [Resolve and document the symbol-translation open decision](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) | Medium | Not Started |
+| ZOD-L10-013 | [Resolve and document the symbol-translation open decision](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) | Medium | Done |
 | ZOD-L10-014 | [Implement the missing-translation-key CI test](localization/ZOD-L10-014-implement-the-missing-translation-key-ci-test.md) | High | Not Started |
 | ZOD-L10-015 | [Build the EN/HE × phone/tablet screenshot comparison suite](localization/ZOD-L10-015-build-the-en-he-phone-tablet-screenshot-comparison-suite.md) | Medium | Not Started |
 

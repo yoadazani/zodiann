@@ -40,7 +40,7 @@ Wrap every Latin-script run (proper nouns, library names, timezone identifiers, 
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** sign, body and aspect names are Hebrew words in Hebrew, but they sit next to Latin runs (glyphs, degrees). Isolate those runs as L-7 requires.
 
 ---
 

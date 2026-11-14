@@ -42,7 +42,7 @@ No direct design reference applies — this is the persistence wiring behind the
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** `UserSettings` stores visible bodies as `Body` keys and orbs keyed by `AspectKind.name`, never display names (L-9). Entity-valued fields are typed as their key enum.
 
 ---
 

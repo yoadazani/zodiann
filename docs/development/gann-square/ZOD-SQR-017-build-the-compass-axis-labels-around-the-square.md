@@ -40,7 +40,7 @@ Build the four edge labels ("90° N" top, "270° S" bottom, "0° W" start, "180�
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** `CompassDirection` (`gann_core`) may identify the edge, but the abbreviated labels (W / N / E / S, Hebrew מע׳ / צפ׳ / מז׳ / דר׳, kit.js `axW` …) are this task's own ARB keys, not `directionName`.
 
 ---
 

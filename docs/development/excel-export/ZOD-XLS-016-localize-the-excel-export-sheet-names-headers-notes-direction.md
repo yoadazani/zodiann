@@ -45,6 +45,8 @@ No direct design reference applies to file content; translated string sourcing f
 
 - **From ZOD-L10-001 (2026-11-14):** the app's translations live in `packages/shared_ui/lib/l10n/` (`ZodiannLocalizations`, `package:shared_ui`; PO decision N1). This task decides how `shared_export_xlsx` gets the sheet names and headers: either the caller passes in localized strings, or the package depends on `shared_ui` if it is a Flutter package.
 
+- **From ZOD-L10-007 (2026-11-14):** entity names (signs, bodies, aspects, directions) come from `ZodiannLocalizations` via `ZodiannEntityNames` by key. The export layer receives keys and localizes at export time. The Cell list direction column is a live formula (EX-14), and `directionName` supplies the labels it selects from.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Excel Export" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

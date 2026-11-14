@@ -42,7 +42,7 @@ No direct design reference applies — pure computation; the resulting formatted
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-L10-007 (2026-11-14):** the stable sign key is `ZodiacSign` in `astro_core` (L-9). The decomposition returns `ZodiacSign.values[(normalizeDegrees(l) / 30).floor()]`. Don't define another sign key. Names come from `ZodiannLocalizations.signName`.
 
 ---
 

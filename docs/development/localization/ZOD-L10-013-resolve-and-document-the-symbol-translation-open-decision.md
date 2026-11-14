@@ -6,7 +6,7 @@
 - **Category:** [Localization](../README.md#localization) (`localization/`)
 - **Phase:** Phase 1 (decision), ongoing (content)
 - **Priority:** Medium
-- **Status:** In Progress
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -24,8 +24,8 @@ Confirm and document the open decision on whether astrological symbols/terms are
 
 ## Acceptance Criteria
 
-- [ ] A written decision record exists, consistent with or explicitly overriding D20.
-- [ ] ZOD-L10-007's Hebrew terminology work cites this decision record.
+- [x] A written decision record exists, consistent with or explicitly overriding D20.
+- [x] ZOD-L10-007's Hebrew terminology work cites this decision record.
 
 ## Dependencies
 
@@ -45,6 +45,7 @@ _None — this task has no prerequisites._
   - **Outer planets:** the common Hebrew names אורנוס, נפטון, פלוטו (T3), not the Academy of the Hebrew Language's proposals (אורון, רהב). These planets have no traditional Hebrew names, so this is a **recorded exception** to ZOD-L10-007 criterion 2's "not transliteration". That criterion is met for every sign, the classical bodies (שמש, ירח, כוכב חמה, נוגה, מאדים, צדק, שבתאי) and the node (ראש הדרקון).
   - **Source of truth:** `packages/shared_ui/lib/l10n/app_he.arb`, pinned by `packages/shared_ui/test/l10n/entity_names_test.dart` against the design kit (`design-reference/zodiann/_source/kit.js`).
   - **Plan:** [`docs/plans/ZOD-L10-007-ZOD-L10-013-entity-keys.md`](../../plans/ZOD-L10-007-ZOD-L10-013-entity-keys.md) (decisions T1–T4).
+- **Done 2026-11-14** with ZOD-L10-007 (grouped). Criterion 1: the record above. Criterion 2: ZOD-L10-007's Notes cite it.
 
 ---
 
