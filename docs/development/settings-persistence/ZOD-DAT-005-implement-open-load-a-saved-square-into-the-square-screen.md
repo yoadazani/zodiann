@@ -39,6 +39,7 @@ No new visual element — this reuses the already-specified Square screen (`gann
 ## Notes
 
 - 2026-11-12 (per the [ZOD-GAN-003](../computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) time-zone decision): "identical / same anchor moment" means the same instant **and** offset. In date-and-time mode, the loaded cells re-display in the device's current zone after travel; dates mode is unchanged.
+- **From ZOD-FND-014:** navigating to the Square screen from a feature package needs a feature-accessible route contract. `AppRoute` lives in the app layer, which feature packages never import, so this task (or an earlier NAV task) decides where that contract lives.
 
 ---
 

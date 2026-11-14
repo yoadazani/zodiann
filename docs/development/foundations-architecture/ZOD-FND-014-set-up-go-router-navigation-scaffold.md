@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -25,8 +25,8 @@ No direct design reference applies to routing logic; the resulting screen chrome
 
 ## Acceptance Criteria
 
-- [ ] All five routes resolve to a (currently blank) screen stub.
-- [ ] An unrecognized route redirects to the wheel screen.
+- [x] All five routes resolve to a (currently blank) screen stub.
+- [x] An unrecognized route redirects to the wheel screen.
 
 ## Dependencies
 
@@ -39,7 +39,11 @@ No direct design reference applies to routing logic; the resulting screen chrome
 
 ## Notes
 
-_No additional notes._
+- 2026-11-14 (done; plan [`docs/plans/ZOD-FND-014-go-router-navigation-scaffold.md`](../../plans/ZOD-FND-014-go-router-navigation-scaffold.md)):
+  - **Identifiers:** `AppRoute` (`apps/astro_mobile/lib/src/navigation/app_route.dart`) lists the five screens in the table's order. The spec's `#wheel` is `'#' + name`; the `go_router` location is `path` = `'/' + name`. These are identifiers only, with no URL strategy configured.
+  - **Router:** one `GoRouter` from `buildAppRouter({initialLocation})`, held in `appRouterProvider` so app rebuilds never reset the screen.
+  - **Unknown routes:** any unmatched location (`/`, `/nope`, `/wheel/extra`, wrong case), at startup or at runtime, is sent by a top-level redirect to `/wheel`. A query string or a trailing slash stays on its route.
+  - **Stubs:** each route shows a blank `ScreenStub(route:)`, which replaces `ShellHome`.
 
 ---
 

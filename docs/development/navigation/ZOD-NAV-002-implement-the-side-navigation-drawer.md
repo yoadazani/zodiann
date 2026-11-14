@@ -51,6 +51,10 @@ Build the drawer that opens from the hamburger: header, grouped item list, foote
 ## Notes
 
 - **Floating layer (ZOD-UI-003):** use `ZodiannElevation.floating` (the theme extension) for the shadow, plus `floatingOutline` (1 px `line`) painted *outside* the box, e.g. as `BoxShadow(color: side.color, spreadRadius: side.width)` after `floating`. The outline applies in both themes (product-owner decision, 2026-11-13).
+- **From ZOD-FND-014:**
+  - **Active screen:** comes from the router's location → `AppRoute`.
+  - **Drawer items:** iterate `AppRoute.values` (table order).
+  - **Contract:** if the bar or drawer is built in `shared_ui`, decide here where the feature-accessible route contract lives. `shared_ui` and the feature packages never import the app layer.
 
 ---
 

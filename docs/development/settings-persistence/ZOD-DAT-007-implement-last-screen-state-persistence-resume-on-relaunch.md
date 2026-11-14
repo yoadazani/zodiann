@@ -43,7 +43,11 @@ No direct design reference applies — behavioral persistence layered on already
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-014:**
+  - **Restoring the route:** override `appRouterProvider` with `buildAppRouter(initialLocation: saved.path)`, disposing it in `ref.onDispose`.
+  - **Storage format:** `AppRoute.name` is recommended, never a path or a translated title. The format is this task's decision.
+  - **Stale values:** a stale or unknown value lands on the wheel (tested).
+  - **Precedence:** a platform deep link (a `defaultRouteName` other than `/`) takes precedence over the restored `initialLocation` (go_router `_effectiveInitialLocation`).
 
 ---
 
