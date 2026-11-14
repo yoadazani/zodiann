@@ -44,7 +44,11 @@ No direct design reference applies to the routing wiring itself; the resulting n
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-014:**
+  - **Screens and taps:** replace `ScreenStub` with the real screens in `buildAppRouter` (`apps/astro_mobile/lib/src/navigation/app_router.dart`), and navigate with `context.go(route.path)`.
+  - **Deep links:** the cold-start platform deep link and T-UI-1 are still this task's. Flutter's deep linking is on by default; the Android and iOS link configuration belongs here.
+  - **Back:** back currently replaces rather than stacks (`go`; `canPop()` is false).
+  - **Contract:** `AppRoute` is an app-level placeholder, not a public contract. Feature packages must never import the app layer.
 
 ---
 

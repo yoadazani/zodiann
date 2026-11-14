@@ -2,16 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import 'navigation/app_router.dart';
 import 'theme/theme_mode_provider.dart';
 
-/// The root widget: theme, localization and the screen tree that navigation
-/// and screens plug into later (ZOD-FND-014, ZOD-NAV-*).
+/// The root widget: theme, localization and the router whose routes the
+/// screens plug into (ZOD-FND-014; the drawer and top bar come in ZOD-NAV-*).
 class ZodiannApp extends ConsumerWidget {
   const ZodiannApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: ref.watch(appRouterProvider),
       theme: ZodiannTheme.porcelain,
       darkTheme: ZodiannTheme.graphite,
       themeMode: ref.watch(themeModeProvider),
@@ -36,16 +38,6 @@ class ZodiannApp extends ConsumerWidget {
         ),
         child: child!,
       ),
-      home: const ShellHome(),
     );
   }
-}
-
-/// The blank shell screen. It must not read `ephemerisPortProvider`: no
-/// source is bound yet.
-class ShellHome extends StatelessWidget {
-  const ShellHome({super.key});
-
-  @override
-  Widget build(BuildContext context) => const Scaffold();
 }

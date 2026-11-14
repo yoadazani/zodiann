@@ -1,4 +1,5 @@
 import 'package:astro_mobile/src/app.dart';
+import 'package:astro_mobile/src/navigation/screen_stub.dart';
 import 'package:astro_mobile/src/theme/theme_mode_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,7 +14,7 @@ Future<void> _pump(WidgetTester tester, Brightness device) async {
 }
 
 BuildContext _ctx(WidgetTester tester) =>
-    tester.element(find.byType(ShellHome));
+    tester.element(find.byType(ScreenStub));
 
 ThemeModeController _controller(WidgetTester tester) =>
     ProviderScope.containerOf(
