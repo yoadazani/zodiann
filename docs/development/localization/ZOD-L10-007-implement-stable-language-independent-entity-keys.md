@@ -6,7 +6,7 @@
 - **Category:** [Localization](../README.md#localization) (`localization/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** In Progress
 - **Scope:** MVP
 
 ## Description

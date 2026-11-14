@@ -447,10 +447,11 @@ These are places the design reference made a judgment call that stretches or int
 | D19 | Sidereal/Topocentric shown as visible (disabled/planned) options rather than hidden entirely | ZOD-SET-006, ZOD-EXT-004 |
 | D16 | Rotating rings and on-square planet positions are deliberately **not** designed yet | ZOD-EXT-006, ZOD-EXT-007 |
 
-Two more spec-level open items, not from `DESIGN_DECISIONS.md`, also need resolution:
+Three more spec-level open items, not from `DESIGN_DECISIONS.md`, also need resolution:
 
 - **The Excel numeric-anchor interpretation** ("Export with live formulas" → "One open decision for approval"): does changing a numbers-mode anchor keep highlights fixed to position (the document's working assumption, EX-11) or recompute them from the new value's square root? Blocks ZOD-XLS-003's exact formula semantics.
 - **Resolved 2026-11-12** (product-owner decision, see the [ZOD-GAN-003](computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) Notes): absolute-time stepping shown in the device's current zone, with the visible one-hour DST jump; dates mode is calendar-only. Original item: **The DST 4-hour-step behavior** (planning constraints: "a decision is needed on whether this is the desired behavior"): the spec's working assumption (absolute-time stepping, so the displayed local hour jumps across a DST change) is implemented as the default throughout `computation-engine/`/`gann-square/`/`excel-export/`, but is explicitly flagged as needing confirmation, not a settled requirement.
+- **Resolved 2026-11-14** (product-owner decision, see the [ZOD-L10-013](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) Notes): astrological names are translated per each language's tradition (D20 confirmed). Original item: the spec's "Translation and content" open decision.
 
 ## 6.3 Gate-level blockers
 
