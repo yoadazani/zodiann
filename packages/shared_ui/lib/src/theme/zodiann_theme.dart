@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'tokens/graphite_tokens.dart';
 import 'tokens/porcelain_tokens.dart';
+import 'tokens/zodiann_dimensions.dart';
 import 'zodiann_surfaces.dart';
 import 'zodiann_text_styles.dart';
 import 'zodiann_tokens.dart';
@@ -54,6 +55,8 @@ ThemeData buildZodiannTheme(
       scrim: s.scrim,
     ),
     scaffoldBackgroundColor: s.bg,
+    // ZOD-FND-009: kit.css `svg.i` is 20 px in currentColor.
+    iconTheme: IconThemeData(size: ZodiannSize.icon, color: s.text),
     textTheme: buildZodiannTextTheme(styles),
     extensions: [...t.extensions, styles],
   );
