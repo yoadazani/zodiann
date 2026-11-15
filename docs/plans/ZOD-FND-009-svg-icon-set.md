@@ -484,3 +484,21 @@ All round-1 corrections were verified as applied, with no contradictions between
 | M10 | Minor | The working-directory-relative SVG path wasn't stated | Applied |
 
 Two rounds done (the cap). U1 resolved: Option A. Plan approved 2026-11-15.
+
+### Calibration record (Task 4, 2026-11-15)
+
+Measured worst per size, Flutter 3.50.0 tester vs Chrome 157.0.8103.78, α in [0, 1]. Every icon was within the starting ceilings, so they were tightened by the rule `max(round_up(worst × 1.5, 3), floor)`, never above the start.
+
+| S | worst mean | worst max | worst \|ink − 1\| | mean ceiling | max ceiling | inkTol |
+|---|---|---|---|---|---|---|
+| 16 | 0.0004 | 0.004 | 0.0014 | 0.002 (floor) | 0.10 (floor) | 0.005 (floor) |
+| 20 | 0.0026 | 0.122 | 0.0016 | 0.004 | 0.184 | 0.005 (floor) |
+| 48 | 0.0023 | 0.396 | 0.0090 | 0.004 | 0.45 (start cap) | 0.014 |
+| 60 | 0.0011 | 0.145 | 0.0004 | 0.002 | 0.219 | 0.005 (floor) |
+| 96 | 0.0013 | 0.290 | 0.0011 | 0.003 | 0.35 (start cap) | 0.005 (floor) |
+
+- **Joins at 96:** our ink matches Chrome's exactly (chevL 0.608, check 0.561). The tolerance stays at 0.5.
+- **Mutation proofs:**
+  - All of F1–F11 failed the predicted tests.
+  - F10 (miter) added 1.694 alpha-pixels at chevL's join (the review expected ≈ 1.76).
+  - F6 as first written (x only) is an equivalent mutant for `globe`, whose x reflection equals the unreflected value (15.5). Unreflecting x and y fails globe at 16, 20, 48 and 60.

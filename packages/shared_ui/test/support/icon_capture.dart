@@ -1,6 +1,7 @@
 // ZOD-FND-009, test only: renders a widget into a fixed-size transparent
 // boundary at devicePixelRatio 1 and reads its straight-alpha RGBA pixels,
 // as button_sheet_test.dart does.
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -42,6 +43,7 @@ Future<Pixels> captureWidget(
   required int height,
   TextDirection direction = TextDirection.ltr,
   Widget Function(Widget boundary)? wrap,
+  String? savePng,
 }) async {
   tester.view.physicalSize = Size(width.toDouble(), height.toDouble());
   tester.view.devicePixelRatio = 1;
@@ -73,6 +75,10 @@ Future<Pixels> captureWidget(
       format: ui.ImageByteFormat.rawStraightRgba,
     );
     pixels = Pixels(data!, image.width, image.height);
+    if (savePng != null) {
+      final png = await image.toByteData(format: ui.ImageByteFormat.png);
+      File(savePng).writeAsBytesSync(png!.buffer.asUint8List());
+    }
     image.dispose();
   });
   return pixels;
