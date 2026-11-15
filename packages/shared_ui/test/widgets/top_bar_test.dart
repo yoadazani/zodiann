@@ -1,4 +1,4 @@
-// ZOD-NAV-001: ZodiannTopBar (MASTER ֲ§5, NAV-1; kit.css .topbar) ג€” height,
+// ZOD-NAV-001: ZodiannTopBar (MASTER §5, NAV-1; kit.css .topbar) — height,
 // order and mirroring, paddings, typography, responsive actions, disabled
 // controls, background, semantics, status bar, text scale and overflow.
 import 'dart:ui' show ImageFilter;
@@ -12,9 +12,8 @@ import 'package:shared_ui/shared_ui.dart';
 
 const _enTitle = 'Gann Square of Nine';
 const _enSubtitle = 'Spiral, angles and highlights';
-const _heTitle = '׳”׳’׳“׳¨׳•׳×';
-const _heSubtitle =
-    '׳©׳₪׳”, ׳¢׳¨׳›׳× ׳ ׳•׳©׳, ׳׳•׳¨׳‘׳™׳ ׳•׳‘׳¨׳™׳¨׳•׳× ׳׳—׳“׳';
+const _heTitle = 'הגדרות';
+const _heSubtitle = 'שפה, ערכת נושא, אורבים וברירות מחדל';
 
 List<ZodiannTopBarAction> _actions({bool enabled = false}) => [
   ZodiannTopBarAction(
@@ -41,6 +40,8 @@ Future<void> _pump(
   VoidCallback? onMenuPressed,
   double textScale = 1,
   double topPadding = 0,
+  double leftPadding = 0,
+  double rightPadding = 0,
 }) async {
   tester.view.physicalSize = Size(width, 800);
   tester.view.devicePixelRatio = 1;
@@ -52,7 +53,11 @@ Future<void> _pump(
       theme: rtl ? withZodiannScript(base, ZodiannScript.hebrew) : base,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          padding: EdgeInsets.only(top: topPadding),
+          padding: EdgeInsets.only(
+            top: topPadding,
+            left: leftPadding,
+            right: rightPadding,
+          ),
           textScaler: TextScaler.linear(textScale),
         ),
         child: Directionality(
@@ -107,7 +112,7 @@ void main() {
   });
 
   testWidgets(
-    'hamburger is 46 ֳ— 46 at the start: LTR left 12 (phone 4), RTL right 12 '
+    'hamburger is 46 × 46 at the start: LTR left 12 (phone 4), RTL right 12 '
     '(phone 4)',
     (tester) async {
       for (final (width, inset) in [(1440.0, 12.0), (390.0, 4.0)]) {
@@ -166,20 +171,19 @@ void main() {
     expect(1440 - _titles(tester, _enTitle).right, 24);
   });
 
-  testWidgets(
-    'gaps: 12 hamburger ג†’ titles, 12 titles ג†’ actions, 8 between',
-    (tester) async {
-      await _pump(tester, actions: _actions());
-      final titles = _titles(tester, _enTitle);
-      expect(titles.left - tester.getRect(_hamburger).right, 12);
-      final save = tester.getRect(find.byType(ZodiannButton).first);
-      final export = tester.getRect(find.byType(ZodiannButton).last);
-      expect(save.left - titles.right, 12);
-      // The buttons' 44-high touch targets equal their drawn width, so the
-      // drawn boxes are 8 apart (kit.css .end gap s2).
-      expect(export.left - save.right, 8);
-    },
-  );
+  testWidgets('gaps: 12 hamburger → titles, 12 titles → actions, 8 between', (
+    tester,
+  ) async {
+    await _pump(tester, actions: _actions());
+    final titles = _titles(tester, _enTitle);
+    expect(titles.left - tester.getRect(_hamburger).right, 12);
+    final save = tester.getRect(find.byType(ZodiannButton).first);
+    final export = tester.getRect(find.byType(ZodiannButton).last);
+    expect(save.left - titles.right, 12);
+    // The buttons' 44-high touch targets equal their drawn width, so the
+    // drawn boxes are 8 apart (kit.css .end gap s2).
+    expect(export.left - save.right, 8);
+  });
 
   testWidgets('title is screenTitle 18/600; subtitle is 12/400 text2', (
     tester,
@@ -272,7 +276,7 @@ void main() {
   for (final dark in [true, false]) {
     final name = dark ? 'graphite' : 'porcelain';
     testWidgets(
-      '$name background: bg at 0.88 behind a ֿƒ 10 blur, 1 px lineSoft '
+      '$name background: bg at 0.88 behind a σ 10 blur, 1 px lineSoft '
       'bottom rule',
       (tester) async {
         await _pump(tester, dark: dark);
@@ -345,15 +349,32 @@ void main() {
     },
   );
 
+  testWidgets(
+    'side safe-area insets (landscape notch): controls clear of the inset, '
+    'background full-bleed',
+    (tester) async {
+      await _pump(tester, leftPadding: 47, actions: _actions());
+      expect(tester.getRect(_hamburger).left, 47 + 12);
+      expect(tester.getRect(_bar).left, 0);
+      expect(tester.getSize(_under(DecoratedBox).first).width, 1440);
+
+      await _pump(tester, rightPadding: 47, actions: _actions());
+      expect(
+        tester.getRect(find.byType(ZodiannButton).last).right,
+        1440 - 47 - 24,
+      );
+      expect(tester.getRect(_hamburger).left, 12);
+
+      await _pump(tester, rtl: true, leftPadding: 47, actions: _actions());
+      expect(tester.getRect(find.byType(ZodiannButton).last).left, 47 + 24);
+      expect(tester.getRect(_hamburger).right, 1440 - 12);
+    },
+  );
+
   testWidgets('textScaler 2.0: height unchanged, no overflow', (tester) async {
     for (final (width, rtl, title, subtitle) in [
       (700.0, false, _enTitle, _enSubtitle),
-      (
-        700.0,
-        true,
-        '׳¨׳™׳‘׳•׳¢ ׳”׳×׳©׳¢ ׳©׳ ׳’׳׳',
-        '׳¡׳₪׳™׳¨׳׳”, ׳–׳•׳•׳™׳•׳× ׳•׳”׳“׳’׳©׳•׳×',
-      ),
+      (700.0, true, 'ריבוע התשע של גאן', 'ספירלה, זוויות והדגשות'),
       (320.0, true, _heTitle, _heSubtitle),
     ]) {
       await _pump(
@@ -433,7 +454,7 @@ void main() {
     );
     final bar = tester.getRect(_bar);
     for (final button in [_hamburger, find.byType(ZodiannIconButton).last]) {
-      // The ring sits 4 px outside the 46 ֳ— 46 box (2 gap + 2 width).
+      // The ring sits 4 px outside the 46 × 46 box (2 gap + 2 width).
       final ring = tester.getRect(button).inflate(4);
       expect(bar.contains(ring.topLeft), isTrue);
       expect(ring.right, lessThanOrEqualTo(bar.right));

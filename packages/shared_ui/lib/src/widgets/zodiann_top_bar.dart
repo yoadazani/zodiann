@@ -183,24 +183,31 @@ class ZodiannTopBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             child: MediaQuery.withClampedTextScaling(
               maxScaleFactor: _maxTextScale,
-              child: Row(
-                children: [
-                  ZodiannIconButton(
-                    icon: const ZodiannIcon(ZodiannIcons.menu),
-                    semanticLabel: menuLabel,
-                    onPressed: onMenuPressed,
-                  ),
-                  const SizedBox(width: ZodiannSpace.s3),
-                  Expanded(child: titles),
-                  if (actionWidgets.isNotEmpty) ...[
-                    const SizedBox(width: ZodiannSpace.s3),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: ZodiannSpace.s2,
-                      children: actionWidgets,
+              // Side insets (a landscape notch) keep the controls clear; the
+              // background above stays full-bleed. The top inset is the
+              // Container's padding.
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                child: Row(
+                  children: [
+                    ZodiannIconButton(
+                      icon: const ZodiannIcon(ZodiannIcons.menu),
+                      semanticLabel: menuLabel,
+                      onPressed: onMenuPressed,
                     ),
+                    const SizedBox(width: ZodiannSpace.s3),
+                    Expanded(child: titles),
+                    if (actionWidgets.isNotEmpty) ...[
+                      const SizedBox(width: ZodiannSpace.s3),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: ZodiannSpace.s2,
+                        children: actionWidgets,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
