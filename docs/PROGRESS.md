@@ -37,7 +37,12 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **None in progress.** ZOD-FND-014 is done on `task/ZOD-FND-014-go-router-navigation`, with its PR open (see Git State). Merge on approval.
+- **ZOD-FND-009, integrate the 33-icon set** (Medium, Phase 1): plan written and reviewed, **awaiting approval**. Branch `task/ZOD-FND-009-svg-icon-set`.
+  - **Plan:** [`docs/plans/ZOD-FND-009-svg-icon-set.md`](plans/ZOD-FND-009-svg-icon-set.md). Design: [`docs/superpowers/specs/2026-11-15-zod-fnd-009-icon-set-design.md`](superpowers/specs/2026-11-15-zod-fnd-009-icon-set-design.md).
+  - **Decision (2026-11-15, product owner):** generate Dart drawing code from the source SVGs, because `flutter_svg` / `vector_graphics` depend on `http`, which the FND-007 guard forbids. No new runtime dependency, and the guard is unchanged. Documented deviation: the SVGs stay in `design-reference/`.
+  - **Plan review:** 2 rounds. Round 1: 8 Important applied. Round 2: Approve after corrections, 2 Important applied. Open: U1 (UI-004 sheet placeholder).
+  - **Done:** analysis, brainstorming, plan, review. **Remaining:** approval, then Tasks 1–5.
+- **ZOD-FND-014** is merged (PR #24).
 - **Deferred review minors (FND-014):**
   - the cold-start test duplicates `_pumpApp`'s provider override (extract a helper);
   - "go replaces the screen" mostly exercises go_router (add `canPop() == false` to "every route resolves");
