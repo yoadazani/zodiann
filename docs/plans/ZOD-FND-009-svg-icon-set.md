@@ -86,7 +86,7 @@
 - Icon buttons (46 × 46 / 36): component and NAV tasks.
 - Glyphs (`ZodiannGlyphs`): font-based, UI-002.
 - A CI job that regenerates references: there is no CI yet (FND-004). References are regenerated manually.
-- *(Pending decision U1, see Open items.)* Swapping UI-004's blank 16 × 16 placeholder in `button_sheet_test.dart:357,399` for a real icon.
+- Swapping UI-004's blank 16 × 16 placeholder in `button_sheet_test.dart:357,399` for a real icon (U1, product owner 2026-11-15: Option A). The UI-004 suites stay unchanged; NAV/WHL screens use real icons.
 
 ## Review Focus
 
@@ -439,9 +439,7 @@
 
 ## Open items for approval
 
-1. **U1: UI-004's button-sheet placeholder.** `button_sheet_test.dart:357,399` uses a blank 16 × 16 box. UI-004's notes say "FND-009 supplies the real icons".
-   - **Option A (recommended):** out of scope. No FND-009 criterion needs it, and the Task 3 button test already proves a real icon in the slot.
-   - **Option B:** swap in a real icon and re-check the sheet comparison. This may need a sheet-threshold review.
+None. **U1 resolved (2026-11-15):** Option A, out of scope. Plan approved by the product owner the same day.
 
 Calls made while planning, for you to check:
 - `ZodiannIcon` instead of the task's `AppIcon`.
@@ -464,7 +462,7 @@ Calls made while planning, for you to check:
 | I7 | Important | `iconBack()` inside a forced-LTR island follows the island | Applied: Review Focus 6, a nested-`Directionality` test, the doc comment, the PROGRESS convention |
 | I8 | Important | Inline `<svg>` gaps break the sheet layout; the root tool can't import `ZodiannIcons.values` | Applied: absolute positioning, exact window size, code-unit file order |
 | M1–M11 | Minor | Wording "axis-aligned"; Transform search scope + symmetric icons; theme RED expectation; explicit RED in Task 4; `Radius.` guard; `--stdin-name`; git hygiene; why 48 / 60; Melos block style; `'$name.svg'`; model equality test | All applied |
-| U1 | Needs user decision | Replace UI-004's sheet placeholder with real icons? | Open item 1 |
+| U1 | Needs user decision | Replace UI-004's sheet placeholder with real icons? | Product owner chose Option A (out of scope), 2026-11-15 |
 
 ### Round 2: Approve after corrections (0 Critical, 2 Important, 10 Minor, 0 Needs user decision)
 
@@ -485,4 +483,4 @@ All round-1 corrections were verified as applied, with no contradictions between
 | M9 | Minor | Specimens were written on every test run | Applied: only with `ZODIANN_ICON_SPECIMEN_DIR` |
 | M10 | Minor | The working-directory-relative SVG path wasn't stated | Applied |
 
-Two rounds done (the cap). Remaining open item for the product owner: U1.
+Two rounds done (the cap). U1 resolved: Option A. Plan approved 2026-11-15.
