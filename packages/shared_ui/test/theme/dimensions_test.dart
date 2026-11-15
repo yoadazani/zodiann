@@ -99,6 +99,8 @@ void main() {
       'stepper': (ZodiannSize.stepper, 36),
       'panelHead': (ZodiannSize.panelHead, 56),
       'panelHeadPhone': (ZodiannSize.panelHeadPhone, 52),
+      'topBar': (ZodiannSize.topBar, 64),
+      'topBarPhone': (ZodiannSize.topBarPhone, 60),
       'icon': (ZodiannSize.icon, 20),
       'iconSmall': (ZodiannSize.iconSmall, 16),
     };
@@ -139,6 +141,7 @@ void main() {
       'control-h': ZodiannSize.control,
       'control-h-sm': ZodiannSize.controlSmall,
       'tap': ZodiannSize.iconButton,
+      'topbar-h': ZodiannSize.topBar,
     };
     expected.forEach((key, value) {
       expect(kit[key], value, reason: 'kit.css --$key');

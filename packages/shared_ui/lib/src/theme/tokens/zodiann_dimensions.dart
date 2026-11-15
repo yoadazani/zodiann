@@ -134,6 +134,14 @@ abstract final class ZodiannSize {
   /// Panel head: height at phone width, including its 1 px bottom rule.
   static const double panelHeadPhone = 52.0;
 
+  /// Top bar: height above phone width, including its 1 px bottom rule
+  /// (MASTER §5; kit.css `--topbar-h`).
+  static const double topBar = 64.0;
+
+  /// Top bar: height at phone width, including its 1 px bottom rule
+  /// (MASTER §5).
+  static const double topBarPhone = 60.0;
+
   /// Minimum touch target (MASTER §14), in both axes.
   static const double minTouchTarget = 44.0;
 
