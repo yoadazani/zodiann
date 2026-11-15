@@ -6,7 +6,8 @@ import 'navigation/app_router.dart';
 import 'theme/theme_mode_provider.dart';
 
 /// The root widget: theme, localization and the router whose routes the
-/// screens plug into (ZOD-FND-014; the drawer and top bar come in ZOD-NAV-*).
+/// screens plug into (ZOD-FND-014). Every screen renders inside the app
+/// shell with its top bar (ZOD-NAV-001); the drawer comes in ZOD-NAV-002.
 class ZodiannApp extends ConsumerWidget {
   const ZodiannApp({super.key});
 

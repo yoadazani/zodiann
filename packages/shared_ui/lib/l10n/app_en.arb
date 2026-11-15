@@ -147,5 +147,57 @@
   "directionSouthWest": "south-west",
   "@directionSouthWest": {
     "description": "Compass direction of a square cell from the centre, used mid-sentence ('Axis, west'), so lower case in English (L-9)."
+  },
+  "screenWheelTitle": "Zodiac wheel",
+  "@screenWheelTitle": {
+    "description": "Top-bar title of the Zodiac wheel screen (NAV-1; kit.js wheel)."
+  },
+  "screenWheelSubtitle": "Tropical geocentric positions",
+  "@screenWheelSubtitle": {
+    "description": "Top-bar subtitle of the Zodiac wheel screen (kit.js wheelSub)."
+  },
+  "screenSquareTitle": "Gann Square of Nine",
+  "@screenSquareTitle": {
+    "description": "Top-bar title of the Gann Square of Nine screen (kit.js square)."
+  },
+  "screenSquareSubtitle": "Spiral, angles and highlights",
+  "@screenSquareSubtitle": {
+    "description": "Top-bar subtitle of the Square screen (kit.js squareSub)."
+  },
+  "screenSavedTitle": "Saved squares",
+  "@screenSavedTitle": {
+    "description": "Top-bar title of the Saved squares screen (kit.js saved)."
+  },
+  "screenSavedSubtitle": "Stored on this device",
+  "@screenSavedSubtitle": {
+    "description": "Top-bar subtitle of the Saved squares screen (kit.js savedSub)."
+  },
+  "screenSettingsTitle": "Settings",
+  "@screenSettingsTitle": {
+    "description": "Top-bar title of the Settings screen (kit.js settings)."
+  },
+  "screenSettingsSubtitle": "Language, theme, orbs and defaults",
+  "@screenSettingsSubtitle": {
+    "description": "Top-bar subtitle of the Settings screen (kit.js settingsSub)."
+  },
+  "screenAboutTitle": "About and sources",
+  "@screenAboutTitle": {
+    "description": "Top-bar title of the About and sources screen (kit.js about)."
+  },
+  "screenAboutSubtitle": "Version, sources and method",
+  "@screenAboutSubtitle": {
+    "description": "Top-bar subtitle of the About screen (kit.js aboutSub)."
+  },
+  "openMenu": "Open menu",
+  "@openMenu": {
+    "description": "Accessibility label of the top bar's hamburger button (NAV-1, NAV-6; kit.js openMenu)."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Square screen top-bar action: save the square (kit.js save)."
+  },
+  "actionExportXlsx": "Export to Excel",
+  "@actionExportXlsx": {
+    "description": "Square screen top-bar action: export to an Excel file (kit.js exportXlsx)."
   }
 }

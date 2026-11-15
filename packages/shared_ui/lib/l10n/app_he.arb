@@ -36,5 +36,18 @@
   "directionEast": "מזרח",
   "directionSouthEast": "דרום-מזרח",
   "directionSouth": "דרום",
-  "directionSouthWest": "דרום-מערב"
+  "directionSouthWest": "דרום-מערב",
+  "screenWheelTitle": "גלגל המזלות",
+  "screenWheelSubtitle": "מיקומים גאוצנטריים טרופיים",
+  "screenSquareTitle": "ריבוע התשע של גאן",
+  "screenSquareSubtitle": "ספירלה, זוויות והדגשות",
+  "screenSavedTitle": "ריבועים שמורים",
+  "screenSavedSubtitle": "שמורים במכשיר הזה",
+  "screenSettingsTitle": "הגדרות",
+  "screenSettingsSubtitle": "שפה, ערכת נושא, אורבים וברירות מחדל",
+  "screenAboutTitle": "אודות ומקורות",
+  "screenAboutSubtitle": "גרסה, מקורות ושיטה",
+  "openMenu": "פתיחת תפריט",
+  "actionSave": "שמירה",
+  "actionExportXlsx": "ייצוא לאקסל"
 }

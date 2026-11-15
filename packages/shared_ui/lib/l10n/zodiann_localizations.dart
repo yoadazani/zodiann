@@ -323,6 +323,84 @@ abstract class ZodiannLocalizations {
   /// In en, this message translates to:
   /// **'south-west'**
   String get directionSouthWest;
+
+  /// Top-bar title of the Zodiac wheel screen (NAV-1; kit.js wheel).
+  ///
+  /// In en, this message translates to:
+  /// **'Zodiac wheel'**
+  String get screenWheelTitle;
+
+  /// Top-bar subtitle of the Zodiac wheel screen (kit.js wheelSub).
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical geocentric positions'**
+  String get screenWheelSubtitle;
+
+  /// Top-bar title of the Gann Square of Nine screen (kit.js square).
+  ///
+  /// In en, this message translates to:
+  /// **'Gann Square of Nine'**
+  String get screenSquareTitle;
+
+  /// Top-bar subtitle of the Square screen (kit.js squareSub).
+  ///
+  /// In en, this message translates to:
+  /// **'Spiral, angles and highlights'**
+  String get screenSquareSubtitle;
+
+  /// Top-bar title of the Saved squares screen (kit.js saved).
+  ///
+  /// In en, this message translates to:
+  /// **'Saved squares'**
+  String get screenSavedTitle;
+
+  /// Top-bar subtitle of the Saved squares screen (kit.js savedSub).
+  ///
+  /// In en, this message translates to:
+  /// **'Stored on this device'**
+  String get screenSavedSubtitle;
+
+  /// Top-bar title of the Settings screen (kit.js settings).
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get screenSettingsTitle;
+
+  /// Top-bar subtitle of the Settings screen (kit.js settingsSub).
+  ///
+  /// In en, this message translates to:
+  /// **'Language, theme, orbs and defaults'**
+  String get screenSettingsSubtitle;
+
+  /// Top-bar title of the About and sources screen (kit.js about).
+  ///
+  /// In en, this message translates to:
+  /// **'About and sources'**
+  String get screenAboutTitle;
+
+  /// Top-bar subtitle of the About screen (kit.js aboutSub).
+  ///
+  /// In en, this message translates to:
+  /// **'Version, sources and method'**
+  String get screenAboutSubtitle;
+
+  /// Accessibility label of the top bar's hamburger button (NAV-1, NAV-6; kit.js openMenu).
+  ///
+  /// In en, this message translates to:
+  /// **'Open menu'**
+  String get openMenu;
+
+  /// Square screen top-bar action: save the square (kit.js save).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get actionSave;
+
+  /// Square screen top-bar action: export to an Excel file (kit.js exportXlsx).
+  ///
+  /// In en, this message translates to:
+  /// **'Export to Excel'**
+  String get actionExportXlsx;
 }
 
 class _ZodiannLocalizationsDelegate
