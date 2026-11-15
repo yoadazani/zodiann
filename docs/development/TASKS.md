@@ -77,7 +77,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 | ZOD-FND-006 | [Local storage infrastructure: `shared_preferences` + SQLite (drift) schema v1](foundations-architecture/ZOD-FND-006-local-storage-infrastructure-shared-preferences-sqlite-drift-schema-v1.md) | High | Not Started |
 | ZOD-FND-007 | [Bundle offline fonts and verify no network dependency](foundations-architecture/ZOD-FND-007-bundle-offline-fonts-and-verify-no-network-dependency.md) | Medium | Done |
 | ZOD-FND-008 | [Package and integrate the app icon / logo asset set](foundations-architecture/ZOD-FND-008-package-and-integrate-the-app-icon-logo-asset-set.md) | Medium | Not Started |
-| ZOD-FND-009 | [Integrate the 33-icon set as SVG assets](foundations-architecture/ZOD-FND-009-integrate-the-33-icon-set-as-svg-assets.md) | Medium | Not Started |
+| ZOD-FND-009 | [Integrate the 33-icon set as SVG assets](foundations-architecture/ZOD-FND-009-integrate-the-33-icon-set-as-svg-assets.md) | Medium | Done |
 | ZOD-FND-010 | [Research and document the Swiss Ephemeris license decision](foundations-architecture/ZOD-FND-010-research-and-document-the-swiss-ephemeris-license-decision.md) | Critical | Not Started |
 | ZOD-FND-011 | [Decide and document the ephemeris data-file coverage range](foundations-architecture/ZOD-FND-011-decide-and-document-the-ephemeris-data-file-coverage-range.md) | High | Not Started |
 | ZOD-FND-012 | [Define `UserSettings`, `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes](foundations-architecture/ZOD-FND-012-define-usersettings-squareconfig-highlightrule-crossing-dart-data.md) | Critical | Done |
