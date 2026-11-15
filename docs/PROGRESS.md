@@ -5,13 +5,14 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 ## Project Status
 
 - **Current phase:** Phase 1 — Foundations
-- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) and ZOD-FND-007 (offline fonts) merged. ZOD-UI-002 (typography scale) merged. ZOD-UI-003 (spacing, radius, elevation, sizing tokens) merged — the Shared UI token track (UI-001…003) is complete. ZOD-UI-004 (button components) merged. ZOD-L10-001 (ARB localization) merged. ZOD-L10-007 + ZOD-L10-013 (entity keys, translation decision) merged. ZOD-FND-014 (`go_router` scaffold) merged. ZOD-FND-009 (the 33-icon set, as generated Dart drawing code) merged. ZOD-NAV-001 (top bar) planned, awaiting approval. 24 of 205 tasks done.
-- **Last updated:** 2026-11-15
+- **Overall status:** FND-001, FND-002, FND-012, EPH-001, TST-002, GAN-001 and GAN-002 merged; automatic plan review in place. ZOD-GAN-003, ZOD-TST-012, ZOD-TST-013 and ZOD-TST-010 merged; ZOD-TST-011 merged — the Square of Nine core and all its verification suites are complete. ZOD-FND-005 (Flutter app shell) merged; iOS build/runtime verification outstanding (needs a Mac). ZOD-FND-013 (theme token skeleton) merged. ZOD-UI-001 (colour token values) and ZOD-FND-007 (offline fonts) merged. ZOD-UI-002 (typography scale) merged. ZOD-UI-003 (spacing, radius, elevation, sizing tokens) merged — the Shared UI token track (UI-001…003) is complete. ZOD-UI-004 (button components) merged. ZOD-L10-001 (ARB localization) merged. ZOD-L10-007 + ZOD-L10-013 (entity keys, translation decision) merged. ZOD-FND-014 (`go_router` scaffold) merged. ZOD-FND-009 (the 33-icon set, as generated Dart drawing code) merged. ZOD-NAV-001 (sticky top bar, app shell) done, PR open. 25 of 205 tasks done.
+- **Last updated:** 2026-11-16
 
 ## Completed Tasks
 
 | ID | Name | Status | Verification evidence |
 |---|---|---|---|
+| ZOD-NAV-001 | Implement the sticky top bar (+ `ZodiannPressable`, `ZodiannIconButton`, app shell) | Done (PR open) | Final run (2026-11-16, sequential, foreground): `melos run lint` exit 0 (l10n:check and icons:check up to date, analyze clean, format 0 changed); `melos run test` exit 0: astro_core 60, gann_core 196, workspace 264, astro_mobile 46, shared_ui 436. `shared_ui`: pressable 6 (UI-004 suites unedited, empty diff check); icon button 9; top bar 20 (64 / 60 and the 699.9 / 700 boundary; hamburger 46 × 46 at 12 / 4; order and exact RTL mirroring with no mirroring transform; end padding 24 / 16 / 8; gaps 12 / 12 / 8; title 18/600, subtitle 12/400 `text2`; labelled buttons vs phone icon buttons; disabled at 42 %; bg 0.88 + σ 10 blur + 1 px `lineSoft`; status-bar icons per theme; header semantics; status-bar and side insets; textScaler 2.0 and the narrow Hebrew phone with real Hebrew; focus ring inside the clip); PNG reference 5 (desktop / phone × en / he within 1 px, extractor self-check); kit.js copy test (13 keys × en / he). App: shell 11 (titles per route en / he, the same bar element across navigation, Square actions disabled, phone icon buttons, hamburger label, deep link and unknown route, body inset, content scrolls under the bar); only the three planned "no Text" assertions narrowed. Mutation proofs: I1–I4, T1–T9, S1–S4 all caught. Plan review: 2 rounds (2 Critical + 7 Important applied). Code review: With fixes, 0 Critical / 2 Important fixed (side safe-area insets test-first; garbled Hebrew fixtures restored), 3 minors deferred. Plan: [`docs/plans/ZOD-NAV-001-sticky-top-bar.md`](plans/ZOD-NAV-001-sticky-top-bar.md) |
 | ZOD-FND-009 | Integrate the 33-icon set (generated Dart drawing code; PO deviation from "SVG assets") | Done ([PR #25](https://github.com/yoadazani/zodiann/pull/25), merged `4d1acf0`) | Final run (2026-11-15, sequential, foreground): `melos run lint` exit 0: l10n:check and the new icons:check up to date; analyze clean on 11 packages; format 0 changed. `melos run test` exit 0: astro_core 60, gann_core 196, workspace 264, astro_mobile 35, shared_ui 396. Root tool tests (117): the strict parser, with about 80 explicit-failure cases; the emitter and the `--check` exit codes 0/1/2/64; freshness of the committed `.g.dart`, plus the kit.js second-source check; name validation; stray files and non-finite numbers rejected. `shared_ui` icon tests: data model; size: 20 by default, never Material's 24, 16 in buttons, unchanged at textScaler 2; centred in a tight box; colour and opacity; semantics; all 33 at 16 and 20; `iconBack` / `iconFwd`: LTR / RTL, en / he, live switch, nested; no mirroring: pixel LTR == RTL for all 33, plus no `Transform`; fidelity against Chrome 157 references at 16 / 20 / 48 / 60 / 96 (SHA-256 manifest, calibrated ceilings, crisp, round caps / joins); light and dark tint. Mutation proofs D1–D7 and F1–F11 all caught (F6 needed both coordinates; x alone is equivalent for globe). `flutter build apk --debug` ✓. `no_network_test.dart` unchanged, and no member pubspec changed. Plan review: 2 rounds (10 Important applied; U1 → Option A). Code review: Ready to merge, 0 Critical / 0 Important; 2 minors regraded by effect and fixed test-first, 7 deferred. Plan: [`docs/plans/ZOD-FND-009-svg-icon-set.md`](plans/ZOD-FND-009-svg-icon-set.md) |
 | ZOD-FND-014 | Set up `go_router` navigation scaffold | Done ([PR #24](https://github.com/yoadazani/zodiann/pull/24), merged `f1ff765`) | astro_mobile 35/35 (9 new tests: the route identifiers against the spec table; boots to the wheel; every route to its blank stub; unknown routes `/`, `/nope`, `/wheel/extra`, `/Square` → wheel at runtime and at cold start; a query or trailing slash keeps the route; a cold start at `/square` opens it directly; the route survives a theme-mode rebuild and device theme and locale changes; `go` replaces). Mutation proofs: redirect removed, router built in `build()`, enum values swapped; all caught. Plan review: 2 rounds (2 Critical + 3 Important applied in round 1; round 2 Approve). Code review: 1 Important fixed (the caret pin), 3 minors deferred. Plan: [`docs/plans/ZOD-FND-014-go-router-navigation-scaffold.md`](plans/ZOD-FND-014-go-router-navigation-scaffold.md) |
 | ZOD-L10-007 + ZOD-L10-013 | Stable language-independent entity keys + the symbol-translation decision | Done ([PR #23](https://github.com/yoadazani/zodiann/pull/23), merged `c26f576`) | `astro_core` 60/60 (pinned JSON keys for Body, ZodiacSign (12) and AspectKind (5); round trip; rejection of wrong-case, unknown and non-string input). `gann_core` 196/196 (CompassDirection keys, the angle mapping, `atAngle` on rings 1 and 30, non-axis angles → null). `shared_ui` 243/243 (36 en / he names per key against a literal table and kit.js, distinct per set, Hebrew script). Workspace 158 (key-only guard: import scanner 12 cases, source walk, runtime dependency closure, two positive controls). Mutation proofs: swapped aspect order, renamed direction; Hebrew Leo → Latin, venus → mars, `ophiuchus` (non-exhaustive switch + pinned list); an import and a dependency in shared_storage; all caught. Plan review: 2 rounds (1 Critical + 8 Important applied; PO decisions T1–T4). Code review: Ready to merge, 0 Critical / 0 Important; hand-off wording applied, 5 minors deferred. Plan: [`docs/plans/ZOD-L10-007-ZOD-L10-013-entity-keys.md`](plans/ZOD-L10-007-ZOD-L10-013-entity-keys.md) |
@@ -38,17 +39,12 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Current Task
 
-- **ZOD-NAV-001, the sticky top bar** (Critical, Phase 1): plan written and reviewed, **awaiting approval**. Branch `task/ZOD-NAV-001-sticky-top-bar` (from `main` @ `4d1acf0`).
-  - **Plan:** [`docs/plans/ZOD-NAV-001-sticky-top-bar.md`](plans/ZOD-NAV-001-sticky-top-bar.md). Design: [`docs/superpowers/specs/2026-11-15-zod-nav-001-top-bar-design.md`](superpowers/specs/2026-11-15-zod-nav-001-top-bar-design.md).
-  - **Decisions (2026-11-15, product owner):**
-    - a route-independent `ZodiannTopBar` in `shared_ui`, with the app shell (a `ShellRoute` over all five routes) mapping routes to copy and actions;
-    - a reusable 46 × 46 `ZodiannIconButton` with UI-004's states;
-    - copy from `kit.js` only;
-    - subtitle weight 400 (kit.css and the mockups; MASTER §3 says 500, documented and not edited);
-    - Option B: the hamburger, Save and Export are visible but disabled until NAV-002, the saved-squares task and the Excel task.
-  - **Plan review:** 2 rounds. Round 1: 2 Critical + 5 Important applied. Round 2: 2 Important applied. No open items.
-  - **Done:** analysis, brainstorming, plan, review. **Remaining:** approval, then Tasks 1–5.
+- **None in progress.** ZOD-NAV-001 is done on `task/ZOD-NAV-001-sticky-top-bar`, with its PR open (see Git State). Merge on approval.
 - **ZOD-FND-009** is merged (PR #25, `4d1acf0`).
+- **Deferred review minors (NAV-001):**
+  - the shell resolves the active route by path equality with a silent fallback to the wheel; nested routes (NAV-003, DAT-005) should name each `GoRoute` (`name: route.name`) or assert;
+  - `ZodiannTopBar.preferredSize` is a nominal 64 (documented); a sized helper would prevent misuse at phone width;
+  - the PNG reference test renders the controls enabled; the shipped disabled look is covered only by the opacity test.
 - **Deferred review minors (FND-009):**
   - an unreadable or non-UTF-8 SVG crashes `gen_icons.dart` with exit 255 instead of exit 2 naming the file;
   - the render tool and the kit.js test assume the first `>` closes `<svg>`, so an XML declaration would mislead them (it still fails loudly downstream);
@@ -68,15 +64,13 @@ Verified record of actual development state. See `docs/development/TASKS.md` for
 
 ## Next Recommended Task
 
-- **ID:** ZOD-NAV-001, implement the sticky top bar (Critical, Phase 1).
-  - **Dependencies:** FND-014 (merged), UI-003 and UI-004 (merged), FND-009 (this PR, **open**). Merge the FND-009 PR first; otherwise branch NAV-001 from `task/ZOD-FND-009-svg-icon-set` (a stacked branch).
-  - **Why next:** every screen sits under the top bar, and its icons (`menu`, back / forward) now exist.
-  - **Carry in from FND-009:**
-    - use `ZodiannIcon(ZodiannIcons.menu)` and `iconBack()` / `iconFwd()`;
-    - inside `IconButton` / `AppBar`, pass `size: ZodiannSize.icon` or set the container's icon size, because Material injects 24;
-    - the 46 × 46 hamburger target is NAV-001's.
-  - **Alternative:** ZOD-FND-006 (local storage, High), which L10-002's persisted first-launch language, DAT-007's last route and every settings task need. It is independent of the FND-009 PR.
+- **ID:** ZOD-FND-008, package and integrate the app icon / logo asset set (Medium, Phase 1).
+  - **Dependencies:** FND-005 (done). Independent of the NAV-001 PR.
+  - **Why next:** NAV-002 (the drawer, Critical path) needs NAV-001 (this PR), FND-008 (the logo in the drawer header) and UI-009 (tags). FND-008 is its first missing prerequisite, and the About screen needs it too.
+  - **Risk:** MASTER §11 says to use the logo SVGs with flutter_svg or the PNGs. flutter_svg is ruled out by the network guard (FND-009), so the plan must choose the 1024 px PNG renders or generated drawing code. The logo has gradients, which the FND-009 generator does not support.
+  - **Alternative:** ZOD-UI-009 (the tag component; dependencies UI-001…003 done), the other NAV-002 prerequisite. ZOD-FND-006 (local storage) stays available.
   - **Can run independently:** ZOD-FND-010 (Swiss Ephemeris license research, Critical, no code).
+- **Previously (kept for reference):** ZOD-NAV-001 was recommended after FND-009, and is done.
 - **Previously (kept for reference):** ZOD-FND-009 was recommended after FND-014, and is done.
 - **Previously (kept for reference):** ZOD-L10-007 (with L10-013) was recommended after L10-001, then ZOD-FND-014; both done.
 - **Done in TST-012 / TST-013** (kept for reference; the same pattern applies to TST-010 / TST-011):
@@ -129,7 +123,12 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 - **Routes:** `AppRoute` (`apps/astro_mobile/lib/src/navigation/`) holds the five spec routes in table order. The spec's `#name` is the `go_router` path `/name`, an identifier only.
 - **Router:** one `GoRouter` from `buildAppRouter`, held in `appRouterProvider`. Never build a router in a widget's `build`: a rebuild would reset the screen. To start elsewhere, override the provider (DAT-007, tests).
 - **Unknown routes:** any unmatched location redirects to `/wheel` (top-level redirect on `topRoute == null`).
-- **Contract:** `AppRoute` is app-level and feature packages never import it. The first feature-side navigation (DAT-005, or NAV-001/002 in `shared_ui`) decides where a feature-accessible route contract lives.
+- **Contract:** `AppRoute` is app-level and feature packages never import it. NAV-001's bar is route-independent, so the decision on where a feature-accessible route contract lives passes to the first feature-side navigation (DAT-005) or NAV-002.
+
+**App shell** (established in ZOD-NAV-001)
+- **Screens render inside `AppShell`** (one go_router `ShellRoute`), under the sticky `ZodiannTopBar`. The body extends behind the bar, so a scroll view inherits the bar's height as `MediaQuery` top padding. A scroll view with its own `padding` must add `MediaQuery.paddingOf(context).top` itself. Keep `AppShell` the only owner of the `Scaffold` app bar: a screen with its own `appBar` would stack a second bar.
+- **Screen actions** go through `ZodiannTopBarAction` (labelled buttons above phone width, icon buttons on phone), disabled (`onPressed: null`) until their task wires them.
+- **Controls:** icon-only controls use `ZodiannIconButton` (46 × 46, plain / boxed); every control's states come from `ZodiannPressable` (UI-004).
 
 **Fonts and network** (established in ZOD-FND-007)
 - Text styles name bundled fonts only through `ZodiannFonts` constants plus `package: ZodiannFonts.package`. Font files are byte-for-byte official releases recorded in `packages/shared_ui/assets/fonts/SOURCES.md` (SHA-256 checked by tests).
@@ -233,6 +232,8 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 
 | Date | Decision | Reason | Impacted components | Reference |
 |---|---|---|---|---|
+| 2026-11-15 | ZOD-NAV-001 product-owner decisions: `ZodiannTopBar` in `shared_ui`, route-independent; the app shell (`ShellRoute` over all five routes) maps routes to copy and actions; a reusable 46 × 46 `ZodiannIconButton` (plain / boxed) with UI-004's states; copy from kit.js only; subtitle weight 400 (kit.css and the mockups; MASTER §3 says 500, not edited); Option B: the hamburger, Save and Export visible but disabled until NAV-002 / the saved-squares task / the Excel task. | Keeps the route-contract decision open; one implementation of the control states; honest about unwired actions. | `shared_ui` widgets, `apps/astro_mobile` navigation | NAV-001 task Notes, plan, `docs/superpowers/specs/2026-11-15-zod-nav-001-top-bar-design.md` |
+| 2026-11-16 | `ZodiannPressable` (internal) holds UI-004's interaction layer, extracted verbatim; `ZodiannButton` (now a `StatelessWidget`, same API) and `ZodiannIconButton` use it. New tokens `ZodiannSize.topBar` 64 / `topBarPhone` 60. The bar clamps its text at 1.5 ×, uses phone end padding 8 with actions and 16 without, sets the status-bar icon style per theme and keeps controls clear of side safe-area insets. | MASTER §5 / kit.css; the fixed-height bar must never overflow; a landscape notch (code review). | `shared_ui`, every screen | NAV-001 plan |
 | 2026-11-15 | ZOD-FND-009 product-owner decisions: Option 1, the icons as Dart drawing code generated from the source SVGs (`tool/gen_icons.dart` → `packages/shared_ui/lib/src/icons/zodiann_icons.g.dart`, `--check` in `lint`). No new runtime dependency; the FND-007 guard is unchanged; the SVGs stay the single source; generator failures are explicit; `iconBack()` / `iconFwd()` follow `Directionality` with no auto-mirroring; U1 Option A (UI-004's sheet placeholder is out of scope). | `flutter_svg` 2.4.0 and `vector_graphics` 1.3.1 depend on `http`, which DATA-8's guard forbids. A documented deviation from "register the SVGs as assets". | `shared_ui` icons, every screen with icons, root `tool/` | FND-009 task Notes, plan, `docs/superpowers/specs/2026-11-15-zod-fnd-009-icon-set-design.md` |
 | 2026-11-15 | Root dev dependencies gain `xml ^7.1.0` (the generator's parser) and `crypto ^3.0.8` (SHA-256s of the reference sheets). Both are latest, already in the lock, and dev-only in the non-shipped root package. | The root package is not a workspace member, so neither enters any runtime closure (the network guard checks members, runtime only). | root `pubspec.yaml` | FND-009 plan |
 | 2026-11-15 | Both Zodiann themes set `iconTheme: IconThemeData(size: ZodiannSize.icon, color: text)`. `ZodiannIcon` reads the raw inherited `IconTheme` size, because `IconTheme.of` substitutes Material's 24. | kit.css `svg.i` is 20 px in currentColor; MASTER §4 says 20 in controls, 16 in small buttons and fields. | `shared_ui` theme, `ZodiannIcon` | FND-009 plan Task 3 |
@@ -294,6 +295,16 @@ Every task follows these infrastructure conventions (established in ZOD-FND-001)
 | 2026-11-12 | `Body.node` bypasses `coveredRange` in every adapter. | The analytical formula is independent of the source's data files. Already in the FND-002 contract, restated on the mixin. Pinned by the 1900 test. | EPH-002/003/004 | EPH-001 plan Revision 2 |
 
 ## Verification
+
+ZOD-NAV-001, final run on 2026-11-16 (Flutter 3.50.0 / Dart 3.14.0 via FVM), sequential and in the foreground:
+
+| Check | Command | Result |
+|---|---|---|
+| Lint | `fvm dart run melos run lint` | exit 0 in 82 s: l10n:check and icons:check up to date; analyze clean; format 0 changed |
+| Tests | `fvm dart run melos run test` | exit 0 in 105 s: astro_core 60, gann_core 196, workspace 264, astro_mobile 46, shared_ui 436 |
+| Guard | `git diff main --stat -- test/architecture/no_network_test.dart`; member pubspecs | empty; no member pubspec changed (no new dependency) |
+| UI-004 | `git diff --stat -- ':/packages/shared_ui/test/widgets/button_*' ':/packages/shared_ui/test/support/button_*'` | empty: UI-004 tests unedited |
+| Mutation proof | I1–I4 (icon button), T1–T9 (top bar), S1–S4 (shell) | all caught; the PNG reference test fails on every geometry mutant |
 
 ZOD-FND-009, final run on 2026-11-15 (Flutter 3.50.0 / Dart 3.14.0 via FVM). Sequential and in the foreground, after an earlier combined background run had been stopped for low memory. Before the rerun, the idle Gradle / Kotlin daemons from the APK build were stopped with `gradlew --stop`; no stale Dart or Flutter processes remained.
 
@@ -599,9 +610,9 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **Current task branch:** `task/ZOD-NAV-001-sticky-top-bar` (from `main` @ `4d1acf0`)
+- **Current task branch:** `task/ZOD-NAV-001-sticky-top-bar` (from `main` @ `4d1acf0`): plan `4a24855`, approval docs, pressable `f70069e`, icon button `c25a4f4`, top bar `2824712`, shell `2f5bba8`, review fix `e675544`, close-out.
 - **Relevant commits:** FND-001 → `0303645` (PR #2), FND-002 → `331c7dc` (PR #3), FND-012 → `13ea8e6` (PR #4), EPH-001 → `a21e4ed` (PR #5), plan-reviewer → `83ee377` (PR #6), TST-002 → `a86e284` (PR #7), GAN-001 → `ef1ea48` (PR #8), GAN-002 → `1284889` (PR #9), GAN-003 → `8655a9d` (PR #10), TST-012 → `718edf1` (PR #11), TST-013 → `c5e442f` (PR #12), TST-010 → `3a447d5` (PR #13), TST-011 → `30ea9eb` (PR #14), FND-005 → `e4a8859` (PR #15), FND-013 → `ae666da` (PR #16), UI-001 → `4d207d7` (PR #17), FND-007 → `fe012e6` (PR #18), UI-002 → `360279d` (PR #19), UI-003 → `6dca326` (PR #20), UI-004 → `3b6f6b9` (PR #21), all merged. L10-001 branch: plan `f086866`, wiring `a939b4a`, freshness check `58287c4`, key parity `36aa73c`, Text() guard `1978243`, delegate guard `59cb3f0` (review fix), close-out L10-001 → `62b9afc` (PR #22). L10-007 + L10-013 branch: plan `cde31ab`, decision record `c5e8baa`, key enums `d606ab5`, names `e42b2f6`, guard `c5071ff`, close-out → `c26f576` (PR #23). FND-014 branch: plan `564ca7a`, scaffold `3e850bb`, caret fix `5a85393` (review fix), close-out → `f1ff765` (PR #24). FND-009 branch: plan `700f232`, approval `e594bf0`, parser `3f08645`, generator `579c74e`, widget `89e70d2`, fidelity `219c6a5`, fixtures README `2a78739`, review fix `1d7d45f`, close-out.
-- **Pull request:** PRs #2–#22 merged. L10-001 → `62b9afc` (PR #22, merged). L10-007 + L10-013 → `c26f576` ([PR #23](https://github.com/yoadazani/zodiann/pull/23), merged) FND-014 → `f1ff765` ([PR #24](https://github.com/yoadazani/zodiann/pull/24), merged). FND-009 → `4d1acf0` ([PR #25](https://github.com/yoadazani/zodiann/pull/25), merged).
-- **Unmerged task branches others depend on:** none.
+- **Pull request:** PRs #2–#22 merged. L10-001 → `62b9afc` (PR #22, merged). L10-007 + L10-013 → `c26f576` ([PR #23](https://github.com/yoadazani/zodiann/pull/23), merged) FND-014 → `f1ff765` ([PR #24](https://github.com/yoadazani/zodiann/pull/24), merged). FND-009 → `4d1acf0` ([PR #25](https://github.com/yoadazani/zodiann/pull/25), merged). NAV-001: PR to be opened.
+- **Unmerged task branches others depend on:** `task/ZOD-NAV-001-sticky-top-bar` (NAV-002…005 and every screen build on the shell and the top bar).
 - **Uncommitted changes:** `.fvmrc` lost its trailing newline (tooling touch, not task work; left unstaged)
 - **Preserve:** `.idea/` and `.qodo/` are local IDE folders. Never stage them. `.fvm/` is a local symlink (gitignored).
