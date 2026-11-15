@@ -24,6 +24,9 @@ dev_dependencies:
   # 3.50.0's flutter_test pins test_api 0.7.14 in the shared workspace
   # resolution. See docs/PROGRESS.md → Technical Decisions.
   test: ^1.32.0
+  # ZOD-FND-009: tool/gen_icons.dart parses the icon SVGs. Dev-only, root
+  # only: never in a member's runtime closure.
+  xml: ^7.1.0
 
 melos:
   sdkPath: .fvm/flutter_sdk
