@@ -18,12 +18,17 @@ workspace:
   - packages/shared_export_xlsx
 
 dev_dependencies:
+  # ZOD-FND-009: tool/icons/render_icon_references.dart hashes the icon SVGs.
+  crypto: ^3.0.8
   lints: ^6.1.0
   melos: ^8.10.1
   # Held below the latest (1.33.0): it pins test_api 0.7.15, while Flutter
   # 3.50.0's flutter_test pins test_api 0.7.14 in the shared workspace
   # resolution. See docs/PROGRESS.md → Technical Decisions.
   test: ^1.32.0
+  # ZOD-FND-009: tool/gen_icons.dart parses the icon SVGs. Dev-only, root
+  # only: never in a member's runtime closure.
+  xml: ^7.1.0
 
 melos:
   sdkPath: .fvm/flutter_sdk
@@ -47,13 +52,17 @@ melos:
     l10n:check:
       description: Fail if the committed gen-l10n output is stale (ZOD-L10-001).
       run: dart run tool/check_l10n.dart
+    icons:check:
+      description: Fail if the generated icon code is stale (ZOD-FND-009).
+      run: dart run tool/gen_icons.dart --check
     format:check:
       description: Fail if any package is not formatted.
       run: dart run melos exec "dart format --output=none --set-exit-if-changed ."
     lint:
-      description: l10n:check + analyze + format:check.
+      description: l10n:check + icons:check + analyze + format:check.
       steps:
         - l10n:check
+        - icons:check
         - analyze
         - format:check
     test:dart:

@@ -2,6 +2,9 @@
 library;
 
 export 'l10n/zodiann_localizations.dart';
+export 'src/icons/zodiann_icon.dart' hide ZodiannIconPainter;
+export 'src/icons/zodiann_icon_data.dart' show ZodiannIconData;
+export 'src/icons/zodiann_icons.g.dart';
 export 'src/l10n/entity_names.dart';
 export 'src/theme/aspect_colors.dart';
 export 'src/theme/body_colors.dart';

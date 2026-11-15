@@ -97,6 +97,15 @@ void main() {
     expect(theme.extension<AspectColors>(), same(tokens.aspects));
     expect(theme.extension<BodyColors>(), same(tokens.bodies));
     expect(theme.extension<ZodiannElevation>(), same(tokens.elevation));
+    expect(theme.iconTheme.color, tokens.surfaces.text);
+  });
+
+  // ZOD-FND-009: kit.css `svg.i` is 20 px in currentColor (the text colour).
+  test('iconTheme size 20 and colour text, in both themes', () {
+    for (final MapEntry(key: name, value: (theme, tokens)) in themes.entries) {
+      expect(theme.iconTheme.size, ZodiannSize.icon, reason: name);
+      expect(theme.iconTheme.color, tokens.surfaces.text, reason: name);
+    }
   });
 
   test("signTintOpacity is MASTER's 10 % / 9 %", () {
