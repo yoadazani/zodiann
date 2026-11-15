@@ -548,7 +548,9 @@ double _numberAttribute(
 ) {
   final text = attributes[key]!.trim();
   if (!_isNumber(text)) fail('$where $key="$text" is not a number');
-  return double.parse(text);
+  final value = double.parse(text);
+  if (!value.isFinite) fail('$where $key="$text" is not finite');
+  return value;
 }
 
 double _positive(
@@ -699,7 +701,11 @@ final class _PathParser {
     final match = _number.matchAsPrefix(d, _i);
     if (match == null) fail('expected a number at offset $_i');
     _i = match.end;
-    return double.parse(match[0]!);
+    final value = double.parse(match[0]!);
+    if (!value.isFinite) {
+      fail('number ${match[0]} at offset ${match.start} is not finite');
+    }
+    return value;
   }
 
   bool _flag() {

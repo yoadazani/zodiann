@@ -29,13 +29,19 @@ const _forbiddenNames = {
 
 /// The formatted generated library for the icons in [dir].
 Future<String> generateIconsSource(Directory dir) async {
-  final files =
-      dir
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('.svg'))
-          .toList()
-        ..sort((a, b) => _fileName(a).compareTo(_fileName(b)));
+  // Every entry must be an icon: a stray file (star.SVG, notes.txt) is an
+  // error, never silently skipped.
+  final entries = dir.listSync();
+  for (final entry in entries) {
+    final name = entry.uri.pathSegments.lastWhere((s) => s.isNotEmpty);
+    if (entry is! File || !name.endsWith('.svg')) {
+      throw IconGeneratorException(
+        '$name in ${dir.path}: only <name>.svg icon files are allowed',
+      );
+    }
+  }
+  final files = entries.cast<File>().toList()
+    ..sort((a, b) => _fileName(a).compareTo(_fileName(b)));
   if (files.isEmpty) {
     throw IconGeneratorException('no .svg files in ${dir.path}');
   }

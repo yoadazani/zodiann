@@ -150,6 +150,22 @@ void main() {
       });
     }
 
+    for (final stray in ['star.SVG', 'notes.txt', 'star.svg.bak']) {
+      test('a stray file $stray is rejected, not skipped', () {
+        final dir = _tempIcons({'a.svg': _validSvg, stray: _validSvg});
+        expect(
+          () => generateIconsSource(dir),
+          throwsA(
+            isA<IconGeneratorException>().having(
+              (e) => e.message,
+              'message',
+              contains(stray),
+            ),
+          ),
+        );
+      });
+    }
+
     test('an empty directory', () {
       final dir = _tempIcons({});
       expect(

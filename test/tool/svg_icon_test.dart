@@ -426,6 +426,7 @@ void main() {
       'M1 -',
       'M1 1e',
       'M1 1a-1 1 0 0 1 2 2',
+      'M1e400 0',
     ]) {
       test('d="$d"', () {
         expectFailure(svg('<path d="$d"/>'), 'd="$d"');
@@ -484,6 +485,10 @@ void main() {
 
     test('stroke-width="0"', () {
       expectFailure(svg('<path d="M1 1h1" stroke-width="0"/>'), 'stroke-width');
+    });
+
+    test('a non-finite number attribute', () {
+      expectFailure(svg('<circle cx="1" cy="1" r="1e999"/>'), '1e999');
     });
 
     test('a malformed number attribute', () {
