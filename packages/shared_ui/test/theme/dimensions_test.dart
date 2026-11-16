@@ -103,6 +103,11 @@ void main() {
       'topBarPhone': (ZodiannSize.topBarPhone, 60),
       'icon': (ZodiannSize.icon, 20),
       'iconSmall': (ZodiannSize.iconSmall, 16),
+      // ZOD-FND-008: MASTER §11 (never below 40), §5 (drawer header 40),
+      // §9 (About hero 132).
+      'logoMin': (ZodiannSize.logoMin, 40),
+      'logoDrawer': (ZodiannSize.logoDrawer, 40),
+      'logoAbout': (ZodiannSize.logoAbout, 132),
     };
     sizes.forEach((name, value) {
       expect(value.$1, value.$2, reason: name);

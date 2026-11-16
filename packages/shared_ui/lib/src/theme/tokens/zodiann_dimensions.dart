@@ -150,6 +150,16 @@ abstract final class ZodiannSize {
 
   /// Icons in small buttons and fields.
   static const double iconSmall = 16.0;
+
+  /// The logo is never rendered smaller than this: its hairlines blur at
+  /// small raster sizes (MASTER §11).
+  static const double logoMin = 40.0;
+
+  /// The logo in the drawer header (MASTER §5).
+  static const double logoDrawer = 40.0;
+
+  /// The logo in the About hero (MASTER §9).
+  static const double logoAbout = 132.0;
 }
 
 /// The breakpoint widths (MASTER §6), in logical pixels.

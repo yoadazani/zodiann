@@ -31,6 +31,8 @@ dev_dependencies:
 flutter:
   generate: true
   assets:
+    - assets/logo/zodiann-logo-on-dark.png
+    - assets/logo/zodiann-logo-on-light.png
     - assets/fonts/ibm-plex-sans/OFL.txt
     - assets/fonts/ibm-plex-sans-hebrew/OFL.txt
     - assets/fonts/noto-sans-symbols/OFL.txt

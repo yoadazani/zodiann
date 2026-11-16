@@ -25,4 +25,5 @@ export 'src/theme/zodiann_tokens.dart';
 export 'src/widgets/zodiann_button_colors.dart';
 export 'src/widgets/zodiann_button.dart' hide ZodiannFocusRingPainter;
 export 'src/widgets/zodiann_icon_button.dart';
+export 'src/widgets/zodiann_logo.dart';
 export 'src/widgets/zodiann_top_bar.dart';
