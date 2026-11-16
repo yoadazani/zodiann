@@ -1,6 +1,6 @@
 // ZOD-FND-009, test only: renders a widget into a fixed-size transparent
-// boundary at devicePixelRatio 1 and reads its straight-alpha RGBA pixels,
-// as button_sheet_test.dart does.
+// boundary (devicePixelRatio 1 unless asked, ZOD-FND-008) and reads its
+// straight-alpha RGBA pixels, as button_sheet_test.dart does.
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -33,20 +33,26 @@ final _boundaryKey = GlobalKey();
 /// Pumps [child] at the top-left of a [width] × [height] transparent
 /// boundary (the view is exactly that size) and captures it.
 ///
-/// [child] gets tight [width] × [height] constraints; wrap it in `Center`
-/// for loose ones. [wrap] adds ancestors outside the boundary (a theme, an
-/// `IconTheme`); the default is just a `Directionality`.
+/// [child] gets tight [width] × [height] logical constraints; wrap it in
+/// `Center` for loose ones. [wrap] adds ancestors outside the boundary (a
+/// theme, an `IconTheme`); the default is just a `Directionality`. At a
+/// [devicePixelRatio] above 1 the returned [Pixels] are
+/// `width·dpr × height·dpr`.
 Future<Pixels> captureWidget(
   WidgetTester tester,
   Widget child, {
   required int width,
   required int height,
+  double devicePixelRatio = 1,
   TextDirection direction = TextDirection.ltr,
   Widget Function(Widget boundary)? wrap,
   String? savePng,
 }) async {
-  tester.view.physicalSize = Size(width.toDouble(), height.toDouble());
-  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = Size(
+    width * devicePixelRatio,
+    height * devicePixelRatio,
+  );
+  tester.view.devicePixelRatio = devicePixelRatio;
   addTearDown(tester.view.reset);
   final boundary = RepaintBoundary(
     key: _boundaryKey,
@@ -70,7 +76,7 @@ Future<Pixels> captureWidget(
   );
   late Pixels pixels;
   await tester.runAsync(() async {
-    final image = await render.toImage(pixelRatio: 1);
+    final image = await render.toImage(pixelRatio: devicePixelRatio);
     final data = await image.toByteData(
       format: ui.ImageByteFormat.rawStraightRgba,
     );

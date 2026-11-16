@@ -16,6 +16,10 @@ const _onLight = 'assets/logo/zodiann-logo-on-light.png';
 /// squeeze it below [size] reports a [FlutterError]. Pass a token
 /// ([ZodiannSize.logoDrawer], [ZodiannSize.logoAbout]).
 ///
+/// The mark is decoded at `size × devicePixelRatio` (not the full 1024 px):
+/// measured against Chrome's render of the SVG it keeps the hairlines and is
+/// closer than a full decode (plan Task 2 calibration).
+///
 /// The logo sits beside the wordmark, so it is decorative (excluded from
 /// semantics) unless [semanticLabel] is given; a caller passes a localized
 /// string.
@@ -38,11 +42,13 @@ class ZodiannLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final dpr = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
     return _LogoBox(
       size: size,
       child: Image.asset(
         dark ? _onDark : _onLight,
         package: _package,
+        cacheWidth: (size * dpr).round(),
         width: size,
         height: size,
         fit: BoxFit.contain,

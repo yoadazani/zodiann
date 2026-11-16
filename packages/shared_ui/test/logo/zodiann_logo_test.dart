@@ -14,8 +14,13 @@ Widget _app(Widget child, {ThemeMode mode = ThemeMode.light}) => MaterialApp(
   home: Scaffold(body: Center(child: child)),
 );
 
-AssetImage _asset(WidgetTester tester) =>
-    tester.widget<Image>(find.byType(Image)).image as AssetImage;
+/// The asset behind the logo (decoded at the target size, so the provider
+/// is a [ResizeImage] around the [AssetImage]).
+AssetImage _asset(WidgetTester tester) {
+  final provider = tester.widget<Image>(find.byType(Image)).image;
+  return (provider is ResizeImage ? provider.imageProvider : provider)
+      as AssetImage;
+}
 
 void main() {
   testWidgets('uses the dark mark under the dark theme', (tester) async {
@@ -119,7 +124,10 @@ void main() {
     );
     await tester.pump();
     final raw = tester.widget<RawImage>(find.byType(RawImage));
+    // Decoded at size × device pixel ratio (never the full 1024 px).
+    final side = (ZodiannSize.logoDrawer * tester.view.devicePixelRatio)
+        .round();
     expect(raw.image, isNotNull);
-    expect((raw.image!.width, raw.image!.height), (1024, 1024));
+    expect((raw.image!.width, raw.image!.height), (side, side));
   });
 }
