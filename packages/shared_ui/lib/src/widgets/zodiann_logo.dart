@@ -1,4 +1,5 @@
 // ZOD-FND-008: the in-app logo mark.
+import 'package:flutter/foundation.dart' show precisionErrorTolerance;
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -45,17 +46,22 @@ class ZodiannLogo extends StatelessWidget {
     final dpr = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
     return _LogoBox(
       size: size,
-      child: Image.asset(
-        dark ? _onDark : _onLight,
-        package: _package,
-        cacheWidth: (size * dpr).round(),
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.high,
-        gaplessPlayback: true,
-        excludeFromSemantics: semanticLabel == null,
-        semanticLabel: semanticLabel,
+      // Centred so that a larger tight parent only adds space around the mark:
+      // it always paints at exactly `size`, matching its decode (never
+      // upscaled, which would blur the hairlines).
+      child: Center(
+        child: Image.asset(
+          dark ? _onDark : _onLight,
+          package: _package,
+          cacheWidth: (size * dpr).round(),
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          gaplessPlayback: true,
+          excludeFromSemantics: semanticLabel == null,
+          semanticLabel: semanticLabel,
+        ),
       ),
     );
   }
@@ -101,8 +107,10 @@ class _RenderLogoBox extends RenderConstrainedBox {
   @override
   void performLayout() {
     assert(() {
-      if (constraints.maxWidth < _logoSize ||
-          constraints.maxHeight < _logoSize) {
+      // Tolerant of float rounding: logoDrawer equals logoMin, and flex
+      // arithmetic can hand over 39.99999999999.
+      if (constraints.maxWidth < _logoSize - precisionErrorTolerance ||
+          constraints.maxHeight < _logoSize - precisionErrorTolerance) {
         // Reported, not thrown: a throw inside performLayout leaves the
         // parents without a size and cascades into unrelated errors.
         FlutterError.reportError(

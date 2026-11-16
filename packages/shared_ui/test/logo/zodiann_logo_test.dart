@@ -81,12 +81,35 @@ void main() {
     expect(error.toString(), contains('ZodiannSize.logoMin'));
   });
 
-  testWidgets('a larger tight parent is not reported', (tester) async {
+  testWidgets('a larger tight parent is not reported, and the mark stays '
+      'crisp at its own size', (tester) async {
     await tester.pumpWidget(
       _app(
         const SizedBox.square(
           dimension: ZodiannSize.logoAbout,
           child: ZodiannLogo(),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    // The decode is size × dpr, so the mark must paint at exactly `size`
+    // (never upscaled into the larger parent, which would blur it).
+    expect(
+      tester.getSize(find.byType(RawImage)),
+      const Size.square(ZodiannSize.logoDrawer),
+    );
+  });
+
+  testWidgets('a parent a float rounding below the size is not reported', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        ConstrainedBox(
+          constraints: BoxConstraints.tight(
+            Size.square(ZodiannSize.logoMin - 1e-10),
+          ),
+          child: const ZodiannLogo(),
         ),
       ),
     );
