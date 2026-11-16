@@ -20,6 +20,10 @@ workspace:
 dev_dependencies:
   # ZOD-FND-009: tool/icons/render_icon_references.dart hashes the icon SVGs.
   crypto: ^3.0.8
+  # ZOD-FND-008: tool/launcher/gen_launcher_icons.dart re-encodes the iOS icons
+  # as RGB, and the launcher tests read pixels. Dev-only, root only: never in
+  # a member's runtime closure.
+  image: ^4.13.1
   lints: ^6.1.0
   melos: ^8.10.1
   # Held below the latest (1.33.0): it pins test_api 0.7.15, while Flutter
