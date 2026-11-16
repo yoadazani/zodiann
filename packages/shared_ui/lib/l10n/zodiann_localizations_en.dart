@@ -121,4 +121,43 @@ class ZodiannLocalizationsEn extends ZodiannLocalizations {
 
   @override
   String get directionSouthWest => 'south-west';
+
+  @override
+  String get screenWheelTitle => 'Zodiac wheel';
+
+  @override
+  String get screenWheelSubtitle => 'Tropical geocentric positions';
+
+  @override
+  String get screenSquareTitle => 'Gann Square of Nine';
+
+  @override
+  String get screenSquareSubtitle => 'Spiral, angles and highlights';
+
+  @override
+  String get screenSavedTitle => 'Saved squares';
+
+  @override
+  String get screenSavedSubtitle => 'Stored on this device';
+
+  @override
+  String get screenSettingsTitle => 'Settings';
+
+  @override
+  String get screenSettingsSubtitle => 'Language, theme, orbs and defaults';
+
+  @override
+  String get screenAboutTitle => 'About and sources';
+
+  @override
+  String get screenAboutSubtitle => 'Version, sources and method';
+
+  @override
+  String get openMenu => 'Open menu';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get actionExportXlsx => 'Export to Excel';
 }

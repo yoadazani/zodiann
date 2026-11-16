@@ -67,7 +67,10 @@ void main() {
   testWidgets('boots to the wheel', (tester) async {
     await _pumpApp(tester);
     expect(_stubRoute(tester), AppRoute.wheel);
-    expect(find.byType(Text), findsNothing);
+    expect(
+      find.descendant(of: find.byType(ScreenStub), matching: find.byType(Text)),
+      findsNothing,
+    );
   });
 
   testWidgets('every route resolves to its blank stub', (tester) async {
@@ -75,7 +78,14 @@ void main() {
     for (final route in AppRoute.values) {
       await _go(tester, route.path);
       expect(_stubRoute(tester), route, reason: route.path);
-      expect(find.byType(Text), findsNothing, reason: route.path);
+      expect(
+        find.descendant(
+          of: find.byType(ScreenStub),
+          matching: find.byType(Text),
+        ),
+        findsNothing,
+        reason: route.path,
+      );
     }
   });
 

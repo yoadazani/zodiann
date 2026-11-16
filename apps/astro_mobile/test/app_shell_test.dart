@@ -52,7 +52,10 @@ void main() {
       tester.widget<ScreenStub>(find.byType(ScreenStub)).route,
       AppRoute.wheel,
     );
-    expect(find.byType(Text), findsNothing);
+    expect(
+      find.descendant(of: find.byType(ScreenStub), matching: find.byType(Text)),
+      findsNothing,
+    );
   });
 
   testWidgets('light device → light theme', (tester) async {

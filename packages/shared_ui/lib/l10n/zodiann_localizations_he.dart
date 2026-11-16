@@ -121,4 +121,43 @@ class ZodiannLocalizationsHe extends ZodiannLocalizations {
 
   @override
   String get directionSouthWest => 'דרום-מערב';
+
+  @override
+  String get screenWheelTitle => 'גלגל המזלות';
+
+  @override
+  String get screenWheelSubtitle => 'מיקומים גאוצנטריים טרופיים';
+
+  @override
+  String get screenSquareTitle => 'ריבוע התשע של גאן';
+
+  @override
+  String get screenSquareSubtitle => 'ספירלה, זוויות והדגשות';
+
+  @override
+  String get screenSavedTitle => 'ריבועים שמורים';
+
+  @override
+  String get screenSavedSubtitle => 'שמורים במכשיר הזה';
+
+  @override
+  String get screenSettingsTitle => 'הגדרות';
+
+  @override
+  String get screenSettingsSubtitle => 'שפה, ערכת נושא, אורבים וברירות מחדל';
+
+  @override
+  String get screenAboutTitle => 'אודות ומקורות';
+
+  @override
+  String get screenAboutSubtitle => 'גרסה, מקורות ושיטה';
+
+  @override
+  String get openMenu => 'פתיחת תפריט';
+
+  @override
+  String get actionSave => 'שמירה';
+
+  @override
+  String get actionExportXlsx => 'ייצוא לאקסל';
 }

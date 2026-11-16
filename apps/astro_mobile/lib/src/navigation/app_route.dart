@@ -6,9 +6,10 @@
 /// location, which must start with `/`. [wheel] is the default.
 ///
 /// **App-level placeholder, not a public contract.** Feature packages must
-/// never import the app layer. The first task that needs a route from a
-/// feature package (for example ZOD-DAT-005, or ZOD-NAV-001/002 if built in
-/// `shared_ui`) decides where the feature-accessible route contract lives.
+/// never import the app layer. ZOD-NAV-001's top bar is route-independent
+/// (the app shell maps routes to its copy), so the decision on where a
+/// feature-accessible route contract lives passes to the first feature-side
+/// navigation (ZOD-DAT-005) or ZOD-NAV-002.
 enum AppRoute {
   wheel,
   square,
