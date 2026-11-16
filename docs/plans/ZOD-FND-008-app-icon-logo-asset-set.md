@@ -186,3 +186,25 @@
 - **I4 (adaptive wiring untested):** applied. XML test and a `delete ic_launcher.xml` mutation added.
 - **M1–M9:** applied (`captureWidget` DPR detail; foreground `viewBox` rasterisation; exit-2 test; relative forward-slash manifest paths; out-of-scope: exported files and platform-mandated sub-40 sizes; Task 5 status wording; `ensureInitialized`; expected RED reasons; `launcher_spec.dart` hash in the manifest).
 - **Open items after round 2:** none needing a decision beyond the three listed in "Open items for approval".
+
+## Calibration record (Task 2, 2026-11-16)
+
+Flutter 3.50.0 tester vs Chrome 157.0.8103.78, α in [0, 1], worst of both themes, decode at `size × devicePixelRatio` with `FilterQuality.high` (the chosen strategy):
+
+| Reference px | mean α | max α | mean colour |
+|---|---|---|---|
+| 40 | 0.0398 | 0.576 | 0.0283 |
+| 80 | 0.0236 | 0.635 | 0.0169 |
+| 120 | 0.0180 | 0.467 | 0.0131 |
+| 132 | 0.0179 | 0.561 | 0.0129 |
+| 264 | 0.0058 | 0.404 | 0.0043 |
+| 396 | 0.0042 | 0.278 | 0.0032 |
+
+The full-decode alternative (1024 px decoded, `FilterQuality.high`) measured worse at 40 px (0.0454 / 0.710 / 0.0328) and 80 px (0.0271 / 0.753 / 0.0195), and slightly better only at 396 px (0.0040 / 0.345 / 0.0030). Outer-band ink share 0.86…1.24 (full decode 0.84…1.25), whole-image ink 0.99…1.06. Ceilings sit about 20 % above the measured worst; the fidelity test also asserts the outer-band ink share within 0.75…1.35 and the whole-image ink within 0.95…1.10.
+
+## Implementation record (2026-11-17)
+
+- **Tasks 1–4** were implemented as planned, with these rulings: the below-size parent check *reports* a `FlutterError` instead of throwing from `performLayout` (a throw left the parents unsized and cascaded); the hairline floor became an outer-band ink share plus whole-image ink (an annulus under 1 px wide was noise at 40 px); `launcher:check` and its place in `lint` landed with the committed outputs in Task 4.
+- **Device check:** an API 35 emulator (Pixel 9 Pro) was used, since the API 28 AVD the plan names doesn't exist on this machine; both are adaptive-capable.
+- **Whole-branch review:** With fixes (0 Critical, 1 Important). Fixed test-first: a larger tight parent upscaled the small decode and blurred the mark (the `Image` is now centred, painting at exactly `size`); the squeeze check now tolerates `precisionErrorTolerance` (promoted from Minor, because `logoDrawer == logoMin`). Nine minors are deferred (listed in `docs/PROGRESS.md`).
+- **Plan text correction:** `image` pulls `archive` and, through it, `posix` into the root lock (dev-only, harmless).
