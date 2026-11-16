@@ -722,6 +722,38 @@ The first session is for understanding, planning, and selecting the correct star
 
 ---
 
+# 12. Context Management Policy
+
+This policy reduces unnecessary token consumption. It complements every other section of this skill and weakens none of them: the plan review, TDD, code review, verification, documentation, and Git requirements apply in full regardless of context size.
+
+Project state lives in the repository (`docs/PROGRESS.md`, the plan under `docs/plans/`, task files, Git), never only in the conversation. Section 7 (Session Recovery) rebuilds a session from those files.
+
+## `/clear`
+
+- Recommend `/clear` when starting a genuinely independent task or a new implementation session.
+- Before recommending it, ensure all important decisions, progress, implementation status, and unresolved issues are persisted in the appropriate project documentation (`docs/PROGRESS.md`, the plan, task files).
+- Never recommend clearing context in the middle of active implementation or when important unsaved context exists.
+- Do not automatically clear context. `/clear` is only ever recommended to the user.
+
+## `/compact`
+
+- Use `/compact` when the conversation becomes unnecessarily large or approaches context limitations.
+- Before compaction, ensure important implementation decisions, completed work, current state, test results, and remaining steps are documented.
+- When appropriate, provide a concise, task-focused compaction summary.
+- Preserve architectural decisions, constraints, and unresolved issues.
+- Never compact merely because a fixed number of messages has passed.
+
+## General Rules
+
+- Prefer reading only the files relevant to the current task.
+- Avoid repeatedly reading files already understood unless verification is necessary.
+- Keep task context focused.
+- Do not sacrifice code quality, testing, architectural consistency, or Superpowers review requirements to reduce token usage.
+- Do not omit necessary repository exploration or verification.
+- Never assume that `/compact` or `/clear` automatically saves project progress. Persist it explicitly first (Section 6).
+
+---
+
 # Final Rule
 
 Your responsibility is not simply to execute tasks.
