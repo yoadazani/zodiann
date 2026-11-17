@@ -20,21 +20,27 @@
 - **Close label.** "Close menu" / "סגירת תפריט": an intentional, documented exception to NAV-001's "`kit.js`-only copy" rule, localized and consistent with `openMenu`.
 - **Light references.** Chrome-generated from `kit.css`, labelled as generated visual references, not designer assets; `kit.css` and the design specification stay authoritative and the images never override them.
 - **Motion and version.** `easeOutCubic` for open (240 ms) and close (180 ms), instant under reduced motion. Version ownership stays outside `shared_ui`: the drawer receives the finished version line. `1.0.0` is a temporary app-provided value with its fallback documented.
+- **Active item colour (plan review D1): `accent-strong`** for the active icon and name, as kit.css, every designer PNG and NAV-3 ("marked with the accent colour") draw it. MASTER §5 and the task text say `text`; MASTER is not edited and the deviation is recorded here and in PROGRESS (as the UI-009 neutral-tag weight was).
+- **Screen reader (plan review D2).** Try a real TalkBack session. If the emulator cannot run one, the task is still closed, with acceptance criterion 4 left **unticked** and the check recorded as outstanding (the FND-005 iOS precedent).
 
 ## Facts established while planning (2026-11-17)
 
-- **Geometry (kit.css, border-box):**
-  - Panel: width `min(320, 86 % × screen width)` (so 320 from 372.09 up; 309.6 at 360); full height; `surface`; `border-inline-end` 1 px `line`; `box-shadow: var(--shadow-float)`.
-  - Header: height 76 including a 1 px `line-soft` bottom rule; padding start 20 (`s5`), end 12 (`s3`), top and bottom 12; gap 12; logo 40, wordmark 20/600 −0.01 em (`ZodiannTextStyles.drawerWordmark` exists), close button 46 × 46 at the end.
-  - Nav: padding 12, items 2 apart. Group label: padding 16 / 12 / 8 (top / sides / bottom), the first one 8 on top; 12, `text-3`, weight 400.
-  - Item: padding 12, radius 8; a 24 px icon column, 12 gap, icon 1 px down; name 14/500; description 12 `text-2`, weight 400; row gap 2. Active: `accent-soft` fill, 3 px `accent` bar on the start edge (10 px from the top and bottom, radius 3), icon and name in `accent-strong`.
+- **Geometry (kit.css, border-box; reference measurements by plan review round 1 on `00-navigation-drawer_desktop_en_dark.png`):**
+  - Panel: width `min(320, 0.86 × screen width)`: 320 from 372.093… up (372.1 → 320; 372.09 → 319.9974; 360 → 309.6; 320 → 275.2); full height; `surface`; `border-inline-end` 1 px `line`; shadow `var(--shadow-float)`. **The 1 px border is inside the width**: the content box is `width − 1`. At 320 the border column is x 319 and the outline column (under the shadow) x 320.
+  - Header: 76 high including a 1 px `line-soft` bottom rule (rule at row 75); padding start 20 (`s5`), end 12 (`s3`), top and bottom 12; gap 12; logo 40 (x 20–60); wordmark starts at x 72, 20/600 −0.01 em (`drawerWordmark`); close button 46 × 46 ending 12 from the inner border (x 261–307 at 320), its X ink x 278–289.
+  - Nav: padding 12, items 2 apart. Group label: padding 16 / 12 / 8, the first 8 on top; 12, `text-3`, weight 400.
+  - Item: padding 12, radius 8; a 24 px icon column (the 20 px icon at its start, not centred, 1 px down: `margin-top: 1px`), 12 gap, text column 235 wide at 320; name 14/500 (`text`); description 12 `text-2`, weight 400; row gap 2. **The en Wheel description wraps to two lines** (fill ≈ 81 px high), so a width error of a few pixels shifts every row below it. Inactive icon `text-2`, inactive name `text`.
+  - Active: `accent-soft` fill, 3 px `accent` bar on the start edge (10 px from top and bottom, radius 3), icon and name `accent-strong` (decided, D1).
   - Footer: pinned to the bottom; padding 16 / 20, 1 px `line-soft` top rule, 12 `text-3`, two lines 2 apart.
-- **Reference measurements (the executor re-checks them in Task 5).** At 390 × 844 @2 the panel is 640 device px wide (320 logical), which agrees with `min(320, 86 %)`. Desktop (1440 × 900 @1): the logo spans x 20–60 and the panel's inner edge is at x ≈ 320.
-- **Discrepancy, decided by the reference:** MASTER §5 and the task text say the active icon and name are `text`; `kit.css` draws `accent-strong` (white on dark, black on light). The PNGs are the pixel authority, so Task 5 measures the active-name ink colour and the plan follows the PNG. **Open item for the product owner (see Review record).**
-- **`ZodiannPressable` has one semantics node and no `selected` or `hint`** (`zodiann_pressable.dart:95-100`). The selected state needs two additive optional parameters (Task 1); the UI-004 / NAV-001 suites are the regression gate.
-- **Existing assertion that must change:** `apps/astro_mobile/test/navigation/top_bar_shell_test.dart:153-162` ("hamburger is disabled and labelled …") asserts `onPressed` is null; Task 4 changes exactly that assertion and its description. Nothing else in that file.
-- **Tokens that exist:** `ZodiannSurfaces.scrim / accentSoft / accentStrong / lineSoft / line / text3`, `ZodiannElevation.floating / floatingOutline`, `ZodiannTextStyles.drawerWordmark`, `ZodiannSize.logoDrawer (40) / iconButton (46) / icon (20)`, `ZodiannIcons.wheel / grid / folder / sliders / info / x`.
-- **Device sizes of the reference renderer:** desktop 1440 × 900 @1, mobile 390 × 844 @2 (`_source/render/render.js:6`).
+- **At 390 × 844 @2 the panel is 640 device px (320 logical).** Border columns 638–639 and outline 640–641; header rule rows 150–151.
+- **`ZodiannPressable` has one semantics node and no `selected` or `hint`** (`zodiann_pressable.dart:95-100`). In Flutter 3.50 the selected flag has three states, so the node must carry *no* selected state unless the item is active (Task 1).
+- **Flutter's close curve does not flip.** A `CurvedAnimation` applies the same curve on the way back, so `reverseCurve: easeOutCubic` would close slowly then fast (98.4 % open after 25 % of the close). The close uses `Curves.easeOutCubic.flipped`: open fraction 0.422 / 0.125 / 0.016 at 45 / 90 / 135 ms of closing; opening is 0.578 / 0.875 / 0.984 at 60 / 120 / 180 ms (±0.01).
+- **Route default barrier fades with `Curves.ease` on raw progress**, not in step with the panel; the route supplies its own barrier (Task 3).
+- **Existing assertion that must change:** `apps/astro_mobile/test/navigation/top_bar_shell_test.dart:150-167` ("hamburger is disabled and labelled …": `onPressed` null and `isEnabled: false`) and the file header's mention of the hamburger (lines 1-4). Nothing else in that file.
+- **Tokens that exist:** `ZodiannSurfaces.scrim / accentSoft / accentStrong / lineSoft / line / text2 / text3`, `ZodiannElevation.floating / floatingOutline`, `ZodiannTextStyles.drawerWordmark`, `ZodiannSize.logoDrawer (40) / iconButton (46) / icon (20)`, `ZodiannIcons.wheel / grid / folder / sliders / info / x`, and the ARB key `appTitle` ("Zodiann", used for the wordmark).
+- **Device sizes of the reference renderer:** desktop 1440 × 900 @1, mobile 390 × 844 @2 (`_source/render/render.js:6`). That renderer launches Chrome with web fonts reachable from `file://`, hinting off, sRGB, and waits for fonts (`render.js:13-23`).
+- **Root architecture guards** (`test/architecture`: `no_magic_dimensions`, `no_text_literals`, `logo_size_guard`, `l10n_key_parity`, `sentence_case`) run from the repository root, so every task runs them explicitly.
+- **Go_router back** stops at a route pushed on the root navigator (`delegate.dart:116-135`), so the drawer closes on back before the router acts.
 
 ## Global Constraints
 
@@ -42,19 +48,20 @@
 - Layout values come from `ZodiannSpace / ZodiannRadius / ZodiannSize` (`no_magic_dimensions_test`); directional geometry only (`EdgeInsetsDirectional`, `AlignmentDirectional`), no mirroring transform, no icon is mirrored.
 - `shared_ui` imports no route, no app code and no version source; `AppRoute` stays in the app.
 - The logo is `ZodiannLogo(size: ZodiannSize.logoDrawer)`; icons come from `ZodiannIcon(ZodiannIcons.…)`; text styles derive from `ZodiannTextStyles` roles.
-- The drawer is never docked or permanent, at any width (NAV-7).
+- The drawer is never docked or permanent, at any width (NAV-7). NAV-005 keeps its own criteria and dedicated suite; Task 4's widths are this task's smoke test.
 - No new dependency; keep `no_network_test` green.
 - Commands run as `fvm flutter …` / `fvm dart …` / `fvm dart run melos …`, sequentially. A root `fvm flutter pub get` deletes the tracked l10n output: restore with `git checkout -- packages/shared_ui/lib/l10n` (never commit the deletion). Regenerate l10n with the command `tool/check_l10n.dart` uses.
+- **Every task's final run** includes the root guards: from the repository root, `fvm dart test test/architecture` (all pass), plus `fvm dart run melos run lint`.
 
 ## Review Focus
 
 Failure modes the spec implies and no acceptance criterion exercises. Each has a test in the owning task.
 
-1. **Narrow phone, large text:** at 320 px wide with `textScaler` 2.0 and long Hebrew descriptions, items grow and wrap, nothing overflows, and the list scrolls (Task 2).
+1. **Narrow phone, large text:** at 320 px wide with `textScaler` 2.0 and long Hebrew descriptions, items grow and wrap, the header (clamped at 1.5×) does not overflow, nothing overflows, and the list scrolls (Task 2).
 2. **Short screen (landscape phone, 360 px high):** header + nav + footer exceed the height; the nav area scrolls, the footer stays at the bottom, no overflow (Task 2).
-3. **Double tap on the hamburger:** two quick taps open one drawer, not two stacked (Task 4).
-4. **Locale or theme change while open:** the drawer re-lays out in the new direction and theme, and the swipe direction follows (Task 3).
-5. **Interrupted gestures:** release mid-drag, drag toward the open side (must not move past open), a fling while opening, and back pressed during the opening animation all end in a consistent open or closed state with no leftover route (Task 3).
+3. **Double tap on the hamburger:** two quick taps open one drawer, not two stacked (Tasks 3 and 4).
+4. **Locale or theme change while open:** the drawer re-lays out in the new direction, theme and scrim colour, the app's copy follows the new locale, and the swipe direction follows (Tasks 3 and 4).
+5. **Interrupted gestures:** release mid-drag, drag toward the open side (must not move past open), a fling while opening, a drag to the closed edge, and back pressed during the opening animation all end in a consistent open or closed state with no leftover route (Task 3).
 
 ---
 
@@ -63,32 +70,34 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 | File | Responsibility |
 |---|---|
 | `packages/shared_ui/lib/src/theme/tokens/zodiann_dimensions.dart` (modify) | Drawer and nav sizes in `ZodiannSize` |
-| `packages/shared_ui/lib/src/theme/tokens/zodiann_states.dart` (modify) | `drawerOpenDuration`, `drawerCloseDuration` |
+| `packages/shared_ui/lib/src/theme/tokens/zodiann_states.dart` (modify) | Drawer durations and fling velocity |
 | `packages/shared_ui/lib/src/widgets/zodiann_pressable.dart` (modify) | Optional `selected`, `semanticHint` |
 | `packages/shared_ui/lib/src/widgets/zodiann_drawer.dart` (create) | `ZodiannDrawer`, `ZodiannDrawerGroup`, `ZodiannDrawerItem` (the panel) |
-| `packages/shared_ui/lib/src/widgets/zodiann_drawer_route.dart` (create) | `showZodiannDrawer`, the route, scrim, motion and swipe |
-| `packages/shared_ui/lib/shared_ui.dart` (modify) | Exports (the route class hidden) |
+| `packages/shared_ui/lib/src/widgets/zodiann_drawer_route.dart` (create) | `showZodiannDrawer`, the private route, barrier, motion and swipe |
+| `packages/shared_ui/lib/shared_ui.dart` (modify) | Exports |
 | `packages/shared_ui/lib/l10n/app_{en,he}.arb` (modify) + generated output | New strings |
+| `apps/astro_mobile/lib/src/app_version.dart` (create) | The temporary `appVersion` constant |
 | `apps/astro_mobile/lib/src/navigation/app_shell.dart` (modify) | Enable the hamburger, build the groups |
+| `apps/astro_mobile/lib/src/navigation/app_route.dart` (modify, doc only) | Route-contract comment |
 | `tool/drawer/render_drawer_references.dart` (create) | Headless-Chrome reference renderer |
 | `packages/shared_ui/test/fixtures/drawer/` (create) | Generated PNGs, `manifest.json`, `README.md` |
 | `packages/shared_ui/test/support/drawer_features.dart` (create) | The feature extractor for the references |
-| Tests: `test/widgets/drawer_test.dart`, `drawer_route_test.dart`, `drawer_reference_test.dart`, `test/l10n/drawer_copy_test.dart` (shared_ui); `test/navigation/drawer_shell_test.dart` (app) | |
+| Tests (new files only): shared_ui `test/widgets/pressable_selected_test.dart`, `drawer_test.dart`, `drawer_route_test.dart`, `drawer_reference_test.dart`, `test/l10n/drawer_copy_test.dart`, `test/theme/dimensions_test.dart` (extended: UI-003's own file); app `test/navigation/drawer_shell_test.dart` | |
 
 ---
 
 ### Task 1: Tokens, copy and the pressable's selected state
 
-**Files:** modify `zodiann_dimensions.dart`, `zodiann_states.dart`, `zodiann_pressable.dart`, both ARBs; test `packages/shared_ui/test/theme/dimensions_test.dart` (extend), `packages/shared_ui/test/widgets/pressable_test.dart` (extend), create `packages/shared_ui/test/l10n/drawer_copy_test.dart`.
+**Files:** modify `zodiann_dimensions.dart`, `zodiann_states.dart`, `zodiann_pressable.dart`, both ARBs; extend `packages/shared_ui/test/theme/dimensions_test.dart`; create `packages/shared_ui/test/widgets/pressable_selected_test.dart` and `packages/shared_ui/test/l10n/drawer_copy_test.dart`. (`pressable_test.dart` is NAV-001's and stays unedited.)
 
 **Interfaces:**
-- Produces: `ZodiannSize.drawerMaxWidth = 320`, `drawerWidthFactor = 0.86`, `drawerHead = 76`, `navIconColumn = 24`, `navItemGap = 2`, `navActiveBar = 3`, `navActiveBarInset = 10`; `ZodiannStates.drawerOpenDuration = 240 ms`, `drawerCloseDuration = 180 ms`; `ZodiannPressable({…, bool selected = false, String? semanticHint})`.
-- ARB keys (en / he): `closeMenu` "Close menu" / "סגירת תפריט"; `drawerGroupAnalysis` "Analysis" / "ניתוח"; `drawerGroupLibrary` "Library and app" / "ספרייה ואפליקציה"; `drawerDescWheel`, `drawerDescSquare`, `drawerDescSaved`, `drawerDescSettings`, `drawerDescAbout` (kit.js `wheelDesc` … `aboutDesc`, verbatim); `drawerVersion` (placeholder `{version}`: "Version {version}" / "גרסה {version}"); `drawerOffline` "All data stays on this device" / "כל הנתונים נשארים במכשיר". Item names reuse `screen{Wheel,Square,Saved,Settings,About}Title`.
+- Produces: `ZodiannSize.drawerMaxWidth = 320`, `drawerWidthFactor = 0.86`, `drawerHead = 76`, `navIconColumn = 24`, `navIconNudge = 1`, `navItemGap = 2`, `navActiveBar = 3`, `navActiveBarInset = 10`; `ZodiannStates.drawerOpenDuration = 240 ms`, `drawerCloseDuration = 180 ms`, `drawerFlingVelocity = 365` (px/s, Material's drawer constant); `ZodiannPressable({…, bool selected = false, String? semanticHint})`.
+- ARB keys (en / he): `closeMenu` "Close menu" / "סגירת תפריט"; `drawerGroupAnalysis` "Analysis" / "ניתוח"; `drawerGroupLibrary` "Library and app" / "ספרייה ואפליקציה"; `drawerDescWheel`, `drawerDescSquare`, `drawerDescSaved`, `drawerDescSettings`, `drawerDescAbout` (kit.js `wheelDesc` … `aboutDesc`, verbatim); `drawerVersion` (placeholder `{version}`: "Version {version}" / "גרסה {version}"); `drawerOffline` "All data stays on this device" / "כל הנתונים נשארים במכשיר". Item names reuse `screen{Wheel,Square,Saved,Settings,About}Title`; the wordmark reuses `appTitle`.
 
-- [ ] **Step 1: Write the failing tests.** `dimensions_test`: each new token equals the value above and appears in the kit.css cross-check (`.drawer` width 320, `.drawer-head` 76, `.nav-item` grid 24 / gap 2, `.nav-item.on::before` width 3, top 10). `pressable_test`: `selected: true` gives a semantics node with `isSelected` and `semanticHint` becomes its hint; the default node is unchanged (flags and actions equal the current ones). `drawer_copy_test`: every new key equals the `kit.js` value in en and he (`wheelDesc` …, `tools`, `library`, `version` with `1.0.0`, `offline`), the close label is the literal pair above and is the only key that has no `kit.js` source (assert that exemption explicitly, with the reason in a comment), and the key sets of the two ARBs are equal.
-- [ ] **Step 2: Run them; expect FAIL** (undefined tokens and getters). `cd packages/shared_ui; fvm flutter test test/theme/dimensions_test.dart test/widgets/pressable_test.dart test/l10n/drawer_copy_test.dart`.
-- [ ] **Step 3: Implement** the tokens (with doc comments citing MASTER §5 / kit.css), the two durations, the ARB entries with `@key` descriptions (state the exception on `closeMenu`), regenerate l10n, and add `selected` / `semanticHint` to `ZodiannPressable` (passed to the existing `Semantics`; defaults leave the node unchanged).
-- [ ] **Step 4: Run them; expect PASS**, then `fvm dart run melos run l10n:check` and the whole `shared_ui` suite (UI-004 and NAV-001 suites unedited; `git diff --stat` shows no edits to their files).
+- [ ] **Step 1: Write the failing tests.** `dimensions_test`: each new token equals the value above and appears in the kit.css cross-check (`.drawer` width 320, `.drawer-head` 76, `.nav-item` grid 24 / gap 2, `svg` margin-top 1, `.nav-item.on::before` width 3, top 10). `pressable_selected_test`: `selected: true` gives a node with `isSelected` and the `semanticHint` as its hint; with the default, the node has **no selected state at all** (`hasSelectedState` false) and its flags and actions equal a plain pressable's. `drawer_copy_test`: every new key equals the `kit.js` value in en and he (`wheelDesc` …, `tools`, `library`, `version` with `1.0.0`, `offline`); `closeMenu` is the literal pair above and is the only **drawer** key with no `kit.js` source (assert that exemption explicitly, with the reason in a comment); the key sets of the two ARBs are equal.
+- [ ] **Step 2: Run; expect FAIL.** `cd packages/shared_ui; fvm flutter test test/theme/dimensions_test.dart test/widgets/pressable_selected_test.dart test/l10n/drawer_copy_test.dart` → compilation errors: undefined `ZodiannSize.drawerMaxWidth`, `selected`, `closeMenu`.
+- [ ] **Step 3: Implement** the tokens (doc comments citing MASTER §5 / kit.css), the ARB entries with `@key` descriptions (state the exception on `closeMenu`), regenerate l10n, and add `selected` / `semanticHint` to `ZodiannPressable`, passing `selected: widget.selected ? true : null` and `hint: widget.semanticHint` to the existing `Semantics`.
+- [ ] **Step 4: Run; expect PASS:** the three files, `fvm dart run melos run l10n:check`, the whole `shared_ui` suite (UI-004 and NAV-001 suites unedited: `git diff --stat main -- packages/shared_ui/test/widgets/pressable_test.dart packages/shared_ui/test/widgets/button_*.dart packages/shared_ui/test/widgets/top_bar_test.dart` is empty), and the root guards.
 - [ ] **Step 5: Commit** `feat(ZOD-NAV-002): add drawer tokens, copy and the pressable's selected state`.
 
 ### Task 2: `ZodiannDrawer` (the panel)
@@ -100,21 +109,21 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 - Produces:
   - `final class ZodiannDrawerItem { const ZodiannDrawerItem({required ZodiannIconData icon, required String name, required String description, required bool selected, required VoidCallback onTap}); }`
   - `final class ZodiannDrawerGroup { const ZodiannDrawerGroup({required String label, required List<ZodiannDrawerItem> items}); }`
-  - `class ZodiannDrawer extends StatelessWidget { const ZodiannDrawer({super.key, required List<ZodiannDrawerGroup> groups, required String closeLabel, required VoidCallback onClose, required String versionLabel, required String offlineLabel}); }`: width `min(drawerMaxWidth, drawerWidthFactor × MediaQuery width)`, full height.
+  - `class ZodiannDrawer extends StatelessWidget { const ZodiannDrawer({super.key, required String wordmark, required List<ZodiannDrawerGroup> groups, required String closeLabel, required VoidCallback onClose, required String versionLabel, required String offlineLabel}); static double widthFor(double screenWidth); }` where `widthFor` is `min(drawerMaxWidth, drawerWidthFactor × screenWidth)` (the panel's width, mirroring `ZodiannTopBar.heightFor`).
 
-- [ ] **Step 1: Write the failing tests** (`drawer_test.dart`, pumped in graphite and porcelain, en and he, at 1440 and 390; every geometry assertion measured with `tester.getRect` / `getTopLeft`):
-  - width 320 at 1440, 390 and 372.09; 309.6 at 360; 275.2 at 320;
-  - header 76 high with the rule at its last row, logo 40 × 40 at the start inset 20 (LTR x 20, RTL mirrored), wordmark style equals `drawerWordmark`, close button 46 × 46 at 12 from the end edge, labelled `closeLabel`;
-  - group labels 12 / `text3` / weight 400 with paddings 16 / 12 / 8 and the first group 8 on top; items 2 apart; item padding 12, radius 8, icon column 24 + gap 12, name 14/500, description 12 / `text2` / 400;
-  - the active item: `accentSoft` fill, a 3 × (height − 20) `accent` bar on the start edge (LTR left, RTL right), name and icon colours per the Task 5 measurement (default `accentStrong`), and a semantics node `isSelected` with label = name and hint = description; the others are not selected; item semantics have one node each;
-  - footer pinned to the bottom, 16 / 20 padding, `lineSoft` top rule, `text3`, the two lines in order; the inner-edge line and the `floating` shadow plus outside `floatingOutline`;
-  - `ZodiannLogo` variant follows `Theme.brightness` (dark → on-dark asset, porcelain → on-light) with the OS brightness set the other way;
-  - **Review Focus 1 and 2:** 320 px wide with `textScaler` 2.0 and Hebrew descriptions: no overflow, list scrolls; 360 px high: no overflow, footer at the bottom, nav scrolls;
+- [ ] **Step 1: Write the failing tests** (`drawer_test.dart`, graphite and porcelain, en and he, at 1440 and 390; geometry measured with `tester.getRect` / `getTopLeft`):
+  - `widthFor` and the panel's width: 320 at 1440, 390 and 372.1; 319.9974 at 372.09 (compared within 1e-6); 309.6 at 360; 275.2 at 320;
+  - header 76 high with the rule at its last row; the content box is `width − 1` (the 1 px inner border); logo 40 × 40 at the start inset 20 (LTR x 20, RTL mirrored); wordmark text equals `wordmark` with the `drawerWordmark` style, starting 12 after the logo; the close button 46 × 46 ending 12 from the inner border, labelled `closeLabel`;
+  - group labels 12 / `text3` / weight 400 with paddings 16 / 12 / 8, the first 8 on top; items 2 apart; item padding 12, radius 8; the 20 px icon at the **start** of the 24 px column (LTR and RTL), 1 px down; name 14/500 in `text`; description 12 / `text2` / 400; inactive icon `text2`;
+  - the active item: `accentSoft` fill; a `navActiveBar` × (height − 2 × `navActiveBarInset`) `accent` bar on the start edge (LTR left, RTL right) with radius 3; name and icon `accentStrong` (decision D1); a semantics node `isSelected` with label = name and hint = description; the others have no selected state; one semantics node per item;
+  - footer pinned to the bottom, padding 16 / 20, `lineSoft` top rule, `text3`, the two lines in order; the `floating` shadow with the `floatingOutline` ring outside; the inner-edge line;
+  - `ZodiannLogo` variant follows `Theme.brightness` (graphite → on-dark asset, porcelain → on-light) with the OS brightness set the other way;
+  - **Review Focus 1 and 2:** 320 px wide with `textScaler` 2.0 and Hebrew descriptions: no overflow, the header's text is clamped at 1.5×, the list scrolls; 360 px high: no overflow, footer at the bottom, nav scrolls;
   - safe areas: with a 24 top inset, 34 bottom inset and a 20 side inset the background still covers the insets while the content stays inside them;
-  - tapping an item calls its `onTap` once; the close button calls `onClose` once; items have the UI-004 hover / press / focus-ring behaviour (one representative check) and a ≥ 44 target.
-- [ ] **Step 2: Run; expect FAIL** (`ZodiannDrawer` undefined).
-- [ ] **Step 3: Implement** the three classes in `zodiann_drawer.dart` and export them. Build from `Column` (header, `Expanded` scrollable nav, footer), with `EdgeInsetsDirectional` throughout, the active bar as a `PositionedDirectional` in a `Stack`, the elevation via `DecoratedBox` (`floating` shadows followed by a `BoxShadow(color: floatingOutline.color, spreadRadius: floatingOutline.width)`), and `MediaQuery.withClampedTextScaling` only if a measured overflow requires it (record it).
-- [ ] **Step 4: Run; expect PASS**, then the whole `shared_ui` suite and `melos run lint`.
+  - an item tap calls its `onTap` once; the close button calls `onClose` once; items have the UI-004 hover / press / focus-ring behaviour (one representative check) and a ≥ 44 target; the first and last items' focus rings are not clipped by the nav padding (the 2 px item gap leaves rings of neighbouring items overlapping; accepted, noted in the doc comment).
+- [ ] **Step 2: Run; expect FAIL.** `cd packages/shared_ui; fvm flutter test test/widgets/drawer_test.dart` → compilation error: undefined name `ZodiannDrawer`.
+- [ ] **Step 3: Implement** the three classes and `widthFor` in `zodiann_drawer.dart`, exported from `shared_ui.dart`. Build from `Column` (header, `Expanded` scrollable nav, footer) with `EdgeInsetsDirectional` throughout; the content is inset by the border width (`floatingOutline.width`, no literal); the active bar is a `PositionedDirectional` in a `Stack`; the header wraps its text in `MediaQuery.withClampedTextScaling(maxScaleFactor: 1.5)` (the top bar's rule: (20 × 1.45 × 1.5 = 43.5 ≤ 52); nav and footer scale freely); elevation is a `DecoratedBox` whose shadows list `floatingOutline` ring first, then `floating` (Flutter paints later shadows on top, and the reference's outline column sits under the shadow; a 1 px deviation outside the compared region is recorded if the order has to differ).
+- [ ] **Step 4: Run; expect PASS:** `drawer_test.dart`, the whole `shared_ui` suite, the root guards, `fvm dart run melos run lint`.
 - [ ] **Step 5: Commit** `feat(ZOD-NAV-002): add ZodiannDrawer`.
 
 ### Task 3: `showZodiannDrawer` (route, motion, swipe)
@@ -122,59 +131,60 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 **Files:** create `zodiann_drawer_route.dart`; modify `shared_ui.dart`; test `packages/shared_ui/test/widgets/drawer_route_test.dart`.
 
 **Interfaces:**
-- Consumes: `ZodiannDrawer`, `ZodiannStates.drawer*Duration`.
-- Produces: `Future<void> showZodiannDrawer(BuildContext context, {required WidgetBuilder builder})`. Pushes on the root navigator; `builder` returns the `ZodiannDrawer` (it calls `Navigator.of(context).maybePop()` for `onClose`). The duration is read from `MediaQuery.disableAnimationsOf(context)` at push time (zero when reduced).
+- Consumes: `ZodiannDrawer.widthFor`, `ZodiannStates.drawer*`.
+- Produces: `Future<void> showZodiannDrawer(BuildContext context, {required WidgetBuilder builder})`. Pushes a private `_ZodiannDrawerRoute` on the root navigator; `builder` returns the `ZodiannDrawer` (its `onClose` calls `Navigator.of(context).maybePop()`). **Guard:** if `ModalRoute.of(context)?.isCurrent == false` (a drawer is already above the caller's route) it returns without pushing. The durations are read from `MediaQuery.disableAnimationsOf(context)` at push time (zero when reduced).
 
-- [ ] **Step 1: Write the failing tests** (a harness `MaterialApp` with a button that calls `showZodiannDrawer`; en and he):
-  - opens in 240 ms (a frame at 120 ms is part-way, at 240 ms fully open) and closes in 180 ms with `easeOutCubic` (sample the panel's offset against the curve at 25 / 50 / 75 %); the scrim opacity follows the same animation; the scrim colour is `scrim` in both themes;
-  - **the four closes:** backdrop tap (outside the panel) closes; the close button closes; swipe toward the start edge closes (LTR leftward, RTL rightward, mirrored exactly); `tester.binding.handlePopRoute()` closes; after each, no route is left;
-  - a tap on the panel does not close it; a drag toward the open side never moves past fully open; a release before halfway settles open, after halfway or with fling velocity ≥ 365 px/s settles closed; the panel follows the finger 1:1 during the drag;
-  - reduced motion (`disableAnimations: true`): open and close are immediate;
-  - the route is on the root navigator and the top bar is behind the scrim (a tap on the hamburger's position hits the scrim and closes);
-  - the scrim has no semantics node of its own; the panel is the only accessible content;
-  - **Review Focus 3 and 4:** a locale change (en → he) and a theme change while open re-lay out the panel and flip the swipe direction; **Review Focus 5:** back pressed at 100 ms into opening reaches closed with no leftover route; a fling while opening ends in a consistent state; two quick `showZodiannDrawer` calls from the same context leave one route (document the chosen guard, e.g. the route rejects a second push while one is current).
-- [ ] **Step 2: Run; expect FAIL.**
-- [ ] **Step 3: Implement** `_ZodiannDrawerRoute extends PopupRoute<void>`: `transitionDuration` / `reverseTransitionDuration` from the captured values; `barrierDismissible: true`; `barrierColor` the theme's `scrim` (fading in step through `ModalRoute`'s barrier animation); `buildModalBarrier` wrapped to exclude the scrim from semantics; `buildTransitions` slides the child from the start edge with `CurvedAnimation(curve: Curves.easeOutCubic, reverseCurve: Curves.easeOutCubic)` using `AlignmentDirectional`/`Directionality`; a horizontal drag layer drives `controller.value` by `−delta × directionSign / panelWidth`, and on release calls `forward()` or pops (the controller scales the remaining reverse time).
-- [ ] **Step 4: Run; expect PASS**, whole `shared_ui` suite, `melos run lint`.
+- [ ] **Step 1: Write the failing tests** (a harness `MaterialApp` with a button that calls `showZodiannDrawer`; en and he; graphite and porcelain):
+  - **Open:** the open fraction at 60 / 120 / 180 ms is 0.578 / 0.875 / 0.984 (±0.01) and 1.0 at 240 ms. **Close:** the open fraction at 45 / 90 / 135 ms is 0.422 / 0.125 / 0.016 (±0.01) and the route is gone at 180 ms. (The curve is `easeOutCubic` opening and `easeOutCubic.flipped` closing, so both ease out.)
+  - **Scrim in step:** at every sample, opening and closing, the scrim's opacity equals the panel's open fraction × the theme's `scrim` alpha; the scrim colour is the theme's `scrim`, read live (a theme switch while open changes it).
+  - **The four closes:** a backdrop tap (outside the panel) closes; the close button closes; a swipe toward the start edge closes (LTR leftward, RTL rightward, mirrored exactly); `tester.binding.handlePopRoute()` closes; after each, no route is left. A tap on the panel does not close it.
+  - **Gesture:** the panel follows the finger 1:1 (the drag and the settle use linear progress, not the curve); no jump on release (the panel moves < 1 px between the last drag frame and the first settle frame); a drag toward the open side never moves past fully open; a release at ≤ 50 % open, or a fling toward the start ≥ `drawerFlingVelocity`, closes, otherwise it settles open; a drag to the closed edge and release leaves no route; drags start on the panel and on the scrim.
+  - Reduced motion (`disableAnimations: true`): open and close are immediate.
+  - **Top bar and hit testing:** the route is on the root navigator and the top bar is behind it; a tap on the top bar's title area (outside the panel) hits the scrim and closes the drawer; a tap at the hamburger's position hits the panel and the drawer stays open; the top bar's controls get no taps while the drawer is open.
+  - **Semantics:** the scrim has no semantics node of its own (`semanticsDismissible => false`) while a backdrop tap still closes the drawer; the panel is the only accessible content and the screen behind is blocked.
+  - **Review Focus 3:** two quick `showZodiannDrawer` calls from the same context leave one route. **Focus 4:** a locale change (en → he) and a theme change while open re-lay out the panel, update the scrim colour and flip the swipe direction. **Focus 5:** back pressed 100 ms into opening reaches closed with no leftover route; a fling while opening ends in a consistent state.
+- [ ] **Step 2: Run; expect FAIL.** `cd packages/shared_ui; fvm flutter test test/widgets/drawer_route_test.dart` → compilation error: undefined name `showZodiannDrawer`.
+- [ ] **Step 3: Implement** `_ZodiannDrawerRoute extends PopupRoute<void>`: `transitionDuration` / `reverseTransitionDuration` from the captured values; `barrierDismissible: true`; `semanticsDismissible => false`; **override `buildModalBarrier()`** to return an `AnimatedModalBarrier` whose colour is driven by the same animation as the slide (`ColorTween(transparent → scrim)` with the theme's `scrim` read from the navigator's theme at build time), `dismissible: true`, `barrierSemanticsDismissible: false`. `buildTransitions` slides the panel with `SlideTransition(textDirection: Directionality.of(context))` using `CurvedAnimation(curve: Curves.easeOutCubic, reverseCurve: Curves.easeOutCubic.flipped)` while no gesture is active. The drag layer (on the panel and the scrim): when a drag starts, stop the controller and call `navigator.didStartUserGesture()`; draw the slide and scrim from the **linear** controller value while dragging and during the settle after release; set `controller.value` by `−delta × directionSign / ZodiannDrawer.widthFor(screenWidth)`, clamped to ≤ 1; on release pop if the value ≤ 0.5 or the fling toward the start ≥ `drawerFlingVelocity`, otherwise `forward()`; reaching 0 always pops; call `didStopUserGesture()` at the end.
+- [ ] **Step 4: Run; expect PASS:** `drawer_route_test.dart`, the whole `shared_ui` suite, the root guards, `fvm dart run melos run lint`.
 - [ ] **Step 5: Commit** `feat(ZOD-NAV-002): add showZodiannDrawer`.
 
 ### Task 4: Wire the drawer into the app shell
 
-**Files:** modify `app_shell.dart` and its doc comment, `top_bar_shell_test.dart:150-162` (only that test), `apps/astro_mobile/lib/src/app.dart` doc comment; create `apps/astro_mobile/test/navigation/drawer_shell_test.dart`.
+**Files:** create `apps/astro_mobile/lib/src/app_version.dart`, `apps/astro_mobile/test/navigation/drawer_shell_test.dart`; modify `app_shell.dart` (and its doc comment), `app_route.dart` (doc comment only), `app.dart` (doc comment), `top_bar_shell_test.dart:150-167` and its header (lines 1-4).
 
 **Interfaces:**
 - Consumes: `showZodiannDrawer`, `ZodiannDrawer*`, the new ARB getters.
-- Produces: an `AppShell` whose hamburger (`onMenuPressed`) opens the drawer; an app-level constant `appVersion = '1.0.0'` with a doc comment ("temporary app-provided value; replace with the authoritative version source (About task); the drawer never owns it"), passed to `l.drawerVersion(appVersion)`.
+- Produces: `const String appVersion = '1.0.0';` in `app_version.dart`, documented as a temporary app-provided value to be replaced by the authoritative version source (the About task); the drawer never owns it. An `AppShell` whose hamburger opens the drawer; the builder resolves `ZodiannLocalizations.of(drawerContext)` **inside** the builder and builds the groups there (only `route` is captured), passing `wordmark: l.appTitle`, `versionLabel: l.drawerVersion(appVersion)`, `offlineLabel: l.drawerOffline`, `closeLabel: l.closeMenu`.
 
-- [ ] **Step 1: Write the failing tests** (`drawer_shell_test.dart`, en and he, with the shell's `_pumpApp` pattern): the hamburger is enabled and labelled; tapping it opens one drawer whose groups are "Analysis" (wheel, square) and "Library and app" (saved, settings, about) in `AppRoute.values` order with the literal en / he names and descriptions; the active item follows the route (`/square` → Square selected, then Settings); the footer reads "Version 1.0.0" / "גרסה 1.0.0" and the offline line; tapping an item changes nothing (route unchanged, drawer still open: decision A); back closes the drawer and leaves the route unchanged; the close button and the backdrop close it; **Review Focus 3:** two quick hamburger taps → one drawer; **never docked:** at widths 390, 700, 1099, 1100 and 1440 no `ZodiannDrawer` exists while closed, exactly one exists while open and it sits in a route above the shell (the shell's `Scaffold` has no `drawer` / `endDrawer`), and the content behind is covered. Change `top_bar_shell_test`'s hamburger test to "hamburger is enabled and labelled …" (`onPressed` is non-null); nothing else in that file.
-- [ ] **Step 2: Run; expect FAIL.** `cd apps/astro_mobile; fvm flutter test test/navigation`.
-- [ ] **Step 3: Implement** the shell wiring: the hamburger calls `showZodiannDrawer(context, builder: …)` building a `ZodiannDrawer` from the two groups (icons `wheel`, `grid`, `folder`, `sliders`, `info`), `selected: route == r`, item `onTap` a documented no-op ("ZOD-NAV-003 wires navigation and closing"), copy from `ZodiannLocalizations`.
-- [ ] **Step 4: Run; expect PASS**, the whole app suite (NAV-001 / FND-014 suites green), `melos run lint`.
+- [ ] **Step 1: Write the failing tests** (`drawer_shell_test.dart`, en and he, with the shell's `_pumpApp` pattern): the hamburger is enabled and labelled; tapping it opens one drawer whose groups are "Analysis" (wheel, square) and "Library and app" (saved, settings, about) in `AppRoute.values` order with the literal en / he names and descriptions and the wordmark "Zodiann"; the active item follows the route (`/square` → Square selected, then Settings); the footer reads "Version 1.0.0" / "גרסה 1.0.0" and the offline line; tapping an item changes nothing (route unchanged, drawer still open: decision A); back closes the drawer and leaves the route unchanged; the close button and the backdrop close it; **Focus 3:** two quick hamburger taps → one drawer; **Focus 4:** switching the device locale en → he while open shows the Hebrew copy and the mirrored layout; **never docked:** at widths 390, 700, 1099, 1100 and 1440 no `ZodiannDrawer` exists while closed, exactly one exists while open and it sits in a route above the shell (the shell's `Scaffold` has no `drawer` / `endDrawer`), and the content behind is covered. Change `top_bar_shell_test`: the hamburger test becomes "hamburger is enabled and labelled …" (`onPressed` non-null and `isEnabled: true`) and the header comment no longer says the hamburger is disabled; no other test in that file changes.
+- [ ] **Step 2: Run; expect FAIL.** `cd apps/astro_mobile; fvm flutter test test/navigation` → the new tests fail (hamburger disabled, no drawer) and the amended hamburger test fails.
+- [ ] **Step 3: Implement** the wiring: groups with icons `wheel`, `grid`, `folder`, `sliders`, `info`, `selected: route == r`, item `onTap` a documented no-op ("ZOD-NAV-003 wires navigation and closing"). Update `app_route.dart`'s doc comment: the drawer is route-independent too, so the feature-accessible route-contract decision passes to ZOD-DAT-005.
+- [ ] **Step 4: Run; expect PASS:** `fvm flutter test test/navigation`, the whole app suite (NAV-001 / FND-014 suites green), the root guards, `fvm dart run melos run lint`.
 - [ ] **Step 5: Commit** `feat(ZOD-NAV-002): open the drawer from the app shell`.
 
-### Task 5: References, fidelity and the active-colour measurement
+### Task 5: References, fidelity and the active-colour confirmation
 
 **Files:** create `tool/drawer/render_drawer_references.dart`, `packages/shared_ui/test/support/drawer_features.dart`, `packages/shared_ui/test/widgets/drawer_reference_test.dart`, `packages/shared_ui/test/fixtures/drawer/{README.md,manifest.json,*.png}`.
 
 **Interfaces:**
-- Produces: `fvm dart run tool/drawer/render_drawer_references.dart` (Chrome from `CHROME` or the default path, as `tool/logo`), writing `packages/shared_ui/test/fixtures/drawer/generated_{dark,light}_{en,he}_{desktop,mobile}.png` (desktop 1440 × 900 @1, mobile 390 × 844 @2) from `_source/wheel.html?lang=…&theme=…&drawer=1`; `manifest.json` records the Chrome version and the SHA-256 of `kit.css`, `kit.js` and `wheel.html` (LF-normalised). The tool exits non-zero if a PNG has the wrong size. `README.md` states first: **generated visual references, not designer-provided assets; `kit.css` and `MASTER.md` remain authoritative and these images never override them**, and lists how to regenerate.
-- `drawer_features.dart`: one extractor for both PNGs and rendered widgets: the panel's inner-edge column, the header-rule and footer-rule rows, the active fill's rectangle, the active bar's columns and rows, and the ink extents of each text line.
+- Produces: `fvm dart run tool/drawer/render_drawer_references.dart` (Chrome from `CHROME` or the default path), writing `packages/shared_ui/test/fixtures/drawer/generated_{dark,light}_{en,he}_{desktop,mobile}.png` from `_source/wheel.html?lang=…&theme=…&drawer=1` (desktop 1440 × 900 @1, mobile 390 × 844 @2). Chrome arguments: `--headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files --force-color-profile=srgb --font-render-hinting=none --force-device-scale-factor=<1|2> --window-size=<1440,900|390,844> --virtual-time-budget=5000 --screenshot=…` (the logo tool's flags are not enough: web fonts would not load from `file://` and the screenshot would not wait for them). The tool exits non-zero on a wrong PNG size. `manifest.json` records the Chrome version and the SHA-256 (LF-normalised) of `kit.css`, `kit.js`, `wheel.html`, `assets/fonts/fonts.css` and both logo SVGs. `README.md` states first: **generated visual references, not designer-provided assets; `kit.css` and `MASTER.md` remain authoritative and these images never override them**, and how to regenerate.
+- `drawer_features.dart`: one extractor for PNGs and rendered widgets: the border and outline columns, the header-rule and footer-rule rows, the active fill's rectangle, the active bar's columns and rows, each text line's ink extents, and the brightest (dark) or darkest (light) pixel of a name.
 
-- [ ] **Step 1: Write the failing tests.** (a) Extractor self-check: on the four designer dark PNGs the extractor finds the header rule at row 75, the panel edge at x 320 (desktop) and the active bar 3 px wide. (b) Pipeline check: each generated dark PNG matches its designer PNG over the panel region within the same ceilings (proves the renderer reproduces the designer's images). (c) Widget vs reference: `ZodiannDrawer` rendered at the same size with the real fonts and the Wheel active matches the designer dark PNGs and the generated light PNGs (en and he, desktop and mobile): panel edge, rules, fill rectangle and bar within 1 logical px, text ink extents within 3, and a per-pixel mean-difference ceiling over the panel. (d) The manifest hashes still match the three source files. (e) The active name's ink colour in the dark PNG is the `accentStrong` white or the `text` colour: assert whichever the measurement shows and record it in the README (Task 2's active colours follow it).
-- [ ] **Step 2: Run; expect FAIL** (no fixtures, no extractor).
-- [ ] **Step 3: Implement** the renderer and the extractor, generate the eight PNGs, then run the test with `ZODIANN_DRAWER_CALIBRATE=1` to print the measured differences. Pin the ceilings just above the measured worst and record the calibration (values, Chrome version) in this plan's Verification record.
-- [ ] **Step 4: Run; expect PASS**, plus `melos run lint` and the whole `shared_ui` suite.
+- [ ] **Step 1: Write the failing tests.** (a) Extractor self-check on the four designer dark PNGs: border column 319 and outline column 320 (desktop @1; 638–639 and 640–641 @2), header rule at row 75 (150–151 @2), the active bar 3 px wide. (b) Pipeline check: each generated dark PNG matches its designer PNG over the panel region within the same ceilings. (c) Widget vs reference: `ZodiannDrawer` rendered at the same size with the real fonts and Wheel active matches the designer dark PNGs and the generated light PNGs (en and he, desktop and mobile): border, rules, fill rectangle and bar within 1 logical px, text ink extents within 3, and a per-pixel mean-difference ceiling over the panel. (d) The manifest hashes still match the source files. (e) **Active colour:** in the PNG and in the rendered widget, the brightest (dark) or darkest (light) pixel of the active name equals `accentStrong` within ±1 per channel, and the inactive names' equals `text`.
+- [ ] **Step 2: Run; expect FAIL.** `cd packages/shared_ui; fvm flutter test test/widgets/drawer_reference_test.dart` → fixtures and extractor missing.
+- [ ] **Step 3: Implement** the renderer and extractor and generate the eight PNGs. The fixed 1 px (position) and 3 px (text ink) ceilings stand; only the mean-difference ceiling is calibrated: run with `ZODIANN_DRAWER_CALIBRATE=1`, then pin it by the recorded rule `max(round_up(worst × 1.5, 3), floor)` (PROGRESS, 2026-11-15) and record the calibration (values, Chrome version) in the Verification record.
+- [ ] **Step 4: Run; expect PASS:** the test, the whole `shared_ui` suite, the root guards, `fvm dart run melos run lint`.
 - [ ] **Step 5: Commit** `test(ZOD-NAV-002): match the drawer against the references in both themes`.
 
 ### Task 6: Mutation proofs, device check and close-out
 
 **Files:** modify `docs/PROGRESS.md`, the task file's Status, `docs/development/TASKS.md`, this plan's Verification record.
 
-- [ ] **Step 1: Mutation proofs.** Apply each mutant, confirm a named test fails, revert: M1 header 75 / 77; M2 item padding 10; M3 bar 2 px or on the end edge; M4 fixed 320 width (no 86 %); M5 close duration 240; M6 swipe direction not mirrored in RTL; M7 backdrop tap ignored; M8 `selected` semantics dropped; M9 `EdgeInsets` instead of directional (he fails); M10 outline omitted; M11 reduced motion ignored; M12 the drawer docked inline at ≥ 1100; M13 scrim left in semantics; M14 active colour `text` vs `accentStrong` (the reference test fails whichever is wrong).
-- [ ] **Step 2: Device check (emulator-5554, debug APK).** Open the drawer, run `adb shell uiautomator dump` and confirm the active item has `selected="true"` and the others do not; confirm the Android back button closes it. Note: this checks the accessibility node information, not a TalkBack session. Run TalkBack if the emulator image has it; if not, record the limit (**open item**).
+- [ ] **Step 1: Mutation proofs.** Apply each mutant, confirm a named test fails, revert: M1 header 75 / 77; M2 item padding 10; M3 bar 2 px or on the end edge; M4 fixed 320 width (no 86 %); M5 close duration 240; M6 swipe direction not mirrored in RTL; M7 backdrop tap ignored; M8 `selected` semantics dropped; M9 `EdgeInsets` instead of directional (he fails); M10 outline omitted; M11 reduced motion ignored; M12 the drawer docked inline at ≥ 1100; M13 scrim left in semantics; M14 active colour `text` (named failures: Task 2's colour assertion and Task 5(e)); M15 `reverseCurve` not flipped (the close sample test); M16 scrim on the default barrier curve (the in-step test); M17 `selected: false` always passed (the no-selected-state test).
+- [ ] **Step 2: Device check (emulator-5554, debug APK).** `adb` is at `%LOCALAPPDATA%/Android/Sdk/platform-tools/adb.exe` (not on the shell PATH); confirm a device is attached first. Open the drawer with `adb shell input tap` at the hamburger; confirm the Android back button closes it. For the selected state: try TalkBack (`pm list packages | findstr talkback`; enable it if present, ideally on a Google Play image) and listen for / dump the active item's "selected" state. Flutter exposes its accessibility tree only while an accessibility service is active, so a plain `uiautomator dump` may show no Flutter nodes; if neither TalkBack nor a service-backed dump is possible, record that and leave **acceptance criterion 4 unticked** (decision D2).
 - [ ] **Step 3: Final verification** (sequential): `fvm dart run melos run lint`, `fvm dart run melos run test`, `fvm flutter build apk --debug`; record exit codes and counts.
 - [ ] **Step 4: Code review** with `requesting-code-review` on the whole branch; fix Critical and Important findings test-first.
-- [ ] **Step 5: Docs.** Task file Status → Done (acceptance boxes ticked only for what is verified), `TASKS.md` row, `PROGRESS.md` (completed row, conventions: "Drawer" paragraph — use `showZodiannDrawer`, the version is app-owned, items are inert until NAV-003, the references are generated; deferred minors; Next Recommended Task). Commit `docs(ZOD-NAV-002): close out the drawer`, push, open the PR, record the link.
+- [ ] **Step 5: Docs.** Task file Status → Done (acceptance boxes ticked only for what is verified), `TASKS.md` row, `PROGRESS.md`: the completed row; conventions "Drawer" paragraph (use `showZodiannDrawer`; the version is app-owned and temporary; items are inert until NAV-003; the references are generated; the active colour deviation from MASTER §5); **Navigation → Contract** updated to say the route-contract decision passes to ZOD-DAT-005; deferred minors; Next Recommended Task. Commit `docs(ZOD-NAV-002): close out the drawer`, push, open the PR, record the link.
 
 ## Acceptance criteria → proof
 
@@ -183,7 +193,7 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 | Matches `00-navigation-drawer_*` in both languages and both themes | Task 5 (designer dark PNGs; generated light PNGs, labelled as such) |
 | All four close interactions | Task 3 tests; Task 6 device back check |
 | Never permanent at any breakpoint | Task 4 "never docked" test; M12 |
-| Active item "selected" with a screen reader | Task 2 and Task 4 semantics tests; Task 6 device node check (TalkBack itself is an open item) |
+| Active item "selected" with a screen reader | Task 2 and Task 4 semantics tests; Task 6 device check (a real screen-reader run if possible, else criterion left unticked, D2) |
 
 ## Risks
 
@@ -191,6 +201,7 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 - The route's drag layer is the one piece of new gesture code; Task 3 has the most tests for that reason.
 - Android 14+ predictive-back animation is not designed in the references and is out of scope; back still closes the drawer.
 - A root `pub get` deletes the tracked l10n output (see Global Constraints).
+- The screen-reader criterion may stay unticked (D2).
 
 ## Verification record
 
@@ -198,4 +209,12 @@ _(filled during implementation)_
 
 ## Plan review
 
-_(filled by the plan-review cycle)_
+### Round 1 (2026-11-17)
+
+**Verdict:** Needs user decision (2 items). 3 Critical, 16 Important, 13 Minor.
+
+- **Product-owner decisions taken:** D1 active colour → `accent-strong`; D2 screen reader → try real TalkBack, else leave criterion 4 unticked and record it.
+- **Critical (all applied):** C1 the close curve does not flip → `easeOutCubic.flipped` with literal sample values in Facts and Task 3; C2 the default barrier fades on its own curve → own `AnimatedModalBarrier` driven by the panel's animation, plus an in-step test; C3 the hamburger-tap test could not pass (the panel covers it) → replaced with the title-area / hamburger-position / no-controls tests.
+- **Important (all applied):** I1 drag drawn linear, gesture start/stop, release rules, `widthFor`, drag regions, no-jump and drag-to-zero tests (Task 3); I2 `wordmark` parameter, app passes `appTitle` (Tasks 2, 4); I3 `navIconNudge`, `drawerFlingVelocity`, border inset via `floatingOutline.width` (Tasks 1, 2); I4 inactive colours and icon start alignment (Facts, Task 2); I5 `selected: widget.selected ? true : null` and a no-selected-state test (Task 1); I6 the double-push guard specified (Task 3); I7 header text clamped at 1.5× (Task 2); I8 the border inside the width, measured columns and rows (Facts, Tasks 2, 5); I9 renderer Chrome flags, extra manifest hashes (Task 5); I10 active-colour assertions on pixels in the PNG and the widget, M14 names (Tasks 5, 6); I11 the whole hamburger assertion and header comment (Task 4); I12 copy resolved inside the builder plus a locale-switch test (Task 4); I13 new `pressable_selected_test.dart` instead of editing NAV-001's file (Task 1); I14 root architecture guards in every task's final run (Global Constraints, Step 4s); I15 route-contract comment and PROGRESS follow-through (Tasks 4, 6); I16 device-check limits and the `adb` path (Task 6).
+- **Minor:** M1 (372.1 / 372.09 values), M2 (run commands and expected failures), M3 (`fvm dart run melos run lint`), M4 (shadow order, Task 2), M5 (calibration rule, Task 5), M6 (`SlideTransition(textDirection:)`, live scrim colour), M7 (`semanticsDismissible => false`, no outer exclusion), M8 (drawer-scoped exemption), M9 (`app_version.dart`), M10 (private route), M11 (NAV-005 line), M12 (ring overlap noted), M13 (the pointer fixed): all applied.
+- **Open items:** none.
