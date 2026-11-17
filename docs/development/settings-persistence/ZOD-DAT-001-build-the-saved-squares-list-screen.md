@@ -49,3 +49,5 @@ Build the list of saved squares with mini thumbnail, name, meta tags, update dat
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Settings & Persistence" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
+
+- **From ZOD-UI-009 (2026-11-17):** the mode tag is `ZodiannTag(variant: ZodiannTagVariant.neutral, label: <localized mode name>)`. See the SQR-012 note about wrapping a tag in `Align` inside a stretch `Column`.

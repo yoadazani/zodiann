@@ -181,3 +181,18 @@
 - **I1 (the ±1 width budget is fully used by snapping on four tags; no rule to tell snapping from a defect):** applied. A `layout width matches Chrome` test (±0.5 against the Chrome source widths) arbitrates, and padding / gap mutants also fail it.
 - **M1 (`mid` and `spanRight` undefined):** applied. **M2 (corner feature tied on outline tags and passed radius ≥ 8):** applied (`cornerOuter` / `cornerInner`, radius 8 mutant). **M3 (SQR-009 and the SQR-019 path missing from Files):** applied. **M4 (label ±3 may be unreachable under greyscale anti-aliasing):** applied as a calibration-record rule. **M5 (duplicate `all` test):** noted in the test text.
 - **Open items after round 2:** none needing a decision beyond the three listed in "Open items for approval". Both rounds verified the sheet geometry, outline pixels, fills, glyph coverage and `Container` vs `DecoratedBox` behaviour independently.
+
+## Implementation record (2026-11-17)
+
+Executed inline, Tasks 1–3 test-first, with no deviations from the plan (no rulings). Commits: Task 1 `a098260`, Task 2 `ZodiannTag`, Task 3 sheet match.
+
+**Calibration record (Task 3).** Flutter at an integer origin, measured by the same extractor as the sheets:
+
+- Height 24 and top exact in both themes. Pixel width equals the sheet for axis, eighth, center and neutral and is +1 for diagonal (79 vs 78), no highlight (84 vs 83), today (50 vs 49) and accent (77 vs 76): the fractional right edge shows as one partial column. Layout widths match Chrome within 0.02 (axis 53.69, diagonal 78.60, eighth 51.65, no highlight 83.10, center 53.31, today 49.04, neutral 47.68, accent 76.79). The `layout width matches Chrome` test (±0.5) is the arbiter, so the +1 is snapping, not a defect.
+- Accent fill: Flutter `222224` / `F0F0F1` against the sheet's `222225` / `F1F1F1` (8-bit alpha), inside ±1.
+- Outline 50 % pixels: dark center `835B1C` (sheet `825A1C`), today `1F736A` (`1E7269`); light center `ECBB82` (`EBBA82`), today `86CFC6` (`86CEC6`); all within ±1, tolerance ±3.
+- Label colour: matches the sheet within ±3 in every tag; no calibration needed.
+
+**Mutation proofs.** Widget mutants (each fails a named `tag_test` / `tag_style_test` test): drop the axis mark, mark on eighth, outline `strokeAlignOutside`, container-like padding (content at 9.5), swapped axis fill, neutral 600, Opacity widget, Transform. Sheet mutants: padding 6 and gap 4 (pixel width and layout width), height 26, radius 4 (`cornerOuter`), radius 8 (`cornerInner`), outline 1 px (outline pixels), wrong backdrop.
+
+**Final review** (opus, fresh context): 0 Critical, 0 Important, 4 Minor, all deferred (listed in `PROGRESS.md`). All five Review Focus points held.

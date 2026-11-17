@@ -47,3 +47,5 @@ _No additional notes._
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Gann Square of Nine" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
+
+- **From ZOD-UI-009 (2026-11-17):** the controls-summary Today tag is `ZodiannTag(variant: ZodiannTagVariant.today, label: <localized>)`. UI-009 is not a listed dependency of this task; it is merged before it.

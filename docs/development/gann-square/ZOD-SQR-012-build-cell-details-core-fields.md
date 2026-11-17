@@ -48,3 +48,5 @@ Build the details-panel rows common to all modes.
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Gann Square of Nine" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
+
+- **From ZOD-UI-009 (2026-11-17):** use `ZodiannTag(variant:, label:)`. Map the cell's highlight (axis / diagonal / eighth / none / center) to `ZodiannTagVariant` and show `ZodiannTag(variant: today)` when it applies. The `+` / `×` mark is bound to the axis and diagonal variants (NFR-X4), so never draw it yourself. The six vocabulary strings (`tagAxis` … `tagCenter`, en / he in `kit.js`) are ARB keys owned here, with parity tests. A tag fills the width of a stretch `Column` and the height of a horizontal `ListView`: wrap it in `Align` or `UnconstrainedBox` where that matters. Give it a non-empty label.
