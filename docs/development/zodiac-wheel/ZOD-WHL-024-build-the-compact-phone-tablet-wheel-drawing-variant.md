@@ -38,7 +38,7 @@ Apply the compact proportion set from [ZOD-WHL-001](../zodiac-wheel/ZOD-WHL-001-
 
 ## Notes
 
-ZOD-WHL-001 owns the desktop / compact proportion-table switch at the 1100 breakpoint (`WheelScreen`, decided 2026-11-17). This task applies the compact sizes inside each layer and adds the 16° display spread (design decision D6, still pending approval); it does not re-implement the switch.
+ZOD-WHL-001 owns the desktop / compact proportion-table switch at the 1100 breakpoint (`WheelScreen`, decided 2026-11-17). This task applies the compact sizes inside each layer and applies ZOD-WHL-005's 16° display-spread threshold in compact mode (design decision D6, still pending approval); it does not re-implement the switch.
 
 ---
 

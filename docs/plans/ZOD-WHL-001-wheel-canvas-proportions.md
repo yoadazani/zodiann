@@ -22,14 +22,17 @@
 - **D7, degree-number radius:** the design draws the kit's value, `rNum = rSignIn − 26` (the PNGs are rendered from `kit.js` by `_source/render/render.js`, so they cannot disagree with it). MASTER's "22 px inside the band" is the discrepancy and is not edited (the NAV-002 / UI-009 precedent: `kit.js` and the PNGs win). WHL-003's "22px inset desktop / 14px compact" reads 14 as an inset, but 14 is the compact **font size** (`kit.js` `sz.dl`); its Notes now say so. Task 1 still checks the desktop PNG by pixels as a confirmation and reports the result.
 - **Router wiring (D6):** not in this task. `WheelScreen` is exported and proven at feature level; no app file changes.
 
-## Proposed decisions (confirm at approval)
+## Decisions (D1–D5 proposed, confirm at approval; D6–D7 decided)
 
-- **D1: values come from the kit, not the rounded table.** MASTER's fractions are `kit.js` units over `R = 300`, rounded (`296/300 = 0.98667`, MASTER says 0.987). Store `units / 300`. Tests compare to MASTER's printed values with a tolerance of 0.0005, and to the kit units exactly.
+D1–D7 here are this plan's own labels; `DESIGN_DECISIONS.md` D6 / D7 are called "design decision D6 / D7".
+
+
+- **D1: values come from the kit, not the rounded table.** MASTER's fractions are `kit.js` units over `R = 300`, rounded (`296/300 = 0.98667`, MASTER says 0.987). Store `units / 300`. Tests compare to MASTER's printed values with a tolerance of 0.0005, and to the kit units with `closeTo(units, 1e-9)`.
 - **D2: fixed-pixel sizes scale with `R`.** In the kit those pixel sizes (ticks 5/9/14, glyph 17/27, disc r 14/21, dot r 3.2/4.5, label sizes) live in the same viewBox as `R = 300`, so they scale with the drawing. The compact table exists because they shrink on a phone. They are stored as `units / 300` too; callers get pixels from `WheelGeometry`. (ARCH-8: logical pixels.)
 - **D3: the layer seam.** One painter, ordered `WheelLayer`s. Without it, WHL-002…009 would edit one growing painter, and the L-6 and single-canvas tests would have nothing to inject an asymmetric probe through. It is one small interface, not a framework.
 - **D4: state is only the pointer longitude (default 0°).** The kit seeds the pointer with the first body's longitude. No bodies exist yet. WHL-009/010/014 extend `WheelState` (time, drag mode) and keep it the one provider.
 - **D5: compact is "not desktop".** Desktop below/above is `ZodiannBreakpoint.desktop` (≥ 1100, MASTER §6); phone and tablet use the compact table (MASTER §7.2 header).
-- **D6: no router wiring in this task (decided above; reasoning kept).** The task file's criteria need no route, `WheelScreen` is not the real screen (WHL-025 builds the layout around it), and swapping the wheel route's `ScreenStub` breaks 26 references in 6 test files that anchor on `find.byType(ScreenStub)` (the wheel is the default route). `WheelScreen` is exported and proven at feature level. **Cost of the alternative:** wiring now needs `appRouterProvider` to pass a real `screenBuilder`, and those tests to override it. Say so at approval if you want it now; PROGRESS's "replaces the blank wheel ScreenStub" note then moves here instead of WHL-025.
+- **D6: no router wiring in this task (decided above; reasoning kept).** The task file's criteria need no route, `WheelScreen` is not the real screen (WHL-025 builds the layout around it), and swapping the wheel route's `ScreenStub` breaks 26 references in 6 test files that anchor on `find.byType(ScreenStub)` (the wheel is the default route). `WheelScreen` is exported and proven at feature level. **Cost of the alternative:** wiring now needs `appRouterProvider` to pass a real `screenBuilder`, and those tests to override it. PROGRESS's "replaces the blank wheel ScreenStub" note stays with WHL-025.
 - **D7 (decided above):** `degreeNumberRadius` follows the kit (`rSignIn − 26`); Task 1 confirms it against the desktop PNG and reports.
 
 ## Global Constraints
@@ -90,7 +93,7 @@
     final double tickLengthDegree;      //  5/300
     final double tickLengthFive;        //  9/300
     final double tickLengthTen;         // 14/300
-    final double degreeNumberRadius;    // (signBandInner·300 − 26)/300 — see the open item
+    final double degreeNumberRadius;    // (signBandInner·300 − 26)/300 — D7 (kit value; confirmed against the PNG in Step 5)
     final double degreeNumberFontSize;  // 9.5/300 | 14/300
     final double signGlyphSize;         // 21/300 | 30/300
     final double bodyDiscRadiusAt;      // 192/300 | 180/300     (0.64 | 0.60)
@@ -110,13 +113,13 @@
 
 - [ ] **Step 1: wire the package.** Add to `packages/feature_wheel/pubspec.yaml` `dependencies`: `astro_core` and `shared_ui` as `path: ../astro_core` / `path: ../shared_ui` (as `apps/astro_mobile/pubspec.yaml` does with `../../packages/…`), `flutter_riverpod: ^3.5.0`, `material_ui: ^1.11.0`. Run `fvm dart run melos bootstrap`. Expected: exit 0, root `pubspec.lock` unchanged (all four already resolve). Then `git status --short`: a root pub get can delete the tracked generated files under `packages/shared_ui/lib/l10n/` (PROGRESS records this); if they show as deleted, restore them with `git checkout -- packages/shared_ui/lib/l10n` and never commit the deletion. Expected after the restore: only `packages/feature_wheel/pubspec.yaml` modified.
 - [ ] **Step 2: write the failing test** `wheel_proportions_test.dart`, with these cases:
-  - `desktop` fractions equal MASTER's printed values within 0.0005: halo 1.02, band 0.987 → 0.833, body discs 0.64, labels 0.547, inner 0.453. `compact`: band → 0.80, discs 0.60, labels 0.467, inner 0.373, `haloRadius`, `signBandOuter`, the three tick lengths and the extents equal `desktop`'s (every other row differs in compact, `kit.js:298-299`).
+  - `desktop` fractions equal MASTER's printed values within 0.0005: halo 1.02, band 0.987 → 0.833, body discs 0.64, labels 0.547, inner 0.453. `compact`: band → 0.80, discs 0.60, labels 0.467, inner 0.373, `haloRadius`, `signBandOuter`, the three tick lengths and the extents equal `desktop`'s (every other row differs in compact, `kit.js:299-300`).
   - `desktop` equals the kit units: every `field * WheelProportions.referenceRadius` comparison against a kit-unit value uses `closeTo(units, 1e-9)`, never `==` (for example `21/300·300` is `21.000000000000004`). So `signBandOuter` is `closeTo(296, 1e-9)` and `bodyDiscRadiusAt` is `closeTo(192, 1e-9)`.
   - ticks `5/9/14` units, glyph and disc sizes `17/14` desktop and `27/21` compact.
   - invariants for both tables: `haloRadius > signBandOuter > signBandInner > bodyDiscRadiusAt > bodyLabelRadiusAt > innerDiscRadius > 0`; `aspectRatio` is within 1e-9 of `644/656`.
 - [ ] **Step 3: run it, expect FAIL** (compilation error, undefined class `WheelProportions`): `cd packages/feature_wheel; fvm flutter test test/geometry/wheel_proportions_test.dart`.
 - [ ] **Step 4: implement `WheelProportions`** as specified. Doc each field with its MASTER row. Export it from `feature_wheel.dart`.
-- [ ] **Step 5: measure the open item.** Decode `screens/01-zodiac-wheel_desktop_en_dark.png` (as the NAV-001 plan did, a throwaway script in the scratchpad, not committed) and locate the "10" degree-number centres against the band's inner edge. Convert PNG pixels to kit units with `units = px · 296 / rimPx` (measure the accent rim `rSignOut` and the label centres; labels are centred, `kit.css:307`). Keep `degreeNumberRadius` at kit's `−26` if the PNG agrees; use `−22` if it shows 22. Put the measured value, the script's one-line result and the choice in the field's doc comment. Report it at execution.
+- [ ] **Step 5: confirm D7 against the PNG.** Decode `screens/01-zodiac-wheel_desktop_en_dark.png` (as the NAV-001 plan did, a throwaway script in the scratchpad, not committed) and locate the "10" degree-number centres against the band's inner edge. Convert PNG pixels to kit units with `units = px · 296 / rimPx` (measure the accent rim `rSignOut` and the label centres; labels are centred, `kit.css:307`). `degreeNumberRadius` stays `(signBandInner·300 − 26)/300` (D7). If the measured inset differs from 26 by more than 1 kit unit, do not change the value: stop and report the measurement. Put the measured value and the script's one-line result in the field's doc comment, and report it at execution.
 - [ ] **Step 6: run it, expect PASS:** `cd packages/feature_wheel; fvm flutter test test/geometry/wheel_proportions_test.dart` (all pass), then `fvm dart analyze --fatal-infos .` (expect `No issues found!`).
 - [ ] **Step 7: commit** `feat(ZOD-WHL-001): add the wheel proportion table`.
 
@@ -174,11 +177,12 @@
 
 - [ ] **Step 1: write the failing tests.**
   - `wheel_state_test.dart` (a `ProviderContainer`): default is `0`; `setPointerLongitude(-10)` → 350; `360` → 0; `725` → 5; `-1e-15` → 0 (never 360); a value change notifies listeners; setting the same value does not notify; `NaN` and `double.infinity` throw `ArgumentError` and leave the state unchanged.
-  - `wheel_single_provider_test.dart` (root, `package:test`, same walk and `cleanDartSource` helper as `no_magic_dimensions_test.dart`): in `packages/feature_wheel/lib` there is exactly **one** provider declaration (`RegExp(r'\b[A-Z]\w*Provider\b(?:\s*\.\s*\w+)*\s*(?:<[^;{}()]*>)?\s*\(')` on cleaned source: the leading capital means constructors only, and `ProviderScope`, `ProviderContainer` and `ProviderObserver` never match; also flag `@riverpod` / `@Riverpod(`, since there is no codegen), zero `ProviderScope` and zero `ProviderContainer` occurrences, and no file under `src/geometry/` mentions `riverpod` (the derived values are pure). Add controls on inline strings so the scanner is proven: a source with two providers fails, one with a `ProviderScope(` fails, one with `ref.watch(` inside `geometry/` fails; `ref.watch(wheelStateProvider.select((s) => s.pointerLongitude))` alone counts 0, and `NotifierProvider<A, List<int>>(A.new)` counts 1. Document in the guard and in PROGRESS: it counts screen-state providers; a dependency-injection provider (for example the `EphemerisPort` binding, FND-005 Notes) needs an explicit decision and a named allowlist entry here.
-- [ ] **Step 2: run, expect FAIL** (`fvm flutter test test/state/wheel_state_test.dart` in the package: undefined `WheelState`; `fvm dart test test/architecture/wheel_single_provider_test.dart` at the root: `Expected: <1> Actual: <0>` provider declarations).
+  - `wheel_single_provider_test.dart` (root, `package:test`, same walk and `cleanDartSource` helper as `no_magic_dimensions_test.dart`): in `packages/feature_wheel/lib` there is exactly **one** provider declaration (`RegExp(r'\b(?:[A-Z]\w*)?Provider\b(?:\s*\.\s*\w+)*\s*(?:<[^;{}()]*>)?\s*\(')` on cleaned source: it matches only an identifier ending in `Provider` at a word start followed by `(`, so lowercase provider variables, `ProviderScope`, `ProviderContainer` and `ProviderObserver` never match; also flag `@riverpod` / `@Riverpod(`, since there is no codegen), zero `ProviderScope` and zero `ProviderContainer` occurrences, and no file under `src/geometry/` mentions `riverpod` (the derived values are pure). Add controls on inline strings so the scanner is proven: a source with two providers fails, one with a `ProviderScope(` fails, one with `ref.watch(` inside `geometry/` fails; `ref.watch(wheelStateProvider.select((s) => s.pointerLongitude))` alone counts 0, `NotifierProvider<A, List<int>>(A.new)` counts 1, `Provider((ref) => 1)` counts 1 and `Provider<int>((ref) => 1)` counts 1. The assertion is `expect(count, 1, reason: 'expected 1 provider declaration, found $count')`. Document in the guard and in PROGRESS: it counts screen-state providers; a dependency-injection provider (for example the `EphemerisPort` binding, FND-005 Notes) needs an explicit decision and a named allowlist entry here.
+- [ ] **Step 2: run, expect FAIL** (`fvm flutter test test/state/wheel_state_test.dart` in the package: undefined `WheelState`; `fvm dart test test/architecture/wheel_single_provider_test.dart` at the root: `Expected: <1> Actual: <0>`, reason `expected 1 provider declaration, found 0`).
 - [ ] **Step 3: implement** `WheelState`, `WheelController`, `wheelStateProvider`. `normalizeDegrees` is from `astro_core`. Skip the state write when the new value `==` the old.
-- [ ] **Step 4: run, expect PASS.** Mutation check: temporarily append `final otherProvider = NotifierProvider<WheelController, WheelState>(WheelController.new);` to `packages/feature_wheel/lib/src/state/wheel_state.dart`, run the root guard, expect FAIL (`expected 1 provider declaration, found 2`), then restore with `git checkout -- packages/feature_wheel/lib/src/state/wheel_state.dart`. Record it.
+- [ ] **Step 4: run, expect PASS** (both commands from Step 2).
 - [ ] **Step 5: commit** `feat(ZOD-WHL-001): add the wheel's single state provider and its guard`.
+- [ ] **Step 6: mutation check (after the commit, so the file is tracked).** Temporarily append `final otherProvider = NotifierProvider<WheelController, WheelState>(WheelController.new);` to `packages/feature_wheel/lib/src/state/wheel_state.dart`, run the root guard, expect FAIL (`expected 1 provider declaration, found 2`), then restore with `git checkout -- packages/feature_wheel/lib/src/state/wheel_state.dart` and confirm `git status --short` is clean. Record it.
 
 ## Task 4: layers, painter, canvas, proportion grid
 
@@ -207,7 +211,7 @@
         this.layers = const [ProportionGridLayer()]});
   }
   ```
-- `ProportionGridLayer` strokes six concentric circles at the table's radii (`haloRadius` in `line` at 50 % opacity, `signBandOuter` in `accentLine`, `signBandInner`, `bodyDiscRadiusAt`, `bodyLabelRadiusAt`, `innerDiscRadius` in `line`; hairline stroke) and fills the inner disc with `bgRaised` first. Radii come from `geometry.ringRadius(...)`; colours from `surfaces`.
+- `ProportionGridLayer` strokes six concentric circles at the table's radii (`haloRadius` in `line` at 50 % opacity, `signBandOuter` in `accentLine`, `signBandInner`, `bodyDiscRadiusAt`, `bodyLabelRadiusAt`, `innerDiscRadius` in `line`; stroke width one kit unit, `geometry.radius / WheelProportions.referenceRadius`) and fills the inner disc with `bgRaised` first. Radii come from `geometry.ringRadius(...)`; colours from `surfaces`.
 - `WheelCanvas.build`: `LayoutBuilder`; size: both bounded → `(maxWidth, maxHeight)`; width bounded only → `(w, w / aspectRatio)`; height bounded only → `(h · aspectRatio, h)`; neither bounded → `Size.zero` (an infinite size would assert in `RenderCustomPaint`); child `RepaintBoundary(child: Directionality(textDirection: TextDirection.ltr, child: Builder(builder: (c) => CustomPaint(size: size, painter: WheelPainter(…, surfaces: Theme.of(c).extension<ZodiannSurfaces>()!, textDirection: Directionality.of(c), …)))))`. Non-finite or non-positive size paints nothing.
 
 - [ ] **Step 1: write `wheel_harness.dart`** (test support): `pumpWheelCanvas(tester, {size, proportions, state, layers, textDirection, locale, brightness})` mounting a themed `MaterialApp` (the app's `ZodiannTheme` for the brightness; see how `packages/shared_ui/test/support` builds one) with `localizationsDelegates: const [ZodiannLocalizations.delegate, ...GlobalMaterialLocalizations.delegates]` and `supportedLocales: ZodiannLocalizations.supportedLocales` (without them `Locale('he')` falls back to English and the ambient direction stays LTR), with a fixed-size box, and an `OrientationProbeLayer` (test-only `WheelLayer`) that fills a small circle at `geometry.offsetOf(90, ringFraction, pointerLongitude: …)` and records the `textDirection` it was given.
@@ -233,7 +237,7 @@
 
 - [ ] **Step 1: write the failing tests.**
   - **ARCH-3 at runtime:** mount `WheelScreen` under one `ProviderScope(observers: [counter])`; `counter.added` has exactly one provider (`wheelStateProvider`), and `find.byType(ProviderScope)` finds exactly one (the test's root).
-  - **State reaches the painter, and only the state:** after `container.read(wheelStateProvider.notifier).setPointerLongitude(42)`, the `WheelPainter` of the `CustomPaint` under `WheelScreen` has `state == WheelState(pointerLongitude: 42)` and an unchanged `proportions`. Purity of the derived geometry is proven at unit level (Task 2: equal inputs give an equal `WheelGeometry`) and by the Task 3 guard (no riverpod under `src/geometry/`; the painter reads no provider).
+  - **State reaches the painter, and only the state:** after `container.read(wheelStateProvider.notifier)` (get `container` with `ProviderScope.containerOf(tester.element(find.byType(WheelScreen)))`; never `UncontrolledProviderScope`, which would break the exactly-one-`ProviderScope` assertion) then `.setPointerLongitude(42)`, the `WheelPainter` of the `CustomPaint` under `WheelScreen` has `state == WheelState(pointerLongitude: 42)` and an unchanged `proportions`. Purity of the derived geometry is proven at unit level (Task 2: equal inputs give an equal `WheelGeometry`) and by the Task 3 guard (no riverpod under `src/geometry/`; the painter reads no provider).
   - **Table choice:** width 1099 → compact radii, 1100 → desktop radii (`paints` on the signBandInner ring), at a fixed height; resizing across 1100 while shown keeps `pointerLongitude` (set to 42) and repaints.
   - **Theme switch:** dark → light repaints with the light `line` colour.
   - **Render check (not an assertion):** a scratchpad-only test run writes `wheel_grid_{desktop,compact}_{dark,light}.png` through `RepaintBoundary.toImage` (inside `tester.runAsync`). The executor reads them and states in the report that the rings sit where `screens/01-zodiac-wheel_desktop_en_dark.png` has them. They are not committed.
@@ -247,7 +251,7 @@
 - [ ] **Step 1: full verification** on the task branch, recording exit codes, counts and any failing excerpt: `fvm dart run melos run lint` (l10n, icons, launcher checks, analyze with infos fatal, format check) and `fvm dart run melos run test`. Expected: all green, with the workspace's existing test counts plus the new ones. Show that `apps/astro_mobile` is untouched (`git diff --stat main -- apps` empty).
 - [ ] **Step 2: mutation proof.** Run each mutant, confirm the named test fails, restore. (1) halo `306` → `312`; (2) flip `offsetOf`'s `−r·sin` to `+r·sin`; (3) drop the `Directionality` wrapper; (4) add a second provider; (5) paint a ring from a literal radius instead of `geometry.ringRadius`; (6) `fit` ignores `extentTop`. Record the results in PROGRESS.
 - [ ] **Step 3: independent whole-branch review** with `requesting-code-review` (a fresh reviewer, not this session); fix Important findings test-first.
-- [ ] **Step 4: documentation** (only after Steps 1–3 pass): tick the four acceptance criteria in the task file with evidence (commands, commit); `TASKS.md` status; PROGRESS (Current Task, Completed, Next Recommended, Technical Decisions D1–D6 and the `degreeNumberRadius` ruling, Verification with the covered commit, Git State, deferred review minors). Note for the next session: WHL-002 adds the sign ring as a `WheelLayer`; the grid layer then stays as a debug layer or is removed, WHL-002's plan decides.
+- [ ] **Step 4: documentation** (only after Steps 1–3 pass): tick the four acceptance criteria in the task file with evidence (commands, commit); `TASKS.md` status; PROGRESS (Current Task, Completed, Next Recommended, Technical Decisions: WHL-001 D1–D7 (D6 no router wiring; D7 degree-number radius follows `kit.js` `rSignIn − 26`, with the PNG confirmation result); Gate 1 applies from ZOD-WHL-004, not WHL-001; ZOD-WHL-001 owns the desktop / compact table switch at 1100 and WHL-024 applies the compact sizes per layer; the single-provider guard's scope (screen-state providers; DI providers need a named allowlist entry), Verification with the covered commit, Git State, deferred review minors). Note for the next session: WHL-002 adds the sign ring as a `WheelLayer`; the grid layer then stays as a debug layer or is removed, WHL-002's plan decides.
 - [ ] **Step 5: push and PR** per the project's Git rules (`gh pr create`, then the follow-up `docs(ZOD-WHL-001): record PR link` commit). Never merge without approval.
 
 ## Acceptance mapping
@@ -257,15 +261,50 @@
 | 1. Empty grid at the table's fractions, desktop and compact | Task 4 `proportion_grid_test.dart` (MASTER-printed values, two sizes, mutants 1 and 5); Task 5 render check |
 | 2. Never mirrors under RTL | Task 2 orientation cases; Task 4 RTL test with probe (mutants 2 and 3) |
 | 3. One `CustomPaint` / `RepaintBoundary`, no per-element widgets | Task 4 single-canvas test |
-| 4. ARCH-3: one provider, pure derived values, no nested scope | Task 3 source guard (mutant 4) and Task 5 runtime observer test |
+| 4. ARCH-3: one provider, pure derived values, no nested scope | Task 3 source guard (mutant 4); Task 2 geometry equality; Task 5 runtime observer test and painter-state test |
 
 ## Risks and open items
 
-- **Decisions D1–D6 need your confirmation**, above all D6 (router wiring) and D3 (the layer seam).
-- **`degreeNumberRadius`:** MASTER (22 px) vs `kit.js` (26) is resolved by measuring the PNG in Task 1 and recorded, not guessed.
-- **The body display-spread threshold** (11° desktop / 16° compact, design decision D6, still pending approval in `TASKS.md` §6.2) is not stored here. ZOD-WHL-005 / WHL-024 add it.
+- **Decisions D1–D5 need your confirmation** (above all D3, the layer seam). D6 and D7 are decided (see Product-owner decisions).
+- **`degreeNumberRadius`:** decided (D7): follows `kit.js` (`rSignIn − 26`); MASTER's 22 px is the documented discrepancy. Task 1 Step 5 confirms against the PNG and reports; a mismatch stops for review.
+- **The body display-spread threshold** (11° desktop / 16° compact, design decision D6, still pending approval in `TASKS.md` §6.2) is not stored here. ZOD-WHL-005 defines it; WHL-024 applies it in compact.
 - **Accessibility of the canvas** (a semantic label, a focus ring, keyboard rotation) is not here; the wheel's accessibility and focus tasks own it. A painted-only wheel has no semantics until then.
 - **Fixed pixel sizes scale with `R`** (D2). If WHL-024 (compact variant) finds a floor is needed for legibility on very small boxes, it adds a clamp in `WheelGeometry`, not in the table.
-- **The grid layer is scaffolding.** It draws hairline rings for radii that WHL-002/003/004/008 draw properly (some, like `bodyDiscRadiusAt`, have no ring of their own in the finished design).
+- **The grid layer is scaffolding.** It draws thin (one kit unit) rings for radii that WHL-002/003/004/008 draw properly (some, like `bodyDiscRadiusAt`, have no ring of their own in the finished design).
 - **Execution method:** sequential in one session (the six tasks form one dependency chain: proportions → geometry → state → painter → screen). Nothing is independent enough for subagents.
 - **Git:** branches from `main` (NAV-003 is merged); touches no app file.
+
+## Plan review
+
+Reviewed by the `plan-reviewer` subagent before the user saw the plan (two rounds).
+
+### Round 1 (comprehensive) — verdict: needs user decision
+
+| ID | Severity | Finding | Outcome |
+|---|---|---|---|
+| C1 | Critical | `paints..circle` compares exactly, so MASTER-printed radii could not be asserted | Applied: ordered `..something` predicates with `closeTo`, MASTER literals |
+| C2 | Critical | `0.98667·R` misses 296 by 1e-3 | Applied: `closeTo(296.0, 1e-9)` |
+| C3 | Critical | `==` on kit-unit values fails on floating point | Applied: `closeTo(units, 1e-9)` throughout |
+| I1 | Important | `WheelScreen` purity test could not observe anything | Applied: painter-state assertion; purity proven at unit and guard level |
+| I2 | Important | unbounded width reaches `CustomPaint` | Applied: four-case sizing rule, `Row` test |
+| I3 | Important | root pub get deletes tracked l10n files | Applied: restore step |
+| I4 | Important | `minBodySeparationDegrees` pre-empts pending design decision D6 | Applied: removed, noted in Risks |
+| I5 | Important | provider regex loose | Applied (and corrected in round 2, I1) |
+| I6 | Important | mutation step used an unscanned copy | Applied (and corrected in round 2, I2) |
+| I7 | Important | RTL test could pass without RTL | Applied: delegates in the harness, RTL control assertion |
+| M1–M8 | Minor | table wording, stroke width, commands, RED reasons, "26 references in 6 files", PNG conversion, guard scope, debug assert | Applied |
+| Needs user decision 1–4 | — | Gate 1; table-switch owner; degree-number radius; router wiring | Decided by the user 2026-11-17 (see Product-owner decisions); WHL-003 and WHL-024 Notes updated |
+
+### Round 2 (focused on the revision) — verdict: approve after corrections
+
+| ID | Severity | Finding | Outcome |
+|---|---|---|---|
+| C1 | Critical | Task 1 Step 5 let the executor switch to −22, against D7 | Applied: value stays; a mismatch above 1 kit unit stops and reports |
+| I1 | Important | provider regex missed a bare `Provider(` | Applied: `(?:[A-Z]\w*)?Provider`, two new controls |
+| I2 | Important | mutation restore fails on an untracked file | Applied: mutation moved to Step 6, after the commit |
+| I3 | Important | "D7" collides with `DESIGN_DECISIONS.md` D7 | Applied: WHL-003 Note and the plan disambiguate |
+| I4 | Important | Task 6 documentation dropped two decisions | Applied |
+| I5 | Important | Risks section stale | Applied |
+| M1–M7 | Minor | stale wording, stroke wording, one failure format, `containerOf`, citation, acceptance row, WHL-024 ownership of the 16° | Applied |
+
+**Open items:** none needing a decision. D1–D5 remain proposals for approval (D3, the layer seam, is the one to look at). Execution-time confirmation: the desktop PNG check in Task 1 Step 5.
