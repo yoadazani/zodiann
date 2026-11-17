@@ -79,6 +79,9 @@ void main() {
           Directionality.of(tester.element(find.byType(WheelCanvas))),
           TextDirection.ltr,
         );
+        final ltrTransform = tester
+            .renderObject<RenderBox>(wheelPaint())
+            .getTransformTo(null);
 
         final rtl = OrientationProbeLayer();
         await pumpWheelCanvas(
@@ -103,6 +106,22 @@ void main() {
         // Longitude 90 (pointer 0) is left of the centre, in both.
         expect(rtl.points.last, ltr.points.last);
         expect(rtl.points.last.dx, lessThan(322));
+        // Nothing is mirrored at widget level either: same transform to the
+        // root, and no flip or fit widget under the canvas in RTL.
+        expect(
+          tester.renderObject<RenderBox>(wheelPaint()).getTransformTo(null),
+          ltrTransform,
+        );
+        for (final type in [Transform, FittedBox]) {
+          expect(
+            find.descendant(
+              of: find.byType(WheelCanvas),
+              matching: find.byType(type),
+            ),
+            findsNothing,
+            reason: "$type under RTL",
+          );
+        }
       },
     );
   });
@@ -160,6 +179,20 @@ void main() {
       expect(size.width, closeTo(328 * 644 / 656, 1e-9));
     });
 
+    testWidgets('unbounded both ways is empty and throws nothing', (
+      tester,
+    ) async {
+      await pumpWheelCanvas(
+        tester,
+        wrap: (canvas) => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(child: canvas),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(wheelPaint()), Size.zero);
+      expect(wheelRenderObject(tester), paintsNothing);
+    });
     for (final (name, size) in [
       ('shrink', Size.zero),
       ('0 x 100', const Size(0, 100)),

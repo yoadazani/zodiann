@@ -25,7 +25,7 @@ int countProviderDeclarations(String source) {
 
 /// How many `ProviderScope(` / `ProviderContainer(` constructions [source] has.
 int countScopes(String source) =>
-    RegExp(r'\bProvider(?:Scope|Container)\s*\(')
+    RegExp(r'\b(?:Uncontrolled)?Provider(?:Scope|Container)\s*\(')
         .allMatches(cleanDartSource(source))
         .length;
 

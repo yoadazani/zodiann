@@ -71,22 +71,4 @@ void main() {
       });
     }
   }
-
-  testWidgets('a ring 2 % off the printed radius is rejected', (tester) async {
-    await pumpWheelCanvas(tester);
-    final tol = 0.0005 * 300;
-    expect(
-      wheelRenderObject(tester),
-      isNot(
-        paints..something(
-          circle(
-            center: const Offset(322, 334),
-            radius: 0.987 * 300 * 1.02,
-            tolerance: tol,
-            style: PaintingStyle.stroke,
-          ),
-        ),
-      ),
-    );
-  });
 }

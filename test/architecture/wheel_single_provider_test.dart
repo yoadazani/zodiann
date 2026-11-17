@@ -69,6 +69,10 @@ void main() {
     test('scopes and riverpod mentions are found', () {
       expect(countScopes('ProviderScope(child: x)'), 1);
       expect(countScopes('ProviderContainer()'), 1);
+      expect(
+        countScopes('UncontrolledProviderScope(container: c, child: x)'),
+        1,
+      );
       expect(countScopes('final x = 1;'), 0);
       expect(
         mentionsRiverpod("import 'package:flutter_riverpod/x.dart';"),

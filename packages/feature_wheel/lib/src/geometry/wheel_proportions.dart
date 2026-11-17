@@ -113,7 +113,9 @@ final class WheelProportions {
   /// Decision D7 (ZOD-WHL-001 plan): the kit places them at
   /// `signBandInner − 26` units. MASTER §7.2's prose says "22 px inside the
   /// band"; the design PNGs are rendered from `kit.js`, so the kit value
-  /// stands. Confirmed against the desktop PNG in the task's verification.
+  /// stands. Confirmed by eye on the desktop PNG (2026-11-17): the "10" and
+  /// "20" labels sit about 224–225 kit units from the centre, MASTER's 22
+  /// would be 228; not a pixel-script measurement.
   final double degreeNumberRadius;
 
   /// Degree number font size (9.5 units desktop, 14 compact).
