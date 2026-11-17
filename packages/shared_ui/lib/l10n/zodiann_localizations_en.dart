@@ -160,4 +160,37 @@ class ZodiannLocalizationsEn extends ZodiannLocalizations {
 
   @override
   String get actionExportXlsx => 'Export to Excel';
+
+  @override
+  String get closeMenu => 'Close menu';
+
+  @override
+  String get drawerGroupAnalysis => 'Analysis';
+
+  @override
+  String get drawerGroupLibrary => 'Library and app';
+
+  @override
+  String get drawerDescWheel =>
+      'Planet positions, aspects and degree crossings';
+
+  @override
+  String get drawerDescSquare => 'Numbers, days or 4-hour blocks on the spiral';
+
+  @override
+  String get drawerDescSaved => 'Return to squares you named';
+
+  @override
+  String get drawerDescSettings => 'Language, theme, orbs, defaults';
+
+  @override
+  String get drawerDescAbout => 'Computation sources and method';
+
+  @override
+  String drawerVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get drawerOffline => 'All data stays on this device';
 }

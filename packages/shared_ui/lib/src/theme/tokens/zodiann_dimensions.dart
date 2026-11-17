@@ -170,6 +170,36 @@ abstract final class ZodiannSize {
   /// Tags: the inset outline of the today and centre tags (kit.css
   /// `box-shadow: inset 0 0 0 1.5px`).
   static const double tagOutline = 1.5;
+
+  /// The drawer's maximum width (MASTER §5; kit.css `.drawer`
+  /// `width: min(320px, 86vw)`).
+  static const double drawerMaxWidth = 320.0;
+
+  /// The drawer's width as a share of the screen's, below which it is
+  /// narrower than [drawerMaxWidth] (86 %).
+  static const double drawerWidthFactor = 0.86;
+
+  /// The drawer header's height, including its 1 px bottom rule (MASTER §5;
+  /// kit.css `.drawer-head`).
+  static const double drawerHead = 76.0;
+
+  /// The drawer item's icon column (kit.css `.nav-item`
+  /// `grid-template-columns: 24px 1fr`).
+  static const double navIconColumn = 24.0;
+
+  /// The drawer item's icon sits 1 px down (kit.css `.nav-item svg`
+  /// `margin-top: 1px`).
+  static const double navIconNudge = 1.0;
+
+  /// The gap between the drawer list's children and between an item's name
+  /// and description (kit.css `.drawer nav` and `.nav-item` `2px`).
+  static const double navItemGap = 2.0;
+
+  /// The active drawer item's bar: width (kit.css `.nav-item.on::before`).
+  static const double navActiveBar = 3.0;
+
+  /// The active drawer item's bar: inset from the item's top and bottom.
+  static const double navActiveBarInset = 10.0;
 }
 
 /// The breakpoint widths (MASTER §6), in logical pixels.

@@ -401,6 +401,66 @@ abstract class ZodiannLocalizations {
   /// In en, this message translates to:
   /// **'Export to Excel'**
   String get actionExportXlsx;
+
+  /// Accessibility label of the drawer's close button (NAV-2). Not in kit.js (the kit draws the button unlabelled): an intentional, documented exception to the kit.js-only copy rule (product-owner decision 2026-11-17), mirroring openMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Close menu'**
+  String get closeMenu;
+
+  /// Drawer group label above the two instruments (kit.js tools; D17).
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis'**
+  String get drawerGroupAnalysis;
+
+  /// Drawer group label above Saved, Settings and About (kit.js library; D17).
+  ///
+  /// In en, this message translates to:
+  /// **'Library and app'**
+  String get drawerGroupLibrary;
+
+  /// Drawer item description of the Zodiac wheel (NAV-3; kit.js wheelDesc).
+  ///
+  /// In en, this message translates to:
+  /// **'Planet positions, aspects and degree crossings'**
+  String get drawerDescWheel;
+
+  /// Drawer item description of the Gann Square of Nine (NAV-3; kit.js squareDesc).
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers, days or 4-hour blocks on the spiral'**
+  String get drawerDescSquare;
+
+  /// Drawer item description of Saved squares (NAV-3; kit.js savedDesc).
+  ///
+  /// In en, this message translates to:
+  /// **'Return to squares you named'**
+  String get drawerDescSaved;
+
+  /// Drawer item description of Settings (NAV-3; kit.js settingsDesc).
+  ///
+  /// In en, this message translates to:
+  /// **'Language, theme, orbs, defaults'**
+  String get drawerDescSettings;
+
+  /// Drawer item description of About and sources (NAV-3; kit.js aboutDesc).
+  ///
+  /// In en, this message translates to:
+  /// **'Computation sources and method'**
+  String get drawerDescAbout;
+
+  /// Drawer footer: the app version (kit.js version). The app supplies the number; the drawer owns no version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String drawerVersion(String version);
+
+  /// Drawer footer: the privacy line (kit.js offline; DATA-7/8).
+  ///
+  /// In en, this message translates to:
+  /// **'All data stays on this device'**
+  String get drawerOffline;
 }
 
 class _ZodiannLocalizationsDelegate

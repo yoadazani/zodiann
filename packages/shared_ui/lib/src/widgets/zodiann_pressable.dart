@@ -28,6 +28,8 @@ class ZodiannPressable extends StatefulWidget {
     required this.child,
     this.focusNode,
     this.autofocus = false,
+    this.selected = false,
+    this.semanticHint,
   });
 
   /// Called on activation. Null disables the control.
@@ -35,6 +37,14 @@ class ZodiannPressable extends StatefulWidget {
 
   /// The control's accessible name.
   final String semanticLabel;
+
+  /// Whether the control is the selected one of its set (the drawer's active
+  /// item). When false the node carries no selected state at all, as before
+  /// (in Flutter "not selected" is a state of its own).
+  final bool selected;
+
+  /// An optional accessible hint (the drawer item's description).
+  final String? semanticHint;
 
   /// The drawn control.
   final Widget child;
@@ -97,6 +107,8 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
       button: true,
       enabled: enabled,
       label: widget.semanticLabel,
+      hint: widget.semanticHint,
+      selected: widget.selected ? true : null,
       onTap: onPressed,
       child: FocusableActionDetector(
         enabled: enabled,

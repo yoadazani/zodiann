@@ -199,5 +199,51 @@
   "actionExportXlsx": "Export to Excel",
   "@actionExportXlsx": {
     "description": "Square screen top-bar action: export to an Excel file (kit.js exportXlsx)."
+  },
+  "closeMenu": "Close menu",
+  "@closeMenu": {
+    "description": "Accessibility label of the drawer's close button (NAV-2). Not in kit.js (the kit draws the button unlabelled): an intentional, documented exception to the kit.js-only copy rule (product-owner decision 2026-11-17), mirroring openMenu."
+  },
+  "drawerGroupAnalysis": "Analysis",
+  "@drawerGroupAnalysis": {
+    "description": "Drawer group label above the two instruments (kit.js tools; D17)."
+  },
+  "drawerGroupLibrary": "Library and app",
+  "@drawerGroupLibrary": {
+    "description": "Drawer group label above Saved, Settings and About (kit.js library; D17)."
+  },
+  "drawerDescWheel": "Planet positions, aspects and degree crossings",
+  "@drawerDescWheel": {
+    "description": "Drawer item description of the Zodiac wheel (NAV-3; kit.js wheelDesc)."
+  },
+  "drawerDescSquare": "Numbers, days or 4-hour blocks on the spiral",
+  "@drawerDescSquare": {
+    "description": "Drawer item description of the Gann Square of Nine (NAV-3; kit.js squareDesc)."
+  },
+  "drawerDescSaved": "Return to squares you named",
+  "@drawerDescSaved": {
+    "description": "Drawer item description of Saved squares (NAV-3; kit.js savedDesc)."
+  },
+  "drawerDescSettings": "Language, theme, orbs, defaults",
+  "@drawerDescSettings": {
+    "description": "Drawer item description of Settings (NAV-3; kit.js settingsDesc)."
+  },
+  "drawerDescAbout": "Computation sources and method",
+  "@drawerDescAbout": {
+    "description": "Drawer item description of About and sources (NAV-3; kit.js aboutDesc)."
+  },
+  "drawerVersion": "Version {version}",
+  "@drawerVersion": {
+    "description": "Drawer footer: the app version (kit.js version). The app supplies the number; the drawer owns no version.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.0.0"
+      }
+    }
+  },
+  "drawerOffline": "All data stays on this device",
+  "@drawerOffline": {
+    "description": "Drawer footer: the privacy line (kit.js offline; DATA-7/8)."
   }
 }
