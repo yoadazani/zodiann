@@ -597,7 +597,12 @@ void main() {
       }
 
       walk(
-        tester.binding.renderViews.first.owner!.semanticsOwner!
+        tester
+            .binding
+            .renderViews
+            .first
+            .owner!
+            .semanticsOwner!
             .rootSemanticsNode!,
       );
       expect(dismissers, isEmpty);
