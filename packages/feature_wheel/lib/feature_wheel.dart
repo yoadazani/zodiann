@@ -8,3 +8,4 @@ export 'src/canvas/wheel_painter.dart';
 export 'src/geometry/wheel_geometry.dart';
 export 'src/geometry/wheel_proportions.dart';
 export 'src/state/wheel_state.dart';
+export 'src/wheel_screen.dart';
