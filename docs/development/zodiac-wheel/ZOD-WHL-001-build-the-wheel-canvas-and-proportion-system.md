@@ -6,7 +6,7 @@
 - **Category:** [Zodiac Wheel](../README.md#zodiac-wheel) (`zodiac-wheel/`)
 - **Phase:** Phase 2
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done (see Notes)
 - **Scope:** MVP
 
 ## Description
@@ -26,10 +26,10 @@ Create the `CustomPainter` foundation every other wheel-drawing task paints onto
 
 ## Acceptance Criteria
 
-- [ ] A test harness renders the empty proportion grid (rings only, no content) matching the radius fractions in the table at both desktop and compact sizes.
-- [ ] The painter never mirrors when the app's text direction is RTL.
-- [ ] Rendering uses one `CustomPainter`/`RepaintBoundary`, verified by inspecting the widget tree (no per-degree-tick or per-body widget).
-- [ ] ARCH-3 (handed over from ZOD-FND-005): this screen's state is kept in exactly one Riverpod provider, and its derived values are pure functions of that state, verified by a test. The screen adds no nested `ProviderScope`; it uses the app's root scope.
+- [x] A test harness renders the empty proportion grid (rings only, no content) matching the radius fractions in the table at both desktop and compact sizes.
+- [x] The painter never mirrors when the app's text direction is RTL.
+- [x] Rendering uses one `CustomPainter`/`RepaintBoundary`, verified by inspecting the widget tree (no per-degree-tick or per-body widget).
+- [x] ARCH-3 (handed over from ZOD-FND-005): this screen's state is kept in exactly one Riverpod provider, and its derived values are pure functions of that state, verified by a test. The screen adds no nested `ProviderScope`; it uses the app's root scope.
 
 ## Dependencies
 
@@ -45,6 +45,8 @@ Create the `CustomPainter` foundation every other wheel-drawing task paints onto
 - ARCH-3
 
 ## Notes
+
+**Implemented (2026-11-17, plan `docs/plans/ZOD-WHL-001-wheel-canvas-proportions.md`).** `packages/feature_wheel`: `WheelProportions` (the §7.2 table as fractions of `R`, desktop and compact), `WheelGeometry` (fit, ring radii, the counter-clockwise longitude convention), `wheelStateProvider` (the screen's one provider), `WheelLayer` / `WheelPainter` / `WheelCanvas` (one `CustomPaint` on one `RepaintBoundary` in an LTR island), `ProportionGridLayer` (the rings-only grid) and `WheelScreen`. Evidence is in `docs/PROGRESS.md` (Completed Tasks and Verification). Not in this task: wiring `WheelScreen` into the router (the wheel route still shows `ScreenStub`; ZOD-WHL-025 builds the screen layout), and the wheel's accessibility. The degree-number radius follows the design kit (`rSignIn − 26`), confirmed against the PNG by eye.
 
 Handed over from ZOD-FND-005 criterion 3. ARCH-3 requires one Provider per screen, not one ProviderScope per screen. This task owns verifying it for its screen.
 
