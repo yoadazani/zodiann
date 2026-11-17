@@ -205,7 +205,31 @@ Failure modes the spec implies and no acceptance criterion exercises. Each has a
 
 ## Verification record
 
-_(filled during implementation)_
+Recorded 2026-11-17, from the real runs.
+
+**Commands (final, sequential, Windows, Flutter 3.50.0 via FVM)**
+- `fvm dart run melos run lint`: exit 0 (analyze clean with `--fatal-infos`, format check 0 changed, l10n and icons up to date).
+- `fvm dart run melos run test`: exit 0. astro_core 60, gann_core 196, workspace 296 (includes the architecture guards), astro_mobile 63, shared_ui 634.
+- `fvm flutter build apk --debug` (from `apps/astro_mobile`): built `app-debug.apk`.
+
+**Fidelity calibration (Chrome 157.0.8103.78, `ZODIANN_DRAWER_CALIBRATE=1`)**
+- Widget against the references: positions within 1 logical px, text-height-driven bottoms 1.5, text x extents 2, text rows 5.0 by the last list item, mean per-pixel difference 4.07. Pinned ceilings: position 1, bottom 2, textX 3, textY 6, mean 9.
+- The generator against the designer's own dark renders: positions 0.5, mean 1.2. Pinned ceilings: position 1, bottom 1, textX 2, textY 2, mean 3.
+- The text-row drift is Flutter rounding each text line height to whole pixels (a name 20 for 20.3, a description line 17 for 17.4), accumulating over 5 names and 7 description lines. A forced strut did not help. Accepted.
+
+**Mutation proofs (19 mutants, each run against the focused test files)**
+- Caught by named tests: M1 header 77, M2 item padding 10, M3a bar 2 px, M3b bar on the end edge, M4 fixed 320 width, M5 close duration 240, M6 swipe not mirrored in RTL (7 RTL swipe tests), M7 backdrop tap ignored, M8 and M17 selected semantics dropped or always passed, M9 non-directional header padding (reference tests), M10 outline ring omitted, M11 reduced motion ignored, M12 a `Scaffold.drawer` wired (never-docked tests), M14 active colour `text`, M15 close curve not flipped, M16 scrim on the default curve, M18 scrim curved during a drag.
+- M13 (`semanticsDismissible => true`) survives and is an equivalent mutant: `ModalBarrier` builds a tap or dismiss node only when it has a label, and the route's barrier has none, so the flag changes nothing observable (checked by dumping the semantics tree under the mutant, also with a label added). The test 'the scrim exposes no unlabelled tap target' pins the invariant but does not kill the mutant.
+- Finding from the run: M6 hung the runner for 1.5 hours because four swipe tests looped `while (fraction > x)` with no bound. Replaced by `_dragUntil` (at most 200 steps, then a failing `expect`); M6 now fails in 13 s.
+
+**Device check (emulator-5554, Pixel 9 Pro API 35, debug APK)**
+- The hamburger opens the drawer; Android Back closes it and the app stays open.
+- TalkBack enabled through settings: the accessibility node tree contains only the panel (no "Open menu" from behind the scrim); "Zodiac wheel, Planet positions, aspects and degree crossings" has `selected=true`, the other four items `selected=false`; "Close menu" is labelled; the version and offline lines are present.
+- TalkBack's speech could not be captured: the log reports "TTS is not ready". Acceptance criterion 4 therefore stays unticked (decision D2).
+
+**Whole-branch review (opus; a first dispatch on fable stopped on a usage-credit limit before reporting)**
+- 0 Critical, 2 Important, 1 Minor. Important 1: grabbing the panel while it opens made it jump from about 80 % to about 51 % open (the gesture ran on the raw controller value while the panel showed the eased one); fixed test-first (`grabbing the panel while it opens does not move it`, LTR and RTL, RED then GREEN) by taking the shown position over at drag start. Important 2: the fling-while-opening test accepted either end state; it now asserts the drawer closes. Minor (deferred): a tap right after a swipe release can fall through to the scrim.
+- After the fix: lint exit 0 and the suites above.
 
 ## Plan review
 

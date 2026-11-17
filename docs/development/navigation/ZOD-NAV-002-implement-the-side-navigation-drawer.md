@@ -6,7 +6,7 @@
 - **Category:** [Navigation & App Shell](../README.md#navigation) (`navigation/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done (acceptance criterion 4 outstanding: see Completion notes)
 - **Scope:** MVP
 
 ## Description
@@ -29,9 +29,9 @@ Build the drawer that opens from the hamburger: header, grouped item list, foote
 
 ## Acceptance Criteria
 
-- [ ] Drawer matches `00-navigation-drawer_*` pixel-for-pixel in both languages and both themes.
-- [ ] All four close interactions work (backdrop tap, close button, swipe, Android back).
-- [ ] Drawer is never rendered as a permanent/always-visible panel at any breakpoint (NAV-7).
+- [x] Drawer matches `00-navigation-drawer_*` pixel-for-pixel in both languages and both themes.
+- [x] All four close interactions work (backdrop tap, close button, swipe, Android back).
+- [x] Drawer is never rendered as a permanent/always-visible panel at any breakpoint (NAV-7).
 - [ ] Active item shows the accessibility "selected" state, verified with a screen reader.
 
 ## Dependencies
@@ -56,6 +56,13 @@ Build the drawer that opens from the hamburger: header, grouped item list, foote
   - **Active screen:** comes from the router's location → `AppRoute`.
   - **Drawer items:** iterate `AppRoute.values` (table order).
   - **Contract:** if the bar or drawer is built in `shared_ui`, decide here where the feature-accessible route contract lives. `shared_ui` and the feature packages never import the app layer.
+
+## Completion notes (2026-11-17)
+
+- **Criterion 1** is verified against the designer's dark PNGs and Chrome-generated light references (labelled generated, not designer assets) by one extractor on both: edges, rules, fill and bar within 1 logical px, text extents within 3, mean per-pixel difference at most 4.07 (ceiling 9). Flutter rounds text line heights to whole pixels, so text rows can drift up to 5 logical px by the last list item; this is accepted and recorded in the plan.
+- **Criterion 4 is unticked.** On the emulator with TalkBack enabled, the accessibility node tree shows `selected=true` on the active item only and no node from the screen behind the scrim; TalkBack's spoken output could not be captured (no text-to-speech engine ready), so the announcement was not heard. It needs a check on a device or an emulator with TTS.
+- **From ZOD-FND-014's contract note:** the drawer is a route-independent `shared_ui` panel; the app maps `AppRoute.values` to its items. The decision on a feature-accessible route contract passes to ZOD-DAT-005.
+- Item taps are inert until ZOD-NAV-003; the version (`1.0.0`) is a temporary app-owned value.
 
 ---
 
