@@ -1,0 +1,114 @@
+{
+  "chrome": "157.0.8103.78",
+  "sources": {
+    "zodiann-logo.svg": "7a8d5f3e413f563f62ffe127b7146e4e3f3cfcc72dcdc8f1379040c2dce88cbe",
+    "zodiann-logo-on-dark.svg": "cb1809a1a8af1269e93b278968e7eb5e9d35a68ab7b8507538b0ab9a04942eaf"
+  },
+  "spec": "811b91fa25fb528aa5044c0994e89d88c7df2410599eb3b3fa275a7c2e9c2ac8",
+  "outputs": {
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png": {
+      "pixels": 40,
+      "sha256": "7176981681781b0eb9e9f7df2268b8894d86dc5dfa1bf136faaf5ed19a701454"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png": {
+      "pixels": 60,
+      "sha256": "f0d8f437d4171d936ae202ba951aa69c355623f67889e475b85c0229ec8338a5"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png": {
+      "pixels": 29,
+      "sha256": "cce1a38fe1d5cb63e9751a23da6298d24983d1b9249773d93e5409f906005c7b"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png": {
+      "pixels": 58,
+      "sha256": "42033c46520e1b50ee5365dd7a7f0d59fdb592168cfecea0f745896078bf5acd"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png": {
+      "pixels": 87,
+      "sha256": "82acb34a2b2fcb645ab482e42e9804f785062ffd52655e39c44095428ba1808f"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png": {
+      "pixels": 80,
+      "sha256": "7c42efccb92ba77b4460b379601a13acc475236d0b1ed0d69489cf6e632161a4"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png": {
+      "pixels": 120,
+      "sha256": "0f54d8f1b930f57c203182a07e1ca7799d34dece6ec51605d80de208b6889738"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png": {
+      "pixels": 120,
+      "sha256": "0f54d8f1b930f57c203182a07e1ca7799d34dece6ec51605d80de208b6889738"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png": {
+      "pixels": 180,
+      "sha256": "e895597f7dec6376cc56a80f9420545518477820d7ad903bef24694229180fa0"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png": {
+      "pixels": 20,
+      "sha256": "f2e950b5138a7c92de3acc5ac27db5619fb8a4acdf563b5fa9d48eb2eff28ed9"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png": {
+      "pixels": 40,
+      "sha256": "7176981681781b0eb9e9f7df2268b8894d86dc5dfa1bf136faaf5ed19a701454"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png": {
+      "pixels": 76,
+      "sha256": "1cdd2775c1de4c3cacae550fb7593a272274cdd574e04dca87ac1d9b5f2ecd5b"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png": {
+      "pixels": 152,
+      "sha256": "66ba7ea75c1d17d2d708a125193bebc37f8f57893fd8eeb80319ac545fbdb15b"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png": {
+      "pixels": 167,
+      "sha256": "9164ab81d5886112bd7df9a9251eedbb07a402733a45cdbf47a24c6053f2c7f5"
+    },
+    "apps/astro_mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png": {
+      "pixels": 1024,
+      "sha256": "44d25065362c9b668fe1f34a60b592b10bc948af61e6501c895ad56ed1d00105"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+      "pixels": 48,
+      "sha256": "0235bee37c612b134d3855a9cb51deee16bd10b84044345398b27b222e10c349"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+      "pixels": 72,
+      "sha256": "9783b73d9edff1b964b6daef79328eeb0c95bcf6787fcc6935c9003db5f58cf7"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+      "pixels": 96,
+      "sha256": "914d1f48fc27b128cf1e65e60c7efeec2b4bdea5057a48741ad2f6ad7767146e"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+      "pixels": 144,
+      "sha256": "91b5bfa44896a23f52d9adb2ff18f6a0e94d36d1292b16640f9ae54997228328"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+      "pixels": 192,
+      "sha256": "4021e5fdbe86fe58f03a134420e27798663d283e77ac5dd92396674099350928"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png": {
+      "pixels": 108,
+      "sha256": "3d3d1e3487429f3eff4af6025ad26b0ef9bc868c6ee86c8933074f53d742f26f"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png": {
+      "pixels": 162,
+      "sha256": "0b7965733efc0e98fdc283e8bc4a43a4161ad40a2c75896137a19f2d3a8c73dc"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png": {
+      "pixels": 216,
+      "sha256": "f05cb26705c1eab5ac22cfa9ea3d34fc9d57374e03bca37f38e9188e5ad801bd"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png": {
+      "pixels": 324,
+      "sha256": "525666139899b6a0efa16729beb62fccab530d15d8852ea5840ee678da3238df"
+    },
+    "apps/astro_mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png": {
+      "pixels": 432,
+      "sha256": "6a9e8fb7aedd7356f7630e9811f5104be857db4d9fd6e24ac5cba5404febb6d9"
+    },
+    "apps/astro_mobile/android/app/src/main/res/drawable-nodpi/ic_launcher_background.png": {
+      "pixels": 432,
+      "sha256": "86b2eda523813e3fa1f7d3e66fb51ea6607bec5358efd9428c91aba34be75276"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "chrome": "157.0.8103.78",
+  "sizes": [
+    40,
+    80,
+    120,
+    132,
+    264,
+    396
+  ],
+  "svgSha256": {
+    "zodiann-logo-on-dark.svg": "cb1809a1a8af1269e93b278968e7eb5e9d35a68ab7b8507538b0ab9a04942eaf",
+    "zodiann-logo-on-light.svg": "06937389667f8de3200af04571a20d4020c58a6a5d7d1ce63fda7136b5ac656b"
+  }
+}

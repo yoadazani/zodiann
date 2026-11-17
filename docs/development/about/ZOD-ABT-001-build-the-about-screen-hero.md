@@ -38,7 +38,7 @@ Build the top hero block: logo, wordmark, version/build, and one-sentence purpos
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-008:** the hero logo is `ZodiannLogo(size: ZodiannSize.logoAbout)` (132; token only). Add a hero test showing the variant switches with the app theme (not the OS). Give the logo a semantics label only if the design asks for one (a localized ARB string); otherwise it stays decorative.
 
 ---
 

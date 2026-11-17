@@ -96,7 +96,12 @@ void main() {
       );
     }
     final assets = (_flutterSection()['assets'] as YamlList).cast<String>();
-    expect(assets.toSet(), _licences.toSet());
+    // ZOD-FND-008: the logo marks are declared here too; this test is about
+    // the fonts' licences only.
+    expect(
+      assets.where((a) => a.startsWith('assets/fonts/')).toSet(),
+      _licences.toSet(),
+    );
   });
 
   test('every font file matches the SHA-256 recorded in SOURCES.md', () {

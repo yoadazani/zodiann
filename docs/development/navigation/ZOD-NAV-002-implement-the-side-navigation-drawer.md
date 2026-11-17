@@ -51,6 +51,7 @@ Build the drawer that opens from the hamburger: header, grouped item list, foote
 ## Notes
 
 - **Floating layer (ZOD-UI-003):** use `ZodiannElevation.floating` (the theme extension) for the shadow, plus `floatingOutline` (1 px `line`) painted *outside* the box, e.g. as `BoxShadow(color: side.color, spreadRadius: side.width)` after `floating`. The outline applies in both themes (product-owner decision, 2026-11-13).
+- **From ZOD-FND-008:** the header logo is `ZodiannLogo(size: ZodiannSize.logoDrawer)` (40; never a numeric size, never below 40: a parent that squeezes it is reported in debug, and a root guard flags a non-token `size:`). Add a header test showing the variant switches with the app theme (`Theme.of(context).brightness`, not the OS). The logo is decorative beside the wordmark unless you pass a localized `semanticLabel`.
 - **From ZOD-FND-014:**
   - **Active screen:** comes from the router's location → `AppRoute`.
   - **Drawer items:** iterate `AppRoute.values` (table order).

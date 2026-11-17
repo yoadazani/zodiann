@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Medium
-- **Status:** Not Started
+- **Status:** Done (iOS on-device / Xcode check outstanding)
 - **Scope:** MVP
 
 ## Description
@@ -27,9 +27,9 @@ Wire the existing logo artwork (already fully designed — not to be redesigned)
 
 ## Acceptance Criteria
 
-- [ ] Launcher icon renders correctly at all required iOS/Android sizes.
-- [ ] Drawer header (40px), About hero (132px) use the correct dark/light variant automatically with theme.
-- [ ] No instance of the logo renders below 40px anywhere in the app.
+- [x] Launcher icon renders correctly at all required iOS/Android sizes. (Android adaptive icon checked on an emulator; legacy PNGs and the 15 iOS files verified statically: sizes, no alpha, corner gradient. The iOS on-device / Xcode check is outstanding.)
+- [x] Drawer header (40px), About hero (132px) use the correct dark/light variant automatically with theme. (Proven on `ZodiannLogo` at 40 and 132 in both themes with live switching; the drawer and About screens use it in NAV-002 / ABT-001.)
+- [x] No instance of the logo renders below 40px anywhere in the app. (`ZodiannLogo` asserts, reports a squeezing parent, and a root guard requires `ZodiannSize.logo…` tokens. Launcher sizes below 40 are platform-mandated.)
 
 ## Dependencies
 
@@ -42,7 +42,9 @@ Wire the existing logo artwork (already fully designed — not to be redesigned)
 
 ## Notes
 
-_No additional notes._
+- **Delivered:** `ZodiannLogo` (the two 1024 px PNGs, chosen by the app theme), the launcher icons generated from the SVGs (`tool/launcher/gen_launcher_icons.dart`; Android adaptive + legacy, iOS full-bleed opaque), and their checks. Plan: [`docs/plans/ZOD-FND-008-app-icon-logo-asset-set.md`](../../plans/ZOD-FND-008-app-icon-logo-asset-set.md).
+- **Product-owner decisions (2026-11-16):** Android adaptive + legacy; iOS full-bleed opaque; this task owns the full launcher set (ZOD-REL-001 narrows to store assets); iOS verified statically only; AC2 proven at widget level.
+- **Deviation:** the task allows the SVGs "with flutter_svg or the PNGs"; the 1024 px PNGs are used because `flutter_svg` is ruled out by the no-network guard.
 
 ---
 
