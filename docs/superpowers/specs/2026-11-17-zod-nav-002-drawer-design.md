@@ -51,3 +51,11 @@ Widget: width at several screen widths; header geometry; the four close paths; s
 - The close-button label is new copy outside `kit.js` (needs approval).
 - The close curve is `easeOutCubic` too, as MASTER names only one curve.
 - The light reference is derived from `kit.css`, not a designer-supplied image.
+
+## Approval (product owner, 2026-11-17)
+
+The design is approved, with these clarifications:
+
+1. **Close-button label.** "Close menu" / "סגירת תפריט" is an intentional, documented exception to NAV-001's "`kit.js`-only copy" rule. The labels stay localized (ARB) and consistent with `openMenu`.
+2. **Light-theme references.** Generate them (en and he, desktop and mobile) with Chrome from `kit.css`. They are labelled as **generated visual references, not designer-provided assets**. `kit.css` and the design specification stay authoritative; the images never override or redefine them.
+3. **Curve and version.** `easeOutCubic` for both open (240 ms) and close (180 ms); instant under reduced motion. `1.0.0` is a **temporary app-provided** value. **Version ownership stays outside `shared_ui`:** the drawer receives the version (or the finished line) from the caller and hardcodes nothing. The temporary fallback is documented so an authoritative version source can replace it later.
