@@ -13,6 +13,9 @@ const squareLinks = <String>[
   'zodiann://square',
   'zodiann://square/',
   'zodiann://square?x=1',
+  // go_router strips one trailing slash before any code sees the link, so a
+  // doubled one after a host is the same link as zodiann://square/.
+  'zodiann://square//',
   'zodiann://Square',
   'ZODIANN://square',
 ];
@@ -38,6 +41,9 @@ const malformedLinks = <String>[
   'zodiann://nope/square',
   'zodiann://wheel/square',
   'zodiann:///Square',
+  // One trailing slash is stripped by go_router; a second names no screen.
+  'zodiann:///square//',
+  '/square//',
   'https://example.com/square',
   '',
 ];

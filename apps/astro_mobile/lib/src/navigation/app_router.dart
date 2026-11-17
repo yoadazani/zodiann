@@ -34,7 +34,7 @@ GoRouter buildAppRouter({
   refreshListenable: refreshListenable,
   redirect: (_, state) {
     if (state.uri.hasScheme) {
-      return (AppRoute.fromUri(state.uri) ?? AppRoute.wheel).path;
+      return (AppRoute.fromRoutedUri(state.uri) ?? AppRoute.wheel).path;
     }
     return state.topRoute == null ? AppRoute.wheel.path : null;
   },

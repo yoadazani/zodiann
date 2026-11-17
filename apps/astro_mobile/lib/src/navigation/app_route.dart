@@ -31,8 +31,9 @@ enum AppRoute {
   ///
   /// Accepts no scheme or the `zodiann` scheme (a scheme URI must have an
   /// authority, so `zodiann:square` and `zodiann:/square` name nothing). A
-  /// host form (`zodiann://square`) needs a path of `''` or `/`; the path
-  /// forms (`/square`, `zodiann:///square`) tolerate one trailing slash.
+  /// host form (`zodiann://square`) needs a path of `''`, `/` or `//` (go_router
+  /// strips one trailing slash first); the path forms (`/square`,
+  /// `zodiann:///square`) tolerate one trailing slash, not two.
   /// Queries and fragments are ignored. Names are case-sensitive, except that
   /// `Uri` lowercases a scheme and a host, so `zodiann://Square` and
   /// `ZODIANN://square` resolve.
@@ -42,18 +43,30 @@ enum AppRoute {
   /// otherwise the active-route seed would differ from the first
   /// configuration.
   static AppRoute? fromUri(Uri uri) {
+    // go_router's own normalisation (`RouteConfiguration.normalizeUri`)
+    // runs before the redirect sees a link: prepend a leading `/`, strip
+    // exactly one trailing `/`. Applying it here, once, keeps this the same
+    // answer for the raw link (the seed) and the normalised one (the
+    // redirect). It also means a doubled trailing slash after a host
+    // (`zodiann://square//`) is the same link as `zodiann://square/`.
     var path = uri.path;
-    if (uri.hasScheme) {
-      if (uri.scheme != 'zodiann' || !uri.hasAuthority) return null;
-      if (uri.host.isNotEmpty) {
-        if (path.isNotEmpty && path != '/') return null;
-        return _named(uri.host);
-      }
-    }
+    if (!path.startsWith('/')) path = '/$path';
     if (path.length > 1 && path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
     }
-    return _named(path.startsWith('/') ? path.substring(1) : null);
+    return fromRoutedUri(uri.replace(path: path));
+  }
+
+  /// [fromUri] for a URI go_router has already normalised, which is what the
+  /// router's redirect receives: normalising it again would strip a second
+  /// trailing slash (`zodiann:///square//` would open the square).
+  static AppRoute? fromRoutedUri(Uri uri) {
+    final path = uri.path;
+    if (uri.hasScheme) {
+      if (uri.scheme != 'zodiann' || !uri.hasAuthority) return null;
+      if (uri.host.isNotEmpty) return path == '/' ? _named(uri.host) : null;
+    }
+    return path.startsWith('/') ? _named(path.substring(1)) : null;
   }
 
   static AppRoute? _named(String? name) {
