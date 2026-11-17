@@ -3,7 +3,10 @@
 // four ways to close, the swipe gesture, reduced motion, hit testing, semantics
 // and the interrupted-gesture cases. The sampled fractions are literal:
 // Curves.easeOutCubic is Cubic(0.215, 0.61, 0.355, 1.0), not 1 − (1 − t)³.
+import 'dart:ui' show SemanticsAction;
+
 import 'package:flutter/gestures.dart' show kTouchSlop;
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
@@ -166,6 +169,25 @@ Set<String> _labels(WidgetTester tester) => {
   for (final node in tester.semantics.simulatedAccessibilityTraversal())
     if (node.label.isNotEmpty) node.label,
 };
+
+/// Drags toward the start edge until the panel is at most [target] open. Bounded:
+/// if the panel stops following the finger (a regression), this fails at once
+/// instead of looping forever.
+Future<void> _dragUntil(
+  WidgetTester tester,
+  bool he,
+  _Drag drag,
+  double target,
+) async {
+  for (var i = 0; i < 200 && _fraction(tester, he) > target; i++) {
+    await drag.toward(10);
+  }
+  expect(
+    _fraction(tester, he),
+    lessThanOrEqualTo(target),
+    reason: 'the panel did not follow the drag toward the start edge',
+  );
+}
 
 /// A drag with timestamps; [toStart] gives the dx toward the start edge.
 class _Drag {
@@ -400,9 +422,7 @@ void main() {
         await tester.pumpAndSettle();
         final drag = await _Drag.start(tester, he, onPanel);
         await drag.toward(kTouchSlop + 12);
-        while (_fraction(tester, he) > 0.3) {
-          await drag.toward(10);
-        }
+        await _dragUntil(tester, he, drag, 0.3);
         final before = tester.getRect(find.byType(ZodiannDrawer));
         await drag.up();
         await tester.pump();
@@ -422,9 +442,7 @@ void main() {
         await tester.pumpAndSettle();
         final drag = await _Drag.start(tester, he, onPanel);
         await drag.toward(kTouchSlop + 12);
-        while (_fraction(tester, he) > 0.7) {
-          await drag.toward(10);
-        }
+        await _dragUntil(tester, he, drag, 0.7);
         await drag.up();
         await tester.pumpAndSettle();
         expect(find.byType(ZodiannDrawer), findsOneWidget);
@@ -439,9 +457,7 @@ void main() {
         await tester.pumpAndSettle();
         var drag = await _Drag.start(tester, he, onPanel);
         await drag.toward(kTouchSlop + 12);
-        while (_fraction(tester, he) > 0.3) {
-          await drag.toward(10);
-        }
+        await _dragUntil(tester, he, drag, 0.3);
         for (var i = 0; i < 4; i++) {
           await drag.toward(-20, ms: 10);
         }
@@ -453,9 +469,7 @@ void main() {
         // 70 % open, then a fast flick toward the start: closes.
         drag = await _Drag.start(tester, he, onPanel);
         await drag.toward(kTouchSlop + 12);
-        while (_fraction(tester, he) > 0.7) {
-          await drag.toward(10);
-        }
+        await _dragUntil(tester, he, drag, 0.7);
         for (var i = 0; i < 4; i++) {
           await drag.toward(20, ms: 10);
         }
@@ -558,6 +572,35 @@ void main() {
       // The screen behind is blocked; the scrim adds no node of its own.
       expect(labels, isNot(contains('Open menu')));
       expect(labels, isNot(contains('Body button')));
+      handle.dispose();
+    });
+
+    testWidgets('the scrim exposes no unlabelled tap target', (tester) async {
+      final handle = tester.ensureSemantics();
+      final h = _H();
+      await _pump(tester, h);
+      await _open(tester);
+      await tester.pumpAndSettle();
+      // A dismissible scrim left in the semantics tree is an unlabelled
+      // "tap" node a screen reader can land on.
+      final dismissers = <String>[];
+      void walk(SemanticsNode node) {
+        final data = node.getSemanticsData();
+        if (data.hasAction(SemanticsAction.dismiss) ||
+            (data.label.isEmpty && data.hasAction(SemanticsAction.tap))) {
+          dismissers.add('${node.id} ${data.label}');
+        }
+        node.visitChildren((child) {
+          walk(child);
+          return true;
+        });
+      }
+
+      walk(
+        tester.binding.renderViews.first.owner!.semanticsOwner!
+            .rootSemanticsNode!,
+      );
+      expect(dismissers, isEmpty);
       handle.dispose();
     });
 
