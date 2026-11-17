@@ -4,6 +4,9 @@ import 'package:astro_core/astro_core.dart' show Body;
 /// point followed by U+FE0E (text presentation), so no platform renders it
 /// as a colour emoji. Draw them with `ZodiannTextStyles.glyph`.
 ///
+/// [markAxis] and [markDiagonal] (ZOD-UI-009) are the exception: plain text
+/// marks with no U+FE0E, drawn in the UI font (the `small` role).
+///
 /// The constants are fully escaped so the source shows exactly which code
 /// point each one is.
 abstract final class ZodiannGlyphs {
@@ -58,6 +61,14 @@ abstract final class ZodiannGlyphs {
 
   /// Retrograde ℞.
   static const String retrograde = '\u{211E}\u{FE0E}';
+
+  /// The axis tag's mark, + (U+002B). A plain text mark drawn in the UI
+  /// font (the `small` role), not an astrological glyph: it carries no
+  /// U+FE0E, and it is not in [all].
+  static const String markAxis = '+';
+
+  /// The diagonal tag's mark, × (U+00D7). Plain text like [markAxis].
+  static const String markDiagonal = '×';
 
   /// All 29 glyphs: signs, bodies, retrograde, aspects.
   static List<String> get all => [

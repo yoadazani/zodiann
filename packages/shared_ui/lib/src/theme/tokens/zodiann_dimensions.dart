@@ -160,6 +160,16 @@ abstract final class ZodiannSize {
 
   /// The logo in the About hero (MASTER §9).
   static const double logoAbout = 132.0;
+
+  /// Tags: height (MASTER §10 "Tags", kit.css `.tag`).
+  static const double tag = 24.0;
+
+  /// Tags: the gap between the mark and the label (kit.css `.tag`).
+  static const double tagGap = 6.0;
+
+  /// Tags: the inset outline of the today and centre tags (kit.css
+  /// `box-shadow: inset 0 0 0 1.5px`).
+  static const double tagOutline = 1.5;
 }
 
 /// The breakpoint widths (MASTER §6), in logical pixels.

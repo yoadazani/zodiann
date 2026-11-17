@@ -29,6 +29,15 @@ const _fnd007 = {
 };
 
 void main() {
+  test('the highlight marks are + and × (U+00D7), no variation selector', () {
+    expect(ZodiannGlyphs.markAxis.runes.toList(), [0x2B]);
+    expect(ZodiannGlyphs.markDiagonal.runes.toList(), [0xD7]);
+    // Plain text marks, not astrological glyphs: never in `all`.
+    expect(ZodiannGlyphs.all, hasLength(29));
+    expect(ZodiannGlyphs.all, isNot(contains(ZodiannGlyphs.markAxis)));
+    expect(ZodiannGlyphs.all, isNot(contains(ZodiannGlyphs.markDiagonal)));
+  });
+
   test('every glyph is one MASTER code point followed by U+FE0E', () {
     expect(ZodiannGlyphs.textPresentation, '\u{FE0E}');
     for (final g in ZodiannGlyphs.all) {

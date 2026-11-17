@@ -108,6 +108,11 @@ void main() {
       'logoMin': (ZodiannSize.logoMin, 40),
       'logoDrawer': (ZodiannSize.logoDrawer, 40),
       'logoAbout': (ZodiannSize.logoAbout, 132),
+      // ZOD-UI-009: MASTER §10 "Tags", kit.css `.tag` (height 24, gap 6)
+      // and its 1.5 px inset outline (today, center).
+      'tag': (ZodiannSize.tag, 24),
+      'tagGap': (ZodiannSize.tagGap, 6),
+      'tagOutline': (ZodiannSize.tagOutline, 1.5),
     };
     sizes.forEach((name, value) {
       expect(value.$1, value.$2, reason: name);
@@ -164,5 +169,9 @@ void main() {
     expect(_px(sw, 'width'), ZodiannSize.switchWidth, reason: '.switch');
     expect(_px(sw, 'height'), ZodiannSize.switchHeight, reason: '.switch');
     expect(_px(_rule(css, '.tbl td'), 'height'), ZodiannSize.tableRow);
+    final tag = _rule(css, '.tag');
+    expect(_px(tag, 'height'), ZodiannSize.tag, reason: '.tag');
+    expect(_px(tag, 'gap'), ZodiannSize.tagGap, reason: '.tag');
+    expect(_px(tag, 'padding-inline'), ZodiannSpace.s2, reason: '.tag');
   });
 }

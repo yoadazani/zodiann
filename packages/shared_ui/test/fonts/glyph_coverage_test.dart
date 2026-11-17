@@ -105,6 +105,24 @@ void main() {
     expect(missing, isEmpty, reason: _hex(missing));
   });
 
+  test('IBM Plex Sans and IBM Plex Sans Hebrew (Medium and SemiBold) cover the '
+      'tag marks + and ×', () {
+    final marks = {
+      ...ZodiannGlyphs.markAxis.runes,
+      ...ZodiannGlyphs.markDiagonal.runes,
+    };
+    expect(marks, hasLength(2));
+    for (final w in ['Medium', 'SemiBold']) {
+      for (final f in [
+        'assets/fonts/ibm-plex-sans/IBMPlexSans-$w.ttf',
+        'assets/fonts/ibm-plex-sans-hebrew/IBMPlexSansHebrew-$w.ttf',
+      ]) {
+        final missing = marks.where((c) => !_cover(f).contains(c));
+        expect(missing, isEmpty, reason: '$f ${_hex(missing)}');
+      }
+    }
+  });
+
   test('IBM Plex Sans covers Latin and digits', () {
     final cover = _cover('assets/fonts/ibm-plex-sans/IBMPlexSans-Regular.ttf');
     final missing = _latinAndDigits.where((c) => !cover.contains(c));

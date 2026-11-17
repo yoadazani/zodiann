@@ -41,4 +41,7 @@ abstract final class ZodiannStates {
   /// theme's `danger` it is 3.37:1, below WCAG AA for 14 px text (NFR-X5);
   /// handed to ZOD-NFR-009.
   static const Color onDangerSolid = Color(0xFFFFFFFF);
+
+  /// The tag mark (+, ×) draws at 90 % (kit.css `.tag .mk`: `opacity: .9`).
+  static const double tagMarkOpacity = 0.9;
 }
