@@ -40,7 +40,7 @@ Draw the per-degree tick marks and the 10/20-degree numeric labels inside the si
 
 ## Notes
 
-_No additional notes._
+Degree-number radius and size (ZOD-WHL-001 plan decision D7, `docs/plans/ZOD-WHL-001-wheel-canvas-proportions.md`, 2026-11-17; not `DESIGN_DECISIONS.md` design decision D7): the design (`kit.js` `wheelSVG`, from which the PNGs are rendered) places the numbers at `rSignIn − 26` (kit units), not MASTER §7.2's "22 px inside the band", and the "14px compact" above is the compact **font size** (desktop 9.5), not an inset. The radius comes from `WheelProportions` (ZOD-WHL-001).
 
 ---
 
