@@ -7,9 +7,10 @@
 ///
 /// **App-level placeholder, not a public contract.** Feature packages must
 /// never import the app layer. ZOD-NAV-001's top bar is route-independent
-/// (the app shell maps routes to its copy), so the decision on where a
+/// (the app shell maps routes to its copy), and so is ZOD-NAV-002's drawer
+/// (it takes item data, not routes), so the decision on where a
 /// feature-accessible route contract lives passes to the first feature-side
-/// navigation (ZOD-DAT-005) or ZOD-NAV-002.
+/// navigation (ZOD-DAT-005).
 enum AppRoute {
   wheel,
   square,

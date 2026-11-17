@@ -1,7 +1,8 @@
 // ZOD-NAV-001: the app shell puts the top bar over every route (NAV-1): the
-// route's title and subtitle, the Square actions, all disabled until their
-// tasks wire them (product-owner decision, Option B), one bar for the app's
-// lifetime, and content scrolling beneath it.
+// route's title and subtitle, the Square actions (disabled until their tasks
+// wire them: product-owner decision, Option B), the hamburger (enabled since
+// ZOD-NAV-002: it opens the drawer), one bar for the app's lifetime, and
+// content scrolling beneath it.
 import 'package:astro_mobile/src/app.dart';
 import 'package:astro_mobile/src/navigation/app_route.dart';
 import 'package:astro_mobile/src/navigation/app_router.dart';
@@ -135,7 +136,10 @@ void main() {
         [for (final b in icons.skip(1)) b.semanticLabel],
         ['Save', 'Export to Excel'],
       );
-      expect([for (final b in icons) b.onPressed], [null, null, null]);
+      // The hamburger opens the drawer (ZOD-NAV-002); Save and Export stay
+      // disabled until their tasks wire them.
+      expect(icons.first.onPressed, isNotNull);
+      expect([for (final b in icons.skip(1)) b.onPressed], [null, null]);
       for (final label in ['Save', 'Export to Excel']) {
         expect(
           tester.getSemantics(find.bySemanticsLabel(label)),
@@ -150,7 +154,7 @@ void main() {
     ('en', 'Open menu', false),
     ('he', 'פתיחת תפריט', true),
   ]) {
-    testWidgets('hamburger is disabled and labelled $label ($lang)', (
+    testWidgets('hamburger is enabled and labelled $label ($lang)', (
       tester,
     ) async {
       final handle = tester.ensureSemantics();
@@ -159,10 +163,10 @@ void main() {
         _inBar(find.byType(ZodiannIconButton)).first,
       );
       expect(hamburger.semanticLabel, label);
-      expect(hamburger.onPressed, isNull);
+      expect(hamburger.onPressed, isNotNull);
       expect(
         tester.getSemantics(find.bySemanticsLabel(label)),
-        isSemantics(label: label, isButton: true, isEnabled: false),
+        isSemantics(label: label, isButton: true, isEnabled: true),
       );
       handle.dispose();
     });
