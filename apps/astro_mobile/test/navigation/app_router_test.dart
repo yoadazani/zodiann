@@ -11,6 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'deep_link_cases.dart';
+
 Future<void> _pumpApp(WidgetTester tester, {String? initialLocation}) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -171,5 +173,161 @@ void main() {
     await _go(tester, AppRoute.about.path);
     expect(_router(tester).canPop(), isFalse);
     expect(_stubRoute(tester), AppRoute.about);
+  });
+
+  deepLinkTests();
+}
+
+// ZOD-NAV-003: deep links (NAV-5, T-UI-1) and the router seams.
+Future<ProviderContainer> _pumpWith(
+  WidgetTester tester,
+  GoRouter Function() build,
+) async {
+  final container = ProviderContainer(
+    overrides: [
+      appRouterProvider.overrideWith((ref) {
+        final router = build();
+        ref.onDispose(router.dispose);
+        return router;
+      }),
+    ],
+  );
+  addTearDown(container.dispose);
+  await tester.pumpWidget(
+    UncontrolledProviderScope(container: container, child: const ZodiannApp()),
+  );
+  await tester.pumpAndSettle();
+  return container;
+}
+
+void deepLinkTests() {
+  group('AppRoute.fromUri', () {
+    test('resolves every accepted spelling', () {
+      for (final link in squareLinks) {
+        expect(
+          AppRoute.fromUri(Uri.parse(link)),
+          AppRoute.square,
+          reason: link,
+        );
+      }
+      for (final MapEntry(key: link, value: route) in schemeLinks.entries) {
+        expect(AppRoute.fromUri(Uri.parse(link)), route, reason: link);
+      }
+    });
+
+    test('rejects everything that names no screen', () {
+      for (final link in malformedLinks) {
+        expect(AppRoute.fromUri(Uri.parse(link)), isNull, reason: link);
+      }
+    });
+  });
+
+  test('AppRoute.fromPath is exact equality with a wheel fallback', () {
+    for (final route in AppRoute.values) {
+      expect(AppRoute.fromPath(route.path), route);
+    }
+    for (final path in ['', '/', '/Square', '/square/', '/nope', 'square']) {
+      expect(AppRoute.fromPath(path), AppRoute.wheel, reason: path);
+    }
+  });
+
+  group('cold start through initialLocation', () {
+    for (final MapEntry(key: link, value: route) in schemeLinks.entries) {
+      testWidgets('$link opens ${route.name}, no scheme left', (tester) async {
+        await _pumpApp(tester, initialLocation: link);
+        expect(_stubRoute(tester), route);
+        expect(_router(tester).state.uri.toString(), route.path);
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    for (final link in malformedLinks.where((l) => l.isNotEmpty)) {
+      testWidgets('malformed "$link" lands on the wheel', (tester) async {
+        await _pumpApp(tester, initialLocation: link);
+        expect(_stubRoute(tester), AppRoute.wheel);
+        expect(_router(tester).state.uri.toString(), '/wheel');
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
+  group('cold start through the platform default route', () {
+    for (final link in ['zodiann://square', 'zodiann:///square']) {
+      testWidgets('$link opens the square', (tester) async {
+        addTearDown(tester.platformDispatcher.clearDefaultRouteNameTestValue);
+        tester.platformDispatcher.defaultRouteNameTestValue = link;
+        await _pumpApp(tester);
+        expect(_stubRoute(tester), AppRoute.square);
+        expect(_router(tester).state.uri.toString(), '/square');
+      });
+    }
+
+    testWidgets('the platform link wins over an injected initialLocation', (
+      tester,
+    ) async {
+      addTearDown(tester.platformDispatcher.clearDefaultRouteNameTestValue);
+      tester.platformDispatcher.defaultRouteNameTestValue = 'zodiann://square';
+      await _pumpApp(tester, initialLocation: '/saved');
+      expect(_stubRoute(tester), AppRoute.square);
+    });
+  });
+
+  group('warm links (handlePushRoute)', () {
+    testWidgets('open the screen and leave no scheme in router state', (
+      tester,
+    ) async {
+      await _pumpApp(tester);
+      await _go(tester, AppRoute.settings.path);
+      for (final MapEntry(key: link, value: route) in schemeLinks.entries) {
+        await tester.binding.handlePushRoute(link);
+        await tester.pumpAndSettle();
+        expect(_stubRoute(tester), route, reason: link);
+        expect(_router(tester).state.uri.toString(), route.path, reason: link);
+      }
+    });
+
+    testWidgets('a malformed link lands on the wheel', (tester) async {
+      await _pumpApp(tester);
+      for (final link in malformedLinks.where((l) => l.isNotEmpty)) {
+        await _go(tester, AppRoute.square.path);
+        await tester.binding.handlePushRoute(link);
+        await tester.pumpAndSettle();
+        expect(_stubRoute(tester), AppRoute.wheel, reason: link);
+        expect(tester.takeException(), isNull, reason: link);
+      }
+    });
+  });
+
+  group('router seams', () {
+    testWidgets('screenBuilder replaces the stub on every route', (
+      tester,
+    ) async {
+      final container = await _pumpWith(
+        tester,
+        () => buildAppRouter(
+          screenBuilder: (route) => Text('screen-${route.name}'),
+        ),
+      );
+      for (final route in AppRoute.values) {
+        container.read(appRouterProvider).go(route.path);
+        await tester.pumpAndSettle();
+        expect(find.text('screen-${route.name}'), findsOneWidget);
+        expect(find.byType(ScreenStub), findsNothing);
+      }
+    });
+
+    testWidgets('a refreshListenable notifies the router', (tester) async {
+      final refresh = ValueNotifier<int>(0);
+      addTearDown(refresh.dispose);
+      await _pumpWith(tester, () => buildAppRouter(refreshListenable: refresh));
+      var notified = 0;
+      final provider = _router(tester).routeInformationProvider;
+      void count() => notified++;
+      provider.addListener(count);
+      addTearDown(() => provider.removeListener(count));
+      refresh.value++;
+      expect(notified, 1);
+      expect(_stubRoute(tester), AppRoute.wheel);
+    });
   });
 }
