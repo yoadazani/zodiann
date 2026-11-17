@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 import 'navigation/app_router.dart';
+import 'navigation/warm_link.dart';
 import 'theme/theme_mode_provider.dart';
 
 /// The root widget: theme, localization and the router whose routes the
@@ -14,6 +15,10 @@ class ZodiannApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Registers the warm-link observer before the router mounts: Flutter
+    // notifies observers in registration order until one returns true, and
+    // go_router's provider returns true. See WarmLinkEvents.
+    ref.watch(warmLinkProvider);
     return MaterialApp.router(
       routerConfig: ref.watch(appRouterProvider),
       theme: ZodiannTheme.porcelain,
