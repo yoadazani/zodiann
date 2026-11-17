@@ -71,7 +71,13 @@ class _ZodiannDrawerRoute extends PopupRoute<void> {
   final bool reduceMotion;
   final NavigatorState _navigator;
 
+  /// A swipe is in progress or still settling: the progress stays linear.
   bool _gestureActive = false;
+
+  /// The navigator has been told a user gesture is in progress. While it is,
+  /// the page ignores pointers, so it is released as soon as the panel settles
+  /// open (a tap then reaches the panel), not when the settle ends.
+  bool _navigatorGesture = false;
   CurvedAnimation? _progress;
 
   @override
@@ -197,6 +203,7 @@ class _ZodiannDrawerRoute extends PopupRoute<void> {
     c.stop();
     c.value = shown;
     _navigator.didStartUserGesture();
+    _navigatorGesture = true;
   }
 
   void _dragUpdate(DragUpdateDetails details, double width, bool rtl) {
@@ -226,6 +233,8 @@ class _ZodiannDrawerRoute extends PopupRoute<void> {
         duration: transitionDuration * (1.0 - c.value),
         curve: Curves.linear,
       );
+      // The drawer stays open: let the panel take taps while it settles.
+      _releaseNavigatorGesture();
     } else {
       // didPop starts the (linear, from here) reverse.
       _navigator.pop();
@@ -249,6 +258,12 @@ class _ZodiannDrawerRoute extends PopupRoute<void> {
   void _endGesture() {
     if (!_gestureActive) return;
     _gestureActive = false;
+    _releaseNavigatorGesture();
+  }
+
+  void _releaseNavigatorGesture() {
+    if (!_navigatorGesture) return;
+    _navigatorGesture = false;
     _navigator.didStopUserGesture();
   }
 }

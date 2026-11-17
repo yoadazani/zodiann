@@ -20,6 +20,9 @@ class _H {
   bool he = false;
 }
 
+/// Taps the second drawer item receives (reset by the tests that read it).
+int _itemTaps = 0;
+
 List<ZodiannDrawerGroup> _groups() => [
   ZodiannDrawerGroup(
     label: 'Analysis',
@@ -36,7 +39,7 @@ List<ZodiannDrawerGroup> _groups() => [
         name: 'Gann Square of Nine',
         description: 'Numbers',
         selected: false,
-        onTap: () {},
+        onTap: () => _itemTaps++,
       ),
     ],
   ),
@@ -756,6 +759,74 @@ void main() {
           expect(_fraction(tester, he), closeTo(1.0, 1e-6));
         },
       );
+    }
+  });
+
+  // Releasing a swipe above halfway settles the panel open. During that settle
+  // the panel must already take taps: they used to be ignored by the page and
+  // fall through to the scrim, which closed the drawer (found on a device).
+  group('a tap right after a swipe is released', () {
+    /// Drags slowly toward the start edge to just under 60 % open, releases
+    /// (no fling, so it settles open) and runs 20 ms of the settle.
+    Future<void> releaseAndSettleOpen(WidgetTester tester, bool he) async {
+      await _open(tester);
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(find.byType(ZodiannDrawer));
+      final drag = await _Drag.start(
+        tester,
+        he,
+        Offset(he ? rect.left + 40 : rect.right - 40, 450),
+      );
+      await _dragUntil(tester, he, drag, 0.6);
+      await drag.up();
+      await tester.pump(const Duration(milliseconds: 20));
+      expect(
+        _fraction(tester, he),
+        inExclusiveRange(0.4, 0.99),
+        reason: 'the panel should still be settling open',
+      );
+    }
+
+    for (final he in [false, true]) {
+      final dir = he ? 'RTL' : 'LTR';
+
+      testWidgets('reaches the panel during the settle, $dir', (tester) async {
+        final h = _H()..he = he;
+        await _pump(tester, h);
+        _itemTaps = 0;
+        await releaseAndSettleOpen(tester, he);
+        // Tap the part of the item that is already on screen (the panel is
+        // still sliding in, so the item's centre may be off the screen edge).
+        // (An item ends 13 px inside the panel: 1 px border plus 12 padding.)
+        final panel = tester.getRect(find.byType(ZodiannDrawer));
+        final row = tester.getRect(find.text('Gann Square of Nine')).center.dy;
+        final at = Offset(he ? panel.left + 24 : panel.right - 24, row);
+        expect(
+          Rect.fromLTWH(0, 0, 1440, 900).contains(at),
+          isTrue,
+          reason: 'the tap point must be on screen: $at',
+        );
+        await tester.tapAt(at);
+        await tester.pumpAndSettle();
+        expect(_itemTaps, 1, reason: 'the tap should reach the item');
+        expect(
+          find.byType(ZodiannDrawer),
+          findsOneWidget,
+          reason: 'a tap on the panel must not fall through to the scrim',
+        );
+        expect(_fraction(tester, he), closeTo(1.0, 1e-6));
+      });
+
+      testWidgets('a tap on the scrim during the settle still closes it, '
+          '$dir', (tester) async {
+        final h = _H()..he = he;
+        await _pump(tester, h);
+        await releaseAndSettleOpen(tester, he);
+        await tester.tapAt(Offset(he ? 100 : 1340, 450));
+        await tester.pumpAndSettle();
+        expect(find.byType(ZodiannDrawer), findsNothing);
+        expect(_root(tester).canPop(), isFalse);
+      });
     }
   });
 }
