@@ -44,3 +44,5 @@ Build the chip list of every open-source dependency the app ships with attributi
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "About & Sources" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
+
+- **From ZOD-UI-009 (2026-11-17):** the licence names are `ZodiannTag(variant: ZodiannTagVariant.neutral, ...)` inside an LTR `Directionality` (kit's `.ltr`).

@@ -6,7 +6,7 @@
 - **Category:** [Shared UI & Design System](../README.md#shared-ui-design-system) (`shared-ui-design-system/`)
 - **Phase:** Phase 1
 - **Priority:** Medium
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
