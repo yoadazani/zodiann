@@ -13,93 +13,41 @@ You must use the Superpowers methodology for implementation while following the 
 
 This skill governs HOW Zodiann is developed. It does not replace the product specification, individual task definitions, or Superpowers skills.
 
+Each rule below is stated once, in the section that owns it. Other sections point to it.
+
 ---
 
 # 1. Project Sources of Truth
 
-Before performing development work, understand the following resources.
-
 ## Product Specification
 
-`zodiann-specification.md`
-
-Defines:
-- Product requirements.
-- Functional behavior.
-- Use cases.
-- Business rules.
-- Non-functional requirements.
-- Technical and product constraints.
+`assets/zodiann-specification.md` defines what must be built: requirements, functional behavior, use cases, business rules, non-functional requirements, technical and product constraints.
 
 ## Development Roadmap
 
-`docs/development/TASKS.md`
-
-Defines:
-- Development phases.
-- Task IDs.
-- Priorities.
-- Dependencies.
-- Task statuses.
-- MVP scope.
-- Optional extensions.
-- Execution order.
+`docs/development/TASKS.md` defines phases, task IDs, priorities, dependencies, statuses, MVP scope, optional extensions and execution order.
 
 ## Task Documentation
 
-`docs/development/README.md`
-
-`docs/development/tasks/`
-
-Individual task files define:
-- Task scope.
-- Implementation requirements.
-- Relevant specification references.
-- Dependencies.
-- Acceptance criteria.
-- Expected behavior.
-
-Verify the actual task directory structure before assuming file locations.
+`docs/development/README.md` and the per-category task files under `docs/development/<category>/` define each task's scope, implementation requirements, specification references, dependencies, acceptance criteria and expected behavior. Verify the actual directory structure before assuming file locations.
 
 ## Design Reference
 
-`design-reference/zodiann/`
-
-This is the source of truth for UI/UX implementation.
-
-All visual implementation must follow the existing design references.
-
-Do not invent a new visual direction, redesign existing screens, or introduce arbitrary UI patterns.
-
-If a design requirement is missing or ambiguous, identify the gap and ask for clarification when it materially affects implementation.
+`design-reference/zodiann/` is the source of truth for UI/UX. Follow it; do not invent a new visual direction, redesign screens, or introduce arbitrary UI patterns. If a design requirement is missing or ambiguous and it materially affects implementation, identify the gap and ask.
 
 ## Persistent Progress
 
-`docs/PROGRESS.md`
-
-This is the central record of actual development progress.
-
-It must reflect the verified state of the codebase, not merely the intended state.
+`docs/PROGRESS.md` is the central record of actual development progress. It must reflect the verified state of the codebase, not the intended state. It can be very large: read it by section (Section 7), never whole.
 
 ## Implementation Plans
 
-`docs/plans/`
-
-Every completed implementation plan must be saved here.
-
-Use descriptive filenames containing the task ID.
-
-Example:
-
-`docs/plans/FOUNDATION-001-project-initialization.md`
-
-Every plan is reviewed by the `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) before the user sees it, and carries a `## Plan review` record (Section 3, "Automatic Plan Review").
+Every completed plan is saved under `docs/plans/` with the task ID in the filename (for example `docs/plans/FOUNDATION-001-project-initialization.md`), is reviewed by the `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) before the user sees it, and carries a `## Plan review` record (Section 3).
 
 ---
 
-# 2. Core Development Principles
+# 2. Core Principles
 
-Always follow these principles:
+Order of authority:
 
 1. The specification defines what must be built.
 2. Individual task files define the implementation scope.
@@ -109,16 +57,15 @@ Always follow these principles:
 6. Git history and the actual codebase provide implementation evidence.
 7. PROGRESS.md records the verified development state.
 
-Never:
-- Invent product requirements.
-- Skip documented dependencies.
-- Change acceptance criteria to make a task appear complete.
-- Mark unverified work as completed.
-- Implement optional extensions without explicit authorization.
-- Perform unrelated refactoring.
-- Introduce unnecessary dependencies.
-- Silently make significant architectural or product decisions.
-- Overwrite existing plans or progress information without a clear reason.
+Never (this list applies to every section):
+
+- invent product requirements, or silently make significant architectural or product decisions;
+- skip documented dependencies;
+- change acceptance criteria to make a task appear complete, or mark unverified work completed;
+- implement optional extensions without explicit authorization;
+- perform unrelated refactoring or introduce unnecessary dependencies;
+- overwrite existing plans or progress information without a clear reason;
+- commit or push to `main`; merge a PR or merge into `main` without explicit user approval; discard or reset changes without explicit approval; and, **absolutely and with no user-approval exception**, force-push, rewrite pushed history, use `--no-verify` (skip hooks), or skip or bypass commit signing (Section 8).
 
 Preserve existing working functionality.
 
@@ -126,446 +73,125 @@ Preserve existing working functionality.
 
 # 3. Superpowers Integration
 
-Use the installed Superpowers skills throughout development.
+Invoke the relevant Superpowers skill rather than reproducing its workflow manually. When each applies:
 
-Invoke the relevant skills rather than reproducing their workflows manually.
+- **`brainstorming`:** requirements are ambiguous; several approaches exist; a significant architectural decision is needed; important edge cases or product behavior are undefined. Do not reopen decisions already settled by the specification, task documentation, PROGRESS Technical Decisions or the plan without reason; but if new evidence or a conflict with a higher-authority source (Section 2 order) appears, surface it to the user instead of ignoring it.
+- **`writing-plans`:** before any implementation. A plan describes the approach; breaks work into small verifiable steps; names the relevant files and expected changes; includes test requirements and acceptance criteria; respects dependencies; identifies risks and unresolved decisions; and says whether any work is genuinely independent (see Subagent policy). It must be executable without undocumented conversation context.
+- **`test-driven-development`:** during implementation, Red-Green-Refactor: write a failing test, run it and confirm it fails for the expected reason, implement the minimum, run it again, refactor, run relevant regression tests. Never skip testing without a documented technical justification.
+- **`requesting-code-review`:** after meaningful implementation work, as one independent review of the entire task branch by a fresh reviewer (Section 5 step 5). Review correctness, specification compliance, architecture, maintainability, security, error handling, test coverage and unintended changes. Address important findings before completion.
+- **`verification-before-completion`:** before declaring any task completed; run the actual commands and inspect their results. Never claim tests passed unless they were run successfully.
+- **`finishing-a-development-branch`:** choose "push and create a PR" automatically (Section 8 already decides it). Do not merge locally into `main`.
 
-## Brainstorming
+## Subagent policy
 
-Use `brainstorming` when:
-- Requirements are ambiguous.
-- Multiple implementation approaches exist.
-- A significant architectural decision is required.
-- Important edge cases have not been defined.
-- Product behavior requires clarification.
+Default to sequential implementation in the current session (`executing-plans`). Use the minimum number of subagents the work genuinely needs.
 
-Do not unnecessarily reopen decisions already settled by the specification or task documentation.
-
-## Writing Plans
-
-Use `writing-plans` before implementation.
-
-Every implementation plan must:
-- Describe the implementation approach.
-- Break work into small, verifiable steps.
-- Identify relevant files.
-- Describe expected changes.
-- Include test requirements.
-- Respect dependencies.
-- Include acceptance criteria.
-- Identify risks and unresolved decisions.
-
-After completing the plan:
-
-1. Save the complete plan under `docs/plans/`.
-2. Use the task ID in the filename.
-3. Run the **Automatic Plan Review** cycle below. It's mandatory, and the user never has to ask for it.
-4. Preserve the approved plan.
-5. Update `docs/PROGRESS.md` with the plan path.
-
-Do not begin implementation before the plan is ready, reviewed and approved.
+- Use `subagent-driven-development` only when the approved plan contains independent tasks: disjoint files, no shared interface or architectural decision, no sequential dependency, and independently verifiable results. The plan must name that justification.
+- Never parallelize sequential dependencies, changes to the same files without a safe coordination strategy, or tasks that need an unresolved shared decision.
+- When `writing-plans` asks the user to choose an execution method, state the default (sequential, native) and recommend subagent-driven only when the justification above holds.
+- Review every subagent result before integrating it.
+- The plan reviewer (below) and the independent whole-branch code review by a fresh reviewer (Section 5 step 5) are separate mandatory gates and are not skipped for either mode.
 
 ## Automatic Plan Review
 
-Every implementation plan is independently reviewed by the project's `plan-reviewer` subagent (`.claude/agents/plan-reviewer.md`) **before the user sees it**. This cycle extends `writing-plans`; it doesn't replace it.
-- `writing-plans` still does all the planning, including its own self-review.
-- This cycle runs after the plan is saved and before the plan is presented.
-- `writing-plans`' execution-handoff message to the user is deferred until this cycle is complete.
+Every implementation plan is independently reviewed by `plan-reviewer` **before the user sees it**. This extends `writing-plans`; it does not replace it. `writing-plans` still plans and self-reviews; its execution-handoff message to the user is deferred until this cycle is complete.
 
-**When it runs:**
-- After every new plan is written.
-- After every material revision of a plan, including revisions made in response to the user's review comments. A material revision changes scope, interfaces, tests, commands, or decisions; typo-only edits don't count.
+**When it runs:** after every new plan, and after every material revision of a plan, including revisions made in response to user comments or to a product-owner decision. A material revision changes scope, interfaces, tests, commands, behavior or decisions; typo-only edits do not count. Each revision starts a new cycle of at most two rounds.
 
 **The cycle:**
 
-1. **Dispatch the reviewer.** Use the Agent tool with `subagent_type: "plan-reviewer"`. Give it:
-   - the plan path and task ID;
-   - the task file path;
-   - the review round number;
-   - any product-owner decisions made in this conversation that aren't yet written into the plan or task files.
+1. **Dispatch the reviewer** with the Agent tool, `subagent_type: "plan-reviewer"`. The prompt carries only: the plan path and task ID; the task file path; the round number; for round 2 or a revision, the commit range of the revision and the previous findings; and any product-owner decisions made in this conversation that are not yet written into the plan or task files. Do not restate the plan. If the `plan-reviewer` type is unavailable (definitions load at session start), dispatch a `general-purpose` subagent with the body of `.claude/agents/plan-reviewer.md` as its instructions. Never skip the review.
+2. **Triage.** The orchestrator owns the gate; severities are advice.
+   - **Critical / Important:** apply the correction. If you disagree, record why in the review record and surface it to the user. Never silently drop a finding.
+   - **Minor:** apply if it is a clear local improvement; otherwise list it in the record.
+   - **Needs user decision:** never resolve these yourself. Ask the user (AskUserQuestion) or present them as open items before approval. When an answer changes task files, update them consistently.
+3. **Round 2 when needed.** If round 1 produced a Critical or Important correction, dispatch round 2 on the revised plan. **At most two rounds per cycle**; anything unresolved afterwards goes to the user as an open item.
+   - Round 1 is always the comprehensive, independent review.
+   - Round 2 and revision reviews are focused: the revision diff, the previous findings, the contracts and consumers the changes touch, and any newly introduced risk, including a consistency sweep for stale wording. The reviewer must expand toward a full pass whenever a change could affect another component, dependency, behavior or established architectural contract, even if no public interface or acceptance criterion changed.
+4. **Record the review in the plan.** Add or extend a `## Plan review` section: per round, the verdict, findings by ID and severity with what was done (applied / applied differently with the reason / deferred / needs user decision), and open items. Commit the reviewed plan on the task branch.
+5. **Present the plan** with a short review summary in your own words (verdict, what was corrected, what is open), then wait for approval. Do not paste the reviewer's report.
 
-   If the `plan-reviewer` agent type isn't available (agent definitions load when a session starts), dispatch a `general-purpose` subagent instead, with the body of `.claude/agents/plan-reviewer.md` as its instructions. Never skip the review.
-
-2. **Triage the findings.** The orchestrator owns the gate, and the reviewer's severities are advice.
-   - **Critical / Important:** apply the reviewer's correction to the plan. If you disagree, record why in the plan's review record and surface it to the user. Never silently drop a finding.
-   - **Minor:** apply it if it's a clear, local improvement; otherwise list it in the review record.
-   - **Needs user decision:** never resolve these yourself. Ask the user (AskUserQuestion), or present them with the plan as open items to decide before approval. When an answer changes task files, update them consistently, as for any product-owner decision.
-
-3. **Re-review once if needed.** If round 1 produced any Critical or Important correction, dispatch the reviewer again (round 2) on the revised plan, passing it the round-1 findings. **At most two rounds.** Anything still unresolved after round 2 goes to the user as an open item; don't loop further.
-
-4. **Record the review in the plan.** Add a `## Plan review` section to the plan. For each round, list the verdict, the findings by ID and severity with what was done about each (applied / applied differently, with the reason / deferred / needs user decision), and any open items. Commit the reviewed plan on the task branch.
-
-5. **Present the plan to the user** with a short review summary: the verdict, what was corrected, and what's open or needs their decision. Then hand off and wait for approval. Summarize the findings in your own words; don't paste the reviewer's report.
-
-The plan review complements the whole-branch code review (`requesting-code-review`) after implementation. Neither replaces the other.
-
-## Test-Driven Development
-
-Use `test-driven-development` during implementation.
-
-Follow Red-Green-Refactor:
-
-1. Write a failing test.
-2. Run it and verify that it fails for the expected reason.
-3. Implement the minimum required change.
-4. Run the test again.
-5. Refactor where appropriate.
-6. Run relevant regression tests.
-
-Do not skip testing without a documented technical justification.
-
-## Subagent-Driven Development
-
-Use `subagent-driven-development` when:
-- The approved plan contains genuinely independent implementation tasks.
-- Work can be safely separated.
-- Parallel execution does not introduce shared-state or integration risks.
-
-Do not parallelize:
-- Sequential dependencies.
-- Changes to the same files without a safe coordination strategy.
-- Tasks requiring unresolved shared architectural decisions.
-
-Review all subagent results before integrating them.
-
-## Code Review
-
-Use `requesting-code-review` after meaningful implementation work.
-
-Review:
-- Correctness.
-- Specification compliance.
-- Architecture.
-- Maintainability.
-- Security.
-- Error handling.
-- Test coverage.
-- Unintended changes.
-
-Address important findings before considering the task complete.
-
-## Finishing a Branch
-
-If `finishing-a-development-branch` is invoked, choose the "push and create a PR" path automatically — this project's Git workflow (Section 8) already decides it. Do not merge locally into `main`.
-
-## Verification
-
-Use `verification-before-completion` before declaring any task completed.
-
-Run the actual relevant commands and inspect their results.
-
-Never claim that tests passed unless they were actually executed successfully.
+The plan review complements the independent whole-branch code review after implementation (Section 5 step 5); neither replaces nor weakens the other.
 
 ---
 
 # 4. Task Selection and Dependency Management
 
-You are responsible for determining the correct next task.
+You determine the correct next task; the user should not have to pick IDs from the roadmap.
 
-The user should not need to manually select task IDs from the roadmap.
+Whenever development starts or resumes: read PROGRESS (Section 7), inspect the task index, find the earliest incomplete phase and its incomplete tasks, check their dependencies against what is actually completed, and recommend the next task.
 
-Whenever development starts or resumes:
+A task is eligible only when its dependencies are satisfied, its scope is understood, required decisions are resolved, and prerequisites are available.
 
-1. Read the current progress file.
-2. Inspect the task index.
-3. Identify the earliest incomplete development phase.
-4. Identify incomplete tasks in that phase.
-5. Inspect their dependencies.
-6. Verify which dependencies are actually completed.
-7. Identify tasks that are ready for implementation.
-8. Recommend the next appropriate task.
+Prioritize: critical dependencies; foundational architecture; technical proofs-of-concept and documented blockers; high-priority tasks; tasks that unblock other work. Do not select by numerical ID alone and do not assume index order is execution order.
 
-## Task Selection Rules
-
-A task is eligible only when:
-- Its dependencies are satisfied.
-- Its scope is sufficiently understood.
-- Required decisions are resolved.
-- Necessary prerequisites are available.
-
-Prioritize:
-1. Critical dependencies.
-2. Foundational architecture.
-3. Technical proof-of-concepts and documented blockers.
-4. High-priority tasks.
-5. Tasks that unblock other work.
-
-Do not select tasks solely based on their numerical IDs.
-
-Do not assume that the task index order is always the correct execution order.
-
-## Grouping Tasks
-
-You may recommend grouping a small number of independent tasks.
-
-Before grouping, verify:
-- Their dependencies are satisfied.
-- Their implementation scopes are compatible.
-- They do not create unnecessary file conflicts.
-- Their acceptance criteria can be verified independently.
-
-Prefer one task at a time when working on foundational architecture, computation engines, or other high-risk components.
+Grouping: you may recommend grouping a small number of independent tasks when dependencies are satisfied, scopes are compatible, file conflicts are avoided and acceptance criteria can be verified independently. Prefer one task at a time for foundational architecture, computation engines and other high-risk components.
 
 ---
 
-# 5. Task Execution Workflow
+# 5. Task Execution Lifecycle
 
-Every development task must follow this lifecycle.
+This is the single canonical workflow for a task.
 
-## Step 1 — Understand
-
-Read:
-- The individual task file.
-- Relevant specification sections.
-- Relevant design references.
-- Related existing source code.
-- Relevant dependencies.
-
-Identify:
-- Expected behavior.
-- Implementation boundaries.
-- Acceptance criteria.
-- Technical risks.
-- Missing information.
-
-## Step 2 — Brainstorm
-
-Invoke `brainstorming` when necessary.
-
-Resolve significant ambiguities before implementation.
-
-Do not invent missing requirements.
-
-## Step 3 — Plan
-
-Invoke `writing-plans`.
-
-Create a detailed implementation plan and save it under:
-
-`docs/plans/`
-
-The plan must be complete enough to execute without relying on undocumented conversation context.
-
-Run the **Automatic Plan Review** cycle (Section 3) on the saved plan, applying corrections and resolving user decisions as described there.
-
-Present the reviewed plan to the user, with its review summary, and wait for approval. If the user asks for changes, revise the plan and run the review cycle again on the revision before presenting it.
-
-## Step 4 — Implement
-
-After approval:
-
-- Create or switch to the task branch before changing any code (see Section 8). Never implement on `main`.
-- Follow the approved plan.
-- Use TDD.
-- Keep changes focused.
-- Follow existing architecture and conventions.
-- Use subagents only when justified.
-- Do not silently expand scope.
-
-If implementation reveals a significant issue that changes the approved approach, stop and explain the issue before proceeding with a materially different solution.
-
-## Step 5 — Review
-
-Invoke `requesting-code-review` when appropriate.
-
-Review the implementation against the task requirements.
-
-Resolve important findings.
-
-## Step 6 — Verify
-
-Invoke `verification-before-completion`.
-
-Verify:
-- Acceptance criteria.
-- Relevant automated tests.
-- Static analysis.
-- Formatting and linting where applicable.
-- Build requirements when relevant.
-- Regression risks.
-
-Record actual command results.
-
-## Step 7 — Update Documentation
-
-Only after successful verification:
-
-- Update the individual task status.
-- Update `docs/development/TASKS.md`.
-- Update `docs/PROGRESS.md`.
-- Record the implementation plan path.
-- Record relevant decisions.
-- Record verification results.
-
-Do not rewrite task requirements or acceptance criteria.
-
-## Step 8 — Commit and Push
-
-Once verification passes and documentation is updated, commit and push the task branch. This is pre-authorized for every completed task; do not ask for separate permission.
-
-1. Confirm you are on the task branch, not `main`.
-2. Review `git status` and `git diff` — stage only files belonging to this task (code, tests, plan, task docs, `TASKS.md`, `PROGRESS.md`). Never stage unrelated user changes, secrets, or build artifacts.
-3. Commit using the format in Section 8.
-4. Push: `git push -u origin <task-branch>`.
-5. Open a pull request into `main` with `gh pr create` if the GitHub CLI is available and authenticated; otherwise report the branch name so the user can open one.
-6. Add the PR link to the Git State section of `docs/PROGRESS.md` (the branch name should already be recorded before the commit), then commit it as a small follow-up (`docs(<TASK-ID>): record PR link`) and push again. Do not amend or rewrite pushed commits.
-
-Never merge into `main` or push directly to `main` without explicit user approval.
-
-If the commit or push fails (hook failure, rejected push, auth error), stop, report the exact error, and fix the root cause. Never use `--no-verify`, `--force`, or skip signing.
-
-## Step 9 — Recommend Next Task
-
-Re-evaluate dependencies and identify the next eligible task.
-
-Present its ID, title, reason for selection, dependencies, and relevant risks.
-
-State whether it depends on the just-pushed task branch, and if so whether that PR needs to be merged into `main` first.
-
-Wait for user approval before starting another task.
+1. **Understand.** Read the task file, the relevant specification sections and design references, and the relevant source, which includes more than the files the task will modify: the existing interfaces it consumes, their consumers, its dependencies, and the tests that its change could affect. Identify expected behavior, boundaries, acceptance criteria, risks and missing information.
+2. **Brainstorm** when needed (Section 3). Do not invent missing requirements.
+3. **Plan.** Create or switch to the task branch (Section 8), invoke `writing-plans`, save the plan under `docs/plans/`, run the Automatic Plan Review cycle, preserve the approved plan, record the plan path in PROGRESS, present the reviewed plan with its review summary, and wait for approval. If the user asks for changes, revise the plan and run the review cycle again on the revision. Do not begin implementation before the plan is ready, reviewed and approved.
+4. **Implement** only after approval. Create or switch to the task branch before changing any code (never implement on `main`), then follow the approved plan with TDD, focused changes, existing architecture and conventions, and no silent scope expansion. If implementation reveals a significant issue that changes the approved approach, stop and explain before proceeding with a materially different solution.
+5. **Review** with `requesting-code-review`: **one independent review of the entire task branch by a fresh reviewer** (a reviewer with fresh context, not the implementing session). This is a separate mandatory gate from the implementation-plan review in Section 3; it neither replaces nor weakens that review, and the plan review does not satisfy it. Resolve important findings, test-first for defects, before the task can be completed.
+6. **Verify** with `verification-before-completion`: acceptance criteria, relevant automated tests, static analysis, formatting and linting, build requirements when relevant, regression risks. Record actual command results.
+7. **Update documentation**, only after successful verification: the task status, `docs/development/TASKS.md`, `docs/PROGRESS.md` (plan path, decisions, verification results). Do not rewrite task requirements or acceptance criteria.
+8. **Commit and push** per Section 8 (pre-authorized for every completed task).
+9. **Recommend the next task.** Re-evaluate dependencies and present its ID, title, reason, dependencies and risks. State whether it depends on the just-pushed branch and, if so, whether that PR must be merged first. Wait for user approval before starting another task.
 
 ---
 
 # 6. Persistent Progress Management
 
-Maintain:
+Maintain `docs/PROGRESS.md` as the central persistent state; create it if missing and never overwrite existing progress when initializing.
 
-`docs/PROGRESS.md`
+It must contain: **Project Status** (phase, overall status, last update); **Completed Tasks** (ID, name, status, verification evidence); **Current Task** (ID, name, status, plan path, completed and remaining steps); **Next Recommended Task** (ID, name, reason, dependency status); **Blockers** (product decisions, architectural blockers, failed tests, missing prerequisites); **Technical Decisions** (decision, reason, impacted components, documentation); **Verification** (commands executed, test and build results, known failures); **Git State** (task branch, relevant commits, PR link and status, unmerged branches that later tasks depend on, uncommitted changes, work to preserve).
 
-This file is the central persistent development state.
+Update it after completing a task, when starting an approved task, at significant milestones, on discovering a blocker, when a technical decision is made, and before ending a session. Never mark a task complete before its acceptance criteria are verified; record partial work as in progress.
 
-Create it if it does not exist.
-
-Do not overwrite existing progress when initializing it.
-
-## Required Progress Information
-
-The file must contain:
-
-### Project Status
-- Current phase.
-- Overall development status.
-- Last update date.
-
-### Completed Tasks
-- Task IDs.
-- Task names.
-- Completion status.
-- Verification evidence.
-
-### Current Task
-- Task ID.
-- Task name.
-- Current status.
-- Implementation plan path.
-- Completed steps.
-- Remaining steps.
-
-### Next Recommended Task
-- Task ID.
-- Task name.
-- Why it is next.
-- Dependency status.
-
-### Blockers
-- Unresolved product decisions.
-- Architectural blockers.
-- Failed tests.
-- Missing prerequisites.
-
-### Technical Decisions
-- Decision.
-- Reason.
-- Impacted components.
-- Relevant documentation.
-
-### Verification
-- Commands executed.
-- Test results.
-- Build results.
-- Known failures.
-
-### Git State
-- Current task branch.
-- Relevant commits.
-- Pull request link and status (open / merged).
-- Unmerged task branches that later tasks depend on.
-- Uncommitted changes.
-- Any work that must be preserved.
-
-## Progress Update Rules
-
-Update `docs/PROGRESS.md`:
-- After completing a task.
-- When starting an approved task.
-- When a significant implementation milestone is reached.
-- When discovering a blocker.
-- When a technical decision is made.
-- Before ending a work session.
-
-Never mark a task complete before its acceptance criteria are verified.
-
-If implementation is partially complete, clearly record it as in progress.
+A completed task's verification evidence must name the commands, their results, and the commit or branch head they cover, so later sessions can reuse it (Section 7).
 
 ---
 
 # 7. Session Recovery
 
-Development must be resumable across Claude Code sessions and computer restarts.
+Development must be resumable across sessions and restarts. Start from PROGRESS.md and Git state, then read only what the resumed work needs.
 
-At the beginning of every new development session:
+1. **PROGRESS.md, by section:** Project Status, Current Task, Next Recommended Task, Blockers, Git State, Architecture Conventions and Technical Decisions.
+2. **Git state:** `git status --short`, `git branch --show-current`, `git log --oneline -5`, `git branch --no-merged main` (open task branches), and one `gh pr list` when available. If on `main` with an in-progress task, switch to that task's branch first, but only when the switch is clearly safe: from `git status --short`, identify the staged, unstaged and untracked changes and decide whether switching would carry them onto the other branch, mix them with that task's work, or risk losing them (for example modified or untracked files that overlap the target branch's files, or work that belongs to another task). If the transition is not clearly safe, stop and ask the user; do not switch automatically, and do not stash, reset or discard to make it possible (Section 8). A merged PR means the work is integrated into `main`; an open PR means it is not yet integrated. Neither the existence nor the status of a PR shows whether a task is complete: determine completion from the recorded implementation and verification evidence (step 3).
+3. **Verify completed work.** Git history and PR state show where work is, not that it is correct. Never mark a task complete or call it verified without checking the relevant implementation and the verification evidence.
+   - For the last completed task and any task the next work builds on: reuse the documented results instead of rerunning everything only when **all** relevant repository state is unchanged since its recorded verification. Check the task's own implementation and also its shared interfaces, their consumers, its dependencies and the relevant tests (call these the relevant paths), in all three places; a commit-range diff alone is not enough:
+     - committed changes since the commit the record names: `git diff --stat <verified-commit>..HEAD -- <relevant paths>`;
+     - staged and working-tree changes: `git status --short` and `git diff --stat HEAD -- <relevant paths>`;
+     - untracked files: `git status --short` and `git ls-files --others --exclude-standard -- <relevant paths>` (neither diff shows them).
+   - If any of these shows a relevant change, if the repository state, PROGRESS.md and the recorded results disagree, or if the record does not name the commands and the commit it covers, run targeted verification of the affected implementation and tests, and reconcile the documentation.
+4. **Unfinished work and task context:** inspect unfinished implementation and read the resumed task's file and plan. Read the relevant source with the Section 5 scope: interfaces it consumes, consumers, dependencies and tests that could be affected, not only files it modified. Do not repeat completed work or discard unfinished work.
+5. **Re-evaluate dependencies** and identify the next appropriate action.
 
-1. Read `docs/PROGRESS.md`.
-2. Inspect the current Git branch and working tree. If on `main` with an in-progress task, switch to that task's branch before doing anything else.
-3. Inspect recent relevant commits, open task branches, and the status of their PRs (`gh pr list` when available) — a task whose PR is merged is on `main`; one with an open PR is complete but not yet integrated.
-4. Verify the last completed task against the actual code.
-5. Inspect unfinished implementation work.
-6. Read the relevant task file.
-7. Read the associated implementation plan.
-8. Re-evaluate dependencies.
-9. Identify the next appropriate action.
-
-Never trust progress documentation blindly.
-
-If the progress file conflicts with the actual codebase:
-- Investigate the discrepancy.
-- Identify what actually exists.
-- Reconcile the documentation.
-- Do not repeat completed work.
-- Do not discard unfinished work.
-
-If the previous session ended during implementation, resume the existing task rather than automatically selecting a new one.
+Never trust progress documentation blindly. If the previous session ended during implementation, resume that task rather than selecting a new one.
 
 ---
 
 # 8. Git and Change Management
 
-Keep Git changes organized and reviewable. All work happens on task branches — never commit directly to `main`.
+All work happens on task branches; never commit directly to `main`.
 
 ## Branching
 
-- One branch per task (or per approved task group).
-- Branch naming: `task/<TASK-ID>-<short-kebab-description>`
-  - Example: `task/FOUNDATION-001-project-initialization`
-  - Task group: `task/<FIRST-ID>-<LAST-ID>-<short-description>`
-- Planning-only work (saving a plan, updating `PROGRESS.md` before approval) also goes on the task branch, not on `main`.
+- One branch per task or approved task group: `task/<TASK-ID>-<short-kebab-description>` (group: `task/<FIRST-ID>-<LAST-ID>-<short-description>`). Planning-only work also goes on the task branch.
+- Before starting: inspect the working tree and do not overwrite unrelated changes (if uncommitted changes would be carried onto the new branch, stop and ask); `git checkout main` then `git pull --ff-only origin main`; create the branch from updated `main`, or check out the existing branch when resuming.
+- If the task depends on work on an unmerged task branch, do not silently branch from it. Tell the user and recommend merging the dependency PR first (preferred) or a stacked branch, and wait for their choice.
+- Record the branch name in the Git State section of `docs/PROGRESS.md`.
 
-## Before Implementation
+## During implementation
 
-1. Inspect the working tree. Identify unrelated existing changes and do not overwrite them. If uncommitted changes would be carried onto the new branch, stop and ask the user how to handle them.
-2. Update `main`: `git checkout main` then `git pull --ff-only origin main`.
-3. Create the task branch from the updated `main`: `git checkout -b task/<TASK-ID>-<description>`.
-   - If the branch already exists (e.g. resuming), check it out instead of creating a new one.
-   - If the task depends on work that is still on an unmerged task branch, do not silently branch from it. Tell the user and recommend either merging the dependency PR first (preferred) or branching from the dependency branch (stacked branch), and wait for their choice.
-4. Record the branch name in the Git State section of `docs/PROGRESS.md`.
+Keep changes focused, keep the task ID to code relationship clear, and avoid mixing tasks. Intermediate commits are allowed at meaningful milestones (for example a passing TDD cycle); pushing them is optional.
 
-## During Implementation
-
-- Keep changes focused; avoid mixing unrelated tasks.
-- Preserve a clear relationship between task IDs and code changes.
-- Intermediate commits on the task branch are allowed at meaningful milestones (e.g. a passing TDD cycle). Pushing them is optional until the task is complete.
-
-## Commit Format
+## Commit format
 
 ```
 <type>(<TASK-ID>): <concise summary>
@@ -573,198 +199,83 @@ Keep Git changes organized and reviewable. All work happens on task branches —
 <optional body: what changed and why, notable decisions>
 ```
 
-- `type` is one of: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `build`.
-- Example: `feat(FOUNDATION-001): initialize project structure and tooling`
-- Append any attribution trailer required by the current environment.
+`type` is one of `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `build`. Example: `feat(FOUNDATION-001): initialize project structure and tooling`. Append any attribution trailer the environment requires.
 
-## After Verification
+## Commit, push and PR (after verification and documentation)
 
-Follow Task Execution Workflow Step 8 — commit, push the task branch, and open a PR into `main`.
+1. Confirm you are on the task branch, not `main`.
+2. Review `git status` and `git diff --stat`; stage only this task's files (code, tests, plan, task docs, `TASKS.md`, `PROGRESS.md`). Never stage unrelated user changes, secrets or build artifacts.
+3. Commit in the format above, then `git push -u origin <task-branch>`.
+4. Open a PR into `main` with `gh pr create` if available and authenticated; otherwise report the branch name.
+5. Add the PR link to the Git State of `docs/PROGRESS.md` as a small follow-up commit (`docs(<TASK-ID>): record PR link`) and push again. Do not amend or rewrite pushed commits.
 
-## Hard Rules
+If a commit or push fails (hook failure, rejected push, auth error), stop, report the exact error, and fix the root cause.
+
+## Hard rules
 
 - Never commit or push directly to `main`.
 - Never merge a PR or merge into `main` without explicit user approval.
-- Never force-push, rewrite pushed history, or use `--no-verify` without explicit user approval.
+- **Never** force-push, rewrite pushed history, use `--no-verify` (skip hooks), or skip or bypass commit signing. These are absolute prohibitions: user approval does not make them permissible. If a hook or signing step fails, fix the root cause.
 - Never discard or reset changes without explicit user approval.
 
 ---
 
 # 9. User Approval and Communication
 
-The user is the final decision-maker for development direction.
+The user is the final decision-maker. You are responsible for technical analysis, task selection, planning and implementation recommendations.
 
-You are responsible for technical analysis, task selection, planning, and implementation recommendations.
+The user must approve: starting a new task; a significant change to an approved plan; unresolved product decisions; significant architectural changes; optional extensions; risky changes outside the approved task scope.
 
-The user must approve:
-- Starting a new task.
-- A significant change to an approved implementation plan.
-- Unresolved product decisions.
-- Significant architectural changes.
-- Optional extensions.
-- Risky changes outside the approved task scope.
-
-Keep reports concise but technically informative.
-
-When recommending a task, always include:
-
-1. Task ID and title.
-2. Why it is the correct next task.
-3. Dependency status.
-4. Scope.
-5. Risks or blockers.
-6. Recommended Superpowers workflow.
-
-Do not ask the user to manually inspect the entire task index or choose a task when the documented dependencies are sufficient to make a recommendation.
+Keep reports concise but technically informative. When recommending a task, include: task ID and title; why it is next; dependency status; scope; risks or blockers; the recommended Superpowers workflow. Do not ask the user to inspect the task index or pick a task when the documented dependencies are sufficient to recommend one.
 
 ---
 
-# 10. Skill Operating Modes
+# 10. Operating Modes
 
-Interpret the user's request and operate in the appropriate mode.
+Interpret the request and operate in the matching mode; each mode points into the sections above.
 
-## Start
-
-When the user starts development for the first time:
-
-- Read all project documentation.
-- Inspect the repository.
-- Check whether progress tracking exists.
-- Analyze the earliest incomplete phase.
-- Identify the first eligible task.
-- Present the recommended execution strategy.
-- Do not implement application code until approved.
-
-## Next Task
-
-When the user asks to continue or start the next task:
-
-- Verify the current state.
-- Re-evaluate dependencies.
-- Recommend the next eligible task.
-- Wait for approval before implementation.
-
-## Resume
-
-When the user returns after a break:
-
-- Follow the Session Recovery procedure.
-- Identify the exact stopping point.
-- Verify unfinished work.
-- Present a concise recovery report.
-- Recommend how to continue.
-- Wait for approval before starting a new task.
-
-## Plan
-
-When the user asks to plan a task:
-
-- Read the task and its dependencies.
-- Create or switch to the task branch (Section 8).
-- Use brainstorming when necessary.
-- Invoke writing-plans.
-- Save the completed plan under `docs/plans/` on the task branch.
-- Run the Automatic Plan Review cycle (Section 3): `plan-reviewer` subagent, corrections applied, at most two rounds, user decisions surfaced, review recorded in the plan.
-- Update progress documentation.
-- Present the reviewed plan with its review summary and wait for approval before implementation. Re-run the review on any material revision.
-
-## Execute
-
-When the user explicitly approves an implementation plan:
-
-- Ensure you are on the task branch.
-- Follow the approved plan.
-- Use TDD.
-- Use appropriate Superpowers skills.
-- Verify all acceptance criteria.
-- Update progress and task documentation.
-- Commit, push the task branch, and open a PR (Step 8).
-
-## Review
-
-When the user asks for a review:
-
-- Inspect the implementation against the specification.
-- Check the task's acceptance criteria.
-- Run relevant verification.
-- Report findings by severity.
-- Do not silently modify unrelated code.
-
-## Status
-
-When the user asks for project status:
-
-- Read `docs/PROGRESS.md`.
-- Verify important claims against the repository.
-- Report completed, in-progress, blocked, and next eligible tasks.
-- Do not infer completion from stale documentation.
+- **Start (first session or no specific task):** read `docs/PROGRESS.md` by section (Section 7), inspect the roadmap and the project structure, and check whether progress tracking exists. Analyze the earliest incomplete phase and its dependencies and identify the relevant candidate task; then read that task's file and only the specification sections, design references, dependency task files and source materials relevant to it (the Section 5 step 1 scope). Do not read every task file or every design reference by default; expand the inspection whenever needed for architectural or cross-task consistency. Identify the first eligible task, blockers and unresolved decisions, say whether it suits subagents (Section 3 policy), present the recommendation and wait for approval. Do not implement application code in this mode.
+- **Next Task:** verify the current state (Section 7), re-evaluate dependencies (Section 4), recommend the next eligible task, and wait for approval.
+- **Resume:** follow Section 7, identify the exact stopping point, verify unfinished work, present a concise recovery report with a recommendation, and wait for approval before starting a new task.
+- **Plan:** Section 5 steps 1 to 3 (read the task and dependencies, task branch, brainstorm if needed, `writing-plans`, save under `docs/plans/`, Automatic Plan Review, update progress, present and wait for approval).
+- **Execute** (the user explicitly approved a plan): Section 5 steps 4 to 8 on the task branch.
+- **Review** (the user asks for a review): inspect the implementation against the specification and acceptance criteria, run the relevant verification, report findings by severity, and do not silently modify unrelated code.
+- **Status:** read the PROGRESS sections (Section 7), verify important claims against the repository (Section 7 step 3), and report completed, in-progress, blocked and next eligible tasks. Do not infer completion from stale documentation.
 
 ---
 
-# 11. First Session Behavior
+# 11. Context and Output Management
 
-When invoked for the first time without a specific task:
+This policy reduces token use. It weakens no gate: the plan review, TDD, code review, verification, documentation and Git requirements apply in full regardless of context size.
 
-1. Read the project specification.
-2. Read the development roadmap.
-3. Read the task documentation.
-4. Inspect the design references.
-5. Inspect the existing repository and Git state.
-6. Analyze Phase 1 and its dependencies.
-7. Identify the first eligible task.
-8. Identify blockers and unresolved decisions.
-9. Recommend whether the task should be handled independently or with subagents.
-10. Present the recommendation and wait for approval.
+Project state lives in the repository (`docs/PROGRESS.md`, the plan, task files, Git), never only in the conversation. Section 7 rebuilds a session from those files.
 
-Do not implement application code during the initial analysis.
+## Reading
 
-The first session is for understanding, planning, and selecting the correct starting point.
+- Read `docs/PROGRESS.md` by section: Grep the headings, then Read with offset and limit. Always include Architecture Conventions and Technical Decisions; never read the whole file.
+- Prefer Grep, and Read with offset and limit, over whole-file reads. Read only files relevant to the current task, with the scope described in Section 5 step 1.
+- Do not re-read a file already read in this session unless it changed (for example `git diff --stat`) or an edit requires it. Do not rediscover the plan's Decisions section, PROGRESS Technical Decisions or Architecture Conventions without reason. If new evidence contradicts one, or one conflicts with a higher-authority source (Section 2 order), surface it to the user instead of ignoring it, and do not silently override it either.
+- Expand reading whenever needed to establish architectural or cross-task consistency; token savings never justify skipping that.
 
----
+## Tool output
 
-# 12. Context Management Policy
+- Use compact forms: `git status --short`, `git log --oneline -n`, `git diff --stat`, bounded `gh pr list`.
+- For test, lint and build runs, report the exit code, the counts, and only the failing excerpts. Do not print full successful logs. When trimming output through a pipe, keep the real exit code (`set -o pipefail` or capture `$?`). Save a full log to the scratchpad only when a failure needs it.
+- Do not print whole files when an excerpt is enough.
+- Recording actual command results (Sections 3, 5, 6) is unchanged.
 
-This policy reduces unnecessary token consumption. It complements every other section of this skill and weakens none of them: the plan review, TDD, code review, verification, documentation, and Git requirements apply in full regardless of context size.
+## `/clear` and `/compact`
 
-Project state lives in the repository (`docs/PROGRESS.md`, the plan under `docs/plans/`, task files, Git), never only in the conversation. Section 7 (Session Recovery) rebuilds a session from those files.
-
-## `/clear`
-
-- Recommend `/clear` when starting a genuinely independent task or a new implementation session.
-- Before recommending it, ensure all important decisions, progress, implementation status, and unresolved issues are persisted in the appropriate project documentation (`docs/PROGRESS.md`, the plan, task files).
-- Never recommend clearing context in the middle of active implementation or when important unsaved context exists.
-- Do not automatically clear context. `/clear` is only ever recommended to the user.
-
-## `/compact`
-
-- Use `/compact` when the conversation becomes unnecessarily large or approaches context limitations.
-- Before compaction, ensure important implementation decisions, completed work, current state, test results, and remaining steps are documented.
-- When appropriate, provide a concise, task-focused compaction summary.
-- Preserve architectural decisions, constraints, and unresolved issues.
-- Never compact merely because a fixed number of messages has passed.
-
-## General Rules
-
-- Prefer reading only the files relevant to the current task.
-- Avoid repeatedly reading files already understood unless verification is necessary.
-- Keep task context focused.
-- Do not sacrifice code quality, testing, architectural consistency, or Superpowers review requirements to reduce token usage.
-- Do not omit necessary repository exploration or verification.
-- Never assume that `/compact` or `/clear` automatically saves project progress. Persist it explicitly first (Section 6).
+- Recommend `/clear` when starting a genuinely independent task or new implementation session, only after all decisions, progress, status and unresolved issues are persisted in project documentation. Never recommend it mid-implementation or with important unsaved context. Never clear automatically.
+- Use `/compact` when the conversation is unnecessarily large or nearing limits, after documenting decisions, completed work, current state, test results and remaining steps; provide a concise task-focused summary that preserves architectural decisions, constraints and unresolved issues. Never compact merely because a fixed number of messages passed.
+- Never assume either command saves progress; persist it explicitly first (Section 6).
 
 ---
 
 # Final Rule
 
-Your responsibility is not simply to execute tasks.
+Your responsibility is not simply to execute tasks. It is to ensure that Zodiann is developed in the correct order, according to its specification, using the Superpowers engineering methodology, with persistent progress tracking and verified implementation quality.
 
-Your responsibility is to ensure that Zodiann is developed in the correct order, according to its specification, using the Superpowers engineering methodology, with persistent progress tracking and verified implementation quality.
-
-Always know:
-- What needs to be built.
-- What has actually been built.
-- What is currently being worked on.
-- What is blocked.
-- What should happen next.
+Always know what needs to be built, what has actually been built, what is being worked on, what is blocked, and what should happen next.
 
 Never sacrifice correctness or maintainability for speed.
