@@ -189,8 +189,13 @@ class _ZodiannDrawerRoute extends PopupRoute<void> {
   void _dragStart(DragStartDetails details) {
     final c = controller;
     if (c == null || !isCurrent || _gestureActive) return;
+    // The panel shows the eased position; the gesture runs on the raw
+    // controller value, so take the shown position over first (else grabbing
+    // the panel mid-open would make it jump back).
+    final shown = _progress?.value ?? c.value;
     _gestureActive = true;
     c.stop();
+    c.value = shown;
     _navigator.didStartUserGesture();
   }
 

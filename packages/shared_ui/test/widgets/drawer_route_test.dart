@@ -722,9 +722,40 @@ void main() {
         1500,
       );
       await tester.pumpAndSettle();
-      final open = find.byType(ZodiannDrawer).evaluate().isNotEmpty;
-      expect(_root(tester).canPop(), open);
-      if (open) expect(_fraction(tester, false), closeTo(1.0, 1e-6));
+      // A fast flick toward the start edge closes it, whatever the phase.
+      expect(find.byType(ZodiannDrawer), findsNothing);
+      expect(_root(tester).canPop(), isFalse);
     });
+
+    for (final he in [false, true]) {
+      testWidgets(
+        'grabbing the panel while it opens does not move it (${he ? 'RTL' : 'LTR'})',
+        (tester) async {
+          final h = _H()..he = he;
+          await _pump(tester, h);
+          await _open(tester);
+          await tester.pump(const Duration(milliseconds: 100));
+          final before = _fraction(tester, he);
+          expect(before, inInclusiveRange(0.3, 0.95)); // mid-open, eased
+          final rect = tester.getRect(find.byType(ZodiannDrawer));
+          final drag = await _Drag.start(
+            tester,
+            he,
+            Offset(he ? rect.left + 40 : rect.right - 40, 450),
+          );
+          // Toward the open side: the panel must not move back.
+          await drag.toward(-(kTouchSlop + 12));
+          expect(
+            _fraction(tester, he),
+            greaterThanOrEqualTo(before - 0.01),
+            reason: 'the panel jumped back when the finger took hold',
+          );
+          await drag.up();
+          await tester.pumpAndSettle();
+          expect(find.byType(ZodiannDrawer), findsOneWidget);
+          expect(_fraction(tester, he), closeTo(1.0, 1e-6));
+        },
+      );
+    }
   });
 }
