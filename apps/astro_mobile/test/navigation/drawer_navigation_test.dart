@@ -199,6 +199,8 @@ void main() {
 
       var notes = 0;
       h.router.routerDelegate.addListener(() => notes++);
+      var infoNotes = 0;
+      h.router.routeInformationProvider.addListener(() => infoNotes++);
       await h.open();
       await h.tapItem(AppRoute.wheel);
       await tester.pumpAndSettle();
@@ -206,6 +208,7 @@ void main() {
       expect(h.drawerOpen, isFalse);
       expect(h.location, '/wheel');
       expect(notes, 0);
+      expect(infoNotes, 0, reason: "no navigation request at all");
       expect(offset(), scrolled);
     });
 
