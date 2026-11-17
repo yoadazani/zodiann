@@ -119,6 +119,44 @@ void main() {
     });
   });
 
+  test('drawer sizes are MASTER §5 / kit.css (ZOD-NAV-002)', () {
+    expect(ZodiannSize.drawerMaxWidth, 320);
+    expect(ZodiannSize.drawerWidthFactor, 0.86);
+    expect(ZodiannSize.drawerHead, 76);
+    expect(ZodiannSize.navIconColumn, 24);
+    expect(ZodiannSize.navIconNudge, 1);
+    expect(ZodiannSize.navItemGap, 2);
+    expect(ZodiannSize.navActiveBar, 3);
+    expect(ZodiannSize.navActiveBarInset, 10);
+
+    final css = _kitCss();
+    final drawer = _rule(css, '.drawer');
+    expect(drawer, contains('min(320px, 86vw)'));
+    expect(_px(_rule(css, '.drawer-head'), 'height'), ZodiannSize.drawerHead);
+    expect(_px(_rule(css, '.drawer nav'), 'gap'), ZodiannSize.navItemGap);
+    final item = _rule(css, '.nav-item');
+    expect(item, contains('grid-template-columns: 24px 1fr'));
+    expect(item, contains('gap: 2px var(--s3)'));
+    expect(
+      _px(_rule(css, '.nav-item svg'), 'margin-top'),
+      ZodiannSize.navIconNudge,
+    );
+    final bar = _rule(css, '.nav-item.on::before');
+    expect(_px(bar, 'width'), ZodiannSize.navActiveBar);
+    expect(_px(bar, 'top'), ZodiannSize.navActiveBarInset);
+    expect(_px(bar, 'bottom'), ZodiannSize.navActiveBarInset);
+  });
+
+  test('drawer motion is MASTER §12 (ZOD-NAV-002)', () {
+    expect(ZodiannStates.drawerOpenDuration, const Duration(milliseconds: 240));
+    expect(
+      ZodiannStates.drawerCloseDuration,
+      const Duration(milliseconds: 180),
+    );
+    // Material's drawer fling threshold.
+    expect(ZodiannStates.drawerFlingVelocity, 365);
+  });
+
   test("the minimum touch target is MASTER §14's 44", () {
     expect(ZodiannSize.minTouchTarget, 44);
   });

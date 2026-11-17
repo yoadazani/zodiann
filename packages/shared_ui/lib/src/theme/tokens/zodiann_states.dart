@@ -31,6 +31,17 @@ abstract final class ZodiannStates {
   /// The hover transition (MASTER §12); instant under reduced motion.
   static const Duration hoverDuration = Duration(milliseconds: 150);
 
+  /// The drawer opens in 240 ms (MASTER §12, `easeOutCubic`); instant under
+  /// reduced motion.
+  static const Duration drawerOpenDuration = Duration(milliseconds: 240);
+
+  /// The drawer closes in 180 ms (MASTER §12).
+  static const Duration drawerCloseDuration = Duration(milliseconds: 180);
+
+  /// A drawer fling at or above this speed (px/s) decides by its direction
+  /// (Material's drawer constant).
+  static const double drawerFlingVelocity = 365.0;
+
   /// No fill or no border.
   static const Color transparent = Color(0x00000000);
 

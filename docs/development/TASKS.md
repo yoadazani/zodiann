@@ -132,7 +132,7 @@ Every task in this section implements a component that is **already fully design
 | ID | Task | Priority | Status |
 |---|---|---|---|
 | ZOD-NAV-001 | [Implement the sticky top bar](navigation/ZOD-NAV-001-implement-the-sticky-top-bar.md) | Critical | Done |
-| ZOD-NAV-002 | [Implement the side navigation drawer](navigation/ZOD-NAV-002-implement-the-side-navigation-drawer.md) | Critical | Not Started |
+| ZOD-NAV-002 | [Implement the side navigation drawer](navigation/ZOD-NAV-002-implement-the-side-navigation-drawer.md) | Critical | Done |
 | ZOD-NAV-003 | [Wire drawer navigation to `go_router` routes](navigation/ZOD-NAV-003-wire-drawer-navigation-to-go-router-routes.md) | Critical | Not Started |
 | ZOD-NAV-004 | [Implement drawer/top-bar accessibility behavior](navigation/ZOD-NAV-004-implement-drawer-top-bar-accessibility-behavior.md) | High | Not Started |
 | ZOD-NAV-005 | [Implement responsive drawer behavior across breakpoints](navigation/ZOD-NAV-005-implement-responsive-drawer-behavior-across-breakpoints.md) | Medium | Not Started |

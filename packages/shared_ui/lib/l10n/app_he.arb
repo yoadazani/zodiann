@@ -49,5 +49,15 @@
   "screenAboutSubtitle": "גרסה, מקורות ושיטה",
   "openMenu": "פתיחת תפריט",
   "actionSave": "שמירה",
-  "actionExportXlsx": "ייצוא לאקסל"
+  "actionExportXlsx": "ייצוא לאקסל",
+  "closeMenu": "סגירת תפריט",
+  "drawerGroupAnalysis": "ניתוח",
+  "drawerGroupLibrary": "ספרייה ואפליקציה",
+  "drawerDescWheel": "מיקומי כוכבים, היבטים ומעברי מעלות",
+  "drawerDescSquare": "מספרים, ימים או בלוקים של 4 שעות בספירלה",
+  "drawerDescSaved": "חזרה לריבועים ששמרת בשם",
+  "drawerDescSettings": "שפה, ערכת נושא, אורבים",
+  "drawerDescAbout": "מקורות החישוב והשיטה",
+  "drawerVersion": "גרסה {version}",
+  "drawerOffline": "כל הנתונים נשארים במכשיר"
 }

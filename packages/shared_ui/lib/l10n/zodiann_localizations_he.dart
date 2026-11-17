@@ -160,4 +160,36 @@ class ZodiannLocalizationsHe extends ZodiannLocalizations {
 
   @override
   String get actionExportXlsx => 'ייצוא לאקסל';
+
+  @override
+  String get closeMenu => 'סגירת תפריט';
+
+  @override
+  String get drawerGroupAnalysis => 'ניתוח';
+
+  @override
+  String get drawerGroupLibrary => 'ספרייה ואפליקציה';
+
+  @override
+  String get drawerDescWheel => 'מיקומי כוכבים, היבטים ומעברי מעלות';
+
+  @override
+  String get drawerDescSquare => 'מספרים, ימים או בלוקים של 4 שעות בספירלה';
+
+  @override
+  String get drawerDescSaved => 'חזרה לריבועים ששמרת בשם';
+
+  @override
+  String get drawerDescSettings => 'שפה, ערכת נושא, אורבים';
+
+  @override
+  String get drawerDescAbout => 'מקורות החישוב והשיטה';
+
+  @override
+  String drawerVersion(String version) {
+    return 'גרסה $version';
+  }
+
+  @override
+  String get drawerOffline => 'כל הנתונים נשארים במכשיר';
 }
