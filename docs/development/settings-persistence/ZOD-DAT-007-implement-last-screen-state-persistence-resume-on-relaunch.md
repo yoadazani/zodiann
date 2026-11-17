@@ -43,6 +43,8 @@ No direct design reference applies — behavioral persistence layered on already
 
 ## Notes
 
+- **From ZOD-NAV-003:** NAV-003 split the "relaunch returns to the last screen" clause of T-UI-1 out to this task (product-owner decision P3). Inject the saved screen with `buildAppRouter(initialLocation: …)` through the `appRouterProvider` override (pinned by `apps/astro_mobile/test/navigation/t_ui_1_test.dart`). A cold-start platform link (`defaultRouteName`) **overrides** an injected `initialLocation`, so a `zodiann://` link wins over the restored screen (tested). Read the current screen from `activeRouteProvider`; do not persist `router.state.uri` directly (it can still carry a query, while `activeRouteProvider` is always one of the five screens).
+
 - **From ZOD-FND-014:**
   - **Restoring the route:** override `appRouterProvider` with `buildAppRouter(initialLocation: saved.path)`, disposing it in `ref.onDispose`.
   - **Storage format:** `AppRoute.name` is recommended, never a path or a translated title. The format is this task's decision.

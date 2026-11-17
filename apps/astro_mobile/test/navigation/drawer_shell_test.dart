@@ -1,8 +1,9 @@
 // ZOD-NAV-002: the app shell opens the navigation drawer from the hamburger
 // (NAV-2, NAV-3, NAV-7): the two groups in AppRoute order with the kit's copy
 // in en and he, the active item following the route, the temporary app-owned
-// version, inert item taps (product-owner decision A; ZOD-NAV-003 wires them),
-// every close path, never docked at any width, and the review-focus cases.
+// version, every close path (item taps navigate and close it since ZOD-NAV-003,
+// see drawer_navigation_test.dart), never docked at any width,
+// and the review-focus cases.
 import 'package:astro_mobile/src/app.dart';
 import 'package:astro_mobile/src/navigation/app_route.dart';
 import 'package:astro_mobile/src/navigation/app_router.dart';
@@ -197,15 +198,6 @@ void main() {
     await _go(tester, AppRoute.settings);
     await expectSelected(3);
     handle.dispose();
-  });
-
-  testWidgets('item taps are inert in this task (decision A)', (tester) async {
-    await _pumpApp(tester);
-    await _open(tester);
-    await tester.tap(_t('Settings'));
-    await tester.pumpAndSettle();
-    expect(_location(tester), '/wheel');
-    expect(find.byType(ZodiannDrawer), findsOneWidget);
   });
 
   group('closing', () {

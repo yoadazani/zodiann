@@ -1,8 +1,12 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 import '../app_version.dart';
+import 'active_route.dart';
 import 'app_route.dart';
+import 'warm_link.dart';
 
 /// The shell every screen renders in (ZOD-NAV-001): the sticky top bar over
 /// [child], with the body extending behind it so content scrolls beneath the
@@ -17,8 +21,8 @@ import 'app_route.dart';
 ///
 /// The hamburger opens the navigation drawer (ZOD-NAV-002): an overlay route
 /// on the root navigator (`showZodiannDrawer`), never part of this layout.
-/// Its items only report a tap for now; ZOD-NAV-003 wires navigation and
-/// closing.
+/// Its items navigate and close it, and the panel closes on an incoming warm
+/// deep link (ZOD-NAV-003); see [_DrawerPanel].
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.route, required this.child});
 
@@ -66,46 +70,95 @@ class AppShell extends StatelessWidget {
     );
   }
 
-  /// Opens the drawer. The builder resolves the localizations inside itself,
-  /// so a locale change while it is open updates its copy; only [route] is
-  /// captured.
+  /// Opens the drawer. Its panel resolves the localizations and the active
+  /// route inside itself, so a locale change or a screen change while it is
+  /// open updates it; only the router is captured.
   void _openDrawer(BuildContext context) {
-    showZodiannDrawer(
-      context,
-      builder: (drawerContext) {
-        final l = ZodiannLocalizations.of(drawerContext);
-        ZodiannDrawerItem item(AppRoute r) => ZodiannDrawerItem(
-          icon: r.drawerIcon,
-          name: r.title(l),
-          description: r.drawerDescription(l),
-          selected: r == route,
-          // Inert until ZOD-NAV-003 wires navigation and closing.
-          onTap: () {},
-        );
-        return ZodiannDrawer(
-          wordmark: l.appTitle,
-          groups: [
-            ZodiannDrawerGroup(
-              label: l.drawerGroupAnalysis,
-              items: [
-                for (final r in AppRoute.values)
-                  if (r.drawerGroup == AppRouteDrawerGroup.analysis) item(r),
-              ],
-            ),
-            ZodiannDrawerGroup(
-              label: l.drawerGroupLibrary,
-              items: [
-                for (final r in AppRoute.values)
-                  if (r.drawerGroup == AppRouteDrawerGroup.library) item(r),
-              ],
-            ),
+    final router = GoRouter.of(context);
+    showZodiannDrawer(context, builder: (_) => _DrawerPanel(router: router));
+  }
+}
+
+/// The drawer panel (ZOD-NAV-003). An item tap closes the drawer and then
+/// navigates, unless the item is the screen already shown. The active mark
+/// follows `activeRouteProvider`, never the route the drawer opened on.
+///
+/// The panel closes itself on every incoming warm platform link (valid,
+/// same-screen or malformed: product-owner decision P4) through
+/// `warmLinkProvider`, and on nothing internal: not `GoRouter.refresh()`, a
+/// `refreshListenable`, a theme or a locale change. Both the close and the
+/// tap are ignored once the drawer route is no longer active (it is already
+/// leaving), so a second pop never removes the shell page.
+class _DrawerPanel extends ConsumerStatefulWidget {
+  const _DrawerPanel({required this.router});
+
+  final GoRouter router;
+
+  @override
+  ConsumerState<_DrawerPanel> createState() => _DrawerPanelState();
+}
+
+class _DrawerPanelState extends ConsumerState<_DrawerPanel> {
+  late final WarmLinkEvents _warmLinks;
+
+  @override
+  void initState() {
+    super.initState();
+    _warmLinks = ref.read(warmLinkProvider)..addListener(_closeOnWarmLink);
+  }
+
+  @override
+  void dispose() {
+    _warmLinks.removeListener(_closeOnWarmLink);
+    super.dispose();
+  }
+
+  bool get _routeIsActive => ModalRoute.of(context)?.isActive == true;
+
+  void _closeOnWarmLink() {
+    if (_routeIsActive) Navigator.of(context).pop();
+  }
+
+  void _open(AppRoute target) {
+    if (!_routeIsActive) return;
+    final current = ref.read(activeRouteProvider);
+    Navigator.of(context).pop();
+    if (target != current) widget.router.go(target.path);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = ZodiannLocalizations.of(context);
+    final active = ref.watch(activeRouteProvider);
+    ZodiannDrawerItem item(AppRoute r) => ZodiannDrawerItem(
+      icon: r.drawerIcon,
+      name: r.title(l),
+      description: r.drawerDescription(l),
+      selected: r == active,
+      onTap: () => _open(r),
+    );
+    return ZodiannDrawer(
+      wordmark: l.appTitle,
+      groups: [
+        ZodiannDrawerGroup(
+          label: l.drawerGroupAnalysis,
+          items: [
+            for (final r in AppRoute.values)
+              if (r.drawerGroup == AppRouteDrawerGroup.analysis) item(r),
           ],
-          closeLabel: l.closeMenu,
-          onClose: () => Navigator.of(drawerContext).maybePop(),
-          versionLabel: l.drawerVersion(appVersion),
-          offlineLabel: l.drawerOffline,
-        );
-      },
+        ),
+        ZodiannDrawerGroup(
+          label: l.drawerGroupLibrary,
+          items: [
+            for (final r in AppRoute.values)
+              if (r.drawerGroup == AppRouteDrawerGroup.library) item(r),
+          ],
+        ),
+      ],
+      closeLabel: l.closeMenu,
+      onClose: () => Navigator.of(context).maybePop(),
+      versionLabel: l.drawerVersion(appVersion),
+      offlineLabel: l.drawerOffline,
     );
   }
 }

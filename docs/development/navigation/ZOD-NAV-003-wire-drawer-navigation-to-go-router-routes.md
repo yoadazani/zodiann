@@ -6,7 +6,7 @@
 - **Category:** [Navigation & App Shell](../README.md#navigation) (`navigation/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done (criteria 1 and 2 partly open: see Notes)
 - **Scope:** MVP
 
 ## Description
@@ -28,7 +28,7 @@ No direct design reference applies to the routing wiring itself; the resulting n
 
 - [ ] T-UI-1 passes: drawer navigation reaches the right screen, app relaunch returns to the last screen, a deep link opens the requested screen directly.
 - [ ] Starting wheel playback, then navigating to Settings, stops playback (verified by returning to the wheel and confirming it isn't still advancing).
-- [ ] Every screen switch resets scroll position to the top.
+- [x] Every screen switch resets scroll position to the top.
 
 ## Dependencies
 
@@ -44,6 +44,7 @@ No direct design reference applies to the routing wiring itself; the resulting n
 
 ## Notes
 
+- **From ZOD-NAV-003 (completion):** NAV-003 verified the drawer and deep-link parts of criterion 1 and the leave-screen seam for criterion 2; the relaunch clause closes in ZOD-DAT-007 (product-owner decision P3), the real playback proof in ZOD-WHL-017 (P1). Criteria 1 and 2 stay unticked until then. iOS `zodiann://` link delivery is unverified (needs a Mac). Plan: `docs/plans/ZOD-NAV-003-wire-drawer-navigation.md`.
 - **From ZOD-FND-014:**
   - **Screens and taps:** replace `ScreenStub` with the real screens in `buildAppRouter` (`apps/astro_mobile/lib/src/navigation/app_router.dart`), and navigate with `context.go(route.path)`.
   - **Deep links:** the cold-start platform deep link and T-UI-1 are still this task's. Flutter's deep linking is on by default; the Android and iOS link configuration belongs here.

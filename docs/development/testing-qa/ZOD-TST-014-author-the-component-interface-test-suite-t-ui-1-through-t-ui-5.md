@@ -50,7 +50,7 @@ No direct design reference applies — this task tracks test coverage, not new U
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-NAV-003:** T-UI-1 lives in `apps/astro_mobile/test/navigation/t_ui_1_test.dart` (group `T-UI-1`: drawer navigation to each screen, cold-start deep links through the platform default route, and the injected-location seam). Its relaunch case is only the seam; the real restore is ZOD-DAT-007's, so extend the group there.
 
 ---
 

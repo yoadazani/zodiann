@@ -45,6 +45,8 @@ Build the play button that automatically steps time forward at a fixed interval 
 
 ## Notes
 
+- **From ZOD-NAV-003:** stop playback when the user leaves the wheel (WH-12) by listening in the **app layer**, not in `feature_wheel` (feature packages never import the app layer): `ref.listen(activeRouteProvider, (_, next) { if (next != AppRoute.wheel) <call the feature's stop method>; })`. The seam is proven with a fake 110 ms timer in `apps/astro_mobile/test/navigation/screen_switch_test.dart` (drawer, `router.go` and a warm deep link each stop it; a refresh or a `go` to the same screen does not). Closing this task's playback criterion means adding the real timer to that wiring and re-running that proof against it. A screen's own `State` is disposed on leave, so a timer owned by the screen needs no listener.
+
 - **Icon buttons (ZOD-UI-004):** follow the button state model: `ZodiannStates` (hover brightness 1.12 over 150 ms, pressed 0.94 + 1 px down, disabled 0.42), the keyboard-only 2 px `focus` ring at offset 2 (`ZodiannFocusRingPainter` pattern) and a ≥ 44 × 44 hit target.
 
 ---
