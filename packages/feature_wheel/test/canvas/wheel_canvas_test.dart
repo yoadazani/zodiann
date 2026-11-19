@@ -208,13 +208,14 @@ void main() {
     }
   });
 
-  test('the default layers are the sign ring only (the grid is opt-in)', () {
+  test('the default layers are the sign ring, then the degree scale', () {
     const canvas = WheelCanvas(
       proportions: WheelProportions.desktop,
       state: WheelState(),
     );
-    expect(canvas.layers, hasLength(1));
-    expect(canvas.layers.single, isA<SignRingLayer>());
+    expect(canvas.layers, hasLength(2));
+    expect(canvas.layers[0], isA<SignRingLayer>());
+    expect(canvas.layers[1], isA<DegreeScaleLayer>());
   });
 
   group('theme inputs for layers', () {

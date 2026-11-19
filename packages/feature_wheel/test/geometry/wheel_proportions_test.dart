@@ -122,10 +122,7 @@ void signSeparatorTests() {
 
     test('takes part in equality and hash', () {
       const d = WheelProportions.desktop;
-      final other = variant(
-        d,
-        signSeparatorInner: d.signSeparatorInner + 0.01,
-      );
+      final other = variant(d, signSeparatorInner: d.signSeparatorInner + 0.01);
       expect(other == d, isFalse);
       expect(other.hashCode, isNot(d.hashCode));
     });

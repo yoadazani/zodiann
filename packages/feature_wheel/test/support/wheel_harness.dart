@@ -52,7 +52,7 @@ Future<void> pumpWheelCanvas(
   Size size = const Size(644, 656),
   WheelProportions proportions = WheelProportions.desktop,
   WheelState state = const WheelState(),
-  List<WheelLayer> layers = const [SignRingLayer()],
+  List<WheelLayer> layers = const [SignRingLayer(), DegreeScaleLayer()],
   Locale locale = const Locale('en'),
   Brightness brightness = Brightness.dark,
   Widget Function(Widget canvas)? wrap,

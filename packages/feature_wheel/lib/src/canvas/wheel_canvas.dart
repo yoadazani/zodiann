@@ -5,6 +5,7 @@ import 'package:shared_ui/shared_ui.dart'
 
 import '../geometry/wheel_proportions.dart';
 import '../state/wheel_state.dart';
+import 'degree_scale_layer.dart';
 import 'sign_ring_layer.dart';
 import 'wheel_layer.dart';
 import 'wheel_painter.dart';
@@ -21,7 +22,7 @@ class WheelCanvas extends StatelessWidget {
     super.key,
     required this.proportions,
     required this.state,
-    this.layers = const [SignRingLayer()],
+    this.layers = const [SignRingLayer(), DegreeScaleLayer()],
   });
 
   /// The desktop or compact table.

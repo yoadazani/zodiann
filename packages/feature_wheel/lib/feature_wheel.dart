@@ -1,6 +1,7 @@
 /// The zodiac wheel screen.
 library;
 
+export 'src/canvas/degree_scale_layer.dart';
 export 'src/canvas/proportion_grid_layer.dart';
 export 'src/canvas/sign_element.dart';
 export 'src/canvas/sign_ring_layer.dart';
