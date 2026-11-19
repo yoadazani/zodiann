@@ -9,10 +9,14 @@ import 'package:shared_ui/shared_ui.dart';
 final class OrientationProbeLayer implements WheelLayer {
   final directions = <TextDirection>[];
   final points = <Offset>[];
+  final zodiacs = <ZodiacColors>[];
+  final glyphStyles = <TextStyle>[];
 
   @override
   void paint(WheelPaintContext context) {
     directions.add(context.textDirection);
+    zodiacs.add(context.zodiac);
+    glyphStyles.add(context.glyphStyle);
     final point = context.geometry.offsetOf(
       90,
       1,
@@ -46,7 +50,7 @@ Future<void> pumpWheelCanvas(
   Size size = const Size(644, 656),
   WheelProportions proportions = WheelProportions.desktop,
   WheelState state = const WheelState(),
-  List<WheelLayer> layers = const [ProportionGridLayer()],
+  List<WheelLayer> layers = const [SignRingLayer()],
   Locale locale = const Locale('en'),
   Brightness brightness = Brightness.dark,
   Widget Function(Widget canvas)? wrap,
@@ -72,6 +76,14 @@ Future<void> pumpWheelCanvas(
         ...GlobalMaterialLocalizations.delegates,
       ],
       supportedLocales: ZodiannLocalizations.supportedLocales,
+      // The script follows the locale, exactly as the app does (ZOD-UI-002).
+      builder: (context, child) => Theme(
+        data: withZodiannScript(
+          Theme.of(context),
+          ZodiannScript.forLocale(Localizations.localeOf(context)),
+        ),
+        child: child!,
+      ),
       home: Align(
         alignment: Alignment.topLeft,
         child: wrap != null

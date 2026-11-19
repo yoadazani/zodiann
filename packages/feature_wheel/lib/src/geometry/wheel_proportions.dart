@@ -16,6 +16,7 @@ final class WheelProportions {
     required this.haloRadius,
     required this.signBandOuter,
     required this.signBandInner,
+    required this.signSeparatorInner,
     required this.tickInnerEdge,
     required this.tickLengthDegree,
     required this.tickLengthFive,
@@ -44,6 +45,7 @@ final class WheelProportions {
     haloRadius: 306 / referenceRadius,
     signBandOuter: 296 / referenceRadius,
     signBandInner: 250 / referenceRadius,
+    signSeparatorInner: (250 - 18) / referenceRadius,
     tickInnerEdge: 250 / referenceRadius,
     tickLengthDegree: 5 / referenceRadius,
     tickLengthFive: 9 / referenceRadius,
@@ -68,6 +70,7 @@ final class WheelProportions {
     haloRadius: 306 / referenceRadius,
     signBandOuter: 296 / referenceRadius,
     signBandInner: 240 / referenceRadius,
+    signSeparatorInner: (240 - 18) / referenceRadius,
     tickInnerEdge: 240 / referenceRadius,
     tickLengthDegree: 5 / referenceRadius,
     tickLengthFive: 9 / referenceRadius,
@@ -95,6 +98,11 @@ final class WheelProportions {
 
   /// Inner edge of the sign band (MASTER 0.833 R desktop, 0.80 R compact).
   final double signBandInner;
+
+  /// Where the 30° sign separators end: 18 kit units inside the band's inner
+  /// edge (`kit.js` `rTick - 18`), so each runs across the tick zone and is the
+  /// 30° mark (the kit draws no tick at multiples of 30°).
+  final double signSeparatorInner;
 
   /// Where the degree ticks start and run inward from: the band's inner edge.
   final double tickInnerEdge;
@@ -164,6 +172,7 @@ final class WheelProportions {
       other.haloRadius == haloRadius &&
       other.signBandOuter == signBandOuter &&
       other.signBandInner == signBandInner &&
+      other.signSeparatorInner == signSeparatorInner &&
       other.tickInnerEdge == tickInnerEdge &&
       other.tickLengthDegree == tickLengthDegree &&
       other.tickLengthFive == tickLengthFive &&
@@ -187,6 +196,7 @@ final class WheelProportions {
     haloRadius,
     signBandOuter,
     signBandInner,
+    signSeparatorInner,
     tickInnerEdge,
     tickLengthDegree,
     tickLengthFive,

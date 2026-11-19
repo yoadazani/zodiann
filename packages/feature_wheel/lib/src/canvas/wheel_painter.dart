@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:shared_ui/shared_ui.dart' show ZodiannSurfaces;
+import 'package:shared_ui/shared_ui.dart' show ZodiacColors, ZodiannSurfaces;
 
 import '../geometry/wheel_geometry.dart';
 import '../geometry/wheel_proportions.dart';
@@ -16,6 +16,8 @@ class WheelPainter extends CustomPainter {
     required this.proportions,
     required this.state,
     required this.surfaces,
+    required this.zodiac,
+    required this.glyphStyle,
     required this.textDirection,
     required this.layers,
   });
@@ -28,6 +30,12 @@ class WheelPainter extends CustomPainter {
 
   /// The theme's surface colours.
   final ZodiannSurfaces surfaces;
+
+  /// The element colours and sign tint (MASTER §2.3), handed to layers.
+  final ZodiacColors zodiac;
+
+  /// The glyph text role, handed to layers.
+  final TextStyle glyphStyle;
 
   /// The direction handed to layers (LTR, L-6).
   final TextDirection textDirection;
@@ -44,6 +52,8 @@ class WheelPainter extends CustomPainter {
       geometry: geometry,
       state: state,
       surfaces: surfaces,
+      zodiac: zodiac,
+      glyphStyle: glyphStyle,
       textDirection: textDirection,
     );
     for (final layer in layers) {
@@ -56,6 +66,8 @@ class WheelPainter extends CustomPainter {
       oldDelegate.proportions != proportions ||
       oldDelegate.state != state ||
       oldDelegate.surfaces != surfaces ||
+      oldDelegate.zodiac != zodiac ||
+      oldDelegate.glyphStyle != glyphStyle ||
       oldDelegate.textDirection != textDirection ||
       !listEquals(oldDelegate.layers, layers);
 }

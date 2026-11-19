@@ -144,7 +144,7 @@ Every drawing task in this section renders onto a single `CustomPainter` (ARCH-5
 | ID | Task | Priority | Status |
 |---|---|---|---|
 | ZOD-WHL-001 | [Build the wheel canvas and proportion system](zodiac-wheel/ZOD-WHL-001-build-the-wheel-canvas-and-proportion-system.md) | Critical | Done (see task notes) |
-| ZOD-WHL-002 | [Render the zodiac sign ring](zodiac-wheel/ZOD-WHL-002-render-the-zodiac-sign-ring.md) | Critical | Not Started |
+| ZOD-WHL-002 | [Render the zodiac sign ring](zodiac-wheel/ZOD-WHL-002-render-the-zodiac-sign-ring.md) | Critical | Done (see task notes) |
 | ZOD-WHL-003 | [Render the degree scale](zodiac-wheel/ZOD-WHL-003-render-the-degree-scale.md) | High | Not Started |
 | ZOD-WHL-004 | [Render body markers (glyph, degree label, connector, true-position dot)](zodiac-wheel/ZOD-WHL-004-render-body-markers-glyph-degree-label-connector-true-position-dot.md) | Critical | Not Started |
 | ZOD-WHL-005 | [Implement the body display-spread (collision avoidance) algorithm](zodiac-wheel/ZOD-WHL-005-implement-the-body-display-spread-collision-avoidance-algorithm.md) | High | Not Started |

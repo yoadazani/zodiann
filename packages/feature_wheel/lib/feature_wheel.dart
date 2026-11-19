@@ -2,6 +2,8 @@
 library;
 
 export 'src/canvas/proportion_grid_layer.dart';
+export 'src/canvas/sign_element.dart';
+export 'src/canvas/sign_ring_layer.dart';
 export 'src/canvas/wheel_canvas.dart';
 export 'src/canvas/wheel_layer.dart';
 export 'src/canvas/wheel_painter.dart';

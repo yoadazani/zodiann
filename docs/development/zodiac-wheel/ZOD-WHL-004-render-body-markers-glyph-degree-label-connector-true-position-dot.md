@@ -46,6 +46,7 @@ Draw each of the 11 bodies (10 bodies + node) with its fixed glyph/color, its wh
 
 _No additional notes._
 
+- **From ZOD-WHL-002 (2026-11-19, product-owner decision T2):** this task owns the **inner-disc fill** (the kit's `.inner`, `bg-raised` with a `line` outline at `innerDiscRadius`, drawn before the aspects and the dots, `kit.js:324`). Until then only `ProportionGridLayer` (opt-in scaffolding, not in the default layers) draws it; move that drawing into the body layer and remove it from the grid. The grid's two body rings (0.64 R, 0.547 R) have no kit counterpart and disappear with the grid.
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Zodiac Wheel" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

@@ -42,6 +42,7 @@ Draw the per-degree tick marks and the 10/20-degree numeric labels inside the si
 
 Degree-number radius and size (ZOD-WHL-001 plan decision D7, `docs/plans/ZOD-WHL-001-wheel-canvas-proportions.md`, 2026-11-17; not `DESIGN_DECISIONS.md` design decision D7): the design (`kit.js` `wheelSVG`, from which the PNGs are rendered) places the numbers at `rSignIn − 26` (kit units), not MASTER §7.2's "22 px inside the band", and the "14px compact" above is the compact **font size** (desktop 9.5), not an inset. The radius comes from `WheelProportions` (ZOD-WHL-001).
 
+- **From ZOD-WHL-002 (2026-11-19):** the 30° marks are WHL-002's separators (they run from the outer rim to `signBandInner − 18` units, `WheelProportions.signSeparatorInner`): draw **no tick at multiples of 30°**, as the kit does (`kit.js:318`). The band's rims and the halo belong to `SignRingLayer`; the ticks start at `signBandInner` (`tickInnerEdge`) and run inward.
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Zodiac Wheel" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
