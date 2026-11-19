@@ -314,6 +314,50 @@ void main() {
     }
   });
 
+  group('glyph font (the UI-002 pattern)', () {
+    setUpAll(loadWheelGlyphFonts);
+
+    final style = ZodiannTheme.graphite.extension<ZodiannTextStyles>()!.glyph;
+
+    double width(String text, TextStyle s) {
+      final tp = TextPainter(
+        text: TextSpan(text: text, style: s.copyWith(fontSize: 21)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final w = tp.width;
+      tp.dispose();
+      return w;
+    }
+
+    test('the glyph role names the bundled symbol fonts', () {
+      // TextStyle folds `package:` into the family name.
+      const prefix = 'packages/${ZodiannFonts.package}';
+      expect(style.fontFamily, '$prefix/${ZodiannFonts.notoSansSymbols}');
+      expect(style.fontFamilyFallback, [
+        '$prefix/${ZodiannFonts.notoSansSymbols2}',
+        '$prefix/${ZodiannFonts.notoSans}',
+      ]);
+    });
+
+    test('every sign string asks for text presentation (U+FE0E)', () {
+      expect(ZodiannGlyphs.signs, hasLength(12));
+      for (final glyph in ZodiannGlyphs.signs) {
+        expect(glyph.endsWith('\u{FE0E}'), isTrue, reason: glyph);
+      }
+    });
+
+    test('each sign renders in a bundled face, not the test fallback', () {
+      const missing = TextStyle(fontFamily: 'NoSuchFamilyForZodiann');
+      for (final glyph in ZodiannGlyphs.signs) {
+        expect(
+          width(glyph, style),
+          isNot(width(glyph, missing)),
+          reason: glyph,
+        );
+      }
+    });
+  });
+
   group('degenerate sizes', () {
     test('R of 1 paints with no exception and no NaN', () {
       final pass = _paint(box: const Size(644 / 300, 656 / 300));

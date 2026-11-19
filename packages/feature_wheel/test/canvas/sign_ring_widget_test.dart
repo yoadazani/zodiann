@@ -1,50 +1,20 @@
-import 'dart:ui' as ui;
-
 import 'package:astro_core/astro_core.dart';
 import 'package:feature_wheel/feature_wheel.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_ui/material_ui.dart' show Theme;
 import 'package:shared_ui/shared_ui.dart';
 
 import '../support/load_wheel_fonts.dart';
+import '../support/wheel_capture.dart';
 import '../support/wheel_harness.dart';
 
-/// The wheel canvas's pixels, on a `surface` background, as straight RGBA.
-final _frame = GlobalKey();
-
-/// The wheel on its `surface` background, as pixels (the boundary wraps the
-/// background, so the tint blends over it as it does on screen).
-Future<ui.Image> _capture(WidgetTester tester) async {
-  final boundary =
-      _frame.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-  return (await tester.runAsync(boundary.toImage))!;
-}
-
-Future<List<int>> _bytes(WidgetTester tester) async {
-  final image = await _capture(tester);
-  final data = await tester.runAsync(image.toByteData);
-  image.dispose();
-  return data!.buffer.asUint8List();
-}
+Future<List<int>> _bytes(WidgetTester tester) => captureBytes(tester);
 
 Widget Function(Widget) _onSurface({double textScale = 1}) =>
-    (canvas) => Builder(
-      builder: (context) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: TextScaler.linear(textScale)),
-        child: RepaintBoundary(
-          key: _frame,
-          child: ColoredBox(
-            color: Theme.of(context).extension<ZodiannSurfaces>()!.surface,
-            child: SizedBox(width: 644, height: 656, child: canvas),
-          ),
-        ),
-      ),
-    );
+    onSurface(textScale: textScale);
 
 void main() {
+  l6Tests();
   setUpAll(loadWheelGlyphFonts);
 
   testWidgets('text scale 2.0 draws the same pixels as 1.0', (tester) async {
@@ -110,4 +80,40 @@ void main() {
     expect(atThirty, isNot(atZero));
     expect(ZodiacSign.values, hasLength(12));
   });
+}
+
+void l6Tests() {
+  // L-6: the ring never mirrors and never changes with the language. The app
+  // is really RTL in Hebrew (real delegates) and really swaps the script
+  // (the harness builder, as app.dart does), so equal bytes mean the ring
+  // ignored both.
+  for (final (table, proportions) in [
+    ('desktop', WheelProportions.desktop),
+    ('compact', WheelProportions.compact),
+  ]) {
+    for (final brightness in Brightness.values) {
+      testWidgets(
+        '$table ${brightness.name}: English and Hebrew are identical',
+        (tester) async {
+          Future<List<int>> render(String language, double textScale) async {
+            await pumpWheelCanvas(
+              tester,
+              proportions: proportions,
+              state: const WheelState(pointerLongitude: 227.05),
+              layers: const [SignRingLayer()],
+              locale: Locale(language),
+              brightness: brightness,
+              wrap: _onSurface(textScale: textScale),
+            );
+            await tester.pump(const Duration(seconds: 1));
+            return _bytes(tester);
+          }
+
+          final english = await render('en', 1);
+          expect(await render('he', 1), english, reason: 'he vs en');
+          expect(await render('he', 2), english, reason: 'he at text scale 2');
+        },
+      );
+    }
+  }
 }

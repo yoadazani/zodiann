@@ -76,6 +76,14 @@ Future<void> pumpWheelCanvas(
         ...GlobalMaterialLocalizations.delegates,
       ],
       supportedLocales: ZodiannLocalizations.supportedLocales,
+      // The script follows the locale, exactly as the app does (ZOD-UI-002).
+      builder: (context, child) => Theme(
+        data: withZodiannScript(
+          Theme.of(context),
+          ZodiannScript.forLocale(Localizations.localeOf(context)),
+        ),
+        child: child!,
+      ),
       home: Align(
         alignment: Alignment.topLeft,
         child: wrap != null
