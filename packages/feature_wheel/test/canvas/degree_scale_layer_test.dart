@@ -190,6 +190,10 @@ void main() {
       final b = small.of(#drawLine).toList();
       for (var i = 0; i < a.length; i++) {
         _expectNear(
+          (b[i][0] as Offset) - small.geometry.center,
+          ((a[i][0] as Offset) - big.geometry.center) / 2,
+        );
+        _expectNear(
           (b[i][1] as Offset) - small.geometry.center,
           ((a[i][1] as Offset) - big.geometry.center) / 2,
         );
@@ -491,22 +495,56 @@ void main() {
     testWidgets('a theme switch repaints the ticks and the labels', (
       tester,
     ) async {
+      // The same tree is re-pumped (no new tree in between), so a stale cached
+      // picture or a missing `shouldRepaint` field would keep the old colours.
+      // With the pointer at 10° (then 5°) the 10° (5°) tick is vertical at
+      // 12 o'clock: x = 322 +- 0.6 (1.2 units wide) or +- 0.5 (1 unit), so the
+      // two pixels beside the axis each carry exactly that coverage of the ink,
+      // 3 units inside the band's inner edge (y = 334 - 247).
       const layers = [DegreeScaleLayer()];
-      Future<List<int>> shot(ui.Brightness brightness) async {
-        await tester.pumpWidget(const SizedBox.shrink());
+      Future<List<int>> shot(ui.Brightness brightness, double pointer) async {
         await pumpWheelCanvas(
           tester,
+          state: WheelState(pointerLongitude: pointer),
           layers: layers,
           wrap: onSurface(),
           brightness: brightness,
         );
-        await tester.pump(const Duration(seconds: 1)); // AnimatedTheme
+        await tester.pumpAndSettle(); // AnimatedTheme
         return captureBytes(tester);
       }
 
-      final dark = await shot(ui.Brightness.dark);
-      final light = await shot(ui.Brightness.light);
-      expect(light, isNot(dark));
+      void expectTick(
+        List<int> bytes,
+        ThemeData theme,
+        int ink,
+        double coverage,
+      ) {
+        final bg = theme.extension<ZodiannSurfaces>()!.surface.toARGB32();
+        for (final x in [321, 322]) {
+          final i = (87 * 644 + x) * 4;
+          for (var k = 0; k < 3; k++) {
+            final shift = 16 - 8 * k;
+            final b = (bg >> shift) & 255, c = (ink >> shift) & 255;
+            expect(
+              bytes[i + k],
+              closeTo(b + coverage * (c - b), 4),
+              reason: 'x $x channel $k',
+            );
+          }
+        }
+      }
+
+      for (final (brightness, theme) in [
+        (ui.Brightness.dark, ZodiannTheme.graphite),
+        (ui.Brightness.light, ZodiannTheme.porcelain),
+        (ui.Brightness.dark, ZodiannTheme.graphite),
+      ]) {
+        final ten = await shot(brightness, 10);
+        expectTick(ten, theme, _text2[brightness]!, 0.6);
+        final five = await shot(brightness, 5);
+        expectTick(five, theme, _text3[brightness]!, 0.5);
+      }
     });
 
     testWidgets('the default canvas draws the ring, then the scale', (

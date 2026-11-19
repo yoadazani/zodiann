@@ -28,8 +28,9 @@ signBandInner + 1` units.
 | compact dark | 0.75 | 0.50 | 0.05 | 0.46 | 0.77 | -0.07 / -0.05 |
 | compact light | 0.98 | 0.50 | 0.05 | 0.45 | 0.74 | -0.09 / -0.03 |
 
-Ceilings for the mean are `max(round_up(worst x 1.5, 0.05), floor)` (see
-`_ceilings` in the test). `DegreeScaleLayer.labelCentringFactor` stays 0: the
+Ceilings for the mean are `max(round_up(worst x 1.5, 0.05), floor)` from the
+unrounded worst values (desktop dark 1.0014 gives 1.55; see `_ceilings` in the
+test). `DegreeScaleLayer.labelCentringFactor` stays 0: the
 measured label centroids are within 1.08 px of Chrome's
 `dominant-baseline: central` (desktop labels sit about half a pixel high;
 no single fraction of the size fits both tables because Flutter rounds line

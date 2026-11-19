@@ -63,8 +63,10 @@ final class DegreeScaleLayer implements WheelLayer {
 
   /// Vertical shift of each label, as a fraction of the label size, that makes
   /// a laid-out text box read as the kit's `dominant-baseline: central`. A
-  /// fraction (not pixels) so it scales with the wheel. Tuned against the
-  /// Chrome reference in ZOD-WHL-003 Task 3.
+  /// fraction (not pixels) so it scales with the wheel. Measured against the
+  /// Chrome reference in ZOD-WHL-003 Task 3: 0 is the best single value
+  /// (desktop labels sit about 0.5 px high; see
+  /// `test/fixtures/degree_scale/README.md`).
   static const double labelCentringFactor = 0;
 
   /// The style of a degree label for [context]: the label role at the table's
