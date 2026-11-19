@@ -3,17 +3,14 @@ import 'dart:ui' show Paint, PaintingStyle;
 import '../geometry/wheel_proportions.dart';
 import 'wheel_layer.dart';
 
-/// The rings-only proportion grid (ZOD-WHL-001): the six radii of MASTER
-/// §7.2's table, as thin concentric circles, with the inner disc filled.
-///
-/// Scaffolding: later layers draw the real sign band, ticks and bodies at
-/// these radii.
+/// The remaining scaffolding rings (ZOD-WHL-001), opt-in since ZOD-WHL-002: the
+/// inner disc (filled, then outlined) and the two body rings at 0.64 R and
+/// 0.547 R, which have no counterpart in the kit. The sign band's rims and the
+/// halo now belong to `SignRingLayer`. The inner-disc fill (the kit's `.inner`)
+/// is to be taken by ZOD-WHL-004; the body rings disappear with this layer.
 final class ProportionGridLayer implements WheelLayer {
   /// The grid layer.
   const ProportionGridLayer();
-
-  /// The halo is `line` at 50 % (MASTER §7.2).
-  static const double _haloOpacity = 0.5;
 
   @override
   void paint(WheelPaintContext context) {
@@ -32,9 +29,6 @@ final class ProportionGridLayer implements WheelLayer {
     );
 
     final rings = [
-      (p.haloRadius, s.line.withValues(alpha: s.line.a * _haloOpacity)),
-      (p.signBandOuter, s.accentLine),
-      (p.signBandInner, s.line),
       (p.bodyDiscRadiusAt, s.line),
       (p.bodyLabelRadiusAt, s.line),
       (p.innerDiscRadius, s.line),

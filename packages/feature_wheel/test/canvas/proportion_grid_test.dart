@@ -24,11 +24,13 @@ bool Function(Symbol, List<dynamic>) circle({
 };
 
 void main() {
-  // MASTER §7.2's printed fractions, in grid order: halo, rim, band inner,
-  // body discs, body labels, inner disc. Not read from the table object.
+  // MASTER §7.2's printed fractions, in grid order (the grid keeps only the
+  // three rings the kit does not draw plus the inner disc; the band rims and
+  // the halo belong to SignRingLayer): body discs, body labels, inner disc.
+  // Not read from the table object.
   const printed = {
-    'desktop': [1.02, 0.987, 0.833, 0.64, 0.547, 0.453],
-    'compact': [1.02, 0.987, 0.80, 0.60, 0.467, 0.373],
+    'desktop': [0.64, 0.547, 0.453],
+    'compact': [0.60, 0.467, 0.373],
   };
   const tables = {
     'desktop': WheelProportions.desktop,
@@ -43,15 +45,22 @@ void main() {
   for (final name in tables.keys) {
     for (final (box, r, center) in boxes) {
       testWidgets('$name grid at ${box.width.toInt()} x ${box.height.toInt()} '
-          'draws the six rings at the printed fractions', (tester) async {
-        await pumpWheelCanvas(tester, size: box, proportions: tables[name]!);
+          'draws its three rings and the disc at the printed fractions', (
+        tester,
+      ) async {
+        await pumpWheelCanvas(
+          tester,
+          size: box,
+          proportions: tables[name]!,
+          layers: const [ProportionGridLayer()],
+        );
         final f = printed[name]!;
         final tol = 0.0005 * r;
         var pattern = paints
           ..something(
             circle(
               center: center,
-              radius: f[5] * r,
+              radius: f[2] * r,
               tolerance: tol,
               style: PaintingStyle.fill,
             ),
@@ -68,6 +77,20 @@ void main() {
             );
         }
         expect(wheelRenderObject(tester), pattern);
+      });
+
+      testWidgets('$name grid at ${box.width.toInt()}: exactly four circles '
+          '(the disc fill and three strokes; no rim, no halo)', (tester) async {
+        await pumpWheelCanvas(
+          tester,
+          size: box,
+          proportions: tables[name]!,
+          layers: const [ProportionGridLayer()],
+        );
+        expect(
+          wheelRenderObject(tester),
+          paintsExactlyCountTimes(#drawCircle, 4),
+        );
       });
     }
   }

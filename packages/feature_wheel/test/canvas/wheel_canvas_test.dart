@@ -208,6 +208,15 @@ void main() {
     }
   });
 
+  test('the default layers are the sign ring only (the grid is opt-in)', () {
+    const canvas = WheelCanvas(
+      proportions: WheelProportions.desktop,
+      state: WheelState(),
+    );
+    expect(canvas.layers, hasLength(1));
+    expect(canvas.layers.single, isA<SignRingLayer>());
+  });
+
   group('theme inputs for layers', () {
     for (final (name, theme, brightness) in [
       ('graphite', ZodiannTheme.graphite, Brightness.dark),
