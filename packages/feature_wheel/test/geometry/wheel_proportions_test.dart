@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 double units(double fraction) => fraction * WheelProportions.referenceRadius;
 
 void main() {
+  signSeparatorTests();
   const desktop = WheelProportions.desktop;
   const compact = WheelProportions.compact;
 
@@ -99,5 +100,52 @@ void main() {
       expect(p.bodyLabelRadiusAt, greaterThan(p.innerDiscRadius));
       expect(p.innerDiscRadius, greaterThan(0));
     }
+  });
+}
+
+void signSeparatorTests() {
+  group('sign separator inner radius (kit rTick - 18)', () {
+    test('exact literals', () {
+      expect(WheelProportions.desktop.signSeparatorInner, 232 / 300);
+      expect(WheelProportions.compact.signSeparatorInner, 222 / 300);
+    });
+
+    test('is 18 kit units inside the band edge (closeTo, never ==)', () {
+      for (final p in [WheelProportions.desktop, WheelProportions.compact]) {
+        expect(
+          p.signSeparatorInner,
+          closeTo(p.signBandInner - 18 / 300, 1e-12),
+        );
+      }
+    });
+
+    test('takes part in equality and hash', () {
+      const d = WheelProportions.desktop;
+      final other = WheelProportions(
+        haloRadius: d.haloRadius,
+        signBandOuter: d.signBandOuter,
+        signBandInner: d.signBandInner,
+        signSeparatorInner: d.signSeparatorInner + 0.01,
+        tickInnerEdge: d.tickInnerEdge,
+        tickLengthDegree: d.tickLengthDegree,
+        tickLengthFive: d.tickLengthFive,
+        tickLengthTen: d.tickLengthTen,
+        degreeNumberRadius: d.degreeNumberRadius,
+        degreeNumberFontSize: d.degreeNumberFontSize,
+        signGlyphSize: d.signGlyphSize,
+        bodyDiscRadiusAt: d.bodyDiscRadiusAt,
+        bodyDiscRadius: d.bodyDiscRadius,
+        bodyGlyphSize: d.bodyGlyphSize,
+        bodyLabelRadiusAt: d.bodyLabelRadiusAt,
+        bodyLabelFontSize: d.bodyLabelFontSize,
+        innerDiscRadius: d.innerDiscRadius,
+        trueDotRadius: d.trueDotRadius,
+        extentX: d.extentX,
+        extentTop: d.extentTop,
+        extentBottom: d.extentBottom,
+      );
+      expect(other == d, isFalse);
+      expect(other.hashCode, isNot(d.hashCode));
+    });
   });
 }
