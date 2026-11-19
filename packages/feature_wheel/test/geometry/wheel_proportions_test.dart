@@ -6,6 +6,7 @@ double units(double fraction) => fraction * WheelProportions.referenceRadius;
 
 void main() {
   signSeparatorTests();
+  tickStrokeTests();
   const desktop = WheelProportions.desktop;
   const compact = WheelProportions.compact;
 
@@ -121,31 +122,68 @@ void signSeparatorTests() {
 
     test('takes part in equality and hash', () {
       const d = WheelProportions.desktop;
-      final other = WheelProportions(
-        haloRadius: d.haloRadius,
-        signBandOuter: d.signBandOuter,
-        signBandInner: d.signBandInner,
-        signSeparatorInner: d.signSeparatorInner + 0.01,
-        tickInnerEdge: d.tickInnerEdge,
-        tickLengthDegree: d.tickLengthDegree,
-        tickLengthFive: d.tickLengthFive,
-        tickLengthTen: d.tickLengthTen,
-        degreeNumberRadius: d.degreeNumberRadius,
-        degreeNumberFontSize: d.degreeNumberFontSize,
-        signGlyphSize: d.signGlyphSize,
-        bodyDiscRadiusAt: d.bodyDiscRadiusAt,
-        bodyDiscRadius: d.bodyDiscRadius,
-        bodyGlyphSize: d.bodyGlyphSize,
-        bodyLabelRadiusAt: d.bodyLabelRadiusAt,
-        bodyLabelFontSize: d.bodyLabelFontSize,
-        innerDiscRadius: d.innerDiscRadius,
-        trueDotRadius: d.trueDotRadius,
-        extentX: d.extentX,
-        extentTop: d.extentTop,
-        extentBottom: d.extentBottom,
-      );
+      final other = variant(d, signSeparatorInner: d.signSeparatorInner + 0.01);
       expect(other == d, isFalse);
       expect(other.hashCode, isNot(d.hashCode));
+    });
+  });
+}
+
+/// [base] with some fields replaced (every field listed, so a field added to
+/// the table is a compile error here until it is handled).
+WheelProportions variant(
+  WheelProportions base, {
+  double? signSeparatorInner,
+  double? tickStrokeDegree,
+  double? tickStrokeFive,
+  double? tickStrokeTen,
+}) => WheelProportions(
+  haloRadius: base.haloRadius,
+  signBandOuter: base.signBandOuter,
+  signBandInner: base.signBandInner,
+  signSeparatorInner: signSeparatorInner ?? base.signSeparatorInner,
+  tickInnerEdge: base.tickInnerEdge,
+  tickLengthDegree: base.tickLengthDegree,
+  tickLengthFive: base.tickLengthFive,
+  tickLengthTen: base.tickLengthTen,
+  tickStrokeDegree: tickStrokeDegree ?? base.tickStrokeDegree,
+  tickStrokeFive: tickStrokeFive ?? base.tickStrokeFive,
+  tickStrokeTen: tickStrokeTen ?? base.tickStrokeTen,
+  degreeNumberRadius: base.degreeNumberRadius,
+  degreeNumberFontSize: base.degreeNumberFontSize,
+  signGlyphSize: base.signGlyphSize,
+  bodyDiscRadiusAt: base.bodyDiscRadiusAt,
+  bodyDiscRadius: base.bodyDiscRadius,
+  bodyGlyphSize: base.bodyGlyphSize,
+  bodyLabelRadiusAt: base.bodyLabelRadiusAt,
+  bodyLabelFontSize: base.bodyLabelFontSize,
+  innerDiscRadius: base.innerDiscRadius,
+  trueDotRadius: base.trueDotRadius,
+  extentX: base.extentX,
+  extentTop: base.extentTop,
+  extentBottom: base.extentBottom,
+);
+
+void tickStrokeTests() {
+  group('tick stroke widths (kit.css .tick 0.8, .t5 1, .t10 1.2)', () {
+    test('exact literals, both tables', () {
+      for (final p in [WheelProportions.desktop, WheelProportions.compact]) {
+        expect(p.tickStrokeDegree, 0.8 / 300);
+        expect(p.tickStrokeFive, 1 / 300);
+        expect(p.tickStrokeTen, 1.2 / 300);
+      }
+    });
+
+    test('each takes part in equality and hash', () {
+      const d = WheelProportions.desktop;
+      for (final other in [
+        variant(d, tickStrokeDegree: d.tickStrokeDegree + 0.01),
+        variant(d, tickStrokeFive: d.tickStrokeFive + 0.01),
+        variant(d, tickStrokeTen: d.tickStrokeTen + 0.01),
+      ]) {
+        expect(other == d, isFalse);
+        expect(other.hashCode, isNot(d.hashCode));
+      }
     });
   });
 }

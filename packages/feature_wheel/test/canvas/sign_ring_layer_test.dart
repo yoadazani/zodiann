@@ -72,6 +72,7 @@ WheelPaintContext _context(
   surfaces: theme.extension<ZodiannSurfaces>()!,
   zodiac: theme.extension<ZodiacColors>()!,
   glyphStyle: theme.extension<ZodiannTextStyles>()!.glyph,
+  labelStyle: theme.extension<ZodiannTextStyles>()!.micro,
   textDirection: TextDirection.ltr,
 );
 
