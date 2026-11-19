@@ -1,6 +1,6 @@
 # ZOD-FND-010: Swiss Ephemeris license decision record
 
-> **Status: DRAFT. Awaiting the product owner's decision (L2).** Prepared 2026-11-19 (ZOD-FND-010, Task 2).
+> **Status: DECIDED 2026-11-19 (path A, AGPL), to be reconfirmed by ZOD-REL-003 against the distribution channel.** Researched and drafted 2026-11-19 (ZOD-FND-010).
 >
 > **This is not legal advice.** It is a reading of published terms by a software engineer. Each statement is labelled **Confirmed** (read in a cited source on the date shown), **Interpretation** (my reading of confirmed facts, which could be wrong) or **Open** (not settled by the sources; a question for Astrodienst or a qualified lawyer). Nothing was purchased, signed or sent to anyone.
 
@@ -128,4 +128,16 @@ Based on the stated use (public repository, one friend, personal, no sale) and *
 
 ## 10. Decision
 
-*Not yet made.* To be filled in by the owner (Task 3): the path chosen (A, B, or C), the date, the reason, and what follows. The distribution channel stays with ZOD-REL-003, which reconfirms the path.
+**Decided by the product owner on 2026-11-19: Option A, the AGPL (Free Edition) path, for now.** The owner was shown the options and the recommendation (section 9) and chose the recommended path. Nothing was purchased and nothing was sent to Astrodienst.
+
+**Why:** the stated use is a public repository, installation packages for the owner and one friend, personal use, no sale. Option A costs nothing, fits a public repository, and the sources read give no sign that this use is a problem; the Professional License (CHF 700, 6 years) gives no meaningful benefit for it.
+
+**What follows (obligations the owner now carries; none is done by this task, each needs the owner's approval before it is carried out):**
+
+1. Before the first package that contains Swiss Ephemeris is given to anyone, put the whole repository under the AGPL (a `LICENSE` file and notices); today it is public with no license (section 1, 4.2).
+2. Build each package from a tagged commit and keep the tag public; state next to the package where the source is (section 4.2 items 2 and 3).
+3. ZOD-ABT-007: the Swiss Ephemeris chip shows the AGPL path (attribution and the source location), not a commercial-license text; check the other dependencies and fonts for AGPL compatibility there (section 4.2 item 4, open).
+4. ZOD-FND-003 vendors the source from the public repository `aloistr/swisseph` (release v2.10.3bfinal at the time of reading) and records the version; it should use the AGPL-licensed bindings and keep the notices intact (the `sweph` Dart package is AGPL-3.0-only by default).
+5. The questions Q1 to Q4 (section 8) stay available for the owner to send; none was sent.
+
+**Channel and reconfirmation:** the distribution channel is **not** decided here. ZOD-REL-003 owns it and confirms the final path against the channel it picks. If the app is to go to the Apple App Store or Google Play, be sold, or be closed-source, this decision must be revisited then: Q3 answered or the Professional License bought before any store submission (section 6). Switching later is possible but its effect on earlier AGPL releases is open (Q4).
