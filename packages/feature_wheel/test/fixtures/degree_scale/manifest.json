@@ -1,0 +1,17 @@
+{
+  "note": "Generated visual references, not designer-provided assets; kit.css and MASTER.md remain authoritative.",
+  "chrome": "157.0.8103.79",
+  "pointerLongitude": 227.05,
+  "width": 644,
+  "height": 656,
+  "radius": 300,
+  "centre": [
+    322,
+    334
+  ],
+  "sha256": {
+    "design-reference/zodiann/_source/kit.css": "b22b18324758f80b7d2e1c69fc227af0b41919d163f3222389dd57ba099127a7",
+    "design-reference/zodiann/_source/kit.js": "e5acb102b95bea643f1610f86e4493c027a2ac1fb1dab6cbd5de4cdeb6f87c15",
+    "design-reference/zodiann/assets/fonts/fonts.css": "04fb8cfbb9ee3dce5bb470a96e831e095f6f6f07ea6908bab127f9f471ada75a"
+  }
+}

@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:feature_wheel/feature_wheel.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart' show SizedBox;
+import 'package:flutter/widgets.dart' show Locale, SizedBox;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart' show ThemeData;
 import 'package:shared_ui/shared_ui.dart';
@@ -451,6 +451,42 @@ void main() {
       );
       expect(await captureBytes(tester), normal);
     });
+
+    // L-6: the scale never mirrors and never changes with the language. The
+    // app is really RTL in Hebrew (real delegates) and really swaps the script
+    // (the harness builder, as app.dart does), so equal bytes mean the scale
+    // ignored both. A new tree between the renders keeps a cached picture from
+    // hiding a missing repaint field.
+    for (final (table, proportions) in [
+      ('desktop', _desktop),
+      ('compact', _compact),
+    ]) {
+      for (final brightness in ui.Brightness.values) {
+        testWidgets(
+          '$table ${brightness.name}: English and Hebrew are identical',
+          (tester) async {
+            Future<List<int>> render(String language, double textScale) async {
+              await tester.pumpWidget(const SizedBox.shrink());
+              await pumpWheelCanvas(
+                tester,
+                proportions: proportions,
+                state: const WheelState(pointerLongitude: 227.05),
+                layers: const [DegreeScaleLayer()],
+                locale: Locale(language),
+                brightness: brightness,
+                wrap: onSurface(textScale: textScale),
+              );
+              await tester.pump(const Duration(seconds: 1));
+              return captureBytes(tester);
+            }
+
+            final english = await render('en', 1);
+            expect(await render('he', 1), english, reason: 'he vs en');
+            expect(await render('he', 2), english, reason: 'he at scale 2');
+          },
+        );
+      }
+    }
 
     testWidgets('a theme switch repaints the ticks and the labels', (
       tester,
