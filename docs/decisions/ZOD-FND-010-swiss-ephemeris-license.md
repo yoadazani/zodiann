@@ -10,7 +10,7 @@ Zodiann (Flutter, iOS and Android, spec R-6) wants Swiss Ephemeris as its primar
 
 What depends on it: ZOD-FND-003 (the FFI spike vendors the C source), ZOD-FND-011 (data-file range), ZOD-EPH-002 / 003 (adapters), ZOD-ABT-007 (the About screen's license text), ZOD-REL-003 (channel and final license path).
 
-Current state of the repository (**Confirmed**, `gh repo view` and `ls`, 2026-11-19): the repository `yoadazani/zodiann` is **public**, GitHub reports **no license** for it (`licenseInfo: null`), there is **no LICENSE file**, and **no Swiss Ephemeris code is vendored yet** (`native/swisseph/` holds only a README). So no license obligation has been triggered so far.
+Current state of the repository (**Confirmed**, `gh repo view`, `ls` and `git ls-files` (no LICENSE or COPYING tracked), 2026-11-19): the repository `yoadazani/zodiann` is **public**, GitHub reports **no license** for it (`licenseInfo: null`), there is **no LICENSE file**, and **no Swiss Ephemeris code is vendored yet** (`native/swisseph/` holds only a README). So no license obligation has been triggered so far.
 
 ## 2. Sources
 
@@ -44,14 +44,16 @@ Not obtained: Apple's current App Store terms and standard end-user license (the
 
 **Confirmed (S4).** The repository holds the C source and the compressed `.se1` data files; the readme says the planet and asteroid files were rebuilt on JPL DE441 on 14 April 2026, and S1 states a covered range of 13201 BC to AD 17191.
 
+**Confirmed (S1, S4, S5).** The built-in Moshier mode (the one ZOD-EPH-003 would use) is one of the three ephemerides of the Swiss Ephemeris package (S5 section 2.1.1; it covers 3000 BCE to 3000 CE and needs no data files), so the dual-license choice applies to the code that provides it too; no source gives it separate terms.
+
 ## 4. Option A: AGPL (the Free Edition), for the owner's scenario
 
 ### 4.1 What AGPL requires (all **Confirmed** from S6 unless marked)
 
 - **Using it yourself is free of conditions.** AGPL defines "propagate" as anything that, without permission, would make you liable for infringement, "except executing it on a computer or modifying a private copy". The FSF FAQ (S7) says you may make and use modifications privately and need release nothing.
 - **The duties start when you "convey".** "To 'convey' a work means any kind of propagation that enables other parties to make or receive copies." Giving the friend an installation package (a copy of the object code) is conveying. "Mere interaction with a user through a computer network, with no transfer of a copy, is not conveying." (Zodiann has no server, so the AGPL section 13 network clause, which concerns remote interaction with a modified version, is not engaged by the current design. Interpretation.)
-- **Conveying object code requires the Corresponding Source** (section 6): either with the package, or by a written offer, or (6d) by "offering access from a designated place" and offering "equivalent access to the Corresponding Source in the same way through the same place at no further charge"; if the place is a network server, "the Corresponding Source may be on a different server ... provided you maintain clear directions next to the object code saying where to find the Corresponding Source", and "you remain obligated to ensure that it is available for as long as needed to satisfy these requirements".
-- **"Corresponding Source" is complete:** "all the source code needed to generate, install, and (for an executable work) run the object code and to modify the work, including scripts to control those activities", including source for libraries the work is specifically designed to require.
+- **Conveying object code requires the Corresponding Source** (section 6): either with the package, or by a written offer, or (6d) by offering access to the object code from a designated place and equivalent access to the source in the same way at no further charge; the source may be on a different server provided you keep "clear directions next to the object code" saying where it is, and you must keep it available "for as long as needed".
+- **"Corresponding Source" is complete:** it means all the source needed to generate, install, run and modify the work, "including scripts to control those activities", and the source of libraries the work is specifically designed to require.
 - **The whole work is under AGPL, and no further restrictions** may be added: you "may not impose any further restrictions on the exercise of the rights granted" (section 10), and the recipient automatically receives a license from the original licensors (section 10).
 - **Astrodienst's own reading (S1, S4):** the whole project goes under "the AGPL or a compatible license".
 
@@ -66,11 +68,14 @@ Not obtained: Apple's current App Store terms and standard end-user license (the
 
 **Interpretation:** for two people, private use and a public repository, Option A looks workable and costs nothing, **provided items 1 to 4 are done**. It also sits naturally with a public repository, since Option A obliges you to publish the source anyway. **Open:** whether the `.se1` data files are covered by the AGPL grant in the same way as the C source. The LICENSE notice speaks of "any part of Swiss Ephemeris" (S1, S4), and the Professional contract lists the data files as a part of the library (S3 section 1), but no source states the free-edition position on the data files in terms. Question Q2.
 
+The Moshier mode uses no data files, but the license choice still applies to the code (Interpretation).
+
 ### 4.3 Practical consequences of choosing A
 
 - You can never later keep the app closed-source while Swiss Ephemeris is AGPL-licensed inside it, unless you switch to the Professional License (which Astrodienst sells to anyone, S2, S3).
 - The friend, as a recipient, gets AGPL rights to run, modify and pass it on (section 10). You cannot restrict that.
 - A license change to Professional later is possible (section 5.1 below); nothing in the sources says an earlier AGPL release must be withdrawn. **Open**, Q4.
+- **Confirmed (S9, FSF, about GPLv2):** people who already hold a copy keep their license as long as they do not violate it themselves.
 
 ## 5. Option B: the Swiss Ephemeris Professional License
 
@@ -81,6 +86,7 @@ Not obtained: Apple's current App Store terms and standard end-user license (the
 - **Scope:** "valid for distributed software apps" whose copyright the licensee holds; an app that fetches calculations from a server also counts as an app containing Swiss Ephemeris; server-side use through a browser is also covered (S3 section 2).
 - **Source code:** "permitted, but not required" to distribute the Swiss Ephemeris source with the app; if distributed, the complete source, and changes to it fall under AGPL terms (S3 section 5).
 - **Other terms:** API services to third parties need those third parties' own licenses (S3 section 3); the licensee must give Astrodienst a sample copy of an app on request, for Astrodienst's internal use (section 7); the authors' names must not be used (section 9); copyright notices must stay (section 10); the license is transferable by telling Astrodienst (section 15); the license is valid only after full payment through the shop (section 14); venue is Meilen, canton of Zurich (section 17); bindings must also be available under both licenses with no extra fee (section 13); the data files are part of what is licensed (section 1).
+- **Cost and scale:** the price does not depend on user count, seats or revenue; the contract has no such term. (Section 3 of the contract also obliges a licensee who provides API services to inform Astrodienst of each API user; it does not apply to an on-device app.)
 - **Stale price elsewhere:** the general documentation (S5, © 1997-2022) still says CHF 750 for the first license, CHF 400 for each additional one, CHF 1550 unlimited. The price page and the contract (S2, S3) both say CHF 700 unlimited and are newer. The record uses S2 and S3.
 
 ### 5.2 Does it help for the owner's scenario? (**Interpretation**)
@@ -91,7 +97,7 @@ Not obtained: Apple's current App Store terms and standard end-user license (the
 
 - **Selling under AGPL is permitted in principle** (AGPL section 4: "You may charge any price or no price for each copy that you convey", S6), but every buyer receives the AGPL rights and the source obligations stay.
 - **Google Play.** *Confirmed:* Signal's Android code is AGPL-3.0 (S13) and the app is listed on Google Play (S14). *Interpretation:* that shows an AGPL app can be listed there; it does not say whether Astrodienst-owned AGPL code can be, since Signal owns its own code. No source read says Google Play's terms conflict with AGPL. **Open.**
-- **Apple App Store.** *Confirmed:* in 2010 the FSF stated that an iPhone GNU Go port was "not in compliance with the GNU GPL" because "Apple imposes numerous legal restrictions on use and distribution ... through the iTunes Store Terms of Service", which GPLv2 forbids; Apple then removed the app (S8, S15). The FSF added that "Apple is free to distribute our software through the App Store if they wish". *Contested:* commentators dispute the FSF reading (S15, informal). *Not obtained:* Apple's current terms (the fetch failed), and an up-to-date source on whether GPL or AGPL code by third-party copyright holders is accepted today. Signal-iOS is AGPL-3.0 (S13); whether it is on the App Store was not verified here. *Interpretation:* distributing Astrodienst-owned AGPL code through the App Store is **unresolved by the sources I read**, and the Professional License (S3 section 2, "distributed software apps") is the route Astrodienst itself offers for apps. **Open**, Q3.
+- **Apple App Store.** *Confirmed:* in 2010 the FSF stated that an iPhone GNU Go port was "not in compliance with the GNU GPL" because "Apple imposes numerous legal restrictions on use and distribution ... through the iTunes Store Terms of Service", which GPLv2 forbids; Apple then removed the app (S8, S15). The FSF added that "Apple is free to distribute our software through the App Store if they wish". *Contested:* commentators dispute the FSF reading (S15, informal). *Not obtained:* Apple's current terms (the fetch failed), and an up-to-date source on whether GPL or AGPL code by third-party copyright holders is accepted today. Signal-iOS is AGPL-3.0 (S13); whether it is on the App Store was not verified here. The 2010 statement concerns GPLv2; AGPLv3 section 10 has a similar "no further restrictions" rule, which was not read against Apple's terms here (Interpretation). *Interpretation:* distributing Astrodienst-owned AGPL code through the App Store is **unresolved by the sources I read**, and the Professional License (S3 section 2, "distributed software apps") is the route Astrodienst itself offers for apps. **Open**, Q3.
 - **Commercial or closed-source use** needs the Professional License (S1: AGPL means "the whole software project" under AGPL).
 - **If the owner publishes broadly under AGPL** the AGPL section 13 network clause matters only if a server-side component is added later (Interpretation).
 
@@ -123,6 +129,7 @@ Based on the stated use (public repository, one friend, personal, no sale) and *
 
 - **Choose Option A, AGPL, for now.** It costs nothing, matches a public repository, and nothing read suggests that sharing a package with one friend is a problem **provided** the repository is actually put under the AGPL (it is not today), each package is built from a public tag, and the source location is stated next to the package. **Do not buy the Professional License now:** it adds no benefit for this use.
 - **Before the first package that contains Swiss Ephemeris is handed to anyone**, the choice must be made and the repository licensed accordingly (S1: the choice comes "before the software developer distributes" it). That follow-up (adding the AGPL license and notices, and the About screen text via ZOD-ABT-007) is not part of this record and needs the owner's approval.
+- **As a function of the channel (Interpretation, not a legal conclusion):** if the channel is the stores or a closed-source or commercial app, the sources favour **Option B** (CHF 700, 6 years), because it is the only route the vendor states for "distributed software apps" (S3 section 2) and it removes the open App Store question (Q3); if the channel is private installation only, Option A, as above.
 - **Revisit at ZOD-REL-003** if the app is to go to the App Store, to be sold, or to be closed-source: then Q3 should be answered, or the Professional License (CHF 700, 6 years, S2 and S3) bought, before any store submission. Option C would need a separate accuracy decision (section 7).
 - If the owner wants certainty first, send Q1 and Q2; they are cheap, and the answers fit the choice either way.
 
