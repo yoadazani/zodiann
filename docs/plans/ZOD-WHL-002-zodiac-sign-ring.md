@@ -10,7 +10,7 @@
 
 **Spec:** `assets/zodiann-specification.md` WH-1, L-6; `design-reference/zodiann/MASTER.md` §7.2 ("Sign band", "Sign glyphs"), §2.3; task file `docs/development/zodiac-wheel/ZOD-WHL-002-render-the-zodiac-sign-ring.md`; the kit `design-reference/zodiann/_source/kit.js` `wheelSVG` (lines 296-348) and `kit.css` (lines 300-315), which render the PNGs and so win over MASTER's prose (PROGRESS D1 / D7 precedent).
 
-## Product-owner decisions needed (open at plan time)
+## Product-owner decisions (decided 2026-11-19: T1 option (a), T2 option (b), T4 option (a); the options below are kept for the record)
 
 - **T1: tint opacity.** Three sources disagree. MASTER §7.2 and the task's Implementation Details say 11 % (desktop). MASTER §2.3, `kit.css` (`--sign-tint: .10` dark / `.09` light), `ZodiacColors.signTintOpacity` (0.10 / 0.09, shipped in UI-001) and therefore the reference PNGs say 10 % / 9 %. The task's criterion 2 says "11 % dark / 9 % light per §2.3", which no source states. **Recommendation:** use `ZodiacColors.signTintOpacity` (10 % dark / 9 % light), because it is the value the PNGs are rendered with and the token already exists; record that MASTER §7.2's 11 % and the task's 11 % are not edited (NAV-002 / UI-009 precedent), and add a note to the task file. **Cost of the alternative:** 11 % needs a second token, and the ring would no longer match the PNGs.
 - **T2: who draws the band rims and the halo, and does the scaffolding grid ship?** The kit draws the `accent-line` outer circle, the `line` inner circle and the 50 % halo in one statement (`kit.js:315`), after the sectors. Today `ProportionGridLayer` draws all three, plus two body rings (0.64 R, 0.547 R) that have **no counterpart in the kit** and the inner-disc fill (kit `.inner`, `kit.js:324`); PROGRESS hands the grid's future to this task. Options: (a) `SignRingLayer` draws the two rims; the grid stays in the default layers with the halo, the two body rings and the inner disc (two non-design circles stay on the wheel with no owner); (b) **recommended:** `SignRingLayer` draws both rims **and the halo**; `ProportionGridLayer` leaves the default layer list and stays an opt-in debug / test layer; the inner-disc fill is assigned to WHL-007  (recommended owner: ZOD-WHL-004) by a Note on that task file; until WHL-003+ the (unrouted) wheel shows only the ring; (c) as (b), but the grid keeps only the inner disc in the default layers until its owner takes it. **The rest of this plan is written for (b); a different answer changes Task 3 only (which circles the grid keeps, the default layer list, the tests that count circles).**
@@ -147,7 +147,7 @@ Paint order inside the layer, per the kit: for `i` in 0…11 (`a0 = i·30°`): t
 
 ## Risks and open items
 
-- **T1, T2 and T4** above need an answer before implementation.
+- **T1, T2 and T4** were decided on 2026-11-19 (options a, b, a), matching the plan as written.
 - **Glyph centring:** `dominant-baseline: central` has no exact TextPainter equivalent; fidelity thresholds are measured, not assumed (Task 4 step 2).
 - **PNG scale:** the designer PNGs may not be at 1×; Task 4 step 6 derives the scale from the rim and compares at that scale, and the test reports what it found.
 - **Chrome availability** for the reference tool (as FND-009 / FND-008 / NAV-002); `CHROME` overrides the path. The committed PNGs mean the tests need no Chrome.
@@ -170,10 +170,10 @@ Paint order inside the layer, per the kit: for `i` in 0…11 (`a0 = i·30°`): t
 - **I7** a font check that cannot fail: applied (family and package, advance-width pattern, device monochrome check).
 - **I8** cwd-relative file reads: applied (`repoRoot()` helper).
 - **Minor:** M1 line range, M2 apk command, M3 mutants, M4 script builder, M5 T1 note, M6 recorded in Risks, M7 Note for WHL-003, M8 Risks line, M9 throwaway entry: all applied.
-- **Needs user decision (open):** T1 tint 10 % / 9 % vs 11 %; T2 the grid and halo ownership; T4 criterion 3's tolerance against the designer PNGs (the designer's own pairs differ by up to 1 per channel).
+- **Needs user decision (resolved 2026-11-19, see the heading above):** T1 tint 10 % / 9 % vs 11 %; T2 the grid and halo ownership; T4 criterion 3's tolerance against the designer PNGs (the designer's own pairs differ by up to 1 per channel).
 
 ### Round 2 (focused on the revision) — verdict: needs user decision (T1, T2, T4 open by design)
 
 - **I1** fidelity run cut to one combination: applied (four references, proportions × brightness). **I2** grid circle count 3 vs 4: applied (4, each named). **I3** unscaled centring constant: applied (`glyphCentringFactor × signGlyphSize × R`). **I4** glyph crop on a tinted sector: applied (reference paints the sector fill first). **I5** halo colour and position unowned: applied (colour bullet, annulus to `haloRadius + 2`). **I6** incomplete Chrome flags and manifest: applied. **I7** unused `_haloOpacity`: applied.
 - **Minor:** M1 harness default, M2 literal tables, M3 mutant wording, M4 classless dots, M5 stale lists, M6 architecture wording: applied. Added: recommended inner-disc owner ZOD-WHL-004 (under T2); halo annulus in the criterion-3 mask (under T4).
-- **Open items for the user:** T1, T2, T4 (recommendations a, b, a). Two rounds done; no further review round until the decisions revise the plan.
+- **Decisions:** T1 (a), T2 (b), T4 (a), all as recommended; the plan needed no change, so no further review round.
