@@ -39,7 +39,7 @@ No direct design reference applies — this is not legal advice.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-010 (2026-11-19):** the license record is [`docs/decisions/ZOD-FND-010-swiss-ephemeris-license.md`](../../decisions/ZOD-FND-010-swiss-ephemeris-license.md). The product owner chose **Option A, the AGPL (Free Edition) path, for now**, for a public repository and packages shared with one friend for personal use. **The distribution channel was deliberately left to this task**, so the path is to be reconfirmed here against the channel you pick: if the app is to go to the Apple App Store or Google Play, be sold, or be closed-source, the record says to answer its question Q3 for Astrodienst or buy the Swiss Ephemeris Professional License (CHF 700, 6 years, at the time of reading) **before any store submission**, and not to assume AGPL is acceptable to the stores. R-6 stays open until this task confirms the path. Not legal advice.
 
 ---
 
