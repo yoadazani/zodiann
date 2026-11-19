@@ -12,8 +12,8 @@
 
 ## Product-owner decisions needed
 
-- **L1: the distribution channel.** App Store and Google Play, or private installation only (sideloaded APK / TestFlight-style, not public). It decides whether AGPL is workable. This is the spec's own open question; the plan does not guess it.
-- **L2: the license path.** Chosen after the research is presented: (a) AGPL and publish the app's complete source, (b) buy the Astrodienst professional license, or (c) leave Swiss Ephemeris (the spec's backup, astronomy-engine, is the alternative; it carries its own accuracy tolerance, ACC-2, and would change ZOD-EPH-002 and the accuracy tests, so it is outside this task and would be raised as a separate decision).
+- **L1: the distribution channel (decided 2026-11-19: ZOD-REL-003 owns it).** App Store and Google Play, or private installation only. FND-010 does not decide it: it is an input. The record gives the license recommendation as a function of the channel, and ZOD-REL-003 (whose task file owns the channel decision) confirms the final path against the channel it picks.
+- **L2: the license path.** The owner's present choice, taken after the research is presented (REL-003 reconfirms it against the channel): (a) AGPL and publish the app's complete source, (b) buy the Astrodienst professional license, or (c) leave Swiss Ephemeris (the spec's backup, astronomy-engine, is the alternative; it carries its own accuracy tolerance, ACC-2, and would change ZOD-EPH-002 and the accuracy tests, so it is outside this task and would be raised as a separate decision).
 - **L3 (informational):** the record's location (`docs/decisions/`) is the executor's choice; PROGRESS Technical Decisions links to it.
 
 ## Global Constraints
@@ -43,7 +43,7 @@
 | `docs/development/release-preparation/ZOD-REL-003-*.md` (modify) | a Note pointing to the record and to L1 |
 | `docs/development/about/ZOD-ABT-007-*.md` (modify) | a Note giving the Swiss Ephemeris chip's license text source from the record |
 | `docs/development/foundations-architecture/ZOD-FND-010-*.md` (modify) | status, ticked criteria with evidence |
-| `docs/development/TASKS.md`, `docs/PROGRESS.md` (modify) | status, Technical Decisions row, Blockers (R-6) and the Completed Tasks row |
+| `docs/development/TASKS.md`, `docs/PROGRESS.md` (modify) | status, Technical Decisions row, a new Blockers entry for R-6, and the Completed Tasks row |
 
 ---
 
@@ -51,9 +51,10 @@
 
 **Files:** none yet (notes are kept in the working scratch and go into Task 2's record).
 
+- [ ] **Step 0: Tools.** If no web tool is available or a page cannot be fetched, record "not confirmed" for what depends on it and stop; never fill the gap from memory.
 - [ ] **Step 1: Vendor pages.** Read Astrodienst's published pages for the Swiss Ephemeris: the license overview and the professional-license terms, the price list, and the licensing FAQ; record each URL and the date read. Capture: the two license offers and their exact names, the price and what it covers (one app, an edition, a user count), whether the data files are covered, and any statement on app stores or on closed-source apps.
 - [ ] **Step 2: The license texts.** Read the AGPL text as the vendor applies it (the AGPL version, the "additional permission" if any) and the vendor's statement of which of its files are under which license.
-- [ ] **Step 3: Independent sources.** Find at least one independent source for each of: whether AGPL software can be distributed through the Apple App Store and Google Play (the FSF and Apple/Google terms, or well-sourced commentary), how other apps use Swiss Ephemeris in a closed-source mobile app (the Dart / Flutter / mobile bindings' own license notes, for example `sweph` packages and their README), and the astronomy-engine license (MIT, to state the alternative accurately). Record URL, date and "single source" where applicable.
+- [ ] **Step 3: Independent sources.** Find at least one independent source for each of: whether AGPL software can be distributed through the Apple App Store and Google Play (the FSF and Apple/Google terms, or well-sourced commentary), how other apps use Swiss Ephemeris in a closed-source mobile app (the Dart / Flutter / mobile bindings' own license notes, for example `sweph` packages and their README), and the astronomy-engine license (MIT, to state the alternative accurately). Record URL, date and "single source" where applicable. Also check whether the vendor's current wording distinguishes a free and a professional edition (cost, scale and the built-in Moshier mode depend on it).
 - [ ] **Step 4: Gaps.** List what the sources do not settle; each becomes either a drafted question for the owner to send to Astrodienst or an item in the record's "Open questions".
 
 ### Task 2: draft the record
@@ -68,15 +69,17 @@ The record has these sections, in order: **Status and disclaimer** (draft until 
 
 ### Task 3: the owner's decision
 
-- [ ] **Step 1:** present the options and the recommendation briefly and ask the owner L1 and L2 (the AskUserQuestion tool); do not decide for them. If the owner wants Astrodienst contacted first, hand over the drafted question and leave the record in draft with the task `In Progress` (the task cannot be completed without a decision).
-- [ ] **Step 2:** write the owner's answers into the record's **Decision** section (date, path, distribution channel, why, what follows: the obligations they now carry, for example publishing source under AGPL or buying the license before any store submission) and set the status to Decided.
+- [ ] **Step 1:** present the options and the recommendation briefly and ask the owner L2 (the AskUserQuestion tool), saying plainly that the channel is still open and REL-003 will reconfirm; do not decide for them. If the owner wants Astrodienst contacted first, hand over the drafted question and leave the record in draft with the task `In Progress`. If the owner cannot choose a path before the channel is known, the record can state the conditional recommendation, but criterion 1 ("which license path was chosen") would then be met only conditionally: that is the owner's call to accept or not (do not reinterpret the criterion silently); without that acceptance the task stays `In Progress`.
+- [ ] **Step 2:** write the owner's answer into the record's **Decision** section (date, path, why, the channel assumed or left to REL-003, what follows: the obligations they now carry, for example publishing source under AGPL or buying the license before any store submission) and set the status to Decided.
 
-### Task 4: verify, document, hand over
+### Task 4: verify, review, document, hand over
+
+If the owner has not decided L2 (Task 3), do **not** run Steps 3 to 5's completion edits: set the task file `Status` to `In Progress`, add a PROGRESS Current Task entry naming the open question (and the drafted Astrodienst question if one exists), and open the PR as a draft or do not open it. The steps below assume a decision.
 
 - [ ] **Step 1: Source check.** Re-read the record against its sources: every cost, term and obligation matches the cited page (re-fetch the two or three that matter most); no unsourced claim; no long quotation; the disclaimer is at the top; the links work (open each once). This replaces the test run for a documentation task; state in PROGRESS that there is no code and no command result.
-- [ ] **Step 2: Consumers.** Add the Notes to ZOD-REL-003 and ZOD-ABT-007 (the record path, the decision, and for ABT-007 the license text the chip must show), tick the two ZOD-FND-010 criteria with their evidence (the record path; the REL-003 Note), set `Status: Done (see Notes)`, and update `TASKS.md`.
-- [ ] **Step 3: PROGRESS.** Completed Tasks row (what was verified: sources re-read, dates), Technical Decisions row (L1, L2), the Blockers section (R-6 resolved or what remains open, for example "the Astrodienst answer"), Current Task, Next Recommended Task (re-evaluated), Git State.
-- [ ] **Step 4: Review.** One fresh reviewer reads the record against its sources and the task's criteria (the whole-branch review for a documentation task); fix findings.
+- [ ] **Step 2: Review.** One fresh reviewer reads the record against its sources and the task's criteria (the whole-branch review for a documentation task); fix the findings in the record.
+- [ ] **Step 3: Consumers** (after the review fixes, so the Notes cannot go stale). Add the Notes to ZOD-REL-003 (the record path, the decision, the channel left open to it) and ZOD-ABT-007 (the record path and the license text the Swiss Ephemeris chip must show), tick the two ZOD-FND-010 criteria with their evidence (the record path; the REL-003 Note), set `Status: Done (see Notes)`, and update `TASKS.md`.
+- [ ] **Step 4: PROGRESS.** Completed Tasks row (what was verified: sources re-read, dates; no code), Technical Decisions row (L1, L2), the Blockers section (add an R-6 entry, then mark it resolved or list what remains, for example "the Astrodienst answer"), Current Task, Next Recommended Task (re-evaluated), Git State.
 - [ ] **Step 5:** push `task/ZOD-FND-010-swiss-ephemeris-license-decision`, open the PR, then add the PR link in a follow-up docs commit.
 
 ## Acceptance mapping
@@ -84,7 +87,7 @@ The record has these sections, in order: **Status and disclaimer** (draft until 
 | Criterion | Proven by |
 |---|---|
 | A written decision record exists stating which license path was chosen and why | the record's Decision section, written from the owner's answers (Task 3), with the sources behind the reasons (Tasks 1–2, verified in Task 4 Step 1) |
-| The decision is referenced by ZOD-REL-003 before any store submission | the Note added to ZOD-REL-003 (Task 4 Step 2); ZOD-REL-003 depends on this task and cannot start without it |
+| The decision is referenced by ZOD-REL-003 before any store submission | the Note added to ZOD-REL-003 (Task 4 Step 3); ZOD-REL-003 depends on this task and cannot start without it |
 
 ## Risks and open items
 
@@ -95,4 +98,12 @@ The record has these sections, in order: **Status and disclaimer** (draft until 
 
 ## Plan review
 
-(pending)
+### Round 1 (comprehensive) — verdict: needs user decision (D1), answered
+
+0 Critical, 2 Important, 3 Minor, 1 needs-user-decision. The review ran with the dedicated `plan-reviewer` agent.
+
+- **D1 (product owner, 2026-11-19):** who decides the distribution channel. Answer: **ZOD-REL-003 owns it**; FND-010 treats it as an input and gives the license recommendation as a function of the channel. Consequence recorded in the plan: criterion 1 may be only conditionally met until REL-003, which is the owner's call to accept (Task 3 Step 1).
+- **I1 (applied):** Task 4 now says what happens when L2 is undecided (task `In Progress`, PROGRESS entry, draft or no PR, no completion edits).
+- **I2 (applied):** Task 4 reordered: source check, review and fixes, then the consumer Notes, status and PROGRESS.
+- **M1 (applied)** the Blockers entry for R-6 is new; **M2 (applied)** Task 1 Step 0 says what to do without web tools; **M3 (applied)** Task 1 Step 3 checks the free vs professional edition wording.
+- Open items: none.
