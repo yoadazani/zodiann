@@ -18,6 +18,7 @@ class WheelPainter extends CustomPainter {
     required this.surfaces,
     required this.zodiac,
     required this.glyphStyle,
+    required this.labelStyle,
     required this.textDirection,
     required this.layers,
   });
@@ -37,6 +38,9 @@ class WheelPainter extends CustomPainter {
   /// The glyph text role, handed to layers.
   final TextStyle glyphStyle;
 
+  /// The label text role, handed to layers.
+  final TextStyle labelStyle;
+
   /// The direction handed to layers (LTR, L-6).
   final TextDirection textDirection;
 
@@ -54,6 +58,7 @@ class WheelPainter extends CustomPainter {
       surfaces: surfaces,
       zodiac: zodiac,
       glyphStyle: glyphStyle,
+      labelStyle: labelStyle,
       textDirection: textDirection,
     );
     for (final layer in layers) {
@@ -68,6 +73,7 @@ class WheelPainter extends CustomPainter {
       oldDelegate.surfaces != surfaces ||
       oldDelegate.zodiac != zodiac ||
       oldDelegate.glyphStyle != glyphStyle ||
+      oldDelegate.labelStyle != labelStyle ||
       oldDelegate.textDirection != textDirection ||
       !listEquals(oldDelegate.layers, layers);
 }

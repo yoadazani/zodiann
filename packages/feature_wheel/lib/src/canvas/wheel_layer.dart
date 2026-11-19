@@ -17,6 +17,7 @@ final class WheelPaintContext {
     required this.surfaces,
     required this.zodiac,
     required this.glyphStyle,
+    required this.labelStyle,
     required this.textDirection,
   });
 
@@ -38,6 +39,11 @@ final class WheelPaintContext {
   /// The glyph text role (`ZodiannTextStyles.glyph`): the bundled symbol fonts,
   /// line height 1. A layer sets its own size and colour with `copyWith`.
   final TextStyle glyphStyle;
+
+  /// The label text role (`ZodiannTextStyles.micro`: the UI family for the
+  /// script, tabular figures). A layer sets its own size and colour with
+  /// `copyWith`.
+  final TextStyle labelStyle;
 
   /// The direction for any text a layer draws. Always `TextDirection.ltr`:
   /// the wheel never mirrors.

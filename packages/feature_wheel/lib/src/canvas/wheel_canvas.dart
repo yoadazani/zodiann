@@ -57,6 +57,9 @@ class WheelCanvas extends StatelessWidget {
               glyphStyle: Theme.of(context)
                   .extension<ZodiannTextStyles>()!
                   .glyph,
+              labelStyle: Theme.of(context)
+                  .extension<ZodiannTextStyles>()!
+                  .micro,
               textDirection: Directionality.of(context),
               layers: layers,
             ),

@@ -21,6 +21,9 @@ final class WheelProportions {
     required this.tickLengthDegree,
     required this.tickLengthFive,
     required this.tickLengthTen,
+    required this.tickStrokeDegree,
+    required this.tickStrokeFive,
+    required this.tickStrokeTen,
     required this.degreeNumberRadius,
     required this.degreeNumberFontSize,
     required this.signGlyphSize,
@@ -50,6 +53,9 @@ final class WheelProportions {
     tickLengthDegree: 5 / referenceRadius,
     tickLengthFive: 9 / referenceRadius,
     tickLengthTen: 14 / referenceRadius,
+    tickStrokeDegree: 0.8 / referenceRadius,
+    tickStrokeFive: 1 / referenceRadius,
+    tickStrokeTen: 1.2 / referenceRadius,
     degreeNumberRadius: (250 - 26) / referenceRadius,
     degreeNumberFontSize: 9.5 / referenceRadius,
     signGlyphSize: 21 / referenceRadius,
@@ -75,6 +81,9 @@ final class WheelProportions {
     tickLengthDegree: 5 / referenceRadius,
     tickLengthFive: 9 / referenceRadius,
     tickLengthTen: 14 / referenceRadius,
+    tickStrokeDegree: 0.8 / referenceRadius,
+    tickStrokeFive: 1 / referenceRadius,
+    tickStrokeTen: 1.2 / referenceRadius,
     degreeNumberRadius: (240 - 26) / referenceRadius,
     degreeNumberFontSize: 14 / referenceRadius,
     signGlyphSize: 30 / referenceRadius,
@@ -115,6 +124,15 @@ final class WheelProportions {
 
   /// Tick length for a 10° mark (14 units).
   final double tickLengthTen;
+
+  /// Stroke width of a 1° tick (0.8 units, `kit.css` `.wheel .tick`).
+  final double tickStrokeDegree;
+
+  /// Stroke width of a 5° tick (1 unit, `kit.css` `.wheel .tick.t5`).
+  final double tickStrokeFive;
+
+  /// Stroke width of a 10° tick (1.2 units, `kit.css` `.wheel .tick.t10`).
+  final double tickStrokeTen;
 
   /// Radius of the degree numbers' centres (10, 20 within the sign).
   ///
@@ -177,6 +195,9 @@ final class WheelProportions {
       other.tickLengthDegree == tickLengthDegree &&
       other.tickLengthFive == tickLengthFive &&
       other.tickLengthTen == tickLengthTen &&
+      other.tickStrokeDegree == tickStrokeDegree &&
+      other.tickStrokeFive == tickStrokeFive &&
+      other.tickStrokeTen == tickStrokeTen &&
       other.degreeNumberRadius == degreeNumberRadius &&
       other.degreeNumberFontSize == degreeNumberFontSize &&
       other.signGlyphSize == signGlyphSize &&
@@ -201,6 +222,9 @@ final class WheelProportions {
     tickLengthDegree,
     tickLengthFive,
     tickLengthTen,
+    tickStrokeDegree,
+    tickStrokeFive,
+    tickStrokeTen,
     degreeNumberRadius,
     degreeNumberFontSize,
     signGlyphSize,

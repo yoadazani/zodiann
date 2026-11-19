@@ -11,12 +11,14 @@ final class OrientationProbeLayer implements WheelLayer {
   final points = <Offset>[];
   final zodiacs = <ZodiacColors>[];
   final glyphStyles = <TextStyle>[];
+  final labelStyles = <TextStyle>[];
 
   @override
   void paint(WheelPaintContext context) {
     directions.add(context.textDirection);
     zodiacs.add(context.zodiac);
     glyphStyles.add(context.glyphStyle);
+    labelStyles.add(context.labelStyle);
     final point = context.geometry.offsetOf(
       90,
       1,

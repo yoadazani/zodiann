@@ -238,6 +238,26 @@ void main() {
           );
         },
       );
+      testWidgets(
+        '$name: layers get the micro role as the label style, with tabular '
+        'figures',
+        (tester) async {
+          final probe = OrientationProbeLayer();
+          await pumpWheelCanvas(
+            tester,
+            layers: [probe],
+            brightness: brightness,
+          );
+          expect(
+            probe.labelStyles.last,
+            theme.extension<ZodiannTextStyles>()!.micro,
+          );
+          expect(
+            probe.labelStyles.last.fontFeatures,
+            contains(const FontFeature.tabularFigures()),
+          );
+        },
+      );
     }
   });
 
@@ -249,6 +269,7 @@ void main() {
       TextDirection direction = TextDirection.ltr,
       ZodiacColors? zodiac,
       TextStyle? glyphStyle,
+      TextStyle? labelStyle,
       List<WheelLayer> layers = const [ProportionGridLayer()],
     }) => WheelPainter(
       proportions: proportions,
@@ -259,6 +280,9 @@ void main() {
       glyphStyle:
           glyphStyle ??
           ZodiannTheme.graphite.extension<ZodiannTextStyles>()!.glyph,
+      labelStyle:
+          labelStyle ??
+          ZodiannTheme.graphite.extension<ZodiannTextStyles>()!.micro,
       layers: layers,
     );
 
@@ -299,6 +323,11 @@ void main() {
         base.shouldRepaint(painter(glyphStyle: const TextStyle(fontSize: 99))),
         isTrue,
         reason: 'only the glyph style changed',
+      );
+      expect(
+        base.shouldRepaint(painter(labelStyle: const TextStyle(fontSize: 99))),
+        isTrue,
+        reason: 'only the label style changed',
       );
     });
 
