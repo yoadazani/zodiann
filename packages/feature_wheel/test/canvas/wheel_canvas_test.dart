@@ -208,18 +208,48 @@ void main() {
     }
   });
 
+  group('theme inputs for layers', () {
+    for (final (name, theme, brightness) in [
+      ('graphite', ZodiannTheme.graphite, Brightness.dark),
+      ('porcelain', ZodiannTheme.porcelain, Brightness.light),
+    ]) {
+      testWidgets(
+        '$name: layers get the theme zodiac colours and glyph style',
+        (tester) async {
+          final probe = OrientationProbeLayer();
+          await pumpWheelCanvas(
+            tester,
+            layers: [probe],
+            brightness: brightness,
+          );
+          expect(probe.zodiacs.last, theme.extension<ZodiacColors>());
+          expect(
+            probe.glyphStyles.last,
+            theme.extension<ZodiannTextStyles>()!.glyph,
+          );
+        },
+      );
+    }
+  });
+
   group('repaint', () {
     WheelPainter painter({
       WheelProportions proportions = WheelProportions.desktop,
       WheelState state = const WheelState(),
       ZodiannSurfaces? surfaces,
       TextDirection direction = TextDirection.ltr,
+      ZodiacColors? zodiac,
+      TextStyle? glyphStyle,
       List<WheelLayer> layers = const [ProportionGridLayer()],
     }) => WheelPainter(
       proportions: proportions,
       state: state,
       surfaces: surfaces ?? ZodiannTheme.graphite.extension<ZodiannSurfaces>()!,
       textDirection: direction,
+      zodiac: zodiac ?? ZodiannTheme.graphite.extension<ZodiacColors>()!,
+      glyphStyle:
+          glyphStyle ??
+          ZodiannTheme.graphite.extension<ZodiannTextStyles>()!.glyph,
       layers: layers,
     );
 
@@ -249,6 +279,18 @@ void main() {
       );
       expect(base.shouldRepaint(painter(direction: TextDirection.rtl)), isTrue);
       expect(base.shouldRepaint(painter(layers: const [])), isTrue);
+      expect(
+        base.shouldRepaint(
+          painter(zodiac: ZodiannTheme.porcelain.extension<ZodiacColors>()!),
+        ),
+        isTrue,
+        reason: 'only the zodiac colours changed',
+      );
+      expect(
+        base.shouldRepaint(painter(glyphStyle: const TextStyle(fontSize: 99))),
+        isTrue,
+        reason: 'only the glyph style changed',
+      );
     });
 
     testWidgets('switching dark to light repaints with the light colours', (

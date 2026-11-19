@@ -9,10 +9,14 @@ import 'package:shared_ui/shared_ui.dart';
 final class OrientationProbeLayer implements WheelLayer {
   final directions = <TextDirection>[];
   final points = <Offset>[];
+  final zodiacs = <ZodiacColors>[];
+  final glyphStyles = <TextStyle>[];
 
   @override
   void paint(WheelPaintContext context) {
     directions.add(context.textDirection);
+    zodiacs.add(context.zodiac);
+    glyphStyles.add(context.glyphStyle);
     final point = context.geometry.offsetOf(
       90,
       1,

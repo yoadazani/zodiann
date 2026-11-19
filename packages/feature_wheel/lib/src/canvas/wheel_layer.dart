@@ -1,7 +1,7 @@
 import 'dart:ui' show Canvas;
 
-import 'package:flutter/painting.dart' show TextDirection;
-import 'package:shared_ui/shared_ui.dart' show ZodiannSurfaces;
+import 'package:flutter/painting.dart' show TextDirection, TextStyle;
+import 'package:shared_ui/shared_ui.dart' show ZodiacColors, ZodiannSurfaces;
 
 import '../geometry/wheel_geometry.dart';
 import '../state/wheel_state.dart';
@@ -15,6 +15,8 @@ final class WheelPaintContext {
     required this.geometry,
     required this.state,
     required this.surfaces,
+    required this.zodiac,
+    required this.glyphStyle,
     required this.textDirection,
   });
 
@@ -29,6 +31,13 @@ final class WheelPaintContext {
 
   /// The theme's surface colours (ARCH-7: layers never hold colour literals).
   final ZodiannSurfaces surfaces;
+
+  /// The element colours and the sign tint opacity (MASTER §2.3).
+  final ZodiacColors zodiac;
+
+  /// The glyph text role (`ZodiannTextStyles.glyph`): the bundled symbol fonts,
+  /// line height 1. A layer sets its own size and colour with `copyWith`.
+  final TextStyle glyphStyle;
 
   /// The direction for any text a layer draws. Always `TextDirection.ltr`:
   /// the wheel never mirrors.

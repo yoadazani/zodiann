@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:material_ui/material_ui.dart' show Theme;
-import 'package:shared_ui/shared_ui.dart' show ZodiannSurfaces;
+import 'package:shared_ui/shared_ui.dart'
+    show ZodiacColors, ZodiannSurfaces, ZodiannTextStyles;
 
 import '../geometry/wheel_proportions.dart';
 import '../state/wheel_state.dart';
@@ -52,6 +53,10 @@ class WheelCanvas extends StatelessWidget {
               proportions: proportions,
               state: state,
               surfaces: Theme.of(context).extension<ZodiannSurfaces>()!,
+              zodiac: Theme.of(context).extension<ZodiacColors>()!,
+              glyphStyle: Theme.of(context)
+                  .extension<ZodiannTextStyles>()!
+                  .glyph,
               textDirection: Directionality.of(context),
               layers: layers,
             ),
