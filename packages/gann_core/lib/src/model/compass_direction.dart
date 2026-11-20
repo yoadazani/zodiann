@@ -1,3 +1,4 @@
+import 'dart:ui';
 /// The eight compass directions of a square cell seen from the centre
 /// (L-9's "north-west"; SQ-17, EX-2), in the order of the spiral angle.
 ///
