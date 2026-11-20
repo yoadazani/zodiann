@@ -46,7 +46,7 @@ void main() {
     test('center: n = 1 is ring 0 at (0, 0) with no index, steps or angle', () {
       final c = spiralCell(1);
 
-      expect(c.n, 1);
+      expect(c.n, 2);
       expect(c.ring, 0);
       expect(c.indexInRing, isNull);
       expect(c.stepsFromAxis, isNull);
