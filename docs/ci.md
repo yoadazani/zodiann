@@ -1,16 +1,16 @@
 # Continuous integration (ZOD-FND-004)
 
-Status: **in progress.** `Core` and `Lint` are verified on GitHub. `Full suite` fails on `ubuntu-latest` (section 6), so its runtime budget is not set yet. Plan: [`docs/plans/ZOD-FND-004-ci-pipeline.md`](plans/ZOD-FND-004-ci-pipeline.md).
+Status: **in progress** (final verification and code review outstanding). `Core`, `Lint` and `Full suite` all pass on GitHub; `Full suite` runs on `windows-latest` by owner decision after it failed two cases on `ubuntu-latest` (section 6). Plan: [`docs/plans/ZOD-FND-004-ci-pipeline.md`](plans/ZOD-FND-004-ci-pipeline.md).
 
 ## 1. What runs
 
-One workflow, `.github/workflows/ci.yml`, on `push` to `main` and `pull_request` targeting `main` (owner decision O4). Feature-branch pushes are verified through draft pull requests with base `main`; a PR with another base, or one that conflicts with `main`, gets no checks. All jobs run on `ubuntu-latest`, without containers (O1), and are independent so each reports on its own.
+One workflow, `.github/workflows/ci.yml`, on `push` to `main` and `pull_request` targeting `main` (owner decision O4). Feature-branch pushes are verified through draft pull requests with base `main`; a PR with another base, or one that conflicts with `main`, gets no checks. `Core` and `Lint` run on `ubuntu-latest`; `Full suite` runs on `windows-latest`, the platform its pixel-fidelity tests were calibrated on (O1, amended 2026-11-20). No containers. The jobs are independent so each reports on its own; `defaults.run.shell: bash` gives every step one syntax (Git Bash on Windows).
 
 | Check | Runs | Budget |
 |---|---|---|
 | `Core` | `dart analyze --fatal-warnings --fatal-infos packages/astro_core packages/gann_core`; `dart test` in those two packages (`melos exec --scope`); `dart test test/architecture` (ARCH-2 no-Flutter guard, L-8 key parity, and the other root guards) | 5 min: the sum of the three timed steps, setup excluded (a warning, never a failure) |
 | `Lint` | `melos run lint` (`l10n:check`, `icons:check`, `launcher:check`, `analyze`, `format:check`) | none |
-| `Full suite` | `melos run test` (every package; Flutter widget and pixel tests) | pending (section 6) |
+| `Full suite` | `melos run test` (every package; Flutter widget and pixel tests) | 4 min (240 s): 1.5 times the first green run's 144.0 s test step, rounded up to the next whole minute (O3). SDK install and workspace setup (about 2 min) are outside the timed step |
 
 Setup in each job: checkout; read the Flutter version from `.fvmrc`; install that SDK; export `MELOS_SDK_PATH` (Melos 8.10.1 prefers it over `sdkPath: .fvm/flutter_sdk`, which does not exist on a runner); `flutter pub get`; restore the tracked generated l10n files (`git checkout -- packages/shared_ui/lib/l10n`, because a root pub get deletes them); fail if `git status --porcelain` is not empty. Plain `dart pub get` cannot resolve the Flutter members, and `dart run melos bootstrap` needs Melos resolved first, so setup uses `flutter pub get`.
 
@@ -45,11 +45,12 @@ dart run tool/ci/timed.dart analyze-core -- dart analyze --fatal-warnings --fata
 |---|---|---|---|
 | Local Windows, `main` at `0599611` (`melos run test`) | n/a | n/a | 2 min 29 s, all passing |
 | Local clean clone of the task branch, pinned SDK | 8.4 + 18.2 + 12.9 s | 124.1 s | not run |
-| GitHub, PR #41, first run (`ubuntu-latest`) | 1 min 13 s (pass) | 1 min 23 s (pass) | 2 min 23 s (**fail**, section 6) |
+| GitHub, PR #41, first run, `Full suite` on `ubuntu-latest` | 1 min 13 s (pass) | 1 min 23 s (pass) | 2 min 23 s (**fail**, section 6) |
+| GitHub, PR #41, [run 44726200501](https://github.com/yoadazani/zodiann/actions/runs/44726200501), `Full suite` on `windows-latest` | job 44 s (pass); timed steps 1.5 + 11.7 + 8.4 s | job 59 s (pass); timed step 30.5 s | job 5 min 22 s (**pass**); timed step 144.0 s, the rest is SDK install (about 99 s) and setup (28 s) |
 
 ## 4. Guard test
 
-`test/architecture/ci_workflow_test.dart` pins the triggers, read-only permissions, the concurrency group, SHA pinning, the three job names, `ubuntu-latest`, timeouts, no `needs`, the `.fvmrc` / `MELOS_SDK_PATH` setup, the pub-get and l10n-restore order, and the core job's scope, strictness and budget. Mutation proof (each edit made the matching test fail and nothing else; then restored): remove `--fatal-warnings`; replace a SHA with a tag; add `paths-ignore`; rename `Core`; add `flutter test` to `core`; drop `gann_core` from the analyze line; `permissions: write-all`; remove a job's `timeout-minutes`; replace `flutter pub get` with `dart pub get`; remove `MELOS_SDK_PATH`; change a trigger to `branches: ['**']`; one `runs-on: windows-latest`; change the `t > 300` threshold (this one was first missed by a substring check and the assertion was tightened). Editing only the summary echo's `budget 300 s` text is not caught, because the warning line carries the same text.
+`test/architecture/ci_workflow_test.dart` pins the triggers, read-only permissions, the concurrency group, SHA pinning, the three job names, the runner per job (`ubuntu-latest` for Core and Lint, `windows-latest` for Full suite), the shared `bash` shell, the 240 s Full-suite budget, timeouts, no `needs`, the `.fvmrc` / `MELOS_SDK_PATH` setup, the pub-get and l10n-restore order, and the core job's scope, strictness and budget. Mutation proof (each edit made the matching test fail and nothing else; then restored): remove `--fatal-warnings`; replace a SHA with a tag; add `paths-ignore`; rename `Core`; add `flutter test` to `core`; drop `gann_core` from the analyze line; `permissions: write-all`; remove a job's `timeout-minutes`; replace `flutter pub get` with `dart pub get`; remove `MELOS_SDK_PATH`; change a trigger to `branches: ['**']`; `core` to `windows-latest`; `full` to `ubuntu-latest`; remove `defaults.run.shell`; change the Full-suite budget to 2400; change the `t > 300` threshold (this one was first missed by a substring check and the assertion was tightened). Editing only the summary echo's `budget 300 s` text is not caught, because the warning line carries the same text.
 
 ## 5. Negative scenarios on GitHub (draft PRs against `main`, closed unmerged, branches deleted)
 
@@ -61,9 +62,11 @@ dart run tool/ci/timed.dart analyze-core -- dart analyze --fatal-warnings --fata
 | Missing ARB key | `signAries` deleted from `app_he.arb` | `Core` failed at "Architecture guards (ARCH-2, L-8)" (`l10n_key_parity_test`: every language has exactly the template's keys); `Lint` failed at `l10n:check`; `Full suite` failed. [run](https://github.com/yoadazani/zodiann/actions/runs/44722886608) |
 | Analyzer warning in core | an unused local variable in `astro_core/lib` | `Core` failed at "Analyze the core packages" (`unused_local_variable`); `Lint` failed. [run](https://github.com/yoadazani/zodiann/actions/runs/44722901066) |
 
-## 6. Open: `Full suite` on Ubuntu
+## 6. Resolved by owner decision: `Full suite` on Windows (it failed two cases on Ubuntu)
 
-Two tests fail, both in `packages/feature_wheel/test/canvas/degree_scale_fidelity_test.dart`: "compact dark matches the Chrome reference" (mean 1.341, ceiling 1.15) and "compact light" (mean 1.749, ceiling 1.5). Everything else in the suite passed. The ceilings were calibrated on Windows (measured 0.75 and 0.98). The Linux measurements of the other checks equal the Windows ones for ticks and label radius (tick centroid 0.046, tick tip 0.5, label radius 0.765) and differ slightly for label centroids (compact dark 0.68 against 0.46; desktop 1.22 against 1.08); the desktop means (0.96, 1.26) are at or below the Windows values. This points to the small compact labels' text rasterisation, not to geometry. It has not been isolated by a label-only measurement. No tolerance, golden or hash was changed (owner decision O1). Options and the recommendation are in the task report.
+Decision (2026-11-20, option 1 of three): run `Full suite` on `windows-latest`, keep `Core` and `Lint` on `ubuntu-latest`, no Docker, no change to tolerances, goldens, hashes, geometry or tests, no skipped test. The first Windows run passed all three checks (section 3). The Ubuntu evidence follows as history.
+
+On `ubuntu-latest` two tests failed, both in `packages/feature_wheel/test/canvas/degree_scale_fidelity_test.dart`: "compact dark matches the Chrome reference" (mean 1.341, ceiling 1.15) and "compact light" (mean 1.749, ceiling 1.5). Everything else in the suite passed. The ceilings were calibrated on Windows (measured 0.75 and 0.98). The Linux measurements of the other checks equal the Windows ones for ticks and label radius (tick centroid 0.046, tick tip 0.5, label radius 0.765) and differ slightly for label centroids (compact dark 0.68 against 0.46; desktop 1.22 against 1.08); the desktop means (0.96, 1.26) are at or below the Windows values. This points to the small compact labels' text rasterisation, not to geometry. It has not been isolated by a label-only measurement. No tolerance, golden or hash was changed (owner decision O1). Options and the recommendation are in the task report.
 
 ## 7. Ruleset on `main` (owner decision O2)
 

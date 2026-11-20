@@ -50,6 +50,10 @@ void main() {
   });
 
   group('workflow', () {
+    test('every step shares one shell: bash (Git Bash on Windows)', () {
+      final defaults = _asMap(_asMap(workflow['defaults'])['run']);
+      expect(defaults['shell'], 'bash');
+    });
     test('permissions are read-only', () {
       expect(_asMap(workflow['permissions']), {'contents': 'read'});
     });
@@ -185,5 +189,14 @@ void main() {
     test('full runs melos run test', () {
       expect(_commands(_asMap(jobs['full'])), contains('melos run test'));
     });
+    test(
+      'full applies the 240 s runtime budget (O3: 1.5 x 144 s, rounded up)',
+      () {
+        expect(
+          _commands(_asMap(jobs['full'])),
+          matches(RegExp(r'full-suite --budget-seconds 240 --')),
+        );
+      },
+    );
   });
 }

@@ -18,6 +18,8 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
+# bash on both operating systems (Git Bash on windows-latest), so every step
+# below has one syntax.
 defaults:
   run:
     shell: bash
@@ -128,7 +130,7 @@ jobs:
           git checkout -- packages/shared_ui/lib/l10n
           test -z "$(git status --porcelain)" || { git status --short; exit 1; }
       - name: Full test suite
-        run: dart run tool/ci/timed.dart full-suite -- dart run melos run test
+        run: dart run tool/ci/timed.dart full-suite --budget-seconds 240 -- dart run melos run test
       - name: Show the timing
         if: always()
         run: test -f build/ci-timing.csv && cat build/ci-timing.csv || true
