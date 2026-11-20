@@ -1,0 +1,142 @@
+# ZOD-FND-004: the CI pipeline. Three independent checks, each required to
+# merge into main (ruleset, see docs/ci.md): Core, Lint and Full suite.
+# Core and Lint run on ubuntu-latest; Full suite runs on windows-latest, the
+# platform its pixel-fidelity tests were calibrated on (owner decision, docs/ci.md).
+# Pinned: actions by commit SHA (tag in the comment), Flutter by .fvmrc.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# bash on both operating systems (Git Bash on windows-latest), so every step
+# below has one syntax.
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  core:
+    name: Core
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read the pinned Flutter version
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+      - name: Point Melos at the pinned SDK
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
+      - name: Resolve the workspace
+        run: |
+          flutter pub get
+          git checkout -- packages/shared_ui/lib/l10n
+          test -z "$(git status --porcelain)" || { git status --short; exit 1; }
+      - name: Analyze the core packages
+        run: dart run tool/ci/timed.dart analyze-core -- dart analyze --fatal-warnings --fatal-infos packages/astro_core packages/gann_core
+      - name: Test the core packages
+        run: dart run tool/ci/timed.dart core-tests -- dart run melos exec --scope="astro_core,gann_core" "dart test"
+      - name: Architecture guards (ARCH-2, L-8)
+        run: dart run tool/ci/timed.dart architecture -- dart test test/architecture
+      - name: Core runtime budget
+        if: always()
+        run: |
+          test -f build/ci-timing.csv || exit 0
+          total=$(awk -F, '{s+=$2} END {printf "%.1f", s}' build/ci-timing.csv)
+          echo "Core timed steps: ${total} s (budget 300 s)" >> "$GITHUB_STEP_SUMMARY"
+          awk -v t="$total" 'BEGIN { if (t > 300) printf "::warning title=CI runtime budget::core took %s s, budget 300 s\n", t }'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ci-timing-core
+          path: build/ci-timing.csv
+          if-no-files-found: ignore
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read the pinned Flutter version
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+      - name: Point Melos at the pinned SDK
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
+      - name: Resolve the workspace
+        run: |
+          flutter pub get
+          git checkout -- packages/shared_ui/lib/l10n
+          test -z "$(git status --porcelain)" || { git status --short; exit 1; }
+      - name: Lint
+        run: dart run tool/ci/timed.dart lint -- dart run melos run lint
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ci-timing-lint
+          path: build/ci-timing.csv
+          if-no-files-found: ignore
+
+  full:
+    name: Full suite
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Read the pinned Flutter version
+        id: fvm
+        run: echo "version=$(jq -r .flutter .fvmrc)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ steps.fvm.outputs.version }}
+          channel: stable
+          cache: true
+      - name: Point Melos at the pinned SDK
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
+      - name: Resolve the workspace
+        run: |
+          flutter pub get
+          git checkout -- packages/shared_ui/lib/l10n
+          test -z "$(git status --porcelain)" || { git status --short; exit 1; }
+      - name: Full test suite
+        run: dart run tool/ci/timed.dart full-suite --budget-seconds 240 -- dart run melos run test
+      - name: Show the timing
+        if: always()
+        run: test -f build/ci-timing.csv && cat build/ci-timing.csv || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: ci-timing-full
+          path: build/ci-timing.csv
+          if-no-files-found: ignore
