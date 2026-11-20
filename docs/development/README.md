@@ -13,7 +13,7 @@ This directory holds the complete, implementation-ready task breakdown for the Z
 docs/development/
 ├── README.md                              ← you are here
 ├── TASKS.md                               ← master index
-├── foundations-architecture/              ← 14 tasks
+├── foundations-architecture/              ← 15 tasks
 ├── computation-engine/                    ← 14 tasks
 ├── shared-ui-design-system/               ← 15 tasks
 ├── navigation/                            ← 5 tasks
@@ -29,7 +29,7 @@ docs/development/
 └── optional-extensions/                   ← 12 tasks  (Scope: Optional Extension — all other folders are MVP)
 ```
 
-Each folder groups tasks by development area, matching §4 of the original single-file `TASKS.md` one-for-one. MVP tasks (193) and the Optional Extension tasks (12, all in `optional-extensions/`) are never mixed in the same folder.
+Each folder groups tasks by development area, matching §4 of the original single-file `TASKS.md` one-for-one. MVP tasks (194) and the Optional Extension tasks (12, all in `optional-extensions/`) are never mixed in the same folder.
 
 ## What each folder contains
 
@@ -134,7 +134,7 @@ Each task file's **Metadata** block has a `Status` field. When you start, pause,
 2. Update the matching row in `TASKS.md`'s task index table (§4) to the same status, so the master index stays accurate without anyone having to open every file to check progress.
 3. **The individual task file is always the source of truth for the task's details** (description, acceptance criteria, dependencies). `TASKS.md` only mirrors ID / title / priority / status for at-a-glance scanning and linking — if you need to change scope, acceptance criteria, or dependencies, edit the task file, not `TASKS.md`.
 
-All 205 tasks currently start at `Not Started` — none of this plan has been implemented yet.
+All 206 tasks currently start at `Not Started` — none of this plan has been implemented yet.
 
 ## Design reference — unchanged, still the source of truth
 
