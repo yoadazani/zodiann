@@ -199,4 +199,79 @@ void main() {
       },
     );
   });
+
+  group('a failing step cannot be neutralised (acceptance criterion 1)', () {
+    Iterable<(String, Map<String, Object?>)> allSteps() => [
+      for (final entry in jobs.entries)
+        for (final step in _steps(_asMap(entry.value))) (entry.key, step),
+    ];
+
+    bool isTimed(Map<String, Object?> step) =>
+        ((step['run'] as String?) ?? '').contains('tool/ci/timed.dart');
+
+    test('no job or step is conditional except `always()` reporting', () {
+      for (final entry in jobs.entries) {
+        expect(
+          _asMap(entry.value).containsKey('if'),
+          isFalse,
+          reason: '${entry.key}: a conditional job would not report',
+        );
+      }
+      for (final (job, step) in allSteps()) {
+        if (step.containsKey('if')) {
+          expect(step['if'], 'always()', reason: '$job: ${step['name']}');
+          expect(
+            isTimed(step),
+            isFalse,
+            reason: '$job: timed steps run always',
+          );
+        }
+      }
+    });
+
+    test('no step ignores its own failure', () {
+      for (final (job, step) in allSteps()) {
+        expect(
+          step.containsKey('continue-on-error'),
+          isFalse,
+          reason: '$job: ${step['name']}',
+        );
+        if (isTimed(step)) {
+          expect(step['run'], isNot(contains('|| true')), reason: job);
+          expect(step['run'], isNot(contains('||')), reason: job);
+        }
+      }
+    });
+
+    test('every timed step wraps exactly one command and nothing follows', () {
+      for (final (job, step) in allSteps().where((s) => isTimed(s.$2))) {
+        final lines = (step['run']! as String)
+            .trim()
+            .split('\n')
+            .where((line) => line.trim().isNotEmpty);
+
+        expect(lines, hasLength(1), reason: '$job: ${step['name']}');
+        expect(lines.single, isNot(contains(';')), reason: job);
+        expect(lines.single, isNot(contains('&&')), reason: job);
+      }
+    });
+
+    test('Flutter comes from .fvmrc through the flutter-action input', () {
+      for (final entry in jobs.entries) {
+        final action = _steps(_asMap(entry.value)).singleWhere(
+          (step) =>
+              (step['uses'] as String?)?.startsWith(
+                'subosito/flutter-action@',
+              ) ??
+              false,
+        );
+
+        expect(
+          _asMap(action['with'])['flutter-version'],
+          r'${{ steps.fvm.outputs.version }}',
+          reason: entry.key,
+        );
+      }
+    });
+  });
 }

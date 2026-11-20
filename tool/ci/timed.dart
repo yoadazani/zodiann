@@ -47,37 +47,51 @@ Future<void> main(List<String> args) async {
   if (executable == null) {
     stderr.writeln('${command.first}: command not found');
   } else {
-    final process = await Process.start(
-      executable,
-      command.sublist(1),
-      mode: ProcessStartMode.inheritStdio,
-    );
-    exitCode = await process.exitCode;
+    try {
+      final process = await Process.start(
+        executable,
+        command.sublist(1),
+        mode: ProcessStartMode.inheritStdio,
+      );
+      exitCode = await process.exitCode;
+    } on ProcessException catch (error) {
+      // Found but not startable (not executable, not a program): 126, as a
+      // shell reports it.
+      stderr.writeln('${command.first}: cannot execute: ${error.message}');
+      exitCode = 126;
+    }
   }
   stopwatch.stop();
   final elapsed = stopwatch.elapsed;
 
   final csvPath = environment['CI_TIMING_FILE'] ?? 'build/ci-timing.csv';
-  _append(csvPath, formatCsvRow(label, elapsed, exitCode));
+  _record(csvPath, () => formatCsvRow(label, elapsed, exitCode));
   final summaryPath = environment['GITHUB_STEP_SUMMARY'];
   if (summaryPath != null && summaryPath.isNotEmpty) {
-    final file = File(summaryPath);
-    final hasHeader =
-        file.existsSync() &&
-        file.readAsLinesSync().any((line) => line.startsWith('| Step |'));
-    _append(
-      summaryPath,
-      (hasHeader ? '' : summaryHeader) +
-          formatSummaryRow(label, elapsed, exitCode),
-    );
+    _record(summaryPath, () {
+      final file = File(summaryPath);
+      final hasHeader =
+          file.existsSync() &&
+          file.readAsLinesSync().any((line) => line.startsWith('| Step |'));
+      return (hasHeader ? '' : summaryHeader) +
+          formatSummaryRow(label, elapsed, exitCode);
+    });
   }
   final warning = budgetWarning(label, elapsed, budgetSeconds);
   if (warning != null) stdout.writeln(warning);
   exit(exitCode);
 }
 
-void _append(String path, String text) {
-  final file = File(path);
-  file.parent.createSync(recursive: true);
-  file.writeAsStringSync(text, mode: FileMode.append);
+/// Appends [text] to [path]. Recording is best effort: a failure to write is
+/// reported on stderr and never changes the wrapped command's exit code.
+void _record(String path, String Function() text) {
+  try {
+    final file = File(path);
+    file.parent.createSync(recursive: true);
+    file.writeAsStringSync(text(), mode: FileMode.append);
+  } on FileSystemException catch (error) {
+    stderr.writeln(
+      'tool/ci/timed.dart: could not write $path: ${error.message}',
+    );
+  }
 }

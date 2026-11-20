@@ -118,6 +118,33 @@ void main() {
       expect(result.exitCode, 127);
     });
 
+    test(
+      'exits 126 and still records a row when the file cannot be started',
+      () {
+        final plain = script('not_a_program.txt', 'just text');
+
+        final result = runTimed(['broken', '--', plain.path], env);
+
+        expect(result.exitCode, 126, reason: '${result.stderr}');
+        expect(
+          File(csv).readAsLinesSync().single,
+          matches(RegExp(r'^broken,\d+\.\d,126$')),
+        );
+      },
+    );
+
+    test(
+      'keeps the command exit code when the timing file cannot be written',
+      () {
+        final unwritable = {...env, 'CI_TIMING_FILE': temp.path};
+
+        final result = runTimed(['ok', '--', dart(), '--version'], unwritable);
+
+        expect(result.exitCode, 0, reason: '${result.stderr}');
+        expect(result.stderr, contains('could not write'));
+      },
+    );
+
     test('exits 2 without a command separator', () {
       expect(runTimed(['no-separator'], env).exitCode, 2);
       expect(runTimed(['no-command', '--'], env).exitCode, 2);

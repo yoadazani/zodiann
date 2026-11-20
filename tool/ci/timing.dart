@@ -64,7 +64,7 @@ String? resolveExecutable(
   for (final directory in directories) {
     final base = directory.isEmpty
         ? name
-        : '$directory${Platform.pathSeparator}$name';
+        : '$directory${isWindows ? r'\' : '/'}$name';
     for (final extension in extensions) {
       if (File('$base$extension').existsSync()) return '$base$extension';
     }
