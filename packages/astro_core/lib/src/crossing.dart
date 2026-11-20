@@ -50,3 +50,7 @@ final class Crossing {
   String toString() =>
       'Crossing(${body.name} $degree° at $timeUtc${retrograde ? ' ℞' : ''})';
 }
+
+void unusedLocalProof() {
+  final unused = 1;
+}
