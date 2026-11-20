@@ -30,7 +30,15 @@
 5. **Line endings.** Local working trees are CRLF (`core.autocrlf=true`, no `.gitattributes`); a Linux checkout is LF and a Windows runner defaults to `autocrlf=true`. Expected: text-hash and generated-output guards (launcher manifest hashes, `l10n:check` snapshot, icon generator, `format:check`) give the same verdict on the runner as locally (these guards also run in the required `Core` and `Lint` jobs); a difference is classified as a line-ending difference, not a pixel difference or a defect (Task 4).
 6. **Core-only analyze scope drifting.** A new core package added later would be unguarded. Expected: the guard test fails if `pure_dart_test.dart`'s `corePackages` and the workflow's core package list differ (Task 2).
 
-## Open decisions (need the product owner before the step that uses them)
+## Owner decisions (approved 2026-11-20; these override the recommendations below where they differ)
+
+- **O1:** all three jobs on `ubuntu-latest`, no Docker. Pinned Flutter from `.fvmrc`. On a verified Ubuntu-specific failure: find the exact cause, never change hashes, goldens or tolerances, report evidence and the smallest fix, consider `windows-latest` only if the cause is genuinely platform.
+- **O2:** create the ruleset on `main` with exactly: require a pull request; require `Core`, `Lint`, `Full suite`; block force pushes; **no bypass actors**. Nothing broader (the plan's earlier "block deletion" is dropped). Verify repository and ruleset configuration before creating it.
+- **O3:** `Core` budget 5 minutes; `Full suite` budget 1.5 times the first successful run rounded up to the next whole minute; actual durations and overruns are reported.
+- **O4:** triggers are `push` to `main` and `pull_request` targeting `main` only (not every branch push). The guard test therefore asserts `push.branches == [main]` and `pull_request.branches == [main]`, and still forbids `paths`, `paths-ignore` and `branches-ignore`. Feature branches are verified through draft PRs.
+- **O5:** no `.gitattributes` unless CI shows a real line-ending failure; then identify the files, explain the cause, present `* text=auto eol=lf`, and wait for explicit approval.
+
+## Original open decisions and recommendations (history)
 
 - **O1: Runner OS for the full suite.** Recommended: run `core` and `lint` on `ubuntu-latest`, and the `full` job on `ubuntu-latest` if Task 4 proves it green with no test changes, otherwise on `windows-latest` (the OS the tests were calibrated on). The plan makes this an observed result, not a guess. Matrix on both is not recommended (double runtime, no extra gate).
 - **O2: Repository ruleset on `main` (outward-facing setting).** The branch is currently unprotected, so acceptance criterion 1 ("a PR with a failing core test is blocked from merge") cannot be true without it. Recommended: a ruleset requiring the checks `Core`, `Lint` and `Full suite` to pass, blocking force pushes and deletion of `main`, requiring a PR, **with no bypass actor** so the criterion is provable; the owner can still change it later. Alternative: bypass for the repository admin (an emergency path, but a red PR can then be merged by the owner). Task 6 does not start until the owner picks.
@@ -86,7 +94,7 @@ Android/iOS builds, release signing, store uploads (ZOD-REL-*); the Gate 1 requi
 - Produces: three jobs whose `name:` values are exactly `Core`, `Lint`, `Full suite` (job ids `core`, `lint`, `full`). These names are the ruleset's required contexts in Task 6.
 
 - [ ] **Step 1: Write the failing guard test** `test/architecture/ci_workflow_test.dart`, loading `.github/workflows/ci.yml` and asserting:
-  - triggers include `push` and `pull_request`, and neither has `paths` / `paths-ignore` / `branches-ignore` (Review Focus 2);
+  - triggers are exactly `push` with `branches: [main]` and `pull_request` with `branches: [main]` (O4), and neither has `paths` / `paths-ignore` / `branches-ignore` (Review Focus 2);
   - workflow `permissions` is exactly `{contents: read}`;
   - jobs `core`, `lint`, `full` exist with `name` `Core`, `Lint`, `Full suite`, each with a numeric `timeout-minutes`;
   - every `uses:` is `owner/repo@<40-hex SHA>` (Review Focus: pinning), ignoring `./` local actions;
@@ -99,7 +107,7 @@ Android/iOS builds, release signing, store uploads (ZOD-REL-*); the Gate 1 requi
 - [ ] **Step 2: Run to verify it fails.** `dart test test/architecture/ci_workflow_test.dart`. Expected: FAIL, workflow file not found.
 - [ ] **Step 3: Resolve the action SHAs.** For `actions/checkout`, `subosito/flutter-action` and `actions/upload-artifact`, take the latest release tag at least two weeks old and resolve its commit with `gh api repos/<owner>/<repo>/git/ref/tags/<tag> --jq .object.sha` (dereference annotated tags with `git/tags/<sha>`). Record tag and SHA in `docs/ci.md`.
 - [ ] **Step 4: Write `.github/workflows/ci.yml`.**
-  - `on: push` (all branches) and `pull_request`; `concurrency` group `ci-${{ github.ref }}` with `cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}`; `permissions: contents: read`; `defaults.run.shell: bash` so Windows and Linux share syntax.
+  - `on: push` (`branches: [main]`) and `pull_request` (`branches: [main]`); `concurrency` group `ci-${{ github.ref }}` with `cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}`; `permissions: contents: read`; `defaults.run.shell: bash` so Windows and Linux share syntax.
   - Common setup steps in each job: checkout (`persist-credentials: false`); read the version (`jq -r .flutter .fvmrc` into a step output); `subosito/flutter-action` with that version, `channel: stable`, pub cache enabled; export `MELOS_SDK_PATH=$FLUTTER_ROOT` (`$GITHUB_ENV`); `dart run melos bootstrap` at the root (the PROGRESS convention: plain `dart pub get` cannot resolve the Flutter members), then `git checkout -- packages/shared_ui/lib/l10n` (a root pub get deletes the tracked generated l10n files, PROGRESS line 249), then a check that `git status --porcelain` is empty before any test runs; print `dart --version` and `flutter --version`.
   - `core` (`Core`, `ubuntu-latest`, `timeout-minutes: 15`): `dart run tool/ci/timed.dart analyze-core --budget-seconds 300 -- dart analyze --fatal-warnings --fatal-infos packages/astro_core packages/gann_core`; `... core-tests -- dart run melos exec --scope="astro_core,gann_core" "dart test"` (use the existing `melos exec` filter style; if `--scope` cannot express two packages in this Melos, use two `--scope` flags or `--dir-exists` plus a package-name filter, whichever the local run in Task 3 proves); `... architecture -- dart test test/architecture`; upload `build/ci-timing.csv` as artifact `ci-timing-core`.
   - `lint` (`Lint`, `ubuntu-latest`, `timeout-minutes: 20`): `timed.dart lint -- dart run melos run lint`; upload timing artifact.
@@ -136,7 +144,7 @@ Each proof is a branch off the task branch that is pushed, opened as a draft PR,
 
 ### Task 6: Make the checks block a merge (after the owner decides O2)
 
-- [ ] **Step 1:** Show the owner the exact ruleset (target `refs/heads/main`; required status checks `Core`, `Lint`, `Full suite`; require a pull request; block force pushes and deletion; bypass per O2) and wait for approval. Do not create it before.
+- [ ] **Step 1:** Show the owner the exact ruleset (target `refs/heads/main`; required status checks `Core`, `Lint`, `Full suite`; require a pull request; block force pushes; no bypass actors, per the approved O2) and compare it with the approved settings. The owner approved creation on 2026-11-20, so no further wait; verify the repository (`yoadazani/zodiann`, public, default branch `main`) and that no ruleset exists yet before creating it.
 - [ ] **Step 2:** Create it with `gh api -X POST repos/yoadazani/zodiann/rulesets --input <json file in the scratchpad>`; read it back with `gh api repos/yoadazani/zodiann/rulesets` and save the returned JSON (without tokens) to `docs/ci.md` as the recorded configuration.
 - [ ] **Step 3 (prove criterion 1 end to end):** reopen a proof PR from Task 5 step 1 (or push it again), confirm `gh pr view --json mergeStateStatus,mergeable` reports it blocked and `gh pr merge` is refused; close it without merging. Also confirm this task's own PR can be merged once green.
 
