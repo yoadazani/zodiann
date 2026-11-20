@@ -74,9 +74,11 @@ void main() {
       );
       final label = '${reference.body} ${reference.utc}';
       // ignore: avoid_print
-      print('$label: ${result.longitude} vs ${reference.longitudeDegrees} '
-          '(off $off arcsec, flags ${result.returnFlags}, '
-          'error "${result.error}")');
+      print(
+        '$label: ${result.longitude} vs ${reference.longitudeDegrees} '
+        '(off $off arcsec, flags ${result.returnFlags}, '
+        'error "${result.error}")',
+      );
       expect(off, lessThanOrEqualTo(toleranceArcseconds), reason: label);
       expect(result.usedSwissEphemerisFiles, isTrue, reason: label);
     }

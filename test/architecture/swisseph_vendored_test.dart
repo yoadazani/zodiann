@@ -17,9 +17,10 @@ Map<String, Object?> _loadManifest() =>
     jsonDecode(File(_manifestPath).readAsStringSync()) as Map<String, Object?>;
 
 /// The git blob id of [bytes]: sha1 of `blob <length>\0` followed by the bytes.
-String gitBlobSha1(List<int> bytes) => sha1
-    .convert([...utf8.encode('blob ${bytes.length}\u0000'), ...bytes])
-    .toString();
+String gitBlobSha1(List<int> bytes) => sha1.convert([
+  ...utf8.encode('blob ${bytes.length}\u0000'),
+  ...bytes,
+]).toString();
 
 void main() {
   late Map<String, Object?> manifest;
@@ -27,8 +28,7 @@ void main() {
 
   setUpAll(() {
     manifest = _loadManifest();
-    files = (manifest['files']! as List<Object?>)
-        .cast<Map<String, Object?>>();
+    files = (manifest['files']! as List<Object?>).cast<Map<String, Object?>>();
   });
 
   test('the manifest names the upstream tag and commit', () {
@@ -39,26 +39,28 @@ void main() {
     );
   });
 
-  test('every manifest file exists and matches its upstream blob and SHA-256',
-      () {
-    expect(files, isNotEmpty);
-    for (final entry in files) {
-      final path = entry['path']! as String;
-      final file = File(path);
-      expect(file.existsSync(), isTrue, reason: '$path is missing');
-      final bytes = file.readAsBytesSync();
-      expect(
-        gitBlobSha1(bytes),
-        entry['blobSha1'],
-        reason: '$path differs from the upstream git blob (line endings?)',
-      );
-      expect(
-        sha256.convert(bytes).toString(),
-        entry['sha256'],
-        reason: '$path differs from its recorded SHA-256',
-      );
-    }
-  });
+  test(
+    'every manifest file exists and matches its upstream blob and SHA-256',
+    () {
+      expect(files, isNotEmpty);
+      for (final entry in files) {
+        final path = entry['path']! as String;
+        final file = File(path);
+        expect(file.existsSync(), isTrue, reason: '$path is missing');
+        final bytes = file.readAsBytesSync();
+        expect(
+          gitBlobSha1(bytes),
+          entry['blobSha1'],
+          reason: '$path differs from the upstream git blob (line endings?)',
+        );
+        expect(
+          sha256.convert(bytes).toString(),
+          entry['sha256'],
+          reason: '$path differs from its recorded SHA-256',
+        );
+      }
+    },
+  );
 
   test('no file under upstream/ is missing from the manifest', () {
     final listed = {for (final e in files) e['path']! as String};
@@ -71,7 +73,12 @@ void main() {
   });
 
   test('the licence and copyright files are present', () {
-    for (final name in ['LICENSE', 'LICENSE.TXT', 'agpl-3.0.txt', 'readme.md']) {
+    for (final name in [
+      'LICENSE',
+      'LICENSE.TXT',
+      'agpl-3.0.txt',
+      'readme.md',
+    ]) {
       expect(
         File('$_upstreamDir/$name').existsSync(),
         isTrue,

@@ -7,11 +7,20 @@
 /// Tolerance in arcseconds (the T-EPH-1 bound).
 const double toleranceArcseconds = 1.0;
 
-const referenceLongitudes = <({String body, String utc, double longitudeDegrees})>[
-  (body: 'sun', utc: '1900-06-15T06:00:00Z', longitudeDegrees: 83.6521158),
-  (body: 'sun', utc: '2000-01-01T12:00:00Z', longitudeDegrees: 280.3689092),
-  (body: 'sun', utc: '2026-11-20T00:00:00Z', longitudeDegrees: 237.6706436),
-  (body: 'moon', utc: '1900-06-15T06:00:00Z', longitudeDegrees: 290.3111397),
-  (body: 'moon', utc: '2000-01-01T12:00:00Z', longitudeDegrees: 223.323786),
-  (body: 'moon', utc: '2026-11-20T00:00:00Z', longitudeDegrees: 356.7762899),
-];
+const referenceLongitudes =
+    <({String body, String utc, double longitudeDegrees})>[
+      (body: 'sun', utc: '1900-06-15T06:00:00Z', longitudeDegrees: 83.6521158),
+      (body: 'sun', utc: '2000-01-01T12:00:00Z', longitudeDegrees: 280.3689092),
+      (body: 'sun', utc: '2026-11-20T00:00:00Z', longitudeDegrees: 237.6706436),
+      (
+        body: 'moon',
+        utc: '1900-06-15T06:00:00Z',
+        longitudeDegrees: 290.3111397,
+      ),
+      (body: 'moon', utc: '2000-01-01T12:00:00Z', longitudeDegrees: 223.323786),
+      (
+        body: 'moon',
+        utc: '2026-11-20T00:00:00Z',
+        longitudeDegrees: 356.7762899,
+      ),
+    ];

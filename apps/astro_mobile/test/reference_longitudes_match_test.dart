@@ -10,13 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '../integration_test/reference_longitudes.dart';
 
 void main() {
-  final fixture =
-      jsonDecode(
-            File(
-              '../../packages/ephemeris_swiss/test/fixtures/reference_longitudes.json',
-            ).readAsStringSync(),
-          )
-          as Map<String, Object?>;
+  final fixture = jsonDecode(
+    File(
+      '../../packages/ephemeris_swiss/test/fixtures/reference_longitudes.json',
+    ).readAsStringSync(),
+  ) as Map<String, Object?>;
   final entries = (fixture['entries']! as List<Object?>)
       .cast<Map<String, Object?>>();
 
@@ -30,7 +28,11 @@ void main() {
 
   test('every const entry equals the fixture entry (body, utc, longitude)', () {
     for (var i = 0; i < entries.length; i++) {
-      expect(referenceLongitudes[i].body, entries[i]['body'], reason: 'entry $i');
+      expect(
+        referenceLongitudes[i].body,
+        entries[i]['body'],
+        reason: 'entry $i',
+      );
       expect(referenceLongitudes[i].utc, entries[i]['utc'], reason: 'entry $i');
       expect(
         referenceLongitudes[i].longitudeDegrees,
