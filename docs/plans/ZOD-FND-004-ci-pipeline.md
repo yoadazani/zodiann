@@ -27,7 +27,7 @@
 2. **A required check that never reports blocks every merge.** Expected: no `paths`/`paths-ignore` filters, job names stable and equal to the ruleset's contexts, push and PR both produce the three checks (Tasks 2, 6).
 3. **Melos may not honour `MELOS_SDK_PATH`** (the root `sdkPath: .fvm/flutter_sdk` is a symlink to a user path that does not exist on a runner). Expected: `melos run test` resolves the pinned SDK on a clean runner; a wrong SDK fails loudly instead of silently using another Dart (Task 3, Task 4).
 4. **A timer that swallows the wrapped command's failure.** Expected: `tool/ci/timed.dart` exits with the wrapped command's exit code, including signals and "command not found" (Task 1).
-5. **Line endings.** Local working trees are CRLF (`core.autocrlf=true`, no `.gitattributes`); a Linux checkout is LF and a Windows runner defaults to `autocrlf=true`. Expected: text-hash and generated-output guards (launcher manifest hashes, `l10n:check` snapshot, icon generator, `format:check`) give the same verdict on the runner as locally; a difference is classified as a line-ending difference, not a pixel difference or a defect (Task 4).
+5. **Line endings.** Local working trees are CRLF (`core.autocrlf=true`, no `.gitattributes`); a Linux checkout is LF and a Windows runner defaults to `autocrlf=true`. Expected: text-hash and generated-output guards (launcher manifest hashes, `l10n:check` snapshot, icon generator, `format:check`) give the same verdict on the runner as locally (these guards also run in the required `Core` and `Lint` jobs); a difference is classified as a line-ending difference, not a pixel difference or a defect (Task 4).
 6. **Core-only analyze scope drifting.** A new core package added later would be unguarded. Expected: the guard test fails if `pure_dart_test.dart`'s `corePackages` and the workflow's core package list differ (Task 2).
 
 ## Open decisions (need the product owner before the step that uses them)
@@ -35,8 +35,8 @@
 - **O1: Runner OS for the full suite.** Recommended: run `core` and `lint` on `ubuntu-latest`, and the `full` job on `ubuntu-latest` if Task 4 proves it green with no test changes, otherwise on `windows-latest` (the OS the tests were calibrated on). The plan makes this an observed result, not a guess. Matrix on both is not recommended (double runtime, no extra gate).
 - **O2: Repository ruleset on `main` (outward-facing setting).** The branch is currently unprotected, so acceptance criterion 1 ("a PR with a failing core test is blocked from merge") cannot be true without it. Recommended: a ruleset requiring the checks `Core`, `Lint` and `Full suite` to pass, blocking force pushes and deletion of `main`, requiring a PR, **with no bypass actor** so the criterion is provable; the owner can still change it later. Alternative: bypass for the repository admin (an emergency path, but a red PR can then be merged by the owner). Task 6 does not start until the owner picks.
 - **O3: Runtime budget.** The timer warns (non-failing) when a step exceeds a budget. Recommended initial budgets: core 5 min, full suite 1.5 times the first green run rounded up to the minute (set from Task 4's measurement and recorded in `docs/ci.md`). The owner can tighten it later.
-- **O5: `.gitattributes` (repository-wide line endings), only if Task 4 shows a line-ending failure.** Recommended then: `* text=auto eol=lf` with binary assets marked `binary`. It changes how every file is checked out, so it is never added without the owner's approval; hashes, tolerances and tests are never altered to compensate.
 - **O4: Trigger scope.** The task says "every push/PR", so the plan triggers on `push` (all branches) and `pull_request`. A PR branch therefore runs twice (one run per event, same checks). Alternative: `push` on `main` only plus `pull_request`, halving the runs with no loss of gating. Recommended: the literal reading (all pushes); Actions on a public repository is free.
+- **O5: `.gitattributes` (repository-wide line endings), only if Task 4 shows a line-ending failure.** Recommended then: `* text=auto eol=lf` with binary assets marked `binary`. It changes how every file is checked out, so it is never added without the owner's approval; hashes, tolerances and tests are never altered to compensate.
 
 ## Out of scope
 
@@ -64,7 +64,7 @@ Android/iOS builds, release signing, store uploads (ZOD-REL-*); the Gate 1 requi
   - `String formatCsvRow(String label, Duration elapsed, int exitCode)` → `label,<seconds with one decimal>,<exitCode>\n`.
   - `String formatSummaryRow(String label, Duration elapsed, int exitCode)` → a Markdown table row `| label | 12.3 s | ok |` (`ok` when 0, `FAILED (n)` otherwise).
   - `String? budgetWarning(String label, Duration elapsed, int? budgetSeconds)` → `::warning title=CI runtime budget::<label> took <s> s, budget <n> s` when `elapsed` exceeds a non-null budget, else `null`.
-- Produces (`timed.dart`): a `main(List<String> args)` that runs the command after `--` with inherited stdio, measures wall time, appends `formatCsvRow` to the file named by `CI_TIMING_FILE` (default `build/ci-timing.csv`, parent directory created), appends `formatSummaryRow` to the file named by `GITHUB_STEP_SUMMARY` when set (writing the table header first if the file has none from this tool), prints `budgetWarning` when non-null, and exits with the command's exit code (127 when the executable cannot be found, 2 on a usage error). The executable is resolved on `PATH` first (honouring `PATHEXT` on Windows, so `dart.bat` / `flutter.bat` shims resolve); only a `.bat` / `.cmd` resolution runs through the shell. A missing executable returns 127 from the resolver itself and does not depend on `ProcessException` (under `runInShell`, Windows reports it as exit 1).
+- Produces (`timed.dart`): a `main(List<String> args)` that runs the command after `--` with inherited stdio, measures wall time, appends `formatCsvRow` to the file named by `CI_TIMING_FILE` (default `build/ci-timing.csv`, parent directory created), appends `formatSummaryRow` to the file named by `GITHUB_STEP_SUMMARY` when set (writing the table header first if the file has none from this tool), prints `budgetWarning` when non-null, and exits with the command's exit code (127 when the executable cannot be found, 2 on a usage error). The executable is resolved on `PATH` first (honouring `PATHEXT` on Windows, so `dart.bat` / `flutter.bat` shims resolve); only a `.bat` / `.cmd` resolution runs through the shell, with any argument containing a space or a double quote wrapped in double quotes (the Windows-only `.bat` test passes an argument with a space and asserts it arrives as one argument). On GitHub each step has its own `GITHUB_STEP_SUMMARY` file, so the header rule yields one table per step. A missing executable returns 127 from the resolver itself and does not depend on `ProcessException` (under `runInShell`, Windows reports it as exit 1).
 
 - [ ] **Step 1: Write the failing tests** in `test/tool/ci_timing_test.dart`:
   - `formatCsvRow('core', Duration(milliseconds: 12345), 0)` equals `'core,12.3,0\n'`.
@@ -79,7 +79,7 @@ Android/iOS builds, release signing, store uploads (ZOD-REL-*); the Gate 1 requi
 
 ### Task 2: The workflow and its guard test
 
-**Files:** Create `.github/workflows/ci.yml`, `test/architecture/ci_workflow_test.dart`; Modify root `pubspec.yaml` / `pubspec.lock` (add `yaml: ^<the version at pubspec.lock line 764>` under `dev_dependencies`, then `dart run melos bootstrap`, then `git checkout -- packages/shared_ui/lib/l10n`; commit with the guard test).
+**Files:** Create `.github/workflows/ci.yml`, `test/architecture/ci_workflow_test.dart`; Modify root `pubspec.yaml` / `pubspec.lock` (add `yaml: ^<the `version:` of the `yaml:` entry in `pubspec.lock`>` under `dev_dependencies`, then `dart run melos bootstrap`, then `git checkout -- packages/shared_ui/lib/l10n`; commit with the guard test).
 
 **Interfaces:**
 - Consumes: `Task 1` `tool/ci/timed.dart` CLI; `pure_dart_test.dart`'s `corePackages = ['astro_core', 'gann_core']`.
@@ -121,7 +121,7 @@ Android/iOS builds, release signing, store uploads (ZOD-REL-*); the Gate 1 requi
 ### Task 4: First runs on GitHub; resolve the runner question (O1)
 
 - [ ] **Step 1:** Push the branch (`git push -u origin task/ZOD-FND-004-ci-pipeline`) and open a **draft** PR into `main` (`gh pr create --draft`). Watch with `gh run list --branch <branch> --limit 4` and `gh run view <id>`; the first push also tests that the token's `workflow` scope can push a workflow file.
-- [ ] **Step 2:** Expected: `Core` and `Lint` green on `ubuntu-latest`. If `Full suite` fails on Linux, read only the failing excerpts (`gh run view --log-failed`), classify each failure as a pixel/font difference, a line-ending or text-hash difference (Linux checks out LF; a Windows runner defaults to `autocrlf=true`), or a real defect. A real defect gets a test-first fix. A line-ending or text-hash difference never gets an altered hash, tolerance or test: present `.gitattributes` to the owner as O5 and wait. A pixel/font difference does not get a loosened tolerance: switch the `full` job to `windows-latest`, push, and record the evidence and the decision (O1) in PROGRESS Technical Decisions and `docs/ci.md`.
+- [ ] **Step 2:** Expected: `Core` and `Lint` green on `ubuntu-latest`. If any of `Core`, `Lint` or `Full suite` fails on Linux, read only the failing excerpts (`gh run view --log-failed`), classify each failure as a pixel/font difference, a line-ending or text-hash difference (Linux checks out LF; a Windows runner defaults to `autocrlf=true`), or a real defect. A real defect gets a test-first fix. A line-ending or text-hash difference never gets an altered hash, tolerance or test: present `.gitattributes` to the owner as O5 and wait. A pixel/font difference does not get a loosened tolerance: switch the `full` job to `windows-latest`, push, and record the evidence and the decision (O1) in PROGRESS Technical Decisions and `docs/ci.md`.
 - [ ] **Step 3:** Once all three are green, record each job's duration and the full suite's wall time (from the timing artifact and `gh run view`). Set the O3 `--budget-seconds` for the full job to 1.5 times the full-suite time rounded up to the minute; re-run the guard test; commit `chore(ZOD-FND-004): set the full-suite runtime budget`.
 
 ### Task 5: Prove the three blocking criteria with throwaway branches
@@ -155,7 +155,7 @@ Each proof is a branch off the task branch that is pushed, opened as a draft PR,
 - **Spec coverage:** all four Implementation Details bullets and three Acceptance Criteria map to tasks: run `melos run test` on every push/PR (Tasks 2, 4); fast core job separate from the full suite (Task 2); ARB key failure (core `architecture` and `lint`, proved in Task 5 step 3); core analyzer failure (Task 2, proved in Task 5 step 4); failing core test blocks merge (Tasks 5 and 6); UI import fails CI (Task 5 step 2); runtime tracked (Task 1, Task 4 step 3, `docs/ci.md`). The task-file note (CI needs the pinned Flutter SDK) is handled by the version read and `MELOS_SDK_PATH`.
 - **Names:** job ids `core`/`lint`/`full`, names `Core`/`Lint`/`Full suite`, files `tool/ci/timed.dart`, `tool/ci/timing.dart` are used identically across tasks.
 - **Proportion:** the only new code is a small timer and two tests; the rest is workflow configuration, observation on GitHub and documentation.
-- **Known uncertainties, stated not hidden:** Linux behaviour of pixel tests (O1, Task 4); `MELOS_SDK_PATH` support (Task 3 step 4); the `melos exec` filter form for two packages (Task 3 step 1); the latest-but-two-weeks-old action tags (Task 2 step 3).
+- **Known uncertainties, stated not hidden:** Linux behaviour of pixel tests (O1, Task 4); `MELOS_SDK_PATH` support (Task 3 step 2); line endings in the text-hash guards (Review Focus 5, Task 4 step 2); the `melos exec` filter form for two packages (Task 3 step 1); the latest-but-two-weeks-old action tags (Task 2 step 3).
 
 ## Plan review
 
@@ -180,4 +180,15 @@ Open items: O1 to O5 for the owner (O5 only if Task 4 shows a line-ending failur
 
 ### Round 2 (focused on the revision)
 
-*(pending)*
+Verdict: approve after corrections. Round-1 findings I1 to I3 and M1 to M5 were checked as correctly applied. No Critical findings; no new user decision.
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| I4 | Important | the line-ending classification covered only `Full suite`, but the text-hash guards also run in the required `Core` and `Lint` jobs | Applied: Task 4 Step 2 now covers any of the three jobs; Review Focus 5 says so |
+| M6 | Minor | "pubspec.lock line 764" is the key, not the version | Applied |
+| M7 | Minor | known-uncertainties list pointed at the wrong Task 3 step and omitted line endings | Applied |
+| M8 | Minor | each GitHub step has its own summary file | Applied (stated in Task 1) |
+| M9 | Minor | argument quoting on the `.bat` path unspecified | Applied (rule plus a Windows-only test with a spaced argument) |
+| M10 | Minor | O5 listed before O4 | Applied: reordered; the round-2 record filled in |
+
+Open items: O1 to O5 for the owner. The two-round limit for this cycle is used; nothing is unresolved.
