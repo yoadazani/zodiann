@@ -72,7 +72,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 | ZOD-FND-001 | [Set up the Melos monorepo workspace](foundations-architecture/ZOD-FND-001-set-up-the-melos-monorepo-workspace.md) | Critical | Done |
 | ZOD-FND-002 | [Define the `EphemerisPort` interface contract](foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md) | Critical | Done |
 | ZOD-FND-003 | [Spike: Swiss Ephemeris FFI binding on Android and iOS](foundations-architecture/ZOD-FND-003-spike-swiss-ephemeris-ffi-binding-on-android-and-ios.md) | Critical | Not Started |
-| ZOD-FND-004 | [Set up the CI pipeline](foundations-architecture/ZOD-FND-004-set-up-the-ci-pipeline.md) | High | Not Started |
+| ZOD-FND-004 | [Set up the CI pipeline](foundations-architecture/ZOD-FND-004-set-up-the-ci-pipeline.md) | High | Done |
 | ZOD-FND-005 | [Flutter app shell bootstrap (`apps/astro_mobile`)](foundations-architecture/ZOD-FND-005-flutter-app-shell-bootstrap-apps-astro-mobile.md) | Critical | Done (iOS build/runtime verification outstanding) |
 | ZOD-FND-006 | [Local storage infrastructure: `shared_preferences` + SQLite (drift) schema v1](foundations-architecture/ZOD-FND-006-local-storage-infrastructure-shared-preferences-sqlite-drift-schema-v1.md) | High | Not Started |
 | ZOD-FND-007 | [Bundle offline fonts and verify no network dependency](foundations-architecture/ZOD-FND-007-bundle-offline-fonts-and-verify-no-network-dependency.md) | Medium | Done |
