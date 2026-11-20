@@ -56,7 +56,10 @@ void main() {
 
     test('false when the library reported a warning', () {
       expect(
-        result(seflgSwieph | seflgSpeed, 'file not found').usedSwissEphemerisFiles,
+        result(
+          seflgSwieph | seflgSpeed,
+          'file not found',
+        ).usedSwissEphemerisFiles,
         isFalse,
       );
     });

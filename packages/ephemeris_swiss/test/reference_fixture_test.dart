@@ -8,9 +8,9 @@ import 'package:test/test.dart';
 /// app asset: the integration test uses a Dart const copy, which a host test
 /// in astro_mobile keeps equal to this file.
 void main() {
-  final fixture =
-      jsonDecode(File('test/fixtures/reference_longitudes.json').readAsStringSync())
-          as Map<String, Object?>;
+  final fixture = jsonDecode(
+    File('test/fixtures/reference_longitudes.json').readAsStringSync(),
+  ) as Map<String, Object?>;
   final entries = (fixture['entries']! as List<Object?>)
       .cast<Map<String, Object?>>();
 
