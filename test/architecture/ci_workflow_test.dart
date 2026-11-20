@@ -87,10 +87,14 @@ void main() {
       expect(_asMap(jobs['full'])['name'], 'Full suite');
     });
 
-    test('every job runs on ubuntu-latest with a timeout (O1)', () {
+    test('core and lint run on ubuntu-latest, the full suite on windows-latest, all with a timeout (O1)', () {
       for (final entry in jobs.entries) {
         final job = _asMap(entry.value);
-        expect(job['runs-on'], 'ubuntu-latest', reason: entry.key);
+        expect(
+          job['runs-on'],
+          entry.key == 'full' ? 'windows-latest' : 'ubuntu-latest',
+          reason: entry.key,
+        );
         expect(job['timeout-minutes'], isA<int>(), reason: entry.key);
       }
     });

@@ -1,5 +1,7 @@
 # ZOD-FND-004: the CI pipeline. Three independent checks, each required to
 # merge into main (ruleset, see docs/ci.md): Core, Lint and Full suite.
+# Core and Lint run on ubuntu-latest; Full suite runs on windows-latest, the
+# platform its pixel-fidelity tests were calibrated on (owner decision, docs/ci.md).
 # Pinned: actions by commit SHA (tag in the comment), Flutter by .fvmrc.
 name: CI
 
@@ -38,7 +40,9 @@ jobs:
           channel: stable
           cache: true
       - name: Point Melos at the pinned SDK
-        run: echo "MELOS_SDK_PATH=$(dirname "$(dirname "$(command -v flutter)")")" >> "$GITHUB_ENV"
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
       - name: Resolve the workspace
         run: |
           flutter pub get
@@ -81,7 +85,9 @@ jobs:
           channel: stable
           cache: true
       - name: Point Melos at the pinned SDK
-        run: echo "MELOS_SDK_PATH=$(dirname "$(dirname "$(command -v flutter)")")" >> "$GITHUB_ENV"
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
       - name: Resolve the workspace
         run: |
           flutter pub get
@@ -98,7 +104,7 @@ jobs:
 
   full:
     name: Full suite
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -113,7 +119,9 @@ jobs:
           channel: stable
           cache: true
       - name: Point Melos at the pinned SDK
-        run: echo "MELOS_SDK_PATH=$(dirname "$(dirname "$(command -v flutter)")")" >> "$GITHUB_ENV"
+        run: |
+          sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          echo "MELOS_SDK_PATH=$(cygpath -m "$sdk" 2>/dev/null || echo "$sdk")" >> "$GITHUB_ENV"
       - name: Resolve the workspace
         run: |
           flutter pub get
