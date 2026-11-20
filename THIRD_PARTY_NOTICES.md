@@ -20,9 +20,9 @@
 
 Whether a built app actually carries these notices (for example through Flutter's license registry) is `Unverified` until a build exists (ZOD-ABT-007, ZOD-REL-002).
 
-## Reserved: Swiss Ephemeris
+## Swiss Ephemeris
 
-**Not yet part of this repository** (ZOD-FND-003 vendors it). When it is added, its original license and copyright files and notices must be kept unchanged. The vendor's notice (read 2026-11-20) offers the "GNU Affero General Public License (AGPL)" or a Swiss Ephemeris Professional License, requires its copyright and notice to be preserved on all copies, forbids using the authors' or Astrodienst's names to promote software that uses it, and names no AGPL version (an open question for Astrodienst). The data files' license is also an open question. This section is to be completed by ZOD-FND-003 and ZOD-ABT-007.
+**Vendored by ZOD-FND-003 on 2026-11-20, unmodified:** tag `v2.10.3bfinal` of https://github.com/aloistr/swisseph (commit `f4dcd18e8005dde95fd8a8d2312ed12f9accd1b0`), under `native/swisseph/upstream/` with its original `LICENSE`, `LICENSE.TXT`, `agpl-3.0.txt` and `readme.md`, plus the data files `sepl_18.se1` and `semo_18.se1` in `packages/ephemeris_swiss/assets/ephe/`. Its original license and copyright files and notices are kept unchanged and are checked on every test run. The generated Dart bindings `packages/ephemeris_swiss/lib/src/ffi/swisseph_bindings.g.dart` are derived from its `swephexp.h`. Only the Android build is verified so far; no build containing it has been given to anyone. The vendor's notice (read 2026-11-20) offers the "GNU Affero General Public License (AGPL)" or a Swiss Ephemeris Professional License, requires its copyright and notice to be preserved on all copies, forbids using the authors' or Astrodienst's names to promote software that uses it, and names no AGPL version (an open question for Astrodienst). The data files' license is also an open question. The About-screen text is ZOD-ABT-007's.
 
 ## `Unverified` components
 

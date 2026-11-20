@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** In Progress (Android half verified; iOS half pending: see Completion notes)
 - **Scope:** MVP
 
 ## Description
@@ -46,6 +46,17 @@ No direct design reference applies — native build spike.
 ## Notes
 
 - **From ZOD-FND-015 (2026-11-20):** when this task vendors the Swiss Ephemeris source (and any data files), it must preserve the original Swiss Ephemeris license and copyright files and notices unchanged, and record the exact upstream version and where it came from, so [ZOD-FND-015](ZOD-FND-015-apply-the-agpl-decision-to-the-repository.md)'s inventory and source policy can cover it. ZOD-FND-015 is recommended before this task adds Swiss Ephemeris to the repository (licensing decision: `docs/decisions/ZOD-FND-010-swiss-ephemeris-license.md`). Scope and criteria of this task are unchanged.
+
+## Completion notes
+
+*Written 2026-11-20 on branch `task/ZOD-FND-003-swiss-ephemeris-ffi-spike-android`. The owner split this task: the Android half was implemented and verified locally on Windows; the iOS half stays pending because macOS access is unavailable and no spending is allowed (no paid macOS runner, no paid CI, no Mac purchase). **The task is not complete and its four criteria stay unchecked until a real iOS computation is verified.** Verification commands, results and the commit they cover are in `docs/PROGRESS.md` (Verification); the findings and the iOS checklist are in [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md); the plan is [`docs/plans/ZOD-FND-003-swiss-ephemeris-ffi-spike-android.md`](../../plans/ZOD-FND-003-swiss-ephemeris-ffi-spike-android.md).*
+
+1. **Criterion 1 (a single FFI call returns a correct longitude on both Android and iOS): Android verified, iOS open.** On the `Pixel_9_Pro_API_35` x86_64 emulator, Sun and Moon at three UT instants are within 0.03 to 0.24 arcseconds of JPL Horizons, with the Swiss Ephemeris flag set and no warning; an empty-directory control falls back to Moshier. arm64-v8a and armeabi-v7a were built and alignment-checked but not executed. iOS: not attempted.
+2. **Criterion 2 (data files packaged and readable from the app sandbox on both platforms): Android verified, iOS open.** The `.se1` files are in the APK under `flutter_assets/packages/ephemeris_swiss/assets/ephe/` and are read from the app's files directory. iOS: not attempted.
+3. **Criterion 3 (findings written up for the agent picking up ZOD-EPH-002): written for Android; incomplete.** The findings document covers the Android build, gotchas, measurements and what EPH-002 must know. The iOS sections are an explicit checklist, not results.
+4. **Criterion 4 (native assets versus CMake/Xcode decision recorded): provisional.** Native assets were chosen on the Android evidence; the decision is confirmed or reversed by the iOS half (condition stated in the findings, section 5).
+
+**Remaining to close this task:** the iOS checklist in the findings, section 8. Every task that lists this one under Dependencies (ZOD-EPH-002, ZOD-FND-011, ZOD-NFR-011, ZOD-REL-002) stays blocked meanwhile.
 
 ---
 

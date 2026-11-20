@@ -1,0 +1,64 @@
+/// Pure-Dart pieces of the Swiss Ephemeris binding: the Julian day, the body
+/// and flag constants, and the result type. Nothing here imports `dart:ffi`,
+/// so host tests never touch the native library.
+library;
+
+/// `SE_SUN` in `swephexp.h`.
+const int seSun = 0;
+
+/// `SE_MOON` in `swephexp.h`.
+const int seMoon = 1;
+
+/// `SEFLG_SWIEPH`: use the Swiss Ephemeris data files.
+const int seflgSwieph = 2;
+
+/// `SEFLG_MOSEPH`: the built-in Moshier ephemeris. `swe_calc_ut` falls back
+/// to it, with a warning, when a data file cannot be read.
+const int seflgMoseph = 4;
+
+/// `SEFLG_SPEED`: also return the speed.
+const int seflgSpeed = 256;
+
+/// The Julian day number of the UTC instant [utc] (the `tjd_ut` argument of
+/// `swe_calc_ut`), on the proleptic Gregorian calendar.
+///
+/// Throws [ArgumentError] if [utc] is not UTC.
+double julianDayUt(DateTime utc) {
+  if (!utc.isUtc) {
+    throw ArgumentError.value(utc, 'utc', 'must be a UTC DateTime');
+  }
+  const unixEpochJulianDay = 2440587.5;
+  const microsecondsPerDay = 86400000000;
+  return utc.microsecondsSinceEpoch / microsecondsPerDay + unixEpochJulianDay;
+}
+
+/// One `swe_calc_ut` result.
+final class SwissCalcResult {
+  const SwissCalcResult({
+    required this.longitude,
+    required this.speed,
+    required this.returnFlags,
+    required this.error,
+  });
+
+  /// Ecliptic longitude in degrees (`xx[0]`).
+  final double longitude;
+
+  /// Longitude speed in degrees per day (`xx[3]`).
+  final double speed;
+
+  /// The flag word `swe_calc_ut` returned.
+  final int returnFlags;
+
+  /// The library's `serr` text; empty when there was no warning.
+  final String error;
+
+  /// True only when the calculation really used the Swiss Ephemeris data
+  /// files: the Swiss Ephemeris flag is set, the Moshier flag is not, and the
+  /// library gave no warning. A longitude alone does not show this, because
+  /// the Moshier fallback is close to the right value.
+  bool get usedSwissEphemerisFiles =>
+      returnFlags & seflgSwieph != 0 &&
+      returnFlags & seflgMoseph == 0 &&
+      error.isEmpty;
+}

@@ -1,0 +1,55 @@
+{
+  "source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api)",
+  "retrievedOn": "2026-11-20",
+  "quantity": "31 (Observer ecliptic longitude): per the Horizons manual, IAU76/80 ecliptic-of-date longitude of the apparent position with light-time, gravitational deflection and stellar aberration",
+  "referenceFrameNote": "The manual does not state outright whether the equinox of date is mean or true; ZOD-FND-003 Task 4 checks the Swiss Ephemeris result against these values and records the finding.",
+  "queryParameters": {
+    "COMMAND": {
+      "sun": "10",
+      "moon": "301"
+    },
+    "CENTER": "500@399",
+    "EPHEM_TYPE": "OBSERVER",
+    "QUANTITIES": "31",
+    "TLIST_TYPE": "JD",
+    "TLIST": "2415185.75 2451545 2461364.5",
+    "TIME_TYPE": "UT",
+    "ANG_FORMAT": "DEG",
+    "EXTRA_PREC": "YES",
+    "CSV_FORMAT": "NO",
+    "OBJ_DATA": "NO"
+  },
+  "toleranceArcseconds": 1,
+  "entries": [
+    {
+      "body": "sun",
+      "utc": "1900-06-15T06:00:00Z",
+      "longitudeDegrees": 83.6521158
+    },
+    {
+      "body": "sun",
+      "utc": "2000-01-01T12:00:00Z",
+      "longitudeDegrees": 280.3689092
+    },
+    {
+      "body": "sun",
+      "utc": "2026-11-20T00:00:00Z",
+      "longitudeDegrees": 237.6706436
+    },
+    {
+      "body": "moon",
+      "utc": "1900-06-15T06:00:00Z",
+      "longitudeDegrees": 290.3111397
+    },
+    {
+      "body": "moon",
+      "utc": "2000-01-01T12:00:00Z",
+      "longitudeDegrees": 223.323786
+    },
+    {
+      "body": "moon",
+      "utc": "2026-11-20T00:00:00Z",
+      "longitudeDegrees": 356.7762899
+    }
+  ]
+}
