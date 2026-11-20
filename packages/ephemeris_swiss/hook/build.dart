@@ -44,7 +44,9 @@ Future<void> main(List<String> args) async {
     await builder.run(
       input: input,
       output: output,
-      logger: Logger('swisseph')
+      // The root logger: a named logger cannot change its level unless
+      // `hierarchicalLoggingEnabled` is set.
+      logger: Logger('')
         ..level = Level.INFO
         ..onRecord.listen((record) => print(record.message)),
     );
