@@ -1,6 +1,6 @@
 # Continuous integration (ZOD-FND-004)
 
-Status: **implemented and verified; draft [PR #41](https://github.com/yoadazani/zodiann/pull/41) open, not merged.** `Core`, `Lint` and `Full suite` all pass on GitHub; `Full suite` runs on `windows-latest` by owner decision after it failed two cases on `ubuntu-latest` (section 6). Plan: [`docs/plans/ZOD-FND-004-ci-pipeline.md`](plans/ZOD-FND-004-ci-pipeline.md).
+Status: **implemented and verified; [PR #41](https://github.com/yoadazani/zodiann/pull/41) merged as `b042b8d` (2026-11-20).** `Core`, `Lint` and `Full suite` all pass on GitHub; `Full suite` runs on `windows-latest` by owner decision after it failed two cases on `ubuntu-latest` (section 6). Plan: [`docs/plans/ZOD-FND-004-ci-pipeline.md`](plans/ZOD-FND-004-ci-pipeline.md).
 
 ## 1. What runs
 
@@ -49,6 +49,7 @@ dart run tool/ci/timed.dart analyze-core -- dart analyze --fatal-warnings --fata
 | Local clean clone of the task branch, pinned SDK | 8.4 + 18.2 + 12.9 s | 124.1 s | not run |
 | GitHub, PR #41, first run, `Full suite` on `ubuntu-latest` | 1 min 13 s (pass) | 1 min 23 s (pass) | 2 min 23 s (**fail**, section 6) |
 | GitHub, PR #41, [run 44728342176](https://github.com/yoadazani/zodiann/actions/runs/44728342176) at `ce8aa00` (the reviewed head), `Full suite` on `windows-latest` | job 45 s (pass); timed steps 1.5 + 11.5 + 8.8 s | job 1 min 8 s (pass); timed step 45.7 s | job 4 min 29 s (**pass**); timed step 119.3 s, under the 240 s budget (no warning) |
+| GitHub, push to `main` after the merge, [run 44731049475](https://github.com/yoadazani/zodiann/actions/runs/44731049475) at `b042b8d` | pass | pass | job 5 min 13 s (**pass**); timed step 144.6 s, under the 240 s budget |
 | GitHub, PR #41, [run 44727158369](https://github.com/yoadazani/zodiann/actions/runs/44727158369) at `d1de352` | job 45 s (pass) | job 1 min 11 s (pass) | job 4 min 9 s (**pass**) |
 | GitHub, PR #41, [run 44726200501](https://github.com/yoadazani/zodiann/actions/runs/44726200501), `Full suite` on `windows-latest` (the first green run; the budget is taken from it) | job 44 s (pass); timed steps 1.5 + 11.7 + 8.4 s | job 59 s (pass); timed step 30.5 s | job 5 min 22 s (**pass**); timed step 144.0 s, the rest is SDK install (about 99 s) and setup (28 s) |
 
@@ -77,7 +78,7 @@ On `ubuntu-latest` two tests failed, both in `packages/feature_wheel/test/canvas
 
 Created 2026-11-20 with `gh api -X POST repos/yoadazani/zodiann/rulesets`, id `27719587`, named `main protection`, enforcement `active`, target `refs/heads/main`, **no bypass actors**, exactly three rules: `non_fast_forward`; `pull_request` (required approving reviews 0, a sole owner cannot approve their own PR; no code-owner, last-push, stale-review or thread rule); `required_status_checks` with `Core`, `Lint`, `Full suite` (not strict). No deletion, update, linear-history or signature rule. Read-back diff against the posted JSON: the same rules and parameters; GitHub added defaults that were not set: `allowed_merge_methods` (merge, squash, rebase), `require_extra_approval_for_unattributed_changes: true`, `required_reviewers: []`, `do_not_enforce_on_create: false`. The required checks carry no `integration_id`, so a commit status with one of those names from any source that can write statuses would also satisfy a check; pinning the GitHub Actions app is possible hardening and was not part of the approved O2. Before creation: no ruleset existed and `branches/main/protection` returned 404.
 
-Blocking proof: on the proof PR with a failing core test, `mergeStateStatus` was `BLOCKED`; `gh pr merge --merge` was refused ("base branch policy prohibits the merge") and `gh pr merge --merge --admin` was refused ("2 of 3 required status checks are failing"); the PR stayed open until it was closed unmerged. The same result was observed again on the final configuration (section 5, the "final configuration" row). The task's own PR (#41) is a draft and was not merged.
+Blocking proof: on the proof PR with a failing core test, `mergeStateStatus` was `BLOCKED`; `gh pr merge --merge` was refused ("base branch policy prohibits the merge") and `gh pr merge --merge --admin` was refused ("2 of 3 required status checks are failing"); the PR stayed open until it was closed unmerged. The same result was observed again on the final configuration (section 5, the "final configuration" row). The task's own PR (#41) was marked ready and merged after its three checks passed (merge commit `b042b8d`).
 
 ## 8. Not covered
 
