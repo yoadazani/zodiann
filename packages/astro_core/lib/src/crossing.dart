@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'ephemeris/body.dart';
 
 /// A degree crossing: the moment a body's longitude equals a whole degree
