@@ -13,9 +13,11 @@ dependencies:
   # ZOD-FND-003 (owner decision D5, 2026-11-20): a regular dependency, because
   # Flutter bundles a package's assets (the Swiss Ephemeris data files) only
   # for regular dependencies; the build hook then also builds libswisseph for
-  # Android. The release app therefore contains the library and the spike data
-  # subset (1800 to 2400) until ZOD-FND-011 and ZOD-EPH-002 decide the final
-  # range. The app is not distributed.
+  # Android. A release APK therefore contains the spike data subset (1800 to
+  # 2400, +1.66 MB per ABI) until ZOD-FND-011 decides the final range; it
+  # contains libswisseph only once app code reaches the bindings (measured:
+  # the release build drops unreferenced native assets). The app is not
+  # distributed.
   ephemeris_swiss:
     path: ../../packages/ephemeris_swiss
   flutter:
