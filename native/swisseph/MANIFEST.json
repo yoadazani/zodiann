@@ -1,0 +1,141 @@
+{
+  "upstreamTag": "v2.10.3bfinal",
+  "upstreamCommit": "f4dcd18e8005dde95fd8a8d2312ed12f9accd1b0",
+  "files": [
+    {
+      "path": "native/swisseph/upstream/swedate.c",
+      "blobSha1": "b31d7274201e7000e3978f3ade3d12eb23a45922",
+      "sha256": "6790e989a003cb6422080d9aecf3c6567a25030f5b5647fd749e5b16422cfac7"
+    },
+    {
+      "path": "native/swisseph/upstream/swehouse.c",
+      "blobSha1": "1c5bbd3f16892df1a4e55c398ed8d1900fda3871",
+      "sha256": "bb17029e5fc2318885bcb8bfba72af3b7cd2d6437b4013195e953e35dd06c254"
+    },
+    {
+      "path": "native/swisseph/upstream/swejpl.c",
+      "blobSha1": "6eb5dcb053b49ed00ed23119d0bb7b4e4c342617",
+      "sha256": "fcbf71ceb85cdff5e59438d4f72acb19d67363a6d8ab0ba59ceafe95d1c1fef3"
+    },
+    {
+      "path": "native/swisseph/upstream/swemmoon.c",
+      "blobSha1": "dcddb1dff66877c9880e0ee526dad307d755adb5",
+      "sha256": "d268760a942971471a8164d0753769caead9f39743589204966f7307675ef278"
+    },
+    {
+      "path": "native/swisseph/upstream/swemplan.c",
+      "blobSha1": "f0ec8efab0b407cdbe8f0cf693e65b0a295e0e4e",
+      "sha256": "d13502ca7b92e3e32317b67ba7f012d92fabd1d358c3394c094d5515a3567caa"
+    },
+    {
+      "path": "native/swisseph/upstream/sweph.c",
+      "blobSha1": "350c605cce7252e8536352a70f6a4adb696bdf0b",
+      "sha256": "b172aad375f3a3327bf7d0090ffafc8b777363211e8d7b0ed18e4821939444f2"
+    },
+    {
+      "path": "native/swisseph/upstream/swephlib.c",
+      "blobSha1": "2ccfdbb2679aeb57c4280c07e3c6ced94a1bae37",
+      "sha256": "19a30e5310498249edb9c1915ddc8f8a5bc9b59f74f90f34f281b174ea9e04eb"
+    },
+    {
+      "path": "native/swisseph/upstream/swecl.c",
+      "blobSha1": "69447ab82e248225a1618d3ed6a9831b94d2ad37",
+      "sha256": "87c0df8da0292634709d0158d151f18b5c9c683a8941cc521e0de97a4a658565"
+    },
+    {
+      "path": "native/swisseph/upstream/swehel.c",
+      "blobSha1": "044f927b0ce4fd323510803f97e3ce73dfd34f11",
+      "sha256": "e4c0c6513f468462227aacaf0a52b46a7dd95569e1b86ea7356c5c27cb0fb871"
+    },
+    {
+      "path": "native/swisseph/upstream/swedate.h",
+      "blobSha1": "33d1ea0979e4cdfc5bf814361bce2a2f9f53abad",
+      "sha256": "886b001815561f2c5f5e40418ce00d62377cb8962180c38062ac83bfdab77b38"
+    },
+    {
+      "path": "native/swisseph/upstream/swehouse.h",
+      "blobSha1": "8fb5823132f1de7538798ed95dccbccbac6cf7db",
+      "sha256": "7a91a007a4de0900ed6d234d74da421b2372d245b09a2ba8b74d6e2e054a200c"
+    },
+    {
+      "path": "native/swisseph/upstream/swejpl.h",
+      "blobSha1": "fbee9d1d1c018928c2daea4af33e22e9b0edaf13",
+      "sha256": "f61ae6173b150f456540afba68500989c642506822e0397cf99c2cb7f50aac0d"
+    },
+    {
+      "path": "native/swisseph/upstream/swemptab.h",
+      "blobSha1": "6a1b9a5b5ab6745b8e8cdf0a5173691890cf056a",
+      "sha256": "dc7595b81bd49e86a6204ed1e0a041c410a9de5c068fd1d90d350a82d604fb85"
+    },
+    {
+      "path": "native/swisseph/upstream/swenut2000a.h",
+      "blobSha1": "c7907b81cd1d75bb7e058360e64f81263b9a16f2",
+      "sha256": "83b0a2f569174b56c8e26971b00f85f5ae52265b34c1c53436c7122e0f1faad7"
+    },
+    {
+      "path": "native/swisseph/upstream/sweodef.h",
+      "blobSha1": "cd36c6b3dd1dfbd61d72227f382cebfaf9722c8d",
+      "sha256": "aa763c98cfa62d9a643432b6908c820ea0759fcbdee378cf4203b0de9c6c34e0"
+    },
+    {
+      "path": "native/swisseph/upstream/sweph.h",
+      "blobSha1": "7a80166abf5449e8d0cbe710a9c7935412539f2a",
+      "sha256": "eab1d1727f85e88b2bcb8bc0df6c64c9f50430eb2a85a48e85ae1eb1250f769d"
+    },
+    {
+      "path": "native/swisseph/upstream/swephexp.h",
+      "blobSha1": "08ad61979a6f9de5dd539c5b0ec1e391a9b3c151",
+      "sha256": "53647b650504bbdec65166af1fbdb8580fa26a2ec821d5f50f032f5b0745b3cc"
+    },
+    {
+      "path": "native/swisseph/upstream/swephlib.h",
+      "blobSha1": "856e92f3cc46fb1b9db3c9945a9f0d031d6ef33a",
+      "sha256": "29a151bb0c6adcb73fa73eff805b498c26bdffbb81e82d55e1b50f79218ea82a"
+    },
+    {
+      "path": "native/swisseph/upstream/swedll.h",
+      "blobSha1": "47617ee189854c04c6ba8b6f693617f3317d6874",
+      "sha256": "cc33c8a26c28d7cba817012040f4ff68260b378d2149d66bf2c341cbb80549d1"
+    },
+    {
+      "path": "native/swisseph/upstream/LICENSE",
+      "blobSha1": "b6f68752cdb15969a8d5e769b0c2ebe4de7c63b9",
+      "sha256": "b6345743292c516d07799dfad46f1a641e5270da2160cc4d6bd54594d6faa991"
+    },
+    {
+      "path": "native/swisseph/upstream/LICENSE.TXT",
+      "blobSha1": "7a694c9699a986b9adf1f6cb8a18a6e923e47ed9",
+      "sha256": "c693279643b8cd5d248172d9c22cb7cf4ed163a3c98c8a3f69c2717edd3eacb7"
+    },
+    {
+      "path": "native/swisseph/upstream/agpl-3.0.txt",
+      "blobSha1": "be3f7b28e564e7dd05eaf59d64adba1a4065ac0e",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    {
+      "path": "native/swisseph/upstream/readme.md",
+      "blobSha1": "4e608dc78fa2d73831adfadc2a4e4f04be98b499",
+      "sha256": "c3a71aa06757984d7563acbea3c89380faae82c84b1f8b76c5c81fe401f3806f"
+    },
+    {
+      "path": "native/swisseph/upstream/Makefile",
+      "blobSha1": "b549f6d2dcc4306111a2bc9dabb12e6db85c2aae",
+      "sha256": "506658fbbe3c13ccf0d9cf6d6c0948e79945b991215eb35483b5d6d51d502e63"
+    },
+    {
+      "path": "native/swisseph/upstream/seleapsec.txt",
+      "blobSha1": "45389b9b4511193bf98cd3df3670f7aedd53211b",
+      "sha256": "fe4414ca92dccccb1be6e16a4ffff7195e484fc33a39acea3151ccd04729216f"
+    },
+    {
+      "path": "packages/ephemeris_swiss/assets/ephe/sepl_18.se1",
+      "blobSha1": "786702cd04506371ee6223af1ebac02d54c848b8",
+      "sha256": "ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66"
+    },
+    {
+      "path": "packages/ephemeris_swiss/assets/ephe/semo_18.se1",
+      "blobSha1": "5427d9f885fd6cb9489584ade37e52c6abb4d407",
+      "sha256": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7"
+    }
+  ]
+}
