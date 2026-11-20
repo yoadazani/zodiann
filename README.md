@@ -6,6 +6,18 @@ A Flutter app (iOS and Android) combining a zodiac wheel and the Gann Square of 
 - Development roadmap and tasks: [`docs/development/TASKS.md`](docs/development/TASKS.md)
 - Current progress and architecture conventions: [`docs/PROGRESS.md`](docs/PROGRESS.md)
 
+## License
+
+Zodiann is licensed under the **GNU Affero General Public License, version 3 only** (`AGPL-3.0-only`). The full text is in [`LICENSE`](LICENSE).
+
+Copyright (C) 2026 Yoad Azani
+
+- **Covered:** the project-authored files in this repository: source code, translations, scripts, documentation, the logo, launcher and platform icons, the SVG icons and generated icon code, the design reference, the specification files and the test fixtures.
+- **Not covered:** third-party components and assets, which keep their own licenses and notices: Dart and Flutter packages and SDKs, the bundled fonts (SIL Open Font License 1.1), the font copies under `design-reference/zodiann/assets/fonts/`, and any other third-party material. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and the [inventory](docs/licensing/third-party-inventory.md). The AGPL is not applied to them. The name "Zodiann" is not addressed by this license.
+- **Swiss Ephemeris:** not yet part of this repository. When it is added (ZOD-FND-003) it comes under the AGPL option of its own dual license, with its original license and copyright notices kept. This project does not use the names of its authors or of Astrodienst to promote the app.
+- **Source:** the source is in this repository, at https://github.com/yoadazani/zodiann. Every build handed to anyone is made from a public Git tag of it, and the policy for where its source is and how long it stays available is in [`docs/licensing/source-availability-policy.md`](docs/licensing/source-availability-policy.md). The repository being public is not by itself taken to meet the license's source requirement.
+- **For now:** the AGPL path is the current choice and may change (ZOD-REL-003 reconfirms it against the distribution channel). This is not legal advice and not a claim of legal compliance; the open questions are listed in [`docs/decisions/ZOD-FND-015-agpl-application.md`](docs/decisions/ZOD-FND-015-agpl-application.md).
+
 ## Repository layout
 
 A Dart [pub workspace](https://dart.dev/tools/pub/workspaces) managed with [Melos](https://melos.invertase.dev) 8. The Melos configuration lives under `melos:` in the root `pubspec.yaml`, and there is a single committed `pubspec.lock`.

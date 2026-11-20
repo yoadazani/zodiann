@@ -46,4 +46,6 @@ Build the chip list of every open-source dependency the app ships with attributi
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "About & Sources" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
 
+- **From ZOD-FND-015 (2026-11-20):** the third-party inventory produced by [ZOD-FND-015](../foundations-architecture/ZOD-FND-015-apply-the-agpl-decision-to-the-repository.md) (the verified license per component, and the decision on project-owned assets) is the input to this task's chip list and to the AGPL-compatibility check left open in the note above; do not re-derive licenses here. Entries marked `Unverified` there stay unverified here. The Swiss Ephemeris vendor notice (read 2026-11-20) forbids using the authors' or Astrodienst's names to promote software that uses it, outside the preserved copyright notice, and requires its notice preserved on copies: keep the chip text to attribution and licence, not promotion. The notice names no AGPL version (drafted question Q5 in the ZOD-FND-015 record). Scope and criteria of this task are unchanged.
+
 - **From ZOD-UI-009 (2026-11-17):** the licence names are `ZodiannTag(variant: ZodiannTagVariant.neutral, ...)` inside an LTR `Directionality` (kit's `.ltr`).

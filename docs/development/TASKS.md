@@ -43,7 +43,7 @@ Phase 1 Foundations ─► Phase 2 Zodiac wheel ─► Phase 3 Gann square ─�
 
 | Folder | Area | Tasks |
 |---|---|---|
-| [`foundations-architecture/`](foundations-architecture/) | Foundations & Architecture | 14 |
+| [`foundations-architecture/`](foundations-architecture/) | Foundations & Architecture | 15 |
 | [`computation-engine/`](computation-engine/) | Computation Engine | 14 |
 | [`shared-ui-design-system/`](shared-ui-design-system/) | Shared UI & Design System | 15 |
 | [`navigation/`](navigation/) | Navigation & App Shell | 5 |
@@ -57,7 +57,7 @@ Phase 1 Foundations ─► Phase 2 Zodiac wheel ─► Phase 3 Gann square ─�
 | [`performance-accessibility-reliability/`](performance-accessibility-reliability/) | Performance, Accessibility & Reliability | 17 |
 | [`release-preparation/`](release-preparation/) | Release Preparation | 7 |
 | [`optional-extensions/`](optional-extensions/) | Optional Extensions | 12 |
-| | **Total** | **205** |
+| | **Total** | **206** |
 
 See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph description of what each folder covers.
 
@@ -83,6 +83,7 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 | ZOD-FND-012 | [Define `UserSettings`, `SquareConfig`, `HighlightRule`, `Crossing` Dart data classes](foundations-architecture/ZOD-FND-012-define-usersettings-squareconfig-highlightrule-crossing-dart-data.md) | Critical | Done |
 | ZOD-FND-013 | [Establish the design-token theme skeleton (dark + light `ColorScheme`)](foundations-architecture/ZOD-FND-013-establish-the-design-token-theme-skeleton-dark-light-colorscheme.md) | Critical | Done |
 | ZOD-FND-014 | [Set up `go_router` navigation scaffold](foundations-architecture/ZOD-FND-014-set-up-go-router-navigation-scaffold.md) | High | Done |
+| ZOD-FND-015 | [Apply the AGPL decision to the repository](foundations-architecture/ZOD-FND-015-apply-the-agpl-decision-to-the-repository.md) | High | Done |
 
 ### Computation Engine (`computation-engine/`)
 
@@ -470,7 +471,7 @@ These don't block a specific task the way the decisions above do, but each has a
 | R-3 | Formula regressions when splitting code into packages | ZOD-TST-001 through ZOD-TST-013 (tests as source of truth, written before/alongside the split) |
 | R-4 | DST causes a skipped/duplicated cell in date-and-time mode | ZOD-TST-012; DST rule decided 2026-11-12 (ZOD-GAN-003 Notes, §6.2) |
 | R-5 | A result mistaken for financial/astrological advice | ZOD-ABT-005, ZOD-XLS-006/017 |
-| R-6 | Swiss Ephemeris licensing blocks store distribution | ZOD-FND-010, ZOD-REL-003 |
+| R-6 | Swiss Ephemeris licensing blocks store distribution | ZOD-FND-010, ZOD-FND-015, ZOD-REL-003 |
 | R-7 | FFI build complexity on iOS/Android | ZOD-FND-003, ZOD-REL-002 |
 | R-8 | No proven Dart library for formula-bearing Excel export | ZOD-XLS-001 |
 
@@ -478,11 +479,11 @@ These don't block a specific task the way the decisions above do, but each has a
 
 ## 7. MVP vs. Future Extensions overview
 
-193 of 205 tasks are **MVP** scope (required for the first shipping version, phases 1–4). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
+194 of 206 tasks are **MVP** scope (required for the first shipping version, phases 1–4). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
 
 | Folder | MVP tasks | Optional Extension tasks |
 |---|---|---|
-| [`foundations-architecture/`](foundations-architecture/) | 14 | 0 |
+| [`foundations-architecture/`](foundations-architecture/) | 15 | 0 |
 | [`computation-engine/`](computation-engine/) | 14 | 0 |
 | [`shared-ui-design-system/`](shared-ui-design-system/) | 15 | 0 |
 | [`navigation/`](navigation/) | 5 | 0 |
@@ -496,7 +497,7 @@ These don't block a specific task the way the decisions above do, but each has a
 | [`performance-accessibility-reliability/`](performance-accessibility-reliability/) | 17 | 0 |
 | [`release-preparation/`](release-preparation/) | 7 | 0 |
 | [`optional-extensions/`](optional-extensions/) | 0 | 12 |
-| **Total** | **193** | **12** |
+| **Total** | **194** | **12** |
 
 No MVP folder contains an Optional Extension task and vice versa — the separation is structural (by folder), not just a per-task label.
 

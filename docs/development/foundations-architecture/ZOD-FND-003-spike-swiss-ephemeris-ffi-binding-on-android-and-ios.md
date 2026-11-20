@@ -45,7 +45,7 @@ No direct design reference applies — native build spike.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-015 (2026-11-20):** when this task vendors the Swiss Ephemeris source (and any data files), it must preserve the original Swiss Ephemeris license and copyright files and notices unchanged, and record the exact upstream version and where it came from, so [ZOD-FND-015](ZOD-FND-015-apply-the-agpl-decision-to-the-repository.md)'s inventory and source policy can cover it. ZOD-FND-015 is recommended before this task adds Swiss Ephemeris to the repository (licensing decision: `docs/decisions/ZOD-FND-010-swiss-ephemeris-license.md`). Scope and criteria of this task are unchanged.
 
 ---
 
