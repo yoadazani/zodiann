@@ -41,7 +41,7 @@ No direct design reference applies — this is a data/content decision. The resu
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-003 (2026-11-20): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. Whether this decision, which needs only the platform-independent size measurements already in the findings (section 4), may start before the iOS half is an owner decision; it is not taken.
 
 ---
 

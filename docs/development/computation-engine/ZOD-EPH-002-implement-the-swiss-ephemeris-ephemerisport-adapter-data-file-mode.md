@@ -48,7 +48,7 @@ No direct design reference applies — pure computation.
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-FND-003 (2026-11-20): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. The spike findings (section 6) list what this adapter must do, notably: check `usedSwissEphemerisFiles` on every call (a missing or out-of-range file falls back to Moshier without an error) and serialize calls to the library (global state, untested).
 
 ---
 
