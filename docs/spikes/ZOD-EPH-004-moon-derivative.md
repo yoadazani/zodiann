@@ -68,7 +68,7 @@ Eleven terms `A_j·sin(2π(a_j + b_j T))` added to `DLAM`; their derivative is `
 | Item | Size (estimate, not measured) | Where |
 |---|---|---|
 | Rate of change of the frozen ECM-to-ECT rotation (nutation in longitude and obliquity) | up to about 5e-5 °/day (the 13.7-day term, amplitude about 0.23 arcsecond, gives about 2.9e-5; the semiannual term about 1.3e-5; the 18.6-year term about 4.4e-6) | omitted, same kind as the frame-rate term D1 already lists for the other bodies |
-| `ΔT` rate in `T` | about 1e-7 °/day | omitted |
+| `ΔT` rate in `T` | about 1e-7 to 3e-7 °/day | omitted |
 | Light time and aberration of the Moon | none applied to the position by the library; the omitted planetary aberration of the Moon is of the order of 1 arcsecond (the Moon moves with the Earth); its rate is about 1e-5 °/day or less | not modelled, as in the library's position |
 | Truncation of the lunar theory itself (the 1954 *Improved Lunar Ephemeris* series, truncated) | position errors of a few arcseconds at monthly periods imply speed differences from Swiss Ephemeris of the order of 1e-4 to 1e-3 °/day | **not** an error of the derivative: it is the difference between two theories and is what the Swiss comparison will show |
 
