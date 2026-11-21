@@ -10,3 +10,15 @@ external int zodiann_body_state(
   double ut_days,
   ffi.Pointer<ffi.Double> out,
 );
+
+@ffi.Native<ffi.Int Function(ffi.Double, ffi.Pointer<ffi.Double>)>()
+external int zodiann_test_moon_series(
+  double centuries_tt,
+  ffi.Pointer<ffi.Double> out,
+);
+
+@ffi.Native<ffi.Int Function(ffi.Double, ffi.Pointer<ffi.Double>)>()
+external int zodiann_test_moon_state(
+  double ut_days,
+  ffi.Pointer<ffi.Double> out,
+);

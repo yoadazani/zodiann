@@ -12,8 +12,13 @@ import 'dart:io';
 
 import 'package:ffigen/ffigen.dart';
 
-/// The only C function bound.
-const _functions = {'zodiann_body_state'};
+/// The C functions bound.
+const _functions = {
+  'zodiann_body_state',
+  // Test-only (Task 3 Step 1b).
+  'zodiann_test_moon_series',
+  'zodiann_test_moon_state',
+};
 
 Future<void> main() async {
   final packageRoot = Platform.script.resolve('../');

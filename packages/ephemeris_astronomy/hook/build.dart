@@ -25,6 +25,9 @@ const _tracked = [
   '$_native/upstream/astronomy.c',
   '$_native/upstream/astronomy.h',
   '$_native/zodiann_astronomy_shim.h',
+  '$_native/zodiann_moon_rate.c',
+  '$_native/zodiann_moon_rate.h',
+  '$_native/zodiann_moon_terms.h',
 ];
 
 Future<void> main(List<String> args) async {

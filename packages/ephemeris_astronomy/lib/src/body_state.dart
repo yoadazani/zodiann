@@ -5,6 +5,19 @@ import 'package:astro_core/astro_core.dart';
 /// doubles.
 const int bodyStateLength = 8;
 
+/// The number of doubles the test-only Moon series function writes (decision
+/// D2, Task 3 Step 1b): the project-authored value path (longitude, latitude,
+/// distance), its three analytic rates per TT century, and upstream's own
+/// `CalcMoon` longitude, latitude and distance. The caller owns a buffer of
+/// exactly this many doubles.
+const int moonSeriesLength = 9;
+
+/// The number of doubles the test-only Moon state function writes: the ECM
+/// position (3), the ECM velocity (3), the ECT position (3) and the ECT
+/// velocity (3), velocities in AU per day. The caller owns a buffer of exactly
+/// this many doubles.
+const int moonStateLength = 12;
+
 /// The native shim's body ids (D2). An explicit table, not `Body.index`, so a
 /// reordering of the [Body] enum cannot silently change what is sent across
 /// the FFI boundary. [Body.node] is absent: the node is formula-based and is

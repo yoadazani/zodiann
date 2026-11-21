@@ -52,6 +52,55 @@ final class NativeBodyStateSource implements BodyStateSource {
     return _call(id, daysSinceJ2000(utc), guardDoubles: guardDoubles);
   }
 
+  /// Test hook (Task 3 Step 1b): the project-authored Moon series against
+  /// upstream's own `CalcMoon` at [centuriesTt] Julian centuries of TT since
+  /// J2000. Returns exactly [moonSeriesLength] doubles (plus [guardDoubles]
+  /// more, all pre-filled with the sentinel 1234.5, for a bounds check):
+  /// our lon, lat, dist (radians, radians, AU); our analytic rates per TT
+  /// century (radians, radians, AU); upstream lon, lat, dist.
+  @visibleForTesting
+  List<double> moonSeriesForTesting(
+    double centuriesTt, {
+    int guardDoubles = 0,
+  }) => _callHook(
+    moonSeriesLength + guardDoubles,
+    (out) => native.zodiann_test_moon_series(centuriesTt, out),
+  );
+
+  /// Test hook (Task 3 Step 1b): the Moon's state built by the production
+  /// path at [utDays] days since J2000 UT. Returns exactly [moonStateLength]
+  /// doubles (plus [guardDoubles] sentinel-filled ones): ECM position (3),
+  /// ECM velocity (3), ECT position (3), ECT velocity (3), velocities in AU
+  /// per day.
+  @visibleForTesting
+  List<double> moonStateForTesting(double utDays, {int guardDoubles = 0}) =>
+      _callHook(
+        moonStateLength + guardDoubles,
+        (out) => native.zodiann_test_moon_state(utDays, out),
+      );
+
+  /// Runs a test-only shim function on a buffer of [total] doubles, all
+  /// pre-filled with the sentinel, and returns the whole buffer. Throws
+  /// [StateError] if the function reports an error.
+  static List<double> _callHook(
+    int total,
+    int Function(Pointer<Double> out) call,
+  ) {
+    final pointer = calloc<Double>(total);
+    try {
+      for (var i = 0; i < total; i++) {
+        pointer[i] = _sentinel;
+      }
+      final status = call(pointer);
+      if (status != 0) {
+        throw StateError('astronomy-engine status $status');
+      }
+      return [for (var i = 0; i < total; i++) pointer[i]];
+    } finally {
+      calloc.free(pointer);
+    }
+  }
+
   static int _shimId(Body body) {
     final id = shimBodyIds[body];
     if (id == null) {

@@ -3,8 +3,8 @@
  *
  * One translation unit: it includes the unmodified upstream astronomy.c (the
  * file is not edited; the manifest guard and the Moon value-regression test
- * make a version change fail loudly). The Moon branch is added in Task 3,
- * Step 1b; until then it returns ASTRO_INVALID_BODY and writes nothing.
+ * make a version change fail loudly). It then includes zodiann_moon_rate.c, the
+ * project-authored Moon series and its exact analytic derivative.
  *
  * Velocity (decision D1): for the Sun and the planets it is the library's own
  * barycentric velocity of the body minus the Earth's (Astronomy_BaryState,
@@ -17,6 +17,7 @@
 
 #include "zodiann_astronomy_shim.h"
 #include "upstream/astronomy.c"
+#include "zodiann_moon_rate.c"
 
 #define ZODIANN_BODY_MOON 1
 
@@ -35,6 +36,32 @@ static double zodiann_degrees_in_circle(double degrees)
     return degrees;
 }
 
+/*
+ * The Moon: the longitude is upstream's Astronomy_EclipticGeoMoon (ECT, upstream
+ * code, unchanged); the position and velocity are the project-authored Moon
+ * series and its analytic derivative, in ECT (zodiann_moon_rate.c). Writes out
+ * only on success.
+ */
+static int zodiann_moon_body_state(double ut_days, double* out)
+{
+    astro_time_t t = Astronomy_TimeFromDays(ut_days);
+    astro_spherical_t sphere = Astronomy_EclipticGeoMoon(t);
+    double r_ecm[3], v_ecm[3], r_ect[3], v_ect[3];
+    int i;
+
+    if (sphere.status != ASTRO_SUCCESS)
+        return sphere.status;
+    zodiann_moon_state(t, r_ecm, v_ecm, r_ect, v_ect);
+    out[0] = zodiann_degrees_in_circle(sphere.lon);
+    for (i = 0; i < 3; ++i)
+    {
+        out[1 + i] = r_ect[i];
+        out[4 + i] = v_ect[i];
+    }
+    out[7] = NAN;
+    return 0;
+}
+
 int zodiann_body_state(int body, double ut_days, double* out)
 {
     double s[ZODIANN_BODY_STATE_LENGTH];
@@ -47,9 +74,10 @@ int zodiann_body_state(int body, double ut_days, double* out)
     if (out == NULL || body < 0 || body >= ZODIANN_BODY_COUNT || !isfinite(ut_days))
         return ASTRO_INVALID_PARAMETER;
 
-    /* The Moon branch is added in Task 3, Step 1b. Nothing is written. */
+    /* The Moon returns here, before any Astronomy_BaryState call: its velocity
+     * is project-authored and never comes from upstream's GeoMoonState. */
     if (body == ZODIANN_BODY_MOON)
-        return ASTRO_INVALID_BODY;
+        return zodiann_moon_body_state(ut_days, out);
 
     t = Astronomy_TimeFromDays(ut_days);
 
@@ -102,5 +130,51 @@ int zodiann_body_state(int body, double ut_days, double* out)
 
     for (i = 0; i < ZODIANN_BODY_STATE_LENGTH; ++i)
         out[i] = s[i];
+    return 0;
+}
+
+/* Test-only (Task 3 Step 1b): the series value path against upstream's own
+ * CalcMoon, with the analytic rates. Layout: ours lon, lat, dist (rad, rad,
+ * AU), our rates per TT century (rad, rad, AU), upstream lon, lat, dist. */
+int zodiann_test_moon_series(double centuries_tt, double* out)
+{
+    zodiann_moon_series_t ours;
+    double lon, lat, dist;
+
+    if (out == NULL || !isfinite(centuries_tt))
+        return ASTRO_INVALID_PARAMETER;
+    zodiann_moon_series(centuries_tt, &ours);
+    CalcMoon(centuries_tt, &lon, &lat, &dist);
+    out[0] = ours.lon;
+    out[1] = ours.lat;
+    out[2] = ours.dist;
+    out[3] = ours.dlon;
+    out[4] = ours.dlat;
+    out[5] = ours.ddist;
+    out[6] = lon;
+    out[7] = lat;
+    out[8] = dist;
+    return 0;
+}
+
+/* Test-only (Task 3 Step 1b): the Moon's state, ECM position (3), ECM
+ * velocity (3), ECT position (3), ECT velocity (3), velocities in AU per day. */
+int zodiann_test_moon_state(double ut_days, double* out)
+{
+    astro_time_t t;
+    double r_ecm[3], v_ecm[3], r_ect[3], v_ect[3];
+    int i;
+
+    if (out == NULL || !isfinite(ut_days))
+        return ASTRO_INVALID_PARAMETER;
+    t = Astronomy_TimeFromDays(ut_days);
+    zodiann_moon_state(t, r_ecm, v_ecm, r_ect, v_ect);
+    for (i = 0; i < 3; ++i)
+    {
+        out[0 + i] = r_ecm[i];
+        out[3 + i] = v_ecm[i];
+        out[6 + i] = r_ect[i];
+        out[9 + i] = v_ect[i];
+    }
     return 0;
 }

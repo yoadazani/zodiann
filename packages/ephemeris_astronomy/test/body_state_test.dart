@@ -9,6 +9,16 @@ void main() {
     });
   });
 
+  group('the Moon test-hook lengths', () {
+    test('moonSeriesLength is 9: lon, lat, dist, three rates, upstream x3', () {
+      expect(moonSeriesLength, 9);
+    });
+
+    test('moonStateLength is 12: ECM r, ECM v, ECT r, ECT v', () {
+      expect(moonStateLength, 12);
+    });
+  });
+
   group('BodyState.fromBuffer', () {
     // out[0] longitude, out[1..3] r, out[4..6] v, out[7] independent longitude.
     test('maps an eight-element buffer in the shim layout', () {

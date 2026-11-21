@@ -37,6 +37,20 @@ extern "C" {
  */
 int zodiann_body_state(int body, double ut_days, double* out);
 
+/* Test-only functions (Task 3 Step 1b). Each caller owns a buffer of exactly
+ * the stated number of doubles; Dart mirrors the lengths as `moonSeriesLength`
+ * and `moonStateLength`. */
+#define ZODIANN_MOON_SERIES_LENGTH 9
+#define ZODIANN_MOON_STATE_LENGTH 12
+
+/* out: ours lon, lat, dist (rad, rad, AU); our rates per TT century (rad, rad,
+ * AU); upstream CalcMoon lon, lat, dist. */
+int zodiann_test_moon_series(double centuries_tt, double* out);
+
+/* out: ECM position (3), ECM velocity (3), ECT position (3), ECT velocity (3);
+ * velocities in AU per day. */
+int zodiann_test_moon_state(double ut_days, double* out);
+
 #ifdef __cplusplus
 }
 #endif
