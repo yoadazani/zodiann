@@ -4,8 +4,6 @@
 // bodies, with the stations of the eight planets. Run on an Android device or
 // emulator:
 //   flutter test integration_test/astronomy_speed_vs_swiss_test.dart -d <device>
-// and, for the formal pass/fail run once the Moon's bound is frozen,
-//   ... --dart-define=FORMAL=true
 //
 // Time scale (owner decision D12-O1, 2026-11-22): every comparison is at the
 // exact same TT. The adapter is called with the UTC instant, as in production;
@@ -16,10 +14,8 @@
 // differences positions: the stations are found by looking for a sign change
 // of a speed, which is a search, not a derivative.
 //
-// Thresholds are the owner-approved values of decision D7. The Moon's is not
-// approved: while [moonSpeedBoundDegPerDay] is null the run is a diagnostic
-// that measures the Moon and asserts nothing for it, and a formal run fails
-// immediately.
+// Thresholds are the owner-approved values of decision D7; the Moon's 0.0007
+// was confirmed by the owner on 2026-11-22 (see its constant).
 import 'dart:io';
 
 import 'package:astro_core/astro_core.dart';
@@ -48,15 +44,18 @@ const Map<Body, double> speedBoundDegPerDay = {
   Body.pluto: 0.0003,
 };
 
-/// The Moon's bound: NOT approved. Null means diagnostic mode (D7, plan Task 6
-/// Step 3b). Set only after the owner confirms a proposal from the diagnostic.
-const double? moonSpeedBoundDegPerDay = null;
+/// The Moon's bound, degrees per day. FROZEN on 2026-11-22 on the owner's
+/// confirmation of the proposal "0.0007" ("Moon bound 0.0007 confirmed"). It is
+/// the diagnostic maximum 0.000573 (2025-04-24T00:00Z, dense six-hourly set
+/// 2025-01-01 to 2027-01-01 plus the 53 reference instants; the maximum over
+/// the 53 alone is 0.000251) plus 0.000127, about 22%, roughly one residual rms
+/// of the signed difference, as headroom for epochs outside the sampled years.
+/// Epochs beyond those two years and the 53 reference dates are not claimed.
+/// Do not change it without the owner.
+const double moonSpeedBoundDegPerDay = 0.0007;
 
 /// D7 (c): the largest allowed offset of a station, in days.
 const double stationOffsetBoundDays = 1.0;
-
-/// True for the formal pass/fail run (`--dart-define=FORMAL=true`).
-const bool formalRun = bool.fromEnvironment('FORMAL');
 
 /// The Swiss body ids (swephexp.h, decision D9).
 const Map<Body, int> _swissIds = {
@@ -207,12 +206,6 @@ void main() {
       'included', () {
     final watch = Stopwatch()..start();
     swiss.setEphePath(dataDirectory.path);
-    if (formalRun && moonSpeedBoundDegPerDay == null) {
-      fail(
-        'formal run: the Moon bound is not frozen '
-        '(moonSpeedBoundDegPerDay is null)',
-      );
-    }
     final stats = {for (final b in _swissIds.keys) b: _Stat(b)};
 
     /// One sample: the adapter's speed against Swiss's at the same TT.
@@ -387,7 +380,7 @@ void main() {
     // The report.
     final lines = <String>[
       'SPEED vs SWISS (same TT, D12-O1): ${watch.elapsed.inSeconds} s, '
-          'Moon bound ${moonSpeedBoundDegPerDay ?? "null (diagnostic)"}',
+          'Moon bound $moonSpeedBoundDegPerDay',
       '| Body | Samples | Out of range | Bound (deg/day) | Max abs diff '
           '(deg/day) | At | Mean abs diff | Sign checked | Sign exempt | '
           'Sign mismatches | Stations | No crossing | Max station offset '

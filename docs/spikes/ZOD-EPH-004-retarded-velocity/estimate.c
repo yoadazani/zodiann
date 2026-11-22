@@ -18,6 +18,9 @@
 #include "swephexp.h"
 
 #define NV 4
+#ifndef EXTRA_FLAGS
+#define EXTRA_FLAGS 0 /* e.g. -DEXTRA_FLAGS=SEFLG_NOGDEFL for the Swiss reference without light deflection */
+#endif
 static astro_body_t body_id;
 static int swiss_id;
 
@@ -89,7 +92,7 @@ static int speeds(double ut_days, double* sp, double* tt_out)
 static double swiss_speed(double tt_days, char* err)
 {
     double xx[6];
-    int rc = swe_calc(tt_days + 2451545.0, swiss_id, SEFLG_SWIEPH | SEFLG_SPEED, xx, err);
+    int rc = swe_calc(tt_days + 2451545.0, swiss_id, SEFLG_SWIEPH | SEFLG_SPEED | EXTRA_FLAGS, xx, err);
     if (rc < 0 || (rc & SEFLG_MOSEPH)) { fprintf(stderr, "swiss fallback/err: %s\n", err); exit(3); }
     return xx[3];
 }
