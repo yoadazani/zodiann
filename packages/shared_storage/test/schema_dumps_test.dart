@@ -40,8 +40,8 @@ void main() {
       addTearDown(db.close);
       final rows = await db
           .customSelect(
-            "SELECT name, sql FROM sqlite_master WHERE type = 'table' "
-            "AND name NOT LIKE 'sqlite_%'",
+            "SELECT name, sql FROM sqlite_master WHERE type IN ('table', 'index') "
+            "AND name NOT LIKE 'sqlite_%' AND sql IS NOT NULL",
           )
           .get();
       final live = <String, String>{

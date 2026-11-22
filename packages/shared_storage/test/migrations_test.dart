@@ -182,7 +182,9 @@ void main() {
             .customSelect("PRAGMA table_info('saved_squares')")
             .get();
         expect(info.map((r) => r.read<String>('name')), contains('note'));
-        expect((await _rowsOf(database)).length, _v1Rows.length);
+        final kept = await _rowsOf(database);
+        expect(kept.map((r) => r["id"]), _v1Rows.map((r) => r[0]));
+        expect(kept.map((r) => r["config_json"]), _v1Rows.map((r) => r[2]));
       },
     );
 

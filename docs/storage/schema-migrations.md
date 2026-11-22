@@ -18,8 +18,9 @@ All paths below are relative to `packages/shared_storage` unless they start with
 - On open, drift compares the file's version with `currentSchemaVersion` and
   calls `applyMigrations`, which runs the steps in between, in order, **in one
   transaction**.
-- Every shipped version has a committed dump in `drift_schemas/`, and the
-  tests prove each upgrade keeps stored data.
+- Every shipped version has a committed dump in `drift_schemas/` (a guard
+  enforces it), and each upgrade is tested for data loss (step 5 below; a
+  review item, not an enforced guard).
 
 ## When a migration is needed
 
@@ -38,6 +39,8 @@ Dart code around the tables needs none.
    step is a top-level function referenced by name, not a closure:
 
    ```dart
+   // migrations.dart also needs: import 'app_database.dart';
+   // (circular imports are legal in Dart).
    Future<void> _toVersion2(Migrator m) async {
      final db = m.database as AppDatabase;
      await m.addColumn(db.savedSquares, db.savedSquares.note);
@@ -55,7 +58,11 @@ Dart code around the tables needs none.
    insert rows through `rawDatabase`, open the real `AppDatabase`, call
    `verifier.migrateAndValidate(db, N)`, and assert the rows are unchanged and
    the new column has its default. The simulated v2 in
-   `test/support/simulated_v2_database.dart` is the worked example.
+   `test/support/simulated_v2_database.dart` is the worked example. For a real
+   version N, generate its own verifier helper from the real dumps
+   (`fvm dart run drift_dev schema generate drift_schemas test/generated_real_migrations`)
+   and write the test against `AppDatabase` with that helper's
+   `GeneratedHelper`; do not touch the simulation (see below).
 6. **Run the guards.** `test/schema_dumps_test.dart` fails if a dump is missing
    or stale, if a dump above the current version exists, or if
    `migrationSteps` does not hold exactly the keys `2..currentSchemaVersion`.
@@ -74,14 +81,18 @@ last two check them.
 6. git diff --exit-code lib/src/database drift_schemas test/support test/schemas test/generated_migrations
 ```
 
-On a Windows checkout add `--ignore-cr-at-eol` to step 6 (the generated
-`.g.dart` files are rewritten with LF).
+If git reports only line-ending differences on a Windows checkout, add
+`--ignore-cr-at-eol` to step 6; CI (Ubuntu) needs no flag.
 
-Commands 3 and 4 serve the **simulated** v2 used to prove the framework. When
-the first real version 2 ships, replace the simulation with the real one: dump
-`AppDatabase` into `test/schemas` instead (its `drift_schema_v2.json` then
-equals the one in `drift_schemas/`), delete `SimulatedV2Database`, and keep the
-rest. Until then the shipped schema is version 1 (ZOD-DAT-012, owner decision).
+Commands 3 and 4 only ever touch the **simulation's own** files
+(`test/schemas`, `test/generated_migrations`, `test/support`), which prove the
+framework independently of the shipped schema. They keep running, unchanged,
+when a real version 2 ships: the simulation stays as the framework's regression
+test (migration atomicity, retry, `alterTable`), and the real version gets its
+own helper and test (step 5), with command 4' added to the list:
+`fvm dart run drift_dev schema generate drift_schemas test/generated_real_migrations`
+(plus its format and diff entries). Until then the shipped schema is version 1
+(ZOD-DAT-012, owner decision).
 
 ## Never
 
