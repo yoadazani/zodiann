@@ -14,7 +14,7 @@
 
 - **kit.css (the pixel source):** `.field` is a grid with a 6 px gap; label 12 / 500 `text-2`. `.input`: height 40, radius 8, 1 px `line` border, `bg-raised`, row with gap 8 and `padding-inline` 12, value text 14 `text`, icon `text-3`. `.focus`: `accent` border and `0 0 0 3px accent-soft`. `.error`: `danger` border and `0 0 0 3px danger-soft`. `.disabled`: opacity 0.45 on the **input box only** (the label stays at full strength in the sheet). `.ph`: placeholder in `text-3`. `.err`: 12 px `danger`, row with gap 6, 16 px `alert` icon, then the message.
 - **Gap in MASTER:** `danger-soft` (`rgba(242,85,90,.12)` dark, `rgba(220,53,69,.08)` light) is in kit.css but **not** in MASTER §2.1, and no such token exists in `ZodiannSurfaces`. MASTER only says "danger border plus a halo". See decision O1.
-- **Tokens that exist:** `ZodiannSize.control` (40), `ZodiannSize.iconSmall` (16), `ZodiannSize.hairline` (1), `ZodiannRadius.control` (8), `ZodiannSpace.s2` (8), `s3` (12), `ZodiannStates.disabledOpacity` (0.42, a different value), `ZodiannSurfaces` (`bgRaised`, `line`, `text`, `text2`, `text3`, `accent`, `accentSoft`, `danger`), `ZodiannTextStyles.body` (14) and `label` (12 / 500), `ZodiannIcons.alert`, `calendar`, `clock`. `ZodiannTextStyles` has a tabular-figures variant used for readouts (`zodiann_text_styles.dart:214`).
+- **Tokens that exist:** `ZodiannSize.control` (40), `ZodiannSize.iconSmall` (16), `ZodiannSize.hairline` (1), `ZodiannRadius.control` (8), `ZodiannSpace.s2` (8), `s3` (12), `ZodiannStates.disabledOpacity` (0.42, a different value), `ZodiannSurfaces` (`bgRaised`, `line`, `text`, `text2`, `text3`, `accent`, `accentSoft`, `danger`), `ZodiannTextStyles.body` (14) and `label` (12 / 500), `ZodiannIcons.alert`, `calendar`, `clock`. Every `ZodiannTextStyles` role already carries `FontFeature.tabularFigures()` (the shared `ui()` builder, `zodiann_text_styles.dart:205-216`), so `body` is tabular with or without `ltr`.
 - **No text input exists yet** in `apps/` or `packages/` (grep for `TextField`, `EditableText`, `TextFormField`), so there is no consumer to keep green. Later consumers: ZOD-SQR-002 (anchor), ZOD-SQR-003 (custom cells), ZOD-WHL-014 (time field), ZOD-WHL-020, ZOD-DAT-003 (inline rename), ZOD-SET-008, ZOD-NFR-015 (audit of invalid input).
 - **Not an input field in this task:** the "Body" row in the sheet is a select with a chevron (`.input.select`). It is a selector, not text entry; see O3.
 
@@ -48,10 +48,10 @@ class ZodiannTextField extends StatefulWidget {
 
 - **Draws:** a column: label (12 / 500 `text-2`), 6 px gap, the input, and, in error only, 6 px gap and the message row. Input: min height 40 (grows with text scale, never shrinks), radius 8, 1 px border, `bg-raised`, row gap 8, horizontal padding 12, the icon (16, `text-3`) then the `EditableText` filling the row. Value text is the `body` role in `text`; the placeholder is `text-3`.
 - **States:** default border `line`. Focused (any focus, mouse or keyboard; there is no 2 px focus ring on inputs, MASTER §10): border `accent` plus a 3 px `accent-soft` halo painted **outside** the box (no layout change). Error: border `danger` plus a 3 px `danger-soft` halo, and the message row. Error wins over focus (both borders are 1 px; the halo takes the error colour while the message is shown). Disabled: the input box at 0.45 opacity (new token, kit.css and MASTER say 45 %, not the shared 0.42), not focusable, no cursor, no edit, no tap; the label keeps full strength.
-- **Error message (NFR-R2, NFR-X4):** `errorText` renders under the field as a row with the 16 px `alert` icon and the text in 12 px `danger`, in addition to the border and halo, so colour is never the only signal. An empty string asserts. The message wraps to as many lines as it needs (the sheet's message is long). Error plus `enabled: false` asserts (a disabled field is not editable, so it cannot be invalid).
+- **Error message (NFR-R2, NFR-X4):** `errorText` renders under the field as a row with the 16 px `alert` icon and the text in 12 px `danger`, in addition to the border and halo, so colour is never the only signal. An empty or whitespace-only string asserts. The message wraps to as many lines as it needs (the sheet's message is long). A disabled field **ignores** `errorText`: plain disabled look (`line` border, no halo, no message row, no error in semantics). This covers the legitimate consumer state "Cells, disabled unless Custom" after the user typed an invalid value and then switched the size away from Custom (NFR-R2: no crash). Only an empty or whitespace-only `errorText` asserts.
 - **Label association:** a tap on the label focuses the field (HTML `label` behaviour). The tappable area is the label and the input together, so the hit area is far above 44 px high even though the drawn input is 40.
-- **L-7:** `ltr: true` sets the `EditableText` text direction to LTR with start alignment (as `.num`, `direction: ltr`), so in a Hebrew layout the value sits at the physical left of its box while the icon and label stay at the start edge; it also applies the tabular-figures style. The label and the error message follow the app direction.
-- **Semantics:** one text-field node: `textField: true`, label = `label`, hint = the placeholder, `enabled`, `focused`; when in error the message is part of the node's hint and the row is a live region, so a change is announced. The decorative icons are excluded.
+- **L-7:** `ltr: true` sets the `EditableText` text direction to LTR with start alignment (as `.num`, `direction: ltr`), so in a Hebrew layout the value sits at the physical left of its box while the icon and label stay at the start edge; the direction is the only thing `ltr` changes. The label and the error message follow the app direction.
+- **Semantics (mechanism):** `EditableText` already emits its own text-field node (value, focus, set-text). The widget therefore adds one outer `Semantics(container: true, label: label, hint: placeholder plus, in error, the message, enabled: ...)` around the label-plus-input and merges it with that node (`mergeAllDescendants`), so there is exactly one node with the text-field flag and it carries label, hint, value and focus. The message row is a separate `Semantics(liveRegion: true)` so a change is announced; the visible label `Text` and the decorative icons are excluded (`ExcludeSemantics`).
 - **Never throws (NFR-R2):** the widget accepts any string (empty, very long, RTL marks, emoji, control characters). It does no parsing; validity is the caller's `errorText`.
 - **Selection and cursor:** cursor `accent`, selection `accent-line`; selection handles and the toolbar use the platform's controls (Material on Android, the adaptive ones elsewhere), with labels from the app's localization delegates (checked in Task 5).
 - **Controller and focus node:** an owned controller or node is created in `initState` and disposed; a supplied one is never disposed; both are swapped correctly in `didUpdateWidget`.
@@ -79,11 +79,12 @@ class ZodiannTextField extends StatefulWidget {
 |---|---|
 | `lib/src/theme/tokens/zodiann_dimensions.dart` | add `ZodiannSize.fieldGap` (6), `fieldHalo` (3) |
 | `lib/src/theme/tokens/zodiann_states.dart` | add `fieldDisabledOpacity` (0.45) |
-| `lib/src/theme/zodiann_surfaces.dart`, `tokens/graphite_tokens.dart`, `tokens/porcelain_tokens.dart` | add `dangerSoft` (field, `copyWith`, `lerp`; not in `tokens`) |
+| `lib/src/theme/zodiann_surfaces.dart`, `tokens/graphite_tokens.dart`, `tokens/porcelain_tokens.dart` | add `dangerSoft` (required constructor field, `copyWith`, `lerp`; not in `tokens`); both token files construct `ZodiannSurfaces` and must pass it |
 | `lib/src/widgets/zodiann_text_field.dart` | new |
 | `lib/shared_ui.dart` | export it |
-| `test/theme/dimensions_test.dart`, `test/widgets/button_colors_test.dart` | pin the new size and state tokens |
-| `test/theme/danger_soft_test.dart` | new: `dangerSoft` equals the kit.css value in both themes, and is absent from MASTER's map |
+| `test/theme/dimensions_test.dart`, `test/widgets/button_colors_test.dart` | pin the new size and state tokens, and `fieldDisabledOpacity != disabledOpacity` |
+| `test/theme/samples.dart` | add `dangerSoft` to `sampleSurfaces` and `copyAllZodiannSurfaces` (both construct `ZodiannSurfaces` directly); the generic key-order and lerp tests use `tokens`, which is unchanged, so they do not cover the new field |
+| `test/theme/danger_soft_test.dart` | new: `dangerSoft` equals the kit.css value in both themes, is absent from MASTER's map, `copyWith(dangerSoft:)` changes only that field, `lerp` at 0.5 interpolates it |
 | `test/widgets/text_field_test.dart` | new: behaviour, states, semantics, keyboard, RTL / L-7, text scale, fuzz, lifecycle |
 | `test/support/field_features.dart`, `test/widgets/text_field_sheet_test.dart` | new: sheet fidelity (both themes) |
 | task file, `docs/development/TASKS.md`, `docs/PROGRESS.md` | status and records after verification |
@@ -102,17 +103,17 @@ Write `test/widgets/text_field_test.dart` before the widget. Each test names the
 
 1. Typing calls `onChanged` with the text; the field shows it (`controller.text`).
 2. Default: border `line`, no halo; height exactly 40 at text scale 1; label above at 12 / 500 `text-2`.
-3. Focus (tap, programmatic, Tab): border `accent` and a halo of width 3 in `accent-soft`; the halo does not change the layout size.
+3. Focus (tap, programmatic, Tab): border `accent` and a halo of width 3 in `accent-soft`, asserted from the shell painter's paint calls (rect, width, colour) and, in Task 3, from pixels 1 to 2 px outside the box; the halo does not change the layout size, for the focus halo **and** the error halo.
 4. Error: border `danger`, halo `danger-soft`, the message row exists with the `alert` icon and the exact text; error plus focus keeps the danger colours.
-5. `errorText: ''` asserts; `errorText` with `enabled: false` asserts.
+5. `errorText: ''` and `errorText: '  '` assert; `errorText` with `enabled: false` renders the plain disabled look (no message row, `line` border, no halo, no error in semantics).
 6. Disabled: box opacity 0.45, label at full strength, not focusable, a tap does not focus, `enterText` finds no editable, semantics `enabled: false`.
-7. Tapping the label focuses the field.
+7. Tapping the label focuses the field; the tappable region (label plus input) is at least 44 px high; a tap in the 6 px gap between label and input counts as inside it, a tap outside the column does not focus.
 8. Placeholder shows only while empty, in `text-3`; leading icon is 16 px `text-3`, absent when null.
 9. **NFR-R2 without a crash:** a harness validates `dd/MM/yyyy` (test-local parser) and sets `errorText` on `abc`; assert the error message and state appear. A fuzz list (empty, 10 000 characters, RTL and LTR marks, emoji, `\u0000`, newline paste, surrogate halves) goes through `enterText` and a formatter without an exception.
-10. `inputFormatters` and `keyboardType` reach the `EditableText`; `onSubmitted` fires on the action key.
+10. `inputFormatters`, `keyboardType` and `textInputAction` reach the `EditableText`; `onSubmitted` fires on the action key; `autocorrect == false`, `enableSuggestions == false`, `maxLines == 1`, cursor colour `accent`, selection colour `accent-line`, `scrollPadding` keeps the focused field clear of the keyboard; a long value with `ltr: true` inside an RTL layout scrolls without an overflow exception.
 11. Text scale 2.0: height grows past 40, the text is not clipped (`didExceedMaxLines` and render-box checks), the message wraps.
-12. RTL layout: label, icon and error row mirror; with `ltr: true` the value is LTR and sits at the physical left of its box; the digits use tabular figures; without `ltr` the value follows the app direction.
-13. Semantics: text-field flag, label, hint, `focused`, enabled; in error the message is in the node and the row is a live region; the icons are excluded.
+12. RTL layout: label, icon and error row mirror; with `ltr: true` the value is LTR and sits at the physical left of its box; the value style is `body.copyWith(color: text)` and keeps the tabular feature in both modes (that is not what `ltr` proves); without `ltr` the value follows the app direction.
+13. Semantics: exactly one node with the text-field flag, carrying label, hint, value, `isFocused` and enabled; in error the message is in the hint and the message row is a live region; icons and the visible label text are excluded; disabled gives `enabled: false` and no error.
 14. Lifecycle: an owned controller and node are disposed with the widget; supplied ones are not; swapping the controller, the node or `enabled` in `didUpdateWidget` keeps the text, moves the listeners and drops focus when disabled.
 15. Dark and light: each colour above comes from the theme's `ZodiannSurfaces` in both.
 
@@ -123,7 +124,7 @@ Write `test/widgets/text_field_test.dart` before the widget. Each test names the
 ### Task 3: Fidelity to the component sheet (both themes)
 
 - [ ] `test/support/field_features.dart`: measure on the sheet crop and on a Flutter render, the same way `segment_features.dart` does: the input box (left, top, height, border pixel, fill), the halo band colour 1 to 2 px outside the box, the ink box of the label, value and icon, and the message row's ink. The sheet stretches the field to its grid column, so only left, top and height are compared, never the right edge.
-- [ ] `test/widgets/text_field_sheet_test.dart` renders the five sheet fields (Anchor, Anchor focused, Cells in error, Cells disabled; the Body select is not built, O3) with the sheet's strings and compares both themes. Tolerances are measured and justified in the test, as in UI-006.
+- [ ] `test/widgets/text_field_sheet_test.dart` renders the **four** sheet text fields (`components.html` lines 106-112; the Body select is not built, O3) with the sheet's strings and compares both themes: "Anchor" with the `calendar` icon, value `15/04/2026` (`ltr`); "Anchor, focused" with the `clock` icon, value `01/11/2026 00:00`, focused; "Cells" in error, no icon, value `4,000`, message "Enter a number from 9 to 3,721. The largest square is 61 × 61."; "Cells, disabled until Custom is chosen", no icon, value `289`, in a 120 px wide `SizedBox` (the sheet's fixed width). Tolerances are measured and justified in the test, as in UI-006.
 
 ### Task 4: Mutation proof
 
@@ -142,7 +143,7 @@ Write `test/widgets/text_field_test.dart` before the widget. Each test names the
 |---|---|
 | 1. Default, focus, error and disabled match the sheet | Task 3 (both themes), tests 2, 3, 4, 6, 15 |
 | 2. The error state always renders a message, never colour alone | tests 4 and 5 (the empty string asserts), semantics test 13, mutants "error without message" and "message without icon" |
-| 3. Invalid input triggers the error state, not a crash | test 9 (parser harness and fuzz) |
+| 3. Invalid input triggers the error state, not a crash | Proven only at the component boundary: `errorText` drives the error state (tests 4 and 9) and arbitrary input never throws (fuzz). Detecting invalid dates or numbers is the consumer's job (SQR-002, SQR-003, WHL-014, SET-008, NFR-015), recorded as O2 |
 
 ## Execution mode
 
@@ -159,7 +160,7 @@ Sequential, in this session (`executing-plans`). No independent parallel work: o
 ## Open decisions (for the owner; defaults are implemented)
 
 - **O1: the error halo colour.** kit.css defines `danger-soft` (12 % dark, 8 % light) that MASTER §2.1 omits. Default: add a `dangerSoft` field to the theme extension from kit.css, outside MASTER's token map, pinned against kit.css; MASTER is not edited (the same approach as UI-006's O3). Alternative: derive the halo from `danger` with an alpha in code (no new token, but the alpha would be a magic number per theme).
-- **O2: validation API.** Default: no validator and no parser in the component; the caller passes `errorText` (so the language of the message and the rules stay with SQR, WHL and SET). Alternative: a built-in `validator` callback that runs on change.
+- **O2: validation API.** Default: no validator and no parser in the component; the caller passes `errorText` (so the language of the message and the rules stay with SQR, WHL and SET). **Consequence:** acceptance criterion 3 is then satisfied by the caller contract, not by a built-in validator. Alternative: a built-in `validator` callback that runs on change.
 - **O3: the select field.** Default: not built here (the task is text, date and number entry); the screen that needs a select (the Body filter) gets it with its own task or a follow-up. Alternative: add a `ZodiannSelectField` shell with the chevron now.
 - **O4: disabled opacity.** Default: 0.45 as MASTER §10 and kit.css say, as a new `fieldDisabledOpacity` token, not the 0.42 of buttons.
 - **O5: label tap.** Default: a tap on the label focuses the field. Alternative: the label is plain text.
@@ -170,4 +171,21 @@ The behaviours the tests do not obviously reach: a `controller` swapped while fo
 
 ## Plan review
 
-_Pending: `plan-reviewer`, round 1._
+**Round 1** (`plan-reviewer`, comprehensive). Verdict: approve after corrections; no Critical, seven Important, five Minor.
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| I1 | Important | The "tabular-figures variant" does not exist; every role is already tabular, so the `ltr` tabular test would be vacuous | Applied: Facts, L-7 bullet and test 12 rewritten |
+| I2 | Important | Error plus `enabled: false` asserting would crash a legitimate consumer state (Cells, disabled unless Custom) | Applied: a disabled field ignores `errorText`; only empty or whitespace-only asserts; test 5 |
+| I3 | Important | Criterion 3 rests on a test-local parser; the mapping implied the component meets it | Applied: mapping row 3 and O2 state the caller-contract consequence |
+| I4 | Important | `test/theme/samples.dart` and the token files construct `ZodiannSurfaces`; the new field breaks them and the lerp and `copyWith` paths were uncovered | Applied: file table and `danger_soft_test.dart` extended |
+| I5 | Important | Outer `Semantics` would duplicate `EditableText`'s own node | Applied: merge mechanism, single text-field node, live region; test 13 |
+| I6 | Important | Sheet task said five fields, lacked icons, strings and the 120 px width | Applied: Task 3 lists the four fields |
+| I7 | Important | Text-entry settings and a long RTL `ltr` value were untested | Applied: test 10 |
+| M1 | Minor | Hit target 40 versus 44 | Applied: test 7 asserts at least 44 and the gap tap |
+| M2 | Minor | How the halo is measured | Applied: test 3 (paint calls plus pixels; layout for both halos) |
+| M3 | Minor | The two disabled-opacity tokens should differ | Applied: Task 1 pin |
+| M4 | Minor | Whitespace-only `errorText` | Applied: asserts (test 5) |
+| M5 | Minor | Record this review | Applied |
+
+Open items: none beyond O1 to O5 (owner defaults).
