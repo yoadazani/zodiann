@@ -21,6 +21,9 @@ const _functions = {
   'swe_close',
   'swe_version',
   'swe_calc_ut',
+  // ZOD-EPH-004 D12-O1: the TT entry point, for the speed comparison at the
+  // same TT as Astronomy Engine.
+  'swe_calc',
 };
 
 const _ndkVersion = '28.2.13676358';

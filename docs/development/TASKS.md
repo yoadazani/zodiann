@@ -94,7 +94,7 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 | ZOD-EPH-001 | [Implement the mean ascending lunar node formula](computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md) | Critical | Done |
 | ZOD-EPH-002 | [Implement the Swiss Ephemeris `EphemerisPort` adapter (data-file mode)](computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md) | Critical | Not Started |
 | ZOD-EPH-003 | [Implement the Swiss Ephemeris built-in (Moshier) fallback mode](computation-engine/ZOD-EPH-003-implement-the-swiss-ephemeris-built-in-moshier-fallback-mode.md) | Medium | Not Started |
-| ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Not Started |
+| ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Completed (Android and host; iOS not verified) |
 | ZOD-EPH-005 | [Implement retrograde detection and position formatting](computation-engine/ZOD-EPH-005-implement-retrograde-detection-and-position-formatting.md) | High | Not Started |
 | ZOD-CRS-001 | [Implement segment splitting at stationary points](computation-engine/ZOD-CRS-001-implement-segment-splitting-at-stationary-points.md) | Critical | Not Started |
 | ZOD-CRS-002 | [Implement the per-segment crossing solver (bisection/Brent + Newton refinement)](computation-engine/ZOD-CRS-002-implement-the-per-segment-crossing-solver-bisection-brent-newton.md) | Critical | Not Started |
@@ -399,7 +399,7 @@ Settings and persistence (`settings-persistence/`) depend on nearly everything u
 ## 5.3 Tasks that require technical investigation before estimation
 
 - **ZOD-FND-003** (Swiss Ephemeris FFI spike) — R-7's named risk; blocks ZOD-EPH-002 and therefore nearly everything.
-- **ZOD-EPH-004** (astronomy-engine FFI spike) — same category of risk, lower severity since it's a backup.
+- **ZOD-EPH-004** (astronomy-engine FFI spike) — same category of risk, lower severity since it's a backup. **Done 2026-11-22 (Android and host; iOS not verified):** it found that ZOD-TST-001's 1-arcsecond Moon bound against Horizons cannot be met at far-future UT instants by any adapter because sources assume different future ΔT; recorded in [`docs/spikes/ZOD-EPH-004-delta-t.md`](../spikes/ZOD-EPH-004-delta-t.md) and PROGRESS (Blockers), ZOD-TST-001's criteria unchanged, an owner decision needed before ZOD-TST-001 and ZOD-TST-005 are implemented.
 - **ZOD-XLS-001** (OOXML generation spike) — R-8's named risk; blocks all of `excel-export/`.
 - **ZOD-FND-011** (data-file coverage range) — affects app size and every date-range limit in the UI; should resolve early in Phase 1.
 

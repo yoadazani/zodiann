@@ -19,6 +19,12 @@ const int seflgMoseph = 4;
 /// `SEFLG_SPEED`: also return the speed.
 const int seflgSpeed = 256;
 
+/// `SEFLG_NOGDEFL`: turn off the gravitational deflection of light. Swiss
+/// Ephemeris's speed correction for the deflection glitches near solar
+/// conjunction (ZOD-EPH-004, docs/spikes/ZOD-EPH-004-swiss-speed-reference.md),
+/// and Astronomy Engine applies no deflection, so the speed comparison uses it.
+const int seflgNogdefl = 512;
+
 /// The Julian day number of the UTC instant [utc] (the `tjd_ut` argument of
 /// `swe_calc_ut`), on the proleptic Gregorian calendar.
 ///
@@ -30,6 +36,23 @@ double julianDayUt(DateTime utc) {
   const unixEpochJulianDay = 2440587.5;
   const microsecondsPerDay = 86400000000;
   return utc.microsecondsSinceEpoch / microsecondsPerDay + unixEpochJulianDay;
+}
+
+/// The Julian day number in TT (the `tjd_et` argument of `swe_calc`) of
+/// [ttDaysSinceJ2000], days of TT since J2000 (2000-01-01T12:00 TT), the value
+/// the Astronomy Engine test hook reports (ZOD-EPH-004 D12-O1). It is a pure
+/// shift by the Julian day of J2000, 2451545.0.
+///
+/// Throws [ArgumentError] if [ttDaysSinceJ2000] is not finite.
+double julianDayTt(double ttDaysSinceJ2000) {
+  if (!ttDaysSinceJ2000.isFinite) {
+    throw ArgumentError.value(
+      ttDaysSinceJ2000,
+      'ttDaysSinceJ2000',
+      'must be finite',
+    );
+  }
+  return ttDaysSinceJ2000 + 2451545.0;
 }
 
 /// One `swe_calc_ut` result.

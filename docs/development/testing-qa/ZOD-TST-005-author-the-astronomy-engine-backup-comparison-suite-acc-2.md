@@ -36,7 +36,8 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- **2026-11-22, from ZOD-EPH-004 (owner decision D12, Option 2): ΔT and the time scale of the comparison.** At **UT instants** the astronomy-engine adapter's Moon exceeds the 60-arcsecond bound of ACC-2 against JPL Horizons late in the range (78.6 arcseconds at 2099-12-31T23:59:59Z; about 3 arcseconds at 2025) because the library's UT-to-TT model (ΔT, 202.65 s at 2100) differs from Horizons's (about 69.18 s, held constant for the future); Swiss Ephemeris shows the same effect smaller (about 14 arcseconds at 2100). The theory is not at fault: asked at the same TT, every body is within 17.6 arcseconds over the 53 instants. ZOD-EPH-004 therefore judged its own ACC-2 test at **equivalent TT instants** (the adapter is called with the UTC instant; Horizons is asked at the TT the adapter's own conversion assigns, pinned by a device test), and documented ΔT separately in [`docs/spikes/ZOD-EPH-004-delta-t.md`](../../spikes/ZOD-EPH-004-delta-t.md). **This task must decide how its own T-EPH-1 comparison treats ΔT** (a TT-consistent reference as in ZOD-EPH-004, a restricted range for the Moon, or another bound), because a comparison at UT instants will meet the same effect. The specification's literal ACC-1 and ACC-2 text and ZOD-TST-001 are unchanged by that decision.
+- **2026-11-21, from ZOD-EPH-004 (owner decision D6, Option A): the T-EPH-1 run stays here.** ZOD-EPH-004 proves ACC-2's bound with its own Horizons fixture and device test (all 53 instants of `reference_dates.json`, ten physical bodies, 60 arcseconds) and amended its first criterion to say so; this task keeps the shared T-EPH-1 comparison suite run against the astronomy-engine adapter. See the 2026-11-22 note above for the time scale.
 
 ---
 

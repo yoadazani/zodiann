@@ -1,0 +1,22 @@
+{
+  "upstreamTag": "v2.1.19",
+  "upstreamTagObject": "03084ee684bdcc490273fe85f9df4f1c8fb66199",
+  "upstreamCommit": "61dc07020aaa6885d2c7f688a4d82beaf6edb9ef",
+  "files": [
+    {
+      "path": "native/astronomy_c/upstream/astronomy.c",
+      "blobSha1": "713bc1aeee87a04f8512477b984c4f43f3fb30e7",
+      "sha256": "388920479d819713963ffd0f8ab0677944f66c6c94239ceddddd3b0d5d064432"
+    },
+    {
+      "path": "native/astronomy_c/upstream/astronomy.h",
+      "blobSha1": "3013632ea25e1d773a49e2ebd3584a705a34b684",
+      "sha256": "83a31011957c2b87e22f0828820f370f1a495aa4d51357bb57d714cde839dc00"
+    },
+    {
+      "path": "native/astronomy_c/upstream/LICENSE",
+      "blobSha1": "9dd5faf8b0dad1d25ce768b8c0792c8185b0e7ae",
+      "sha256": "690dd98cb13ba4db77c6327deea852a816892bb9debbad5943405c66972f8023"
+    }
+  ]
+}

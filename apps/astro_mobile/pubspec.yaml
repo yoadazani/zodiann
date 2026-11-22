@@ -20,6 +20,12 @@ dependencies:
   # distributed.
   ephemeris_swiss:
     path: ../../packages/ephemeris_swiss
+  # ZOD-EPH-004: a regular dependency for the same reason as ephemeris_swiss: the
+  # build hook then also builds libastronomy for Android. The release build drops
+  # a native asset that no app code references (ZOD-FND-003 gotcha 8), so the
+  # library reaches a release APK only once app code uses the bindings.
+  ephemeris_astronomy:
+    path: ../../packages/ephemeris_astronomy
   flutter:
     sdk: flutter
   flutter_localizations:

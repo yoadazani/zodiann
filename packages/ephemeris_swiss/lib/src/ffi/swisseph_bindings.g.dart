@@ -13,6 +13,23 @@ import 'dart:ffi' as ffi;
     ffi.Pointer<ffi.Char>,
   )
 >()
+external int swe_calc(
+  double tjd,
+  int ipl,
+  int iflag,
+  ffi.Pointer<ffi.Double> xx,
+  ffi.Pointer<ffi.Char> serr,
+);
+
+@ffi.Native<
+  ffi.Int Function(
+    ffi.Double,
+    ffi.Int,
+    ffi.Int,
+    ffi.Pointer<ffi.Double>,
+    ffi.Pointer<ffi.Char>,
+  )
+>()
 external int swe_calc_ut(
   double tjd_ut,
   int ipl,

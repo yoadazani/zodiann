@@ -1,2 +1,4 @@
 native/swisseph/upstream/** -text
 packages/ephemeris_swiss/assets/ephe/** -text
+native/astronomy_c/upstream/** -text
+native/astronomy_c/zodiann_moon_terms.h -text
