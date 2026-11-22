@@ -45,3 +45,8 @@ dev_dependencies:
     sdk: flutter
   # ZOD-FND-003: copies the bundled data files to a real directory.
   path_provider: ^2.1.6
+  # ZOD-FND-006: only the storage persistence integration test uses it. No
+  # production wiring (ZOD-SET-007 and ZOD-DAT-002 add it), so the release
+  # closure is unchanged.
+  shared_storage:
+    path: ../../packages/shared_storage
