@@ -267,6 +267,35 @@ void main() {
     });
   });
 
+  testWidgets('at the ends the arrows keep focus inside, even with focusable '
+      'neighbours', (tester) async {
+    await pumpInApp(
+      tester,
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Focus(child: SizedBox(width: 40, height: 44)),
+          _control(onChanged: (_) {}),
+          const Focus(child: SizedBox(width: 40, height: 44)),
+        ],
+      ),
+    );
+    for (var i = 0; i < 4 && _focusedLabel() != 'Numbers'; i++) {
+      await _key(tester, LogicalKeyboardKey.tab);
+    }
+    expect(_focusedLabel(), 'Numbers');
+    await _key(tester, LogicalKeyboardKey.arrowLeft);
+    expect(
+      _focusedLabel(),
+      'Numbers',
+      reason: 'the left neighbour must not steal it',
+    );
+    await _key(tester, LogicalKeyboardKey.arrowRight);
+    await _key(tester, LogicalKeyboardKey.arrowRight);
+    await _key(tester, LogicalKeyboardKey.arrowRight);
+    expect(_focusedLabel(), 'Date and time', reason: 'nor the right one');
+  });
+
   testWidgets('semantics: a named group of buttons, one selected', (
     tester,
   ) async {
