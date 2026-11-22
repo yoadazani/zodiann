@@ -6,7 +6,7 @@
 - **Category:** [Localization](../README.md#localization) (`localization/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -23,7 +23,7 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] L-8's requirement ("a test fails when a key is missing in one of the languages") is met by a named, runnable test, not just an ad hoc CI script.
+- [x] L-8's requirement ("a test fails when a key is missing in one of the languages") is met by a named, runnable test, not just an ad hoc CI script.
 
 ## Dependencies
 

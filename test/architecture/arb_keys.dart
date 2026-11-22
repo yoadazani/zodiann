@@ -1,5 +1,37 @@
-// ZOD-L10-001: ARB helpers for l10n_key_parity_test.dart.
+// ZOD-L10-001, ZOD-L10-014: ARB helpers and the l10n.yaml-driven file loader for
+// l10n_key_parity_test.dart.
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:test/test.dart';
+
+String _yamlValue(String packageDir, String yaml, String key) {
+  final m = RegExp('^$key:\\s*(\\S+)\\s*\$', multiLine: true).firstMatch(yaml);
+  if (m == null) fail('$packageDir/l10n.yaml has no $key');
+  return m.group(1)!;
+}
+
+/// ZOD-L10-014: the template file name and the raw source of every
+/// `app_<locale>.arb` in [packageDir]'s `arb-dir`, per its `l10n.yaml`.
+/// Fails (naming the file) if `l10n.yaml` lacks `arb-dir` or
+/// `template-arb-file`. Other files in the directory are ignored.
+({String template, Map<String, String> sources}) loadArbSources(
+  String packageDir,
+) {
+  final yaml = File('$packageDir/l10n.yaml').readAsStringSync();
+  final arbDir = _yamlValue(packageDir, yaml, 'arb-dir');
+  final template = _yamlValue(packageDir, yaml, 'template-arb-file');
+  return (
+    template: template,
+    sources: {
+      for (final f in Directory(
+        '$packageDir/$arbDir',
+      ).listSync().whereType<File>())
+        if (RegExp(r'^app_[A-Za-z_]+\.arb$').hasMatch(f.uri.pathSegments.last))
+          f.uri.pathSegments.last: f.readAsStringSync(),
+    },
+  );
+}
 
 Map<String, dynamic> _object(String json) {
   final decoded = jsonDecode(json);
