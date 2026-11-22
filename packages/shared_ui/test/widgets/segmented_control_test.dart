@@ -3,6 +3,7 @@
 // 44 px layout), expansion, the panel head, RTL, text scale, the 120 ms linear
 // crossfade, theme switching and the shared pressable's opacity.
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -11,6 +12,7 @@ import 'package:shared_ui/src/widgets/zodiann_pressable.dart';
 
 import '../support/button_harness.dart';
 import '../support/load_bundled_fonts.dart';
+import '../support/pixels.dart';
 
 const _numbers = ZodiannSegment(value: 'numbers', label: 'Numbers');
 const _dates = ZodiannSegment(value: 'dates', label: 'Dates');
@@ -140,6 +142,12 @@ void main() {
       await _key(tester, LogicalKeyboardKey.tab);
       expect(_focusedLabel(), 'Dates', reason: 'Tab skips the planned one');
       expect(calls, isEmpty);
+      // Enter and Space act on the focused neighbour only, never on the
+      // planned segment.
+      await _key(tester, LogicalKeyboardKey.enter);
+      await _key(tester, LogicalKeyboardKey.space);
+      expect(calls, ['dates', 'dates']);
+      expect(calls, isNot(contains('sidereal')));
     });
 
     testWidgets('it is disabled for focus, cursor and semantics', (
@@ -321,29 +329,88 @@ void main() {
   testWidgets('the keyboard focus ring shows for Tab, not for a tap', (
     tester,
   ) async {
-    await pumpInApp(tester, _control(onChanged: (_) {}));
-    bool ring(String label) =>
-        (tester
-                    .widget<CustomPaint>(
-                      find.descendant(
-                        of: _slot(label),
-                        matching: find.byWidgetPredicate(
-                          (w) =>
-                              w is CustomPaint &&
-                              w.foregroundPainter is ZodiannFocusRingPainter,
-                        ),
-                      ),
-                    )
-                    .foregroundPainter!
-                as ZodiannFocusRingPainter)
-            .show;
+    const boundary = Key('ring-kb-boundary');
+    await pumpInApp(
+      tester,
+      RepaintBoundary(
+        key: boundary,
+        child: _control(onChanged: (_) {}),
+      ),
+    );
+    Future<int> aboveThumb(String label) async {
+      final thumb = tester.getRect(_thumb(label));
+      final origin = tester.getTopLeft(find.byKey(boundary));
+      final px = await Pixels.capture(
+        tester,
+        tester.renderObject<RenderRepaintBoundary>(find.byKey(boundary)),
+      );
+      // The ring's band is 2 to 4 px above the thumb.
+      return (px.argb(
+                (thumb.center.dx - origin.dx).floor(),
+                (thumb.top - origin.dy - 3).floor(),
+              ) >>
+              16) &
+          0xFF;
+    }
+
     await tester.tap(find.text('Numbers'));
     await tester.pump();
-    expect(ring('Numbers'), isFalse, reason: 'a tap gives no ring');
+    expect(
+      await aboveThumb('Numbers'),
+      lessThan(0x80),
+      reason: 'a tap: no ring',
+    );
     await _key(tester, LogicalKeyboardKey.tab);
     final focused = _focusedLabel()!;
-    expect(ring(focused), isTrue, reason: 'keyboard focus gives the ring');
+    expect(
+      await aboveThumb(focused),
+      greaterThan(0xC8),
+      reason: 'keyboard focus draws the ring',
+    );
   });
+
+  for (final rtl in [false, true]) {
+    testWidgets('the focus ring is fully visible next to the selected segment '
+        '(${rtl ? 'RTL' : 'LTR'})', (tester) async {
+      const boundary = Key('ring-boundary');
+      await pumpInApp(
+        tester,
+        RepaintBoundary(
+          key: boundary,
+          child: _control(onChanged: (_) {}),
+        ),
+        hebrew: rtl,
+      );
+      // Focus the segment just before the selected one (Dates is selected).
+      await _key(tester, LogicalKeyboardKey.tab);
+      expect(_focusedLabel(), 'Numbers');
+      final numbers = tester.getRect(_thumb('Numbers'));
+      final dates = tester.getRect(_thumb('Dates'));
+      final px = await Pixels.capture(
+        tester,
+        tester.renderObject<RenderRepaintBoundary>(find.byKey(boundary)),
+      );
+      final origin = tester.getTopLeft(find.byKey(boundary));
+      // The ring's 2 px band lies 2 to 4 px outside the thumb: on the edge
+      // that faces the selected thumb, the middle of that band must be the
+      // focus colour, not the selected thumb's fill.
+      final facingX = rtl ? numbers.left - 3 : numbers.right + 3;
+      expect(
+        rtl ? dates.right : dates.left,
+        closeTo(rtl ? numbers.left - 2 : numbers.right + 2, 0.6),
+      );
+      final x = (facingX - origin.dx).floor();
+      final y = (numbers.center.dy - origin.dy).floor();
+      final focus = graphiteTokens.surfaces.focus;
+      final c = px.argb(x, y);
+      expect(
+        (c >> 16) & 0xFF,
+        greaterThan(0xC8),
+        reason: 'ring over the selected neighbour, got ${c.toRadixString(16)}',
+      );
+      expect(focus.toARGB32() & 0xFFFFFF, 0xFFFFFF);
+    });
+  }
 
   testWidgets('removing the focused segment, or turning onChanged null, '
       'leaves no stale focus and no error', (tester) async {
@@ -363,7 +430,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(_focusedLabel(), isNot('Dates'));
     await _key(tester, LogicalKeyboardKey.tab);
-    expect(_focusedLabel(), anyOf('Numbers', 'Date and time', isNull));
+    expect(_focusedLabel(), anyOf('Numbers', 'Date and time'));
     await pumpInApp(
       tester,
       _control(value: 'numbers', segments: const [_numbers, _dateTime]),
@@ -706,7 +773,7 @@ void main() {
   });
 
   group('dynamic changes and asserts', () {
-    testWidgets('segments changing keeps focus and leaks no node', (
+    testWidgets('segments changing keeps the focused segment focused', (
       tester,
     ) async {
       await pumpInApp(tester, _control(onChanged: (_) {}));

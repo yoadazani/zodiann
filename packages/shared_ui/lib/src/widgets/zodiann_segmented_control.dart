@@ -35,6 +35,9 @@ final class ZodiannSegment<T> {
   final bool planned;
 }
 
+// A tall-and-short sample that sets the line height the thumb is sized from.
+const String _lineProbe = 'Ag';
+
 /// The segmented control (MASTER.md §10; kit.css `.seg`): a `bg-raised`
 /// track with a 3 px inset and a `surface-3` thumb, with an inset 1 px
 /// `accent-line` ring, on the selected segment.
@@ -56,12 +59,11 @@ final class ZodiannSegment<T> {
 /// - **Motion:** fill, ring and ink crossfade linearly over 120 ms, instantly
 ///   under reduced motion.
 ///
-/// The focus ring of a segment paints 4 px beyond its thumb, over the
-/// track; the control never clips. Not for intrinsic measurement (it reads
-/// its constraints).
-// A tall-and-short sample that sets the line height the thumb is sized from.
-const String _lineProbe = 'Ag';
-
+/// The keyboard focus ring is painted by the control itself, above every
+/// segment (a selected neighbour never covers it), 4 px beyond the focused
+/// thumb; the control never clips. Not for intrinsic measurement (it reads
+/// its constraints). A segment shorter than 44 px keeps its natural width in a
+/// 44 px slot, so the visible gap beside it is wider than 2 px.
 class ZodiannSegmentedControl<T> extends StatefulWidget {
   /// A control over [segments] showing [value] as selected.
   ZodiannSegmentedControl({
@@ -109,6 +111,22 @@ class _ZodiannSegmentedControlState<T>
   // after the frame, never while the old detector still holds them.
   final Map<T, FocusNode> _nodes = {};
 
+  // The focus ring is drawn above the row, so it needs each enabled slot's box.
+  final Map<T, GlobalKey> _slotKeys = {};
+
+  @override
+  void initState() {
+    super.initState();
+    FocusManager.instance.addListener(_rebuild);
+    FocusManager.instance.addHighlightModeListener(_rebuildOnMode);
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  void _rebuildOnMode(FocusHighlightMode _) => _rebuild();
+
   bool get _interactive => widget.onChanged != null;
 
   FocusNode? _nodeFor(ZodiannSegment<T> segment) {
@@ -124,6 +142,7 @@ class _ZodiannSegmentedControlState<T>
       for (final s in widget.segments)
         if (_interactive && !s.planned) s.value,
     };
+    _slotKeys.removeWhere((key, _) => !live.contains(key));
     final stale = [
       for (final key in _nodes.keys)
         if (!live.contains(key)) key,
@@ -145,6 +164,8 @@ class _ZodiannSegmentedControlState<T>
 
   @override
   void dispose() {
+    FocusManager.instance.removeListener(_rebuild);
+    FocusManager.instance.removeHighlightModeListener(_rebuildOnMode);
     for (final node in _nodes.values) {
       node.dispose();
     }
@@ -258,7 +279,12 @@ class _ZodiannSegmentedControlState<T>
           ),
         ),
       );
+      final node = _nodeFor(segment);
       return ZodiannPressable(
+        key: node == null
+            ? null
+            : _slotKeys.putIfAbsent(segment.value, GlobalKey.new),
+        focusRing: false,
         onPressed: !enabled
             ? null
             : selected
@@ -268,7 +294,7 @@ class _ZodiannSegmentedControlState<T>
         selected: selected,
         inMutuallyExclusiveGroup: true,
         disabledOpacity: segment.planned ? ZodiannStates.plannedOpacity : null,
-        focusNode: _nodeFor(segment),
+        focusNode: node,
         child: thumb,
       );
     }
@@ -300,6 +326,16 @@ class _ZodiannSegmentedControlState<T>
             ),
       ],
     );
+
+    // The focused segment (keyboard highlight only), if any.
+    GlobalKey? ringTarget;
+    if (FocusManager.instance.highlightMode == FocusHighlightMode.traditional) {
+      for (final item in widget.segments) {
+        if (_nodes[item.value]?.hasPrimaryFocus ?? false) {
+          ringTarget = _slotKeys[item.value];
+        }
+      }
+    }
 
     return Semantics(
       container: true,
@@ -335,6 +371,15 @@ class _ZodiannSegmentedControlState<T>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: frame),
                   child: row(constraints.hasBoundedWidth),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: _RingLayer(
+                      target: ringTarget,
+                      color: s.focus,
+                      thumbHeight: thumbHeight,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -397,5 +442,98 @@ class _SideAction extends Action<DirectionalFocusIntent> {
       FocusTraversalPolicy.defaultTraversalRequestFocusCallback(list[to]);
     }
     return null;
+  }
+}
+
+/// Paints the keyboard focus ring of the focused segment above the whole row.
+///
+/// Drawn here rather than by each segment because the selected neighbour's
+/// opaque thumb starts exactly where the ring does (the segment gap is 2 px)
+/// and would paint over it.
+class _RingLayer extends LeafRenderObjectWidget {
+  const _RingLayer({
+    required this.target,
+    required this.color,
+    required this.thumbHeight,
+  });
+
+  /// The focused segment's slot, or null for no ring.
+  final GlobalKey? target;
+  final Color color;
+  final double thumbHeight;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderRingLayer(target: target, color: color, thumbHeight: thumbHeight);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant _RenderRingLayer renderObject,
+  ) {
+    renderObject
+      ..target = target
+      ..color = color
+      ..thumbHeight = thumbHeight;
+  }
+}
+
+class _RenderRingLayer extends RenderBox {
+  _RenderRingLayer({
+    required this._target,
+    required this._color,
+    required this._thumbHeight,
+  });
+
+  GlobalKey? _target;
+  set target(GlobalKey? v) {
+    if (v == _target) return;
+    _target = v;
+    markNeedsPaint();
+  }
+
+  Color _color;
+  set color(Color v) {
+    if (v == _color) return;
+    _color = v;
+    markNeedsPaint();
+  }
+
+  double _thumbHeight;
+  set thumbHeight(double v) {
+    if (v == _thumbHeight) return;
+    _thumbHeight = v;
+    markNeedsPaint();
+  }
+
+  @override
+  bool get sizedByParent => true;
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final slot = _target?.currentContext?.findRenderObject();
+    if (slot is! RenderBox || !slot.attached || !slot.hasSize) return;
+    final slotRect = MatrixUtils.transformRect(
+      slot.getTransformTo(this),
+      Offset.zero & slot.size,
+    );
+    // The ring hugs the thumb, which is centred in the 44 px slot.
+    final thumb = Rect.fromLTWH(
+      slotRect.left,
+      slotRect.top + (slotRect.height - _thumbHeight) / 2,
+      slotRect.width,
+      _thumbHeight,
+    );
+    final canvas = context.canvas;
+    canvas.save();
+    canvas.translate(offset.dx + thumb.left, offset.dy + thumb.top);
+    ZodiannFocusRingPainter(
+      show: true,
+      color: _color,
+    ).paint(canvas, thumb.size);
+    canvas.restore();
   }
 }

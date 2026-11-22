@@ -73,6 +73,29 @@ Future<TestGesture> _mouse(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('focusRing: false draws no ring even for keyboard focus', (
+    tester,
+  ) async {
+    Future<void> pumpWith(bool ring) => pumpInApp(
+      tester,
+      ZodiannPressable(
+        onPressed: () {},
+        semanticLabel: 'Item',
+        focusRing: ring,
+        child: _box,
+      ),
+    );
+    await pumpWith(true);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(_ring(tester).show, isTrue, reason: 'default draws it');
+    await pumpWith(false);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(_ring(tester).show, isFalse);
+  });
+
   testWidgets(
     'disabledOpacity overrides the disabled opacity, enabled stays 1',
     (tester) async {

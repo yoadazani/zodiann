@@ -13,8 +13,8 @@ import '../theme/zodiann_surfaces.dart';
 ///   and instant under reduced motion; pressed moves it 1 px down and
 ///   darkens it 6 %;
 /// - a 2 px `focus` ring at offset 2, shown for keyboard focus only;
-/// - disabled ([onPressed] null): 42 % opacity ([disabledOpacity] overrides), not focusable, inert,
-///   `forbidden` cursor;
+/// - disabled ([onPressed] null): 42 % opacity ([disabledOpacity] overrides),
+///   not focusable, inert, `forbidden` cursor;
 /// - activation by tap (including the hit margins), Enter, Space or a screen
 ///   reader; one semantics node labelled [semanticLabel];
 /// - a layout and hit box of at least 44 × 44 with [child] centred.
@@ -32,6 +32,7 @@ class ZodiannPressable extends StatefulWidget {
     this.semanticHint,
     this.inMutuallyExclusiveGroup = false,
     this.disabledOpacity,
+    this.focusRing = true,
   });
 
   /// Called on activation. Null disables the control.
@@ -52,6 +53,10 @@ class ZodiannPressable extends StatefulWidget {
   /// The opacity while disabled; null is [ZodiannStates.disabledOpacity]
   /// (42 %). A planned segmented-control option passes 40 %.
   final double? disabledOpacity;
+
+  /// Whether to paint the keyboard focus ring itself. A parent that must draw
+  /// it above neighbouring controls (the segmented control) turns this off.
+  final bool focusRing;
 
   /// An optional accessible hint (the drawer item's description).
   final String? semanticHint;
@@ -164,7 +169,7 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
                     ),
                     child: CustomPaint(
                       foregroundPainter: ZodiannFocusRingPainter(
-                        show: _focusHighlight,
+                        show: _focusHighlight && widget.focusRing,
                         color: s.focus,
                       ),
                       child: filtered,
