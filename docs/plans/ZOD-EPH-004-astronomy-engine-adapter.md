@@ -199,8 +199,8 @@ iOS build or run; the automatic fallback selection (D5); production wiring of a 
 
 **Files:** `apps/astro_mobile/test/di/astronomy_swap_test.dart`; `apps/astro_mobile/pubspec.yaml` (done in Task 3).
 
-- [ ] **Step 1: Write the test (host).** A `ProviderContainer` with `ephemerisPortProvider.overrideWithValue(AstronomyEphemeris(source: fakeSource))`; a function written only against `EphemerisPort` (no import of `ephemeris_astronomy` in its library) returns the expected position; a second container overrides with the existing `_FakePort`-style fake and the same function runs unchanged. Add an assertion over `lib/` that no file under `apps/astro_mobile/lib` and `packages/feature_*` imports `ephemeris_astronomy` (feature code untouched).
-- [ ] **Step 2:** run it (PASS; there is no production wiring to write, which is the point). Run the full host suite for `apps/astro_mobile` to confirm the new regular dependency did not slow or break it (the hook is a no-op on the host).
+- [x] **Step 1: Write the test (host).** A `ProviderContainer` with `ephemerisPortProvider.overrideWithValue(AstronomyEphemeris(source: fakeSource))`; a function written only against `EphemerisPort` (no import of `ephemeris_astronomy` in its library) returns the expected position; a second container overrides with the existing `_FakePort`-style fake and the same function runs unchanged. Add an assertion over `lib/` that no file under `apps/astro_mobile/lib` and `packages/feature_*` imports `ephemeris_astronomy` (feature code untouched).
+- [x] **Step 2:** run it (PASS; there is no production wiring to write, which is the point). Run the full host suite for `apps/astro_mobile` to confirm the new regular dependency did not slow or break it (the hook is a no-op on the host).
 - [ ] **Step 3: Commit** `test(ZOD-EPH-004): prove the astronomy backup swaps in by one override`.
 
 ### Task 8: Findings, the proposed contract note, and project records
