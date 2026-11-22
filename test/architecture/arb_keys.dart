@@ -1,4 +1,5 @@
-// ZOD-L10-001: ARB helpers for l10n_key_parity_test.dart.
+// ZOD-L10-001, ZOD-L10-014: ARB helpers and the l10n.yaml-driven file loader for
+// l10n_key_parity_test.dart.
 import 'dart:convert';
 import 'dart:io';
 

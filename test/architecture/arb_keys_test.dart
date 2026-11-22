@@ -153,12 +153,22 @@ void main() {
       expect(problems(), ['app_he.arb has keys not in app_en.arb: b']);
     });
 
-    test('a third language missing a key is reported by name', () {
-      yaml();
-      write('lib/l10n/app_en.arb', arb('en', ['a', 'b']));
-      write('lib/l10n/app_he.arb', arb('he', ['a', 'b']));
-      write('lib/l10n/app_fr.arb', arb('fr', ['a']));
-      expect(problems(), ['app_fr.arb is missing: b']);
+    test(
+      'a third language (app_zh_Hant) missing a key is reported by name',
+      () {
+        yaml();
+        write('lib/l10n/app_en.arb', arb('en', ['a', 'b']));
+        write('lib/l10n/app_he.arb', arb('he', ['a', 'b']));
+        write('lib/l10n/app_zh_Hant.arb', arb('zh_Hant', ['a']));
+        expect(problems(), ['app_zh_Hant.arb is missing: b']);
+      },
+    );
+
+    test('arb-dir is read from l10n.yaml', () {
+      yaml(arbDir: 'arb-dir: custom/dir\n');
+      write('custom/dir/app_en.arb', arb('en', ['a']));
+      write('lib/l10n/app_he.arb', arb('he', ['a']));
+      expect(loadArbSources(pkg.path).sources.keys, ['app_en.arb']);
     });
 
     test('non-ARB files are ignored', () {
@@ -171,12 +181,30 @@ void main() {
 
     test('l10n.yaml without arb-dir fails naming the file', () {
       yaml(arbDir: '');
-      expect(() => loadArbSources(pkg.path), throwsA(isA<TestFailure>()));
+      expect(
+        () => loadArbSources(pkg.path),
+        throwsA(
+          isA<TestFailure>().having(
+            (e) => e.message,
+            'message',
+            contains('l10n.yaml has no arb-dir'),
+          ),
+        ),
+      );
     });
 
     test('l10n.yaml without template-arb-file fails naming the file', () {
       yaml(template: '');
-      expect(() => loadArbSources(pkg.path), throwsA(isA<TestFailure>()));
+      expect(
+        () => loadArbSources(pkg.path),
+        throwsA(
+          isA<TestFailure>().having(
+            (e) => e.message,
+            'message',
+            contains('l10n.yaml has no template-arb-file'),
+          ),
+        ),
+      );
     });
   });
 }
