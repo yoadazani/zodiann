@@ -267,6 +267,28 @@ void main() {
     });
   });
 
+  testWidgets('Up and Down are not swallowed when the outer handler is '
+      'disabled, but Left and Right always are', (tester) async {
+    await pumpInApp(
+      tester,
+      Actions(
+        actions: {DirectionalFocusIntent: _DisabledDirectional()},
+        child: _control(onChanged: (_) {}),
+      ),
+    );
+    await _key(tester, LogicalKeyboardKey.tab);
+    expect(_focusedLabel(), 'Numbers');
+    final upHandled = await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    final downHandled = await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    final rightHandled = await tester.sendKeyEvent(
+      LogicalKeyboardKey.arrowRight,
+    );
+    expect(upHandled, isFalse, reason: 'no enabled outer handler for Up');
+    expect(downHandled, isFalse, reason: 'nor for Down');
+    expect(rightHandled, isTrue, reason: 'Right moves focus inside');
+    expect(_focusedLabel(), 'Dates');
+  });
+
   testWidgets('at the ends the arrows keep focus inside, even with focusable '
       'neighbours', (tester) async {
     await pumpInApp(
@@ -724,4 +746,13 @@ void main() {
       );
     });
   });
+}
+
+/// An outer directional-focus handler that reports itself disabled.
+class _DisabledDirectional extends Action<DirectionalFocusIntent> {
+  @override
+  bool isEnabled(DirectionalFocusIntent intent) => false;
+
+  @override
+  Object? invoke(DirectionalFocusIntent intent) => null;
 }
