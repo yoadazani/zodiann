@@ -246,7 +246,7 @@ Primary design reference: `design-reference/zodiann/screens/04-settings_{desktop
 | ZOD-DAT-009 | [Persist anchor dates with time-zone offset](settings-persistence/ZOD-DAT-009-persist-anchor-dates-with-time-zone-offset.md) | Medium | Not Started |
 | ZOD-DAT-010 | [Implement "Delete all data" with confirmation](settings-persistence/ZOD-DAT-010-implement-delete-all-data-with-confirmation.md) | Medium | Not Started |
 | ZOD-DAT-011 | [Verify no network/analytics/third-party data paths exist](settings-persistence/ZOD-DAT-011-verify-no-network-analytics-third-party-data-paths-exist.md) | High | Not Started |
-| ZOD-DAT-012 | [Implement the drift schema migration framework](settings-persistence/ZOD-DAT-012-implement-the-drift-schema-migration-framework.md) | Medium | Not Started |
+| ZOD-DAT-012 | [Implement the drift schema migration framework](settings-persistence/ZOD-DAT-012-implement-the-drift-schema-migration-framework.md) | Medium | Completed |
 
 ### Localization (`localization/`)
 

@@ -145,3 +145,7 @@ Round 1 findings confirmed applied. The transaction wrapper was confirmed sound 
 | M8, M9 | Minor | Stale wording; Step 3 ordering of checks before the transaction | Applied |
 
 Open items: none. Two rounds are used; the corrections were mechanical and no further round is required by the workflow.
+
+## Completion notes
+
+All three tasks done; verification at head `4408c5e` is recorded in PROGRESS (Verification). Deviations, all ruled: (1) `analysis_options.yaml` of `shared_storage` excludes `test/generated_migrations/**` (the generated helper trips `strict-raw-types`; Task 1 step 4 said not to widen it, but the alternative was a lint ignore the generator would overwrite); (2) the new tests were appended to `migrations_test.dart` as planned, plus the `SimulatedV2Database` is kept as the framework's permanent regression test after a real v2 ships (the doc says how a real version gets its own helper, review finding on "replace the simulation"); (3) the guard compares tables and indexes. Mutation results (a) to (f) are in PROGRESS. Whole-branch review: two Important fixed, minors deferred (PROGRESS, Deferred review minors DAT-012).
