@@ -59,6 +59,9 @@ final class ZodiannSegment<T> {
 /// The focus ring of a segment paints 4 px beyond its thumb, over the
 /// track; the control never clips. Not for intrinsic measurement (it reads
 /// its constraints).
+// A tall-and-short sample that sets the line height the thumb is sized from.
+const String _lineProbe = 'Ag';
+
 class ZodiannSegmentedControl<T> extends StatefulWidget {
   /// A control over [segments] showing [value] as selected.
   ZodiannSegmentedControl({
@@ -182,7 +185,7 @@ class _ZodiannSegmentedControlState<T>
     // The thumb is 32 high, taller once the text scale needs it. One height
     // for every segment keeps the track hugging them.
     final linePainter = TextPainter(
-      text: TextSpan(text: 'Ag', style: labelStyle),
+      text: TextSpan(text: _lineProbe, style: labelStyle),
       textDirection: Directionality.of(context),
       textScaler: scaler,
     )..layout();
@@ -284,13 +287,17 @@ class _ZodiannSegmentedControlState<T>
       children: [
         for (final item in widget.segments)
           if (!bounded)
-            segment(item, false)
+            KeyedSubtree(key: ValueKey(item.value), child: segment(item, false))
           else if (expand)
-            Expanded(child: segment(item, true))
+            Expanded(key: ValueKey(item.value), child: segment(item, true))
           else
             // Natural widths when they fit, shrinking in proportion when the
             // parent is narrower.
-            Flexible(flex: natural(item).ceil(), child: segment(item, false)),
+            Flexible(
+              key: ValueKey(item.value),
+              flex: natural(item).ceil(),
+              child: segment(item, false),
+            ),
       ],
     );
 
@@ -310,6 +317,9 @@ class _ZodiannSegmentedControlState<T>
           builder: (context, constraints) => SizedBox(
             height: layoutHeight,
             child: Stack(
+              // The row is as tall as one slot, the track may be taller (large
+              // text): keep the row centred so the thumb stays 4 px inside.
+              alignment: AlignmentDirectional.centerStart,
               children: [
                 Positioned.fill(
                   top: trackInset,
@@ -349,6 +359,21 @@ class _SideAction extends Action<DirectionalFocusIntent> {
   /// A context above this control's `Actions`, to find the outer handler.
   final BuildContext outer;
 
+  // Up and Down count as handled only when the outer handler would handle
+  // them, so a missing or disabled one does not swallow the key.
+  @override
+  bool consumesKey(DirectionalFocusIntent intent) {
+    final d = intent.direction;
+    if (d == TraversalDirection.left || d == TraversalDirection.right) {
+      return true;
+    }
+    final next = Actions.maybeFind<DirectionalFocusIntent>(
+      outer,
+      intent: intent,
+    );
+    return next != null && next.isEnabled(intent) && next.consumesKey(intent);
+  }
+
   @override
   Object? invoke(DirectionalFocusIntent intent) {
     final direction = intent.direction;
@@ -367,7 +392,10 @@ class _SideAction extends Action<DirectionalFocusIntent> {
     // On screen, left is the previous segment in LTR and the next in RTL.
     final towardStart = (direction == TraversalDirection.left) != rtl;
     final to = at + (towardStart ? -1 : 1);
-    if (to >= 0 && to < list.length) list[to].requestFocus();
+    if (to >= 0 && to < list.length) {
+      // As the default traversal does: focus it and scroll it into view.
+      FocusTraversalPolicy.defaultTraversalRequestFocusCallback(list[to]);
+    }
     return null;
   }
 }

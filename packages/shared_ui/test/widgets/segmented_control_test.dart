@@ -296,6 +296,66 @@ void main() {
     expect(_focusedLabel(), 'Date and time', reason: 'nor the right one');
   });
 
+  testWidgets('the keyboard focus ring shows for Tab, not for a tap', (
+    tester,
+  ) async {
+    await pumpInApp(tester, _control(onChanged: (_) {}));
+    bool ring(String label) =>
+        (tester
+                    .widget<CustomPaint>(
+                      find.descendant(
+                        of: _slot(label),
+                        matching: find.byWidgetPredicate(
+                          (w) =>
+                              w is CustomPaint &&
+                              w.foregroundPainter is ZodiannFocusRingPainter,
+                        ),
+                      ),
+                    )
+                    .foregroundPainter!
+                as ZodiannFocusRingPainter)
+            .show;
+    await tester.tap(find.text('Numbers'));
+    await tester.pump();
+    expect(ring('Numbers'), isFalse, reason: 'a tap gives no ring');
+    await _key(tester, LogicalKeyboardKey.tab);
+    final focused = _focusedLabel()!;
+    expect(ring(focused), isTrue, reason: 'keyboard focus gives the ring');
+  });
+
+  testWidgets('removing the focused segment, or turning onChanged null, '
+      'leaves no stale focus and no error', (tester) async {
+    await pumpInApp(tester, _control(onChanged: (_) {}));
+    await _key(tester, LogicalKeyboardKey.tab);
+    await _key(tester, LogicalKeyboardKey.arrowRight);
+    expect(_focusedLabel(), 'Dates');
+    await pumpInApp(
+      tester,
+      _control(
+        segments: const [_numbers, _dateTime],
+        value: 'numbers',
+        onChanged: (_) {},
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(_focusedLabel(), isNot('Dates'));
+    await _key(tester, LogicalKeyboardKey.tab);
+    expect(_focusedLabel(), anyOf('Numbers', 'Date and time', isNull));
+    await pumpInApp(
+      tester,
+      _control(value: 'numbers', segments: const [_numbers, _dateTime]),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await _key(tester, LogicalKeyboardKey.tab);
+    expect(
+      _focusedLabel(),
+      isNull,
+      reason: 'a disabled control has no tab stop',
+    );
+  });
+
   testWidgets('semantics: a named group of buttons, one selected', (
     tester,
   ) async {
@@ -518,23 +578,36 @@ void main() {
     );
   });
 
-  testWidgets('text scale 2 grows the thumb and the track, no overflow', (
-    tester,
-  ) async {
-    await pumpInApp(
-      tester,
-      Builder(
-        builder: (context) => MediaQuery(
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(2)),
-          child: _control(onChanged: (_) {}),
+  for (final scale in [2.0, 3.0]) {
+    testWidgets('text scale $scale grows the thumb and the track, the thumb '
+        'stays centred 4 px inside, no overflow', (tester) async {
+      await pumpInApp(
+        tester,
+        Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(scale)),
+            child: _control(onChanged: (_) {}),
+          ),
         ),
-      ),
-    );
-    expect(tester.takeException(), isNull);
-    expect(tester.getSize(_thumb('Dates')).height, greaterThan(32));
-    expect(tester.getSize(_track()).height, greaterThan(40));
-  });
+      );
+      expect(tester.takeException(), isNull);
+      final thumb = tester.getRect(_thumb('Dates'));
+      final track = tester.getRect(_track());
+      expect(thumb.height, greaterThan(32));
+      expect(track.height, greaterThan(40));
+      expect(thumb.top - track.top, 4, reason: 'top inset');
+      expect(track.bottom - thumb.bottom, 4, reason: 'bottom inset');
+      // The control's box holds the whole track, centred.
+      final control = tester.getRect(_controlFinder());
+      expect(track.top, greaterThanOrEqualTo(control.top));
+      expect(track.bottom, lessThanOrEqualTo(control.bottom));
+      expect(
+        track.top - control.top,
+        closeTo(control.bottom - track.bottom, 0.01),
+      );
+    });
+  }
 
   group('crossfade', () {
     // The animated, in-flight decoration (the AnimatedContainer's own widget
