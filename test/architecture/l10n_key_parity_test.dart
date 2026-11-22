@@ -2,35 +2,20 @@
 // language file but not another. Every app_*.arb in shared_ui's arb-dir is
 // checked against the template, so a future language (L-1) is covered by
 // adding its file. Runs from the workspace root on every `melos run test`.
-import 'dart:io';
-
 import 'package:test/test.dart';
 
 import 'arb_keys.dart';
 
 const _package = 'packages/shared_ui';
 
-String _yamlValue(String yaml, String key) {
-  final m = RegExp('^$key:\\s*(\\S+)\\s*\$', multiLine: true).firstMatch(yaml);
-  if (m == null) fail('$_package/l10n.yaml has no $key');
-  return m.group(1)!;
-}
-
 void main() {
   late String template;
   late Map<String, String> sources;
 
   setUpAll(() {
-    final yaml = File('$_package/l10n.yaml').readAsStringSync();
-    final arbDir = _yamlValue(yaml, 'arb-dir');
-    template = _yamlValue(yaml, 'template-arb-file');
-    sources = {
-      for (final f in Directory(
-        '$_package/$arbDir',
-      ).listSync().whereType<File>())
-        if (RegExp(r'^app_[A-Za-z_]+\.arb$').hasMatch(f.uri.pathSegments.last))
-          f.uri.pathSegments.last: f.readAsStringSync(),
-    };
+    final loaded = loadArbSources(_package);
+    template = loaded.template;
+    sources = loaded.sources;
   });
 
   /// [read] on [file]'s source; a malformed file fails naming the file.
