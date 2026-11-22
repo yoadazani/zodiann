@@ -19,6 +19,12 @@ const int seflgMoseph = 4;
 /// `SEFLG_SPEED`: also return the speed.
 const int seflgSpeed = 256;
 
+/// `SEFLG_NOGDEFL`: turn off the gravitational deflection of light. Swiss
+/// Ephemeris's speed correction for the deflection glitches near solar
+/// conjunction (ZOD-EPH-004, docs/spikes/ZOD-EPH-004-swiss-speed-reference.md),
+/// and Astronomy Engine applies no deflection, so the speed comparison uses it.
+const int seflgNogdefl = 512;
+
 /// The Julian day number of the UTC instant [utc] (the `tjd_ut` argument of
 /// `swe_calc_ut`), on the proleptic Gregorian calendar.
 ///

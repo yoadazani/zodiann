@@ -2,6 +2,18 @@ import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('the Swiss flag constants', () {
+    test('seflgNogdefl is SEFLG_NOGDEFL, 512 in swephexp.h', () {
+      expect(seflgNogdefl, 512);
+    });
+
+    test('the flag words the speed comparison uses are distinct bits', () {
+      const word = seflgSwieph | seflgSpeed | seflgNogdefl;
+      expect(word, 2 + 256 + 512);
+      expect(word & seflgMoseph, 0);
+    });
+  });
+
   group('julianDayTt', () {
     test('J2000 in TT days is 2451545.0', () {
       expect(julianDayTt(0), 2451545.0);

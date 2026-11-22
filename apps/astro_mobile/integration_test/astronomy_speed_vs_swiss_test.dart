@@ -10,6 +10,7 @@
 // the TT it uses is read through `NativeBodyStateSource.timeForTesting` (the
 // shim's single conversion helper) and Swiss Ephemeris is asked at that TT
 // through `swe_calc`, so neither engine's delta T enters the speed difference.
+// Swiss is evaluated without gravitational deflection (see _swissSpeedFlags).
 // Each engine keeps its own, independent speed calculation. Nothing here
 // differences positions: the stations are found by looking for a sign change
 // of a speed, which is a search, not a derivative.
@@ -56,6 +57,17 @@ const double moonSpeedBoundDegPerDay = 0.0007;
 
 /// D7 (c): the largest allowed offset of a station, in days.
 const double stationOffsetBoundDays = 1.0;
+
+/// The Swiss flags of every speed sample (owner approval 2026-11-22): the
+/// Swiss Ephemeris data files, with speed, and **without gravitational
+/// deflection**. Swiss's deflection speed correction glitches near solar
+/// conjunction (Uranus at 2075-01-01 and 1946-06-09, 82 Uranus days over the
+/// bound in a daily scan), the dip being in code the data-file and Moshier
+/// modes share; Astronomy Engine applies no deflection, so this is the
+/// like-for-like reference. See docs/spikes/ZOD-EPH-004-swiss-speed-reference.md.
+/// Replaces the `SEFLG_SWIEPH | SEFLG_SPEED` that decision D7 named; no
+/// threshold, formula or sample changes with it.
+const int _swissSpeedFlags = seflgSwieph | seflgSpeed | seflgNogdefl;
 
 /// The Swiss body ids (swephexp.h, decision D9).
 const Map<Body, int> _swissIds = {
@@ -149,7 +161,11 @@ void main() {
   /// sample must come from the data files, otherwise the reference would be
   /// the Moshier ephemeris.
   double swissSpeed(Body body, DateTime utc) {
-    final result = swiss.calcTt(julianDayTt(ttDaysOf(utc)), _swissIds[body]!);
+    final result = swiss.calcTt(
+      julianDayTt(ttDaysOf(utc)),
+      _swissIds[body]!,
+      flags: _swissSpeedFlags,
+    );
     if (!result.usedSwissEphemerisFiles) {
       throw StateError(
         'Swiss Ephemeris did not use its data files for $body at $utc: '
@@ -298,7 +314,7 @@ void main() {
     ) {
       final jd = julianDayTt(ttDaysOf(day));
       for (final p in _planets) {
-        final result = swiss.calcTt(jd, _swissIds[p]!);
+        final result = swiss.calcTt(jd, _swissIds[p]!, flags: _swissSpeedFlags);
         if (!result.usedSwissEphemerisFiles) {
           throw StateError('Swiss files not used for $p at $day');
         }
