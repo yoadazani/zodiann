@@ -7,11 +7,12 @@ import 'storage_failure_reporter.dart';
 /// [SettingsStore] over `shared_preferences` (the async API). Every platform
 /// failure is reported on [reporter] and rethrown as a [StorageException].
 final class PrefsSettingsStore implements SettingsStore {
-  PrefsSettingsStore(this._prefs, {StorageFailureReporter? reporter})
-    : _reporter = reporter;
+  PrefsSettingsStore(this._prefs, {this.reporter});
 
   final SharedPreferencesAsync _prefs;
-  final StorageFailureReporter? _reporter;
+
+  /// Where failures are announced before they are thrown; may be `null`.
+  final StorageFailureReporter? reporter;
 
   @override
   Future<T?> read<T>(SettingsKey<T> key) async {
@@ -81,7 +82,7 @@ final class PrefsSettingsStore implements SettingsStore {
   }
 
   StorageException _fail(StorageException failure) {
-    _reporter?.report(failure);
+    reporter?.report(failure);
     return failure;
   }
 
