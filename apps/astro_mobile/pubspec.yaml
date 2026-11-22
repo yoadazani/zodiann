@@ -41,10 +41,16 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  # ZOD-FND-006: the storage persistence integration test builds a SquareConfig.
+  gann_core:
+    path: ../../packages/gann_core
   integration_test:
     sdk: flutter
   # ZOD-FND-003: copies the bundled data files to a real directory.
   path_provider: ^2.1.6
+  # ZOD-FND-006: the storage persistence integration test reads the real
+  # preferences. Dev only.
+  shared_preferences: ^2.5.6
   # ZOD-FND-006: only the storage persistence integration test uses it. No
   # production wiring (ZOD-SET-007 and ZOD-DAT-002 add it), so the release
   # closure is unchanged.
