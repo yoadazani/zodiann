@@ -125,7 +125,7 @@ Every task in this section implements a component that is **already fully design
 | ZOD-UI-011 | [Implement the toast/feedback component (export status, progress with Stop)](shared-ui-design-system/ZOD-UI-011-implement-the-toast-feedback-component-export-status-progress-with.md) | High | Not Started |
 | ZOD-UI-012 | [Implement the banner component (neutral + danger)](shared-ui-design-system/ZOD-UI-012-implement-the-banner-component-neutral-danger.md) | Medium | Not Started |
 | ZOD-UI-013 | [Implement the dialog component](shared-ui-design-system/ZOD-UI-013-implement-the-dialog-component.md) | Medium | Not Started |
-| ZOD-UI-014 | [Implement the hairline panel component](shared-ui-design-system/ZOD-UI-014-implement-the-hairline-panel-component.md) | High | Not Started |
+| ZOD-UI-014 | [Implement the hairline panel component](shared-ui-design-system/ZOD-UI-014-implement-the-hairline-panel-component.md) | High | Done |
 | ZOD-UI-015 | [Build the automated light/dark, EN/HE visual regression harness](shared-ui-design-system/ZOD-UI-015-build-the-automated-light-dark-en-he-visual-regression-harness.md) | Medium | Not Started |
 
 ### Navigation & App Shell (`navigation/`)

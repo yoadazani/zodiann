@@ -128,6 +128,9 @@ abstract final class ZodiannSize {
   /// Orb stepper: height.
   static const double stepper = 36.0;
 
+  /// The 1 px rule of borders and head rules (MASTER §1, §4).
+  static const double hairline = 1.0;
+
   /// Panel head: height above phone width, including its 1 px bottom rule.
   static const double panelHead = 56.0;
 

@@ -157,6 +157,10 @@ void main() {
     expect(ZodiannStates.drawerFlingVelocity, 365);
   });
 
+  test("the hairline is MASTER §4's 1 px rule (ZOD-UI-014)", () {
+    expect(ZodiannSize.hairline, 1.0);
+  });
+
   test("the minimum touch target is MASTER §14's 44", () {
     expect(ZodiannSize.minTouchTarget, 44);
   });

@@ -6,7 +6,6 @@
 // border-box: padding is counted inside the panel's 1 px border, and the head
 // height includes its 1 px rule.
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
@@ -14,36 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import '../support/pixels.dart';
 import '../support/token_panel_harness.dart';
-
-final class _Pixels {
-  _Pixels(this.width, this.height, this.raw);
-  final int width;
-  final int height;
-  final ByteData raw;
-
-  int argb(int x, int y) {
-    final i = (y * width + x) * 4;
-    return (raw.getUint8(i + 3) << 24) |
-        (raw.getUint8(i) << 16) |
-        (raw.getUint8(i + 1) << 8) |
-        raw.getUint8(i + 2);
-  }
-
-  int firstX(int y, int from, bool Function(int argb) test) {
-    for (var x = from; x < width; x++) {
-      if (test(argb(x, y))) return x;
-    }
-    fail('row $y: no match from x $from');
-  }
-
-  int firstY(int x, int from, bool Function(int argb) test) {
-    for (var y = from; y < height; y++) {
-      if (test(argb(x, y))) return y;
-    }
-    fail('column $x: no match from y $from');
-  }
-}
 
 void main() {
   final s = graphiteTokens.surfaces;
@@ -87,13 +58,13 @@ void main() {
         find.byKey(TokenPanelHarness.boundaryKey),
       );
       final dir = Platform.environment['ZODIANN_PANEL_DIR'];
-      late _Pixels px;
+      late Pixels px;
       await tester.runAsync(() async {
         final image = await boundary.toImage(pixelRatio: 1);
         final raw = (await image.toByteData(
           format: ui.ImageByteFormat.rawRgba,
         ))!;
-        px = _Pixels(image.width, image.height, raw);
+        px = Pixels(image.width, image.height, raw);
         if (dir != null) {
           final png = await image.toByteData(format: ui.ImageByteFormat.png);
           File('$dir/panel_${size.width.toInt()}.png')

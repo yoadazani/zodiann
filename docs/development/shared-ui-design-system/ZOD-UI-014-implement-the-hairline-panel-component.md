@@ -6,7 +6,7 @@
 - **Category:** [Shared UI & Design System](../README.md#shared-ui-design-system) (`shared-ui-design-system/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -25,8 +25,8 @@ Build the base panel shell (border + radius + padding + optional 56/52px head) t
 
 ## Acceptance Criteria
 
-- [ ] Panel padding/radius/border matches the token values exactly.
-- [ ] No drop shadow renders in the dark theme except on floating layers (drawer/dialog/toast), per MASTER.md §4 "Elevation".
+- [x] Panel padding/radius/border matches the token values exactly. (Pixel tests in both themes at 1440 and 390, the UI-003 spacing test on the real widget, and a comparison with the settings reference; see Completion notes.)
+- [x] No drop shadow renders in the dark theme except on floating layers (drawer/dialog/toast), per MASTER.md §4 "Elevation".
 
 ## Dependencies
 
@@ -43,6 +43,13 @@ Build the base panel shell (border + radius + padding + optional 56/52px head) t
 - **Mobile reference mismatch:** `settings_mobile_he_dark.png` shows a phone panel gap of 20 and a head of 56, because `_source/settings.html` never applies the phone values. MASTER §4's 16 / 52 apply.
 
 - **Buttons in panels (ZOD-UI-004):** focus-ring contract for panel heads, bodies and scrolled content: the button paints its complete focus ring, 4 px beyond the drawn box, whenever no ancestor clips it, and it cannot override an ancestor's clip. Keep at least 4 px of clear, unclipped space around each button wherever the ring can appear; if the layout must clip, adjust its padding so keyboard focus stays visible.
+
+
+## Completion notes
+
+- **Delivered:** `ZodiannPanel` and `ZodiannPanelHead` (`packages/shared_ui/lib/src/widgets/zodiann_panel.dart`), the `ZodiannSize.hairline` token, and the UI-003 token harness switched to the real widget. Plan: [`docs/plans/ZOD-UI-014-hairline-panel.md`](../../plans/ZOD-UI-014-hairline-panel.md). Owner-approved defaults: no clip unless asked (focus rings stay visible), string `title` / `meta` plus free `leading` / `end`, titles wrap.
+- **Criterion 2** holds by construction (no elevation input) and by pixels: a 32 px ring around the panel is all page colour in both themes, and the same scan fails on a panel inside a floating-layer shadow.
+- **Not covered:** the panel's content (tables, forms, segmented control) belongs to later tasks; a panel with a head is not for `IntrinsicHeight`.
 
 ---
 
