@@ -26,7 +26,7 @@ final class NativeBodyStateSource implements BodyStateSource {
   @override
   BodyState bodyState(Body body, DateTime utc) {
     final id = _shimId(body);
-    final result = _call(id, daysSinceJ2000(utc), guardDoubles: 0);
+    final result = _call(id, _utDays(utc), guardDoubles: 0);
     if (result.status != 0) {
       throw StateError('astronomy-engine status ${result.status}');
     }
@@ -49,8 +49,26 @@ final class NativeBodyStateSource implements BodyStateSource {
     int? shimIdOverride,
   }) {
     final id = shimIdOverride ?? _shimId(body);
-    return _call(id, daysSinceJ2000(utc), guardDoubles: guardDoubles);
+    return _call(id, _utDays(utc), guardDoubles: guardDoubles);
   }
+
+  /// Test hook (D12): the UT days and the TT days the production path assigns
+  /// to [utc]. `bodyState` and this hook derive the UT days through the same
+  /// private method and the shim converts through one helper, so the TT
+  /// returned here is the one `bodyState` uses. Returns exactly
+  /// [timeStateLength] doubles (plus [guardDoubles] sentinel-filled ones): the
+  /// UT days since J2000, then the TT days since J2000.
+  @visibleForTesting
+  List<double> timeForTesting(DateTime utc, {int guardDoubles = 0}) {
+    final utDays = _utDays(utc);
+    return _callHook(
+      timeStateLength + guardDoubles,
+      (out) => native.zodiann_test_time_for_ut(utDays, out),
+    );
+  }
+
+  /// The one place a UTC [DateTime] becomes the UT days passed to the shim.
+  static double _utDays(DateTime utc) => daysSinceJ2000(utc);
 
   /// Test hook (Task 3 Step 1b): the project-authored Moon series against
   /// upstream's own `CalcMoon` at [centuriesTt] Julian centuries of TT since

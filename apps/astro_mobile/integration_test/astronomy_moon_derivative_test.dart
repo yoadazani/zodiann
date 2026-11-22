@@ -126,6 +126,27 @@ void main() {
       expect(guarded.sublist(0, moonStateLength), plain);
     });
 
+    test('timeForTesting writes exactly timeStateLength doubles: the UT '
+        'days of the production path, then a plausible TT (D12)', () {
+      final utc = DateTime.utc(2000, 1, 1, 12);
+      final plain = _source.timeForTesting(utc);
+      expect(plain, hasLength(timeStateLength));
+      final guarded = _source.timeForTesting(utc, guardDoubles: 4);
+      expect(guarded, hasLength(timeStateLength + 4));
+      for (var i = 0; i < timeStateLength; i++) {
+        expect(guarded[i], isNot(_sentinel), reason: 'element $i not written');
+        expect(guarded[i].isFinite, isTrue, reason: 'element $i');
+      }
+      for (var i = timeStateLength; i < guarded.length; i++) {
+        expect(guarded[i], _sentinel, reason: 'guard element $i overwritten');
+      }
+      expect(guarded.sublist(0, timeStateLength), plain);
+      // out[0] is the UT days the production path sends; out[1] is the TT.
+      expect(plain[0], daysSinceJ2000(utc));
+      // The library's delta T at J2000 is about 64 seconds.
+      expect((plain[1] - plain[0]) * 86400, closeTo(63.8, 1.0));
+    });
+
     test('the series layout is lon, lat, dist, rates, upstream values', () {
       final s = _series(0.1);
       expect(s[_lon], inInclusiveRange(0, 2 * math.pi));

@@ -43,6 +43,10 @@ int zodiann_body_state(int body, double ut_days, double* out);
 #define ZODIANN_MOON_SERIES_LENGTH 9
 #define ZODIANN_MOON_STATE_LENGTH 12
 
+/* D12: the length of the time test hook below; Dart mirrors it as
+ * `timeStateLength`. */
+#define ZODIANN_TIME_STATE_LENGTH 2
+
 /* out: ours lon, lat, dist (rad, rad, AU); our rates per TT century (rad, rad,
  * AU); upstream CalcMoon lon, lat, dist. */
 int zodiann_test_moon_series(double centuries_tt, double* out);
@@ -50,6 +54,12 @@ int zodiann_test_moon_series(double centuries_tt, double* out);
 /* out: ECM position (3), ECM velocity (3), ECT position (3), ECT velocity (3);
  * velocities in AU per day. */
 int zodiann_test_moon_state(double ut_days, double* out);
+
+/* out: the UT days since J2000, then the TT days since J2000 that the
+ * production path assigns to `ut_days` (the shim's single conversion helper).
+ * Returns 0, or a non-zero status and writes nothing for a NULL `out` or a
+ * non-finite `ut_days`. */
+int zodiann_test_time_for_ut(double ut_days, double* out);
 
 #ifdef __cplusplus
 }

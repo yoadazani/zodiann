@@ -19,6 +19,12 @@ void main() {
     });
   });
 
+  group('the time test-hook length (ZOD-EPH-004 D12)', () {
+    test('timeStateLength is 2: the UT days, then the TT days', () {
+      expect(timeStateLength, 2);
+    });
+  });
+
   group('BodyState.fromBuffer', () {
     // out[0] longitude, out[1..3] r, out[4..6] v, out[7] independent longitude.
     test('maps an eight-element buffer in the shim layout', () {

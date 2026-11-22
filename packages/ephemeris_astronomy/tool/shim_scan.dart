@@ -78,3 +78,55 @@ List<String> bannedCalls(String cSource) {
       'Astronomy_BaryState(${m.group(1)})',
   ];
 }
+
+// ZOD-EPH-004 D12: the UTC-to-TT conversion has one site. The shim converts
+// through `zodiann_time_from_ut` only, so the test hook converts the way the
+// production path does. These scans make that a structural fact for the
+// project-authored sources. Residual limit (stated, not hidden): upstream's
+// own Astronomy_AddDays re-derives TT from UT internally; that is upstream
+// behaviour and is not guarded here.
+
+final _bannedTimeCall = RegExp(
+  r'\b(Astronomy_(?:TimeFromTt|MakeTime|CurrentTime))\s*\(',
+);
+const _assignOp = r'(?:[-+*/%&|^]|<<|>>)?=(?!=)';
+final _fieldAssign = RegExp(r'(?:\.|->)(?:tt|ut)\s*' + _assignOp);
+final _fieldIncrement = RegExp(r'(?:\.|->)(?:tt|ut)\s*(?:\+\+|--)');
+final _fieldPrefixIncrement = RegExp(
+  r'(?:\+\+|--)\s*[A-Za-z_]\w*(?:\s*(?:\.|->)\s*\w+)*\s*(?:\.|->)\s*(?:tt|ut)\b',
+);
+
+/// The time calls and field writes found in [cSource] that would change the
+/// TT after the single conversion, after comments and strings are removed:
+/// `Astronomy_TimeFromTt`, `Astronomy_MakeTime`, `Astronomy_CurrentTime`, and
+/// any assignment (`=`, `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `|=`, `^=`,
+/// `<<=`, `>>=`, `++`, `--`) to a `.tt` or `.ut` field. Reads and `==`
+/// comparisons are allowed (`zodiann_moon_rate.c` reads `time.tt`).
+List<String> bannedTimeCalls(String cSource) {
+  final code = stripCommentsAndStrings(cSource);
+  return [
+    for (final m in _bannedTimeCall.allMatches(code)) m.group(1)!,
+    for (final m in _fieldAssign.allMatches(code)) m.group(0)!.trim(),
+    for (final m in _fieldIncrement.allMatches(code)) m.group(0)!.trim(),
+    for (final m in _fieldPrefixIncrement.allMatches(code)) m.group(0)!.trim(),
+  ];
+}
+
+/// How many times [name] is called (followed by an opening parenthesis) in
+/// [cSource], after comments and strings are removed.
+int callCount(String cSource, String name) =>
+    RegExp(r'\b' + RegExp.escape(name) + r'\s*\(')
+        .allMatches(stripCommentsAndStrings(cSource))
+        .length;
+
+final _helperDefinition = RegExp(r'\bastro_time_t\s+zodiann_time_from_ut\s*\(');
+
+/// How many times `zodiann_time_from_ut` is defined (or declared, which is
+/// counted the same way, so a separate prototype is rejected: the helper is
+/// defined before its first use).
+int helperDefinitionCount(String cSource) =>
+    _helperDefinition.allMatches(stripCommentsAndStrings(cSource)).length;
+
+/// How many times `zodiann_time_from_ut` is called, its definition excluded.
+int helperCallCount(String cSource) =>
+    callCount(cSource, 'zodiann_time_from_ut') - helperDefinitionCount(cSource);

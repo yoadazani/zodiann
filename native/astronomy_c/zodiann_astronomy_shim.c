@@ -37,6 +37,19 @@ static double zodiann_degrees_in_circle(double degrees)
 }
 
 /*
+ * The one UTC-to-TT conversion of the shim (ZOD-EPH-004 D12). Every entry point,
+ * the test hook zodiann_test_time_for_ut included, converts through this
+ * function, so the hook reports exactly the TT the production path uses; a
+ * host guard requires that it is the only caller of Astronomy_TimeFromDays and
+ * that nothing edits the time afterwards. Defined before its first use, with no
+ * separate prototype (the guard counts definitions).
+ */
+static astro_time_t zodiann_time_from_ut(double ut_days)
+{
+    return Astronomy_TimeFromDays(ut_days);
+}
+
+/*
  * The Moon: the longitude is upstream's Astronomy_EclipticGeoMoon (ECT, upstream
  * code, unchanged); the position and velocity are the project-authored Moon
  * series and its analytic derivative, in ECT (zodiann_moon_rate.c). Writes out
@@ -44,7 +57,7 @@ static double zodiann_degrees_in_circle(double degrees)
  */
 static int zodiann_moon_body_state(double ut_days, double* out)
 {
-    astro_time_t t = Astronomy_TimeFromDays(ut_days);
+    astro_time_t t = zodiann_time_from_ut(ut_days);
     astro_spherical_t sphere = Astronomy_EclipticGeoMoon(t);
     double r_ecm[3], v_ecm[3], r_ect[3], v_ect[3];
     int i;
@@ -79,7 +92,7 @@ int zodiann_body_state(int body, double ut_days, double* out)
     if (body == ZODIANN_BODY_MOON)
         return zodiann_moon_body_state(ut_days, out);
 
-    t = Astronomy_TimeFromDays(ut_days);
+    t = zodiann_time_from_ut(ut_days);
 
     /* Apparent geocentric position (light time and aberration), EQJ. */
     geo = Astronomy_GeoVector(kShimBodies[body], t, ABERRATION);
@@ -167,7 +180,7 @@ int zodiann_test_moon_state(double ut_days, double* out)
 
     if (out == NULL || !isfinite(ut_days))
         return ASTRO_INVALID_PARAMETER;
-    t = Astronomy_TimeFromDays(ut_days);
+    t = zodiann_time_from_ut(ut_days);
     zodiann_moon_state(t, r_ecm, v_ecm, r_ect, v_ect);
     for (i = 0; i < 3; ++i)
     {
@@ -176,5 +189,20 @@ int zodiann_test_moon_state(double ut_days, double* out)
         out[6 + i] = r_ect[i];
         out[9 + i] = v_ect[i];
     }
+    return 0;
+}
+
+/* Test-only (D12): the time the production path assigns to `ut_days`, through
+ * the same helper. out[0] the UT days since J2000, out[1] the TT days since
+ * J2000. Writes nothing unless it returns 0. */
+int zodiann_test_time_for_ut(double ut_days, double* out)
+{
+    astro_time_t t;
+
+    if (out == NULL || !isfinite(ut_days))
+        return ASTRO_INVALID_PARAMETER;
+    t = zodiann_time_from_ut(ut_days);
+    out[0] = t.ut;
+    out[1] = t.tt;
     return 0;
 }

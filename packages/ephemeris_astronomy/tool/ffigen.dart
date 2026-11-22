@@ -18,6 +18,8 @@ const _functions = {
   // Test-only (Task 3 Step 1b).
   'zodiann_test_moon_series',
   'zodiann_test_moon_state',
+  // Test-only (D12).
+  'zodiann_test_time_for_ut',
 };
 
 Future<void> main() async {

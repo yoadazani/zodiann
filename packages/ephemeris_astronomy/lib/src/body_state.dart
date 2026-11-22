@@ -18,6 +18,11 @@ const int moonSeriesLength = 9;
 /// this many doubles.
 const int moonStateLength = 12;
 
+/// The number of doubles the test-only time function writes (D12): the UT days
+/// since J2000, then the TT days since J2000, as the shim's single conversion
+/// helper computes them. The caller owns a buffer of exactly this many doubles.
+const int timeStateLength = 2;
+
 /// The native shim's body ids (D2). An explicit table, not `Body.index`, so a
 /// reordering of the [Body] enum cannot silently change what is sent across
 /// the FFI boundary. [Body.node] is absent: the node is formula-based and is
