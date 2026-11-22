@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Not Started
+- **Status:** Completed (Android and host; iOS not verified, see Notes)
 - **Scope:** MVP
 
 ## Description
@@ -25,9 +25,9 @@ No direct design reference applies — pure computation / native binding.
 
 ## Acceptance Criteria
 
-- [ ] ACC-2 passes: proved on this task's own device test over the 53 instants of `reference_dates.json`, ten physical bodies, within 1 arcminute of JPL Horizons at equivalent TT instants (the position model; the UT-to-TT conversion is documented separately in `docs/spikes/ZOD-EPH-004-delta-t.md`); the shared T-EPH-1 suite run is tracked by ZOD-TST-005.
-- [ ] Swapping from Swiss Ephemeris to this backup requires only a DI override, no feature-code changes.
-- [ ] Node longitude from this path still uses the ZOD-EPH-001 formula, not an astronomy-engine-derived value.
+- [x] ACC-2 passes: proved on this task's own device test over the 53 instants of `reference_dates.json`, ten physical bodies, within 1 arcminute of JPL Horizons at equivalent TT instants (the position model; the UT-to-TT conversion is documented separately in `docs/spikes/ZOD-EPH-004-delta-t.md`); the shared T-EPH-1 suite run is tracked by ZOD-TST-005.
+- [x] Swapping from Swiss Ephemeris to this backup requires only a DI override, no feature-code changes.
+- [x] Node longitude from this path still uses the ZOD-EPH-001 formula, not an astronomy-engine-derived value.
 
 ## Dependencies
 
