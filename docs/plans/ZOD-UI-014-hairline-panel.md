@@ -51,8 +51,13 @@ ZodiannPanelHead({
 - Shell paints `surface` fill, `Border.all(color: lineSoft, width: ZodiannSize.hairline)`, `ZodiannRadius.panel`, **no `boxShadow`, no elevation parameter**.
 - Border-box: content sits inside the 1 px border.
 - Head padding follows the reference: horizontal = `layout.panelPadding` (20 / 16); vertical = `ZodiannSpace.s4` (16) on regular and `ZodiannSpace.s3` (12) on phone, branching on `layout == ZodiannLayout.phone`. Gap between head children 12 (`ZodiannSpace.s3`). Directional padding only.
-- Head height = `max(layout.panelHeadHeight, 2 × verticalPadding + content + hairline)`, content centred. Arithmetic: a titled head is 16 + 20.8 + 16 + 1 = 53.8 (regular) and 12 + 20.8 + 12 + 1 = 45.8 (phone), both below the minimum, so 56 / 52 govern; a 40 px child gives 73 (regular) and 65 (phone). An empty head is exactly 56 / 52.
-- Head layout: a `Wrap` (spacing 12, run spacing 8, vertically centred) holding the start group (`leading`, or title + meta) and `end`. `end` is pushed to the end edge when it fits on the same line; when it does not (phone, long hint) it wraps beneath the start group, as `wheel.html:56-57` does. Title and meta wrap rather than ellipsize (O4 default).
+- Head height = `max(layout.panelHeadHeight, 2 × verticalPadding + content + hairline)`. Built as `ConstrainedBox(constraints: BoxConstraints(minHeight: panelHeadHeight - hairline))` over the padded, vertically centred content, then the 1 px bottom rule, so the rule sits **inside** the 56 / 52 and an empty head is exactly 56 / 52. Arithmetic: a titled head is 16 + 20.8 + 16 + 1 = 53.8 (regular) and 12 + 20.8 + 12 + 1 = 45.8 (phone), both below the minimum, so 56 / 52 govern; a 40 px child gives 73 (regular) and 65 (phone). An empty head is exactly 56 / 52.
+- Head layout: a private `CustomMultiChildLayout` (one `MultiChildLayoutDelegate`; `Wrap` cannot push `end` to the end edge). The head **fills the panel width** (the delegate sizes itself to `constraints.maxWidth`; no `SizedBox(width: …)`). Rules, with gap `ZodiannSpace.s3` (12) between start and `end` and `ZodiannSpace.s2` (8) between lines:
+  1. measure `end` at its intrinsic width and the start group (`leading`, or title + meta) at its natural width;
+  2. if `start + 12 + end` fits, one line, start at the start edge, `end` at the end edge (directional), both vertically centred;
+  3. otherwise, on **regular** widths (kit.css has no wrap there): `end` stays beside the start group, which is laid out in `max − end − 12` and wraps its text;
+  4. otherwise, on **phone** (`wheel.html:56-57`): `end` goes on a second line below the start group, at the end edge, and the start group takes the full width.
+  Title and meta wrap rather than ellipsize (O4 default).
 - The panel is a plain box that takes its parent's width; it never stacks itself and sets no margin (the page owns `panelGap` and `gutter`).
 - Focus-ring contract (UI-004): the panel adds **no clip by default**, so a button's 4 px focus ring in a head or body is never cut off. A caller that sets `clipBehavior` owns keeping 4 px of clear space around buttons; the doc comment says so.
 
@@ -81,7 +86,7 @@ ZodiannPanelHead({
 | `packages/shared_ui/lib/shared_ui.dart` | export `zodiann_panel.dart` |
 | `packages/shared_ui/test/theme/dimensions_test.dart` | pin `hairline` |
 | `packages/shared_ui/test/support/token_panel_harness.dart` | build panels with the real widget (boxes as content) |
-| `packages/shared_ui/test/support/pixels.dart` | new: `_Pixels` moved out of `panel_spacing_test.dart` (pure move) |
+| `packages/shared_ui/test/support/pixels.dart` | new: `_Pixels` moved out of `panel_spacing_test.dart` and renamed public `Pixels` |
 | `packages/shared_ui/test/widgets/panel_test.dart` | new: decoration, head sizing, wrap, RTL, text scale, semantics, clip |
 | `packages/shared_ui/test/widgets/panel_pixels_test.dart` | new: border, radius, padding, head, no shadow by pixels, both themes |
 | `packages/shared_ui/test/widgets/panel_reference_test.dart` | new, conditional (Task 5) |
@@ -106,7 +111,7 @@ All commands run from `packages/shared_ui` unless marked **root** (tests read `.
   4. an empty head is exactly `panelHeadHeight` tall (56 / 52), rule included (this is what the UI-003 harness measures);
   5. a titled head (one line) is 56 / 52; a head with a 40 px child is 73 on regular and 65 on phone (16 + 40 + 16 + 1; 12 + 40 + 12 + 1); a 72 px child grows it further, never shrinks;
   6. head variants lay out without overflow at 1440 and 390: title only; title + meta; title + meta + a 96 px button as `end`; `leading` only;
-  7. wrap: at 390, a fixed-width `leading` (full panel width) plus a 120-character `end` text lays out without overflow, with `end` **below** `leading`; at 1440 the same pair sits on one line with `end` at the end edge;
+  7. placement: (a) at 1440, a short `leading` plus a 96 px `end` sit on one line, `end` at the end edge; (b) at 1440, a 200-character title with a 96 px `end`: `end` stays on the first line at the end edge and the title wraps; (c) at 390, a `leading` that fills the width (a `SizedBox(width: double.infinity)` built **in the test** from a `LayoutBuilder`, not a pixel literal) plus a 120-character `end` text lays out without overflow with `end` **below** `leading`; each case in LTR and RTL (mirrored offsets as in test 8); the head always spans the panel's inner width;
   8. RTL: title at the right (start) edge, `end` at the left (end) edge; each child's offset equals `width − (LTR offset + child width)`;
   9. text scale 2.0: head grows, no overflow; a 200-character title wraps over several lines and is fully present (no ellipsis);
   10. semantics: the title is a header node; meta and `end` are not marked as headers;
@@ -117,14 +122,14 @@ All commands run from `packages/shared_ui` unless marked **root** (tests read `.
 
 ### Task 3: Switch the harness to the real widget (regression of UI-003)
 
-- [ ] **Step 1:** rewrite `_Panel` in `test/support/token_panel_harness.dart` to `ZodiannPanel(head: ZodiannPanelHead(), child: <the 40 px accent block>)`, keeping the public keys and updating the header comment. This changes what the spacing test measures: the head is now the real min-height path (an empty head is exactly `panelHeadHeight` including its rule, proved by Task 2 test 4), not a hand-built `SizedBox` plus rule.
+- [ ] **Step 1:** rewrite `_Panel` in `test/support/token_panel_harness.dart` to `ZodiannPanel(head: ZodiannPanelHead(), child: <the 40 px accent block>)`, keeping the public keys and updating the header comment. This changes what the spacing test measures: the head is now the real min-height path (an empty head is exactly `panelHeadHeight` including its rule, proved by Task 2 test 4), not a hand-built `SizedBox` plus rule. The panel must still stretch to its parent's width (`Column(crossAxisAlignment: stretch)` on phone, `Expanded` on desktop) and the head must not shrink-wrap; the unchanged spacing test's content offsets at 1440 and 390 prove it.
 - [ ] **Step 2:** run `fvm flutter test test/theme/panel_spacing_test.dart` with **no edits to its expectations**: passes at 1440 and 390.
 - [ ] **Step 3:** `grep -rn TokenPanelHarness` across the repo; run every other consumer unchanged (only `panel_spacing_test.dart` was found while planning).
 - [ ] **Step 4:** commit `test(ZOD-UI-014): measure the real panel in the token harness`.
 
 ### Task 4: Pixel proof of border, radius, padding, head, and no shadow (both themes)
 
-- [ ] **Step 1 (`test/widgets/panel_pixels_test.dart`):** builds **its own** panel on a `bg` page with at least a 32 px margin on every side (the harness's 24 px gutter is too small for the shadow scan). Move `_Pixels` from `panel_spacing_test.dart` to `test/support/pixels.dart` as a pure move (update that import; re-run the spacing test). For Graphite and Porcelain at (1440 × 900, DPR 1) and (390 × 1200, DPR 1):
+- [ ] **Step 1 (`test/widgets/panel_pixels_test.dart`):** builds **its own** panel on a `bg` page with at least a 32 px margin on every side (the harness's 24 px gutter is too small for the shadow scan). Move `_Pixels` from `panel_spacing_test.dart` to `test/support/pixels.dart` and rename it public `Pixels` (a private class cannot be imported); update its 3 uses and the import in `panel_spacing_test.dart`, no expectation changes, and re-run the spacing test. For Graphite and Porcelain at (1440 × 900, DPR 1) and (390 × 1200, DPR 1):
   - border: the outermost ring pixel away from the corners is `lineSoft` exactly, 1 px wide, then `surface`;
   - radius: pixel (0, 0) is `bg`; the pixel on the diagonal about 3.5 px in (12 × (1 − 1/√2)) is partly covered; the straight edge is full colour from y = 12 down (first fully bordered row equals the radius token within 1 px);
   - padding and head: content offsets 1 + `panelPadding` and 1 + head + `panelPadding` in both themes (the spacing test covers Graphite only);
@@ -160,7 +165,7 @@ Sequential, native (`executing-plans`). The tasks share two files (`zodiann_pane
 
 - Flutter may lay out text lines up to 1 px differently from Chrome; the pixel tests use an empty head (as the UI-003 harness does) for exactness, and the reference test allows ±1 px (measured in Task 5).
 - Clipping default (O2): no clip matches the CSS and protects focus rings, but a full-bleed child with its own background paints over the 12 px corners. Callers opt in; UI-010 (tables) must decide at its planning.
-- Head wrap: `Wrap` makes the head's height depend on content width; Task 2 tests 6, 7 and 9 pin the cases that exist in the design.
+- Head layout: a custom layout delegate is the most code in this task and the head's height depends on content width; Task 2 tests 6, 7 and 9 pin the cases that exist in the design. The delegate must report intrinsic sizes sensibly or the panel must not be used inside intrinsic measurement (document it).
 
 ## Open decisions (for the owner; defaults are implemented)
 
@@ -176,7 +181,7 @@ Sequential, native (`executing-plans`). The tasks share two files (`zodiann_pane
 | ID | Severity | Finding | Done |
 |---|---|---|---|
 | I1 | Important | O1 and the head-height risk rested on a wrong reading of kit.css; phone padding is 12 / 16 with `min-height: 52` (`settings.html:33`, `wheel.html:55`) | Applied (checked against the files); head sizing, heights 73 / 65 and test 5 added; O1 reduced to a confirmation |
-| I2 | Important | Wrap / overflow behaviour of the head unspecified (wheel panel wraps on phone) | Applied: `Wrap` layout, tests 6 and 7 |
+| I2 | Important | Wrap / overflow behaviour of the head unspecified (wheel panel wraps on phone) | Applied (mechanism replaced in round 2, see I7): tests 6 and 7 |
 | I3 | Important | RTL test wording wrong | Applied: test 8 reworded |
 | I4 | Important | No exact commands or expected RED reasons | Applied: commands, working directory, expected failures, guard test named |
 | I5 | Important | Clip test under-specified | Applied: `Transform.translate` pixel construction; hit-test only if verified; M8 mapped to test 11 |
@@ -187,4 +192,15 @@ Sequential, native (`executing-plans`). The tasks share two files (`zodiann_pane
 | M4 | Minor | Pixel test margin and Graphite-only spacing test | Applied: Task 4 builds its own panel with a 32 px margin |
 | M5 | Minor | Task 5: PNG is 1×; only shell and head | Applied |
 
-Open items: O2, O3, O4 (owner). Round 2 (focused on the revision) follows.
+**Round 2** (`plan-reviewer`, focused on the revision, commits `02a1793..1e05655`). Verdict: approve after corrections; round 1 items I1 to I6 and M1 to M5 confirmed applied.
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| I7 | Important | `Wrap` cannot push `end` to the end edge, and would drop `end` below a long title on desktop where kit.css does not wrap | Applied: `CustomMultiChildLayout` with explicit rules 1 to 4 (fills panel width; wrap-below only on phone); test 7 split into cases a to c, LTR and RTL |
+| I8 | Important | `_Pixels` is library-private; a "pure move" cannot work | Applied: move and rename to public `Pixels`, update 3 uses and the import |
+| M6 | Minor | Centring and rule-inside-56/52 construction unstated | Applied: `ConstrainedBox(minHeight: panelHeadHeight - hairline)` plus rule |
+| M7 | Minor | Run spacing named as a literal | Applied: `ZodiannSpace.s2` / `s3` named in the layout rules |
+| M8 | Minor | Test 7 width derivation | Applied: built from a `LayoutBuilder` in the test |
+| M9 | Minor | Harness panel must keep stretching | Applied: sentence in Task 3 |
+
+Two rounds are used. Open items for the owner: O2, O3, O4 (defaults implemented).
