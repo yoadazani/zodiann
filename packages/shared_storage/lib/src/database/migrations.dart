@@ -12,12 +12,21 @@ typedef MigrationStep = Future<void> Function(Migrator migrator);
 const Map<int, MigrationStep> migrationSteps = {};
 
 /// Brings a database at version [from] up to [to] by running the steps for
-/// versions `from + 1` through `to`, in ascending order.
+/// versions `from + 1` through `to`, in ascending order, inside one
+/// transaction.
 ///
 /// `from == to` does nothing. Throws `StorageException(unsupportedVersion)`
 /// when `from > to` (the file was written by a newer app) or when a step in
-/// the range is missing. Drift calls this for upgrades and downgrades alike
-/// and never when the versions are equal.
+/// the range is missing; both are decided before any step runs, so a refused
+/// range opens no transaction and changes nothing. Drift calls this for
+/// upgrades and downgrades alike and never when the versions are equal.
+///
+/// The transaction matters: drift runs `onUpgrade` without one and writes the
+/// new `user_version` only after it returns, so a step that fails part-way
+/// would otherwise leave its schema change in the file at the old version, and
+/// the next launch would run the same step again and fail. Inside the
+/// transaction a failure rolls every step of the range back. See
+/// `docs/storage/schema-migrations.md`.
 Future<void> applyMigrations(
   Migrator migrator,
   int from,
@@ -32,13 +41,16 @@ Future<void> applyMigrations(
     );
   }
   for (var version = from + 1; version <= to; version++) {
-    final step = steps[version];
-    if (step == null) {
+    if (steps[version] == null) {
       throw StorageException(
         StorageFailureKind.unsupportedVersion,
         'No migration step to schema version $version',
       );
     }
-    await step(migrator);
   }
+  await migrator.database.transaction(() async {
+    for (var version = from + 1; version <= to; version++) {
+      await steps[version]!(migrator);
+    }
+  });
 }
