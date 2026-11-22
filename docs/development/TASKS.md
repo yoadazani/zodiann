@@ -265,7 +265,7 @@ Primary design reference: `design-reference/zodiann/screens/04-settings_{desktop
 | ZOD-L10-011 | [Verify month/weekday localization and 24-hour time everywhere](localization/ZOD-L10-011-verify-month-weekday-localization-and-24-hour-time-everywhere.md) | Low | Not Started |
 | ZOD-L10-012 | [Enforce Western digits everywhere](localization/ZOD-L10-012-enforce-western-digits-everywhere.md) | Low | Not Started |
 | ZOD-L10-013 | [Resolve and document the symbol-translation open decision](localization/ZOD-L10-013-resolve-and-document-the-symbol-translation-open-decision.md) | Medium | Done |
-| ZOD-L10-014 | [Implement the missing-translation-key CI test](localization/ZOD-L10-014-implement-the-missing-translation-key-ci-test.md) | High | Not Started |
+| ZOD-L10-014 | [Implement the missing-translation-key CI test](localization/ZOD-L10-014-implement-the-missing-translation-key-ci-test.md) | High | Done |
 | ZOD-L10-015 | [Build the EN/HE × phone/tablet screenshot comparison suite](localization/ZOD-L10-015-build-the-en-he-phone-tablet-screenshot-comparison-suite.md) | Medium | Not Started |
 
 ### About & Sources (`about/`)
