@@ -29,6 +29,8 @@ void main() {
     expect(ZodiannStates.focusRingGap, 2);
     expect(ZodiannStates.dangerBorderOpacity, 0.45);
     expect(ZodiannStates.hoverDuration, const Duration(milliseconds: 150));
+    expect(ZodiannStates.plannedOpacity, 0.4);
+    expect(ZodiannStates.selectionDuration, const Duration(milliseconds: 120));
     expect(ZodiannStates.transparent, _transparent);
     expect(ZodiannStates.onDangerSolid, const Color(0xFFFFFFFF));
   });

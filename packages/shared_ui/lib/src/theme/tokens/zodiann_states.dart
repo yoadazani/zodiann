@@ -28,6 +28,14 @@ abstract final class ZodiannStates {
   /// (`color-mix(in srgb, var(--danger) 45%, transparent)`).
   static const double dangerBorderOpacity = 0.45;
 
+  /// A planned (unavailable) segmented-control option renders at 40 % opacity
+  /// (MASTER §10, kit.css `.seg > span.dis`).
+  static const double plannedOpacity = 0.4;
+
+  /// A selection change crossfades over 120 ms (MASTER §12); instant under
+  /// reduced motion.
+  static const Duration selectionDuration = Duration(milliseconds: 120);
+
   /// The hover transition (MASTER §12); instant under reduced motion.
   static const Duration hoverDuration = Duration(milliseconds: 150);
 
