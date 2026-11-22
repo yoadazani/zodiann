@@ -20,6 +20,9 @@ import '../theme/zodiann_text_styles.dart';
 /// Measured as a CSS border-box: the body padding sits **inside** the 1 px
 /// border, and the head's height includes its rule.
 ///
+/// Not for intrinsic measurement (`IntrinsicHeight`) when it has a head: see
+/// [ZodiannPanelHead].
+///
 /// **Focus rings.** By default the panel does not clip, so a button's
 /// 4 px focus ring in the head or body is never cut off (ZOD-UI-004). Content
 /// that runs edge to edge (a table with its own background) would paint over
@@ -103,7 +106,8 @@ class ZodiannPanel extends StatelessWidget {
 /// width), or [end] drops to a second line below it (on a phone, as the wheel
 /// panel's head does). Title and meta wrap; nothing is truncated.
 ///
-/// Not for intrinsic measurement: its height depends on its width.
+/// Not for intrinsic measurement (`IntrinsicHeight`): its height depends on
+/// its width, and a `leading` such as a `LayoutBuilder` has no intrinsics.
 class ZodiannPanelHead extends StatelessWidget {
   /// A head with a [title], [meta], or a free [leading], and an optional [end].
   const ZodiannPanelHead({
@@ -142,28 +146,21 @@ class ZodiannPanelHead extends StatelessWidget {
         leading ??
         (title == null && meta == null
             ? null
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
+            : Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: ZodiannSpace.s3,
+                runSpacing: ZodiannSpace.s1,
                 children: [
                   if (title != null)
-                    Flexible(
-                      child: Semantics(
-                        header: true,
-                        child: Text(
-                          title!,
-                          style: styles.panelTitle.copyWith(color: s.text),
-                        ),
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        title!,
+                        style: styles.panelTitle.copyWith(color: s.text),
                       ),
                     ),
                   if (meta != null)
-                    Flexible(
-                      child: Text(
-                        meta!,
-                        style: styles.small.copyWith(color: s.text2),
-                      ),
-                    ),
+                    Text(meta!, style: styles.small.copyWith(color: s.text2)),
                 ],
               ));
 
@@ -255,9 +252,11 @@ class _HeadLayout
 
 /// Places the start group and the end widget (see [ZodiannPanelHead]).
 ///
-/// 1. If start (natural width) + gap + end fits, one line.
-/// 2. Otherwise, above phone width, the start group wraps in what the end
-///    widget leaves, still one row.
+/// 1. If start + gap + end fit, one line (children are laid out at their
+///    natural width, never through intrinsics, so a `LayoutBuilder` works).
+/// 2. Otherwise, above phone width, the end widget keeps at least half of the
+///    row (or what the start group leaves) and the start group wraps in what
+///    it leaves, still one row.
 /// 3. Otherwise (phone), the end widget goes on a second line.
 ///
 /// The layout fills the available width, so the end widget reaches the end
@@ -322,24 +321,33 @@ class _RenderHeadLayout extends RenderBox
     Size startSize = Size.zero;
     Size endSize = Size.zero;
     var stacked = false;
+    if (start != null) startSize = layoutChild(start, loose);
     if (end != null) endSize = layoutChild(end, loose);
-    if (start != null) {
-      final natural = start.getMaxIntrinsicWidth(double.infinity);
-      final room = endSize.width > 0 ? maxW - _gap - endSize.width : maxW;
-      if (end == null || natural <= room) {
-        startSize = layoutChild(start, BoxConstraints(maxWidth: room));
-      } else if (_stackEnd) {
+    if (start != null &&
+        end != null &&
+        startSize.width + _gap + endSize.width > maxW) {
+      if (_stackEnd) {
         stacked = true;
-        startSize = layoutChild(start, loose);
       } else {
+        // One row: the end widget keeps at least half of the row, or what
+        // the start group leaves; the start group wraps in the rest.
+        final endCap = math.max(
+          (maxW - _gap) / 2,
+          maxW - _gap - startSize.width,
+        );
+        if (endSize.width > endCap) {
+          endSize = layoutChild(end, BoxConstraints(maxWidth: endCap));
+        }
         startSize = layoutChild(
           start,
-          BoxConstraints(maxWidth: math.max(0, room)),
+          BoxConstraints(maxWidth: math.max(0, maxW - _gap - endSize.width)),
         );
       }
     }
 
-    final double contentWidth = width ?? startSize.width + endSize.width;
+    final both = start != null && end != null;
+    final double contentWidth =
+        width ?? startSize.width + (both ? _gap : 0) + endSize.width;
     final double height;
     double startY;
     double endY;
@@ -413,7 +421,7 @@ class _RenderHeadLayout extends RenderBox
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
-    for (final child in children) {
+    for (final child in children.toList().reversed) {
       final data = child.parentData as BoxParentData;
       final hit = result.addWithPaintOffset(
         offset: data.offset,

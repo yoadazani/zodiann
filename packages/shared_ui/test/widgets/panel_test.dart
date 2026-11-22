@@ -70,8 +70,9 @@ Widget _box(Key key, double w, double h) =>
 
 Rect _panelRect(WidgetTester t) => t.getRect(find.byType(ZodiannPanel));
 
-double _padding(Size size) =>
-    size == _phone ? ZodiannLayout.phone.panelPadding : 20;
+double _padding(Size size) => size == _phone
+    ? ZodiannLayout.phone.panelPadding
+    : ZodiannLayout.regular.panelPadding;
 
 /// The head's height, read from where the body's probe starts.
 Future<double> _headHeight(
@@ -307,6 +308,109 @@ void main() {
         expect(rStart.top, start.top);
         expect(rEnd.top, end.top);
       });
+    });
+  });
+
+  group('head layout robustness (whole-branch review)', () {
+    final longText = List.filled(60, 'wide').join(' ');
+
+    testWidgets('a LayoutBuilder as leading lays out (no intrinsics), with '
+        'and without an end', (tester) async {
+      Widget lead() => LayoutBuilder(
+        builder: (_, c) => SizedBox(key: _lead, width: 100, height: 20),
+      );
+      for (final end in <Widget?>[null, _box(_end, 96, 20)]) {
+        await _pump(
+          tester,
+          ZodiannPanel(
+            head: ZodiannPanelHead(leading: lead(), end: end),
+            child: _box(_probe, 10, 10),
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        expect(
+          tester.getRect(find.byKey(_lead)).left,
+          _panelRect(tester).left + 1 + 20,
+        );
+      }
+    });
+
+    testWidgets('a very long end never squeezes a short title to nothing', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        ZodiannPanel(
+          head: ZodiannPanelHead(title: 'Settings', end: Text(longText)),
+          child: _box(_probe, 10, 10),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final title = tester.getRect(find.text('Settings'));
+      expect(title.height, lessThan(30), reason: 'title stays on one line');
+      expect(title.width, greaterThan(40));
+      final end = tester.getRect(find.text(longText));
+      expect(end.left, greaterThanOrEqualTo(title.right + 12 - 0.01));
+    });
+
+    testWidgets('a long title and a long end share the row without '
+        'overlapping', (tester) async {
+      await _pump(
+        tester,
+        ZodiannPanel(
+          head: ZodiannPanelHead(title: longText, end: Text(longText)),
+          child: _box(_probe, 10, 10),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final title = tester.getRect(find.text(longText).first);
+      final end = tester.getRect(find.text(longText).last);
+      expect(title.right + 12, lessThanOrEqualTo(end.left + 0.01));
+      expect(title.width, greaterThan(300));
+      expect(end.width, greaterThan(300));
+    });
+
+    testWidgets('a long title with a short meta is not cut to half the '
+        'width', (tester) async {
+      final title = List.filled(14, 'Wide').join(' ');
+      await _pump(
+        tester,
+        ZodiannPanel(
+          head: ZodiannPanelHead(title: title, meta: 'ten'),
+          child: _box(_probe, 10, 10),
+        ),
+        size: _phone,
+      );
+      expect(tester.takeException(), isNull);
+      final inner = 390 - 2 * 32 - 2 - 2 * 16;
+      expect(
+        tester.getSize(find.text(title)).width,
+        greaterThan(inner / 2),
+        reason: 'title takes what meta does not use',
+      );
+    });
+
+    testWidgets('on a phone a full-width leading pushes even a short end '
+        'below it', (tester) async {
+      await _pump(
+        tester,
+        ZodiannPanel(
+          head: ZodiannPanelHead(
+            leading: const SizedBox(
+              key: _lead,
+              width: double.infinity,
+              height: 30,
+            ),
+            end: _box(_end, 96, 20),
+          ),
+          child: _box(_probe, 10, 10),
+        ),
+        size: _phone,
+      );
+      expect(
+        tester.getRect(find.byKey(_end)).top,
+        greaterThanOrEqualTo(tester.getRect(find.byKey(_lead)).bottom),
+      );
     });
   });
 
