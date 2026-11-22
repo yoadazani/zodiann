@@ -65,12 +65,12 @@
 
 - [ ] **Step 1:** Precondition: `git status --short packages/shared_ui` is clean. Delete one whole `"key": "value",` line (not the last entry; leave its `@key` entry) from `app_he.arb`; run `dart test test/architecture/l10n_key_parity_test.dart`. Expected: the parity test FAILS with `app_he.arb is missing: <key>`; others pass. Restore via `git checkout -- packages/shared_ui/lib/l10n/app_he.arb`.
 - [ ] **Step 2:** Same with `app_en.arb` (same precondition and line rule). Expected: FAIL naming `app_he.arb has keys not in app_en.arb: <key>`. Restore.
-- [ ] **Step 3:** Confirm the Full-suite path covers the root: run `fvm dart run melos list --dir-exists=test --no-flutter` and confirm the root package is listed; then `fvm dart run melos exec --dir-exists=test --no-flutter -- "dart test test/architecture/l10n_key_parity_test.dart"` and confirm it ran and passed in the root. Record the output. Also confirm `ci.yml` `Core` runs `dart test test/architecture` (pinned by `ci_workflow_test.dart`). If the root is not listed, report it as a finding. After the PR is open, record its `Core` and `Full suite` results.
+- [ ] **Step 3:** Confirm the Full-suite path covers the root: run `fvm dart run melos list --dir-exists=test --no-flutter` and confirm the root package is listed; then `fvm dart run melos exec --scope=zodiann_workspace --dir-exists=test --no-flutter -- dart test test/architecture/l10n_key_parity_test.dart` (the root package is `zodiann_workspace`; the file exists only there, so the scope is required) and confirm it ran only in the root and passed. Optionally record that `fvm dart run melos run test:dart` output includes the architecture tests. Record the output. Also confirm `ci.yml` `Core` runs `dart test test/architecture` (pinned by `ci_workflow_test.dart`). If the root is not listed, report it as a finding. After the PR is open, record its `Core` and `Full suite` results.
 - [ ] **Step 4:** `git status --short packages/shared_ui` is empty.
 
 ### Task 3: Documentation and verification
 
-- [ ] **Step 1:** Add one sentence to the `docs/ci.md` notes (the `Core` row already says "L-8 key parity"; do not duplicate it) naming the specific L-8 test is `l10n_key_parity_test.dart` › `every language has exactly the template's keys`, with the proof method.
+- [ ] **Step 1:** Add one sentence to the `docs/ci.md` notes (the `Core` row already says "L-8 key parity"; do not duplicate it) naming the specific L-8 test, `l10n_key_parity_test.dart` › `every language has exactly the template's keys`, and the proof method (fixture-package tests plus a recorded mutation run) is `l10n_key_parity_test.dart` › `every language has exactly the template's keys`, with the proof method.
 - [ ] **Step 2:** Run `dart test test/architecture`, `dart analyze --fatal-infos test`, `dart format --output=none --set-exit-if-changed test`. Record results.
 - [ ] **Step 3:** Update the task file `Status` to Done and tick its criterion, `TASKS.md` row to Done, `PROGRESS.md` (Completed Tasks, Current Task, Next Recommended, Git State, Verification with commands and commit).
 - [ ] **Step 4:** Commit `docs(ZOD-L10-014): record the verified state`, then independent whole-branch review, push, PR (skill Section 8).
@@ -93,3 +93,11 @@
 ### Round 2 (plan-reviewer), first attempt
 
 - The first round 2 ran against the plan before the round 1 corrections were on disk (my edit step failed), so its "not resolved" findings were stale. Its one new finding was **I3 (Important): commands must use `fvm`**. Applied as a Global Constraint. Round 2 is re-run on commit range 29d1520..HEAD.
+
+### Round 2 (plan-reviewer), on 29d1520..5eace51
+
+- **Verdict:** approve after corrections. No Critical findings. I1, I2 (in intent), M1 to M4 confirmed resolved.
+- **I3 (Important, fvm):** applied as a Global Constraint (this also covers M5).
+- **I4 (Important):** the `melos exec` in Task 2 step 3 would run the root-only test path in every package. Applied: added `--scope=zodiann_workspace` and removed the quotes.
+- **M6:** ci.md sentence grammar (applied).
+- **Needs user decision:** none. Two rounds are used; no open items.
