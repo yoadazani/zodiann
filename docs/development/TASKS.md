@@ -117,7 +117,7 @@ Every task in this section implements a component that is **already fully design
 | ZOD-UI-003 | [Implement spacing, radius, elevation, and sizing tokens](shared-ui-design-system/ZOD-UI-003-implement-spacing-radius-elevation-and-sizing-tokens.md) | Medium | Done |
 | ZOD-UI-004 | [Implement the button components (primary, secondary, accent-outline, quiet, danger) and their states](shared-ui-design-system/ZOD-UI-004-implement-the-button-components-primary-secondary-accent-outline-quiet.md) | High | Done |
 | ZOD-UI-005 | [Implement the input/field component](shared-ui-design-system/ZOD-UI-005-implement-the-input-field-component.md) | High | Not Started |
-| ZOD-UI-006 | [Implement the segmented control component](shared-ui-design-system/ZOD-UI-006-implement-the-segmented-control-component.md) | High | Not Started |
+| ZOD-UI-006 | [Implement the segmented control component](shared-ui-design-system/ZOD-UI-006-implement-the-segmented-control-component.md) | High | Done |
 | ZOD-UI-007 | [Implement switch, stepper, and body-chip components](shared-ui-design-system/ZOD-UI-007-implement-switch-stepper-and-body-chip-components.md) | Medium | Not Started |
 | ZOD-UI-008 | [Implement the radio-list component (ephemeris source selector)](shared-ui-design-system/ZOD-UI-008-implement-the-radio-list-component-ephemeris-source-selector.md) | Low | Not Started |
 | ZOD-UI-009 | [Implement the tag component (highlight tags, mode tags, Today/Center outline tags)](shared-ui-design-system/ZOD-UI-009-implement-the-tag-component-highlight-tags-mode-tags-today-center.md) | Medium | Done |

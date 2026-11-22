@@ -222,3 +222,11 @@ The behaviours the tests do not obviously reach: a `value` that changes while a 
 | M1 to M3 | Minor | Pressable doc comment; colour-only text animation; criterion 3 mapping | Applied |
 
 Two rounds are used. Open items for the owner: O1 to O5 (defaults implemented).
+
+## Execution notes (2026-11-23)
+
+- **Deviation, Flutter 3.50:** round 2 of the plan review (I2) specified a custom `Action` whose `isEnabled` is true only for Left and Right so that Up and Down fall through to ancestors. In Flutter 3.50 `Actions.maybeFind` returns the nearest action by intent type even when it is disabled, and the shortcut manager would then report the key as unhandled for the whole chain, so Up and Down would never reach the default traversal or an outer handler. The implemented action is enabled for all four directions: Left and Right move focus between enabled segments (mirrored in RTL, stopping at the ends, scrolling the new segment into view); Up and Down are passed to the next enclosing handler found from a context above the control, and `consumesKey` is true for them only when that handler is enabled and consumes the key. Tests: an outer handler sees Up and Down and never Left and Right; with a disabled outer handler Up and Down are reported unhandled; mutants M17 and M22.
+- **Focus ring (found by the final review):** the planned "ring on each segment" was drawn by `ZodiannPressable` inside each slot, where the selected neighbour (2 px gap, opaque thumb) covered it. `ZodiannPressable` gained `focusRing` (default true) and the control draws the focused thumb's ring in a layer above the row, measured from the thumb (not the 44 px slot). Tests: LTR and RTL pixel tests, a Tab-versus-tap test, a short-segment test; mutant M23.
+- **Text scale:** above scale about 1.6 the row sat at the top of the track stack; fixed by centring (tests at scales 2 and 3; mutant M21).
+- **Sheet test tolerance:** the unselected icon is compared at 8 per channel (anti-aliasing coverage 95 percent on the sheet against 100 percent here); the selected icon, which separates `accent-strong` from `text`, at 3.
+- **Verification:** package by package after a single full run was stopped by the system for low memory (an environment event, not a failure); results and the 23-mutant proof are in `docs/PROGRESS.md` under Verification.
