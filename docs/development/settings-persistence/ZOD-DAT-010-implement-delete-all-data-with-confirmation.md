@@ -38,7 +38,7 @@ Implement the destructive action that clears every setting and saved square from
 
 ## Notes
 
-_No additional notes._
+- 2026-11-22 (ZOD-FND-006): the wipe primitives are `SettingsStore.clear()` and `SquareStore.deleteAll()`; the confirmation and the flow are this task's.
 
 ---
 

@@ -37,7 +37,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- 2026-11-22 (ZOD-FND-006): the stub exists: `applyMigrations` and the empty `migrationSteps` in `packages/shared_storage/lib/src/database/migrations.dart`, wired into `MigrationStrategy.onUpgrade`; a newer on-disk version throws `StorageException(unsupportedVersion)`. This task owns the documented process, the schema dumps and the first real step.
 
 ---
 

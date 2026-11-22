@@ -37,7 +37,7 @@ Wire the red "storage unavailable" banner ([ZOD-UI-012](../shared-ui-design-syst
 
 ## Notes
 
-_No additional notes._
+- 2026-11-22 (ZOD-FND-006): the real failure path is `StorageFailureReporter.failures` (a broadcast stream of `StorageException` with `kind` unavailable, full, corrupt or unsupportedVersion); every store reports a failure and then throws it. The read-only degraded mode against last-known state is this task's.
 
 ---
 
