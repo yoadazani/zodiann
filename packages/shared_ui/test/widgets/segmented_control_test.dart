@@ -401,16 +401,63 @@ void main() {
       );
       final x = (facingX - origin.dx).floor();
       final y = (numbers.center.dy - origin.dy).floor();
-      final focus = graphiteTokens.surfaces.focus;
+      // Precondition: Graphite's focus token is white, so a ring pixel is bright
+      // in every channel (the selected thumb and its ring are dark).
+      expect(graphiteTokens.surfaces.focus.toARGB32() & 0xFFFFFF, 0xFFFFFF);
       final c = px.argb(x, y);
-      expect(
-        (c >> 16) & 0xFF,
-        greaterThan(0xC8),
-        reason: 'ring over the selected neighbour, got ${c.toRadixString(16)}',
-      );
-      expect(focus.toARGB32() & 0xFFFFFF, 0xFFFFFF);
+      for (final shift in [16, 8, 0]) {
+        expect(
+          (c >> shift) & 0xFF,
+          greaterThan(0xC8),
+          reason:
+              'ring over the selected neighbour, got ${c.toRadixString(16)}',
+        );
+      }
     });
   }
+
+  testWidgets(
+    'the focus ring hugs the thumb of a segment narrower than 44 px',
+    (tester) async {
+      const boundary = Key('ring-short-boundary');
+      const short = [
+        ZodiannSegment(value: 'd', label: '1D'),
+        ZodiannSegment(value: 'w', label: '1W'),
+        ZodiannSegment(value: 'm', label: '1M'),
+      ];
+      await pumpInApp(
+        tester,
+        RepaintBoundary(
+          key: boundary,
+          child: _control(
+            segments: short,
+            value: 'w',
+            expand: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      final thumb = tester.getRect(_thumb('1D'));
+      expect(thumb.width, lessThan(44), reason: 'a short label');
+      await _key(tester, LogicalKeyboardKey.tab);
+      expect(_focusedLabel(), '1D');
+      final px = await Pixels.capture(
+        tester,
+        tester.renderObject<RenderRepaintBoundary>(find.byKey(boundary)),
+      );
+      final origin = tester.getTopLeft(find.byKey(boundary));
+      final y = (thumb.center.dy - origin.dy).floor();
+      int red(double x) => (px.argb((x - origin.dx).floor(), y) >> 16) & 0xFF;
+      // The 2 px ring band lies 2 to 4 px outside the thumb, not outside the
+      // 44 px slot around it.
+      expect(
+        red(thumb.left - 3),
+        greaterThan(0xC8),
+        reason: 'ring at the thumb',
+      );
+      expect(red(thumb.left - 7), lessThan(0x80), reason: 'not at the slot');
+    },
+  );
 
   testWidgets('removing the focused segment, or turning onChanged null, '
       'leaves no stale focus and no error', (tester) async {

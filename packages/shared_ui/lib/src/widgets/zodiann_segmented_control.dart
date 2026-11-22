@@ -111,8 +111,9 @@ class _ZodiannSegmentedControlState<T>
   // after the frame, never while the old detector still holds them.
   final Map<T, FocusNode> _nodes = {};
 
-  // The focus ring is drawn above the row, so it needs each enabled slot's box.
-  final Map<T, GlobalKey> _slotKeys = {};
+  // The focus ring is drawn above the row, so it needs each thumb's box.
+  // Keyed on the thumb, not the 44 px slot around it, so the ring hugs it.
+  final Map<T, GlobalKey> _thumbKeys = {};
 
   @override
   void initState() {
@@ -121,8 +122,22 @@ class _ZodiannSegmentedControlState<T>
     FocusManager.instance.addHighlightModeListener(_rebuildOnMode);
   }
 
+  T? _ringValue;
+
+  T? _focusedValue() {
+    if (FocusManager.instance.highlightMode != FocusHighlightMode.traditional) {
+      return null;
+    }
+    for (final item in widget.segments) {
+      if (_nodes[item.value]?.hasPrimaryFocus ?? false) return item.value;
+    }
+    return null;
+  }
+
   void _rebuild() {
-    if (mounted) setState(() {});
+    // Any focus change in the app lands here; only a change of the ring's
+    // target needs a rebuild.
+    if (mounted && _focusedValue() != _ringValue) setState(() {});
   }
 
   void _rebuildOnMode(FocusHighlightMode _) => _rebuild();
@@ -142,7 +157,9 @@ class _ZodiannSegmentedControlState<T>
       for (final s in widget.segments)
         if (_interactive && !s.planned) s.value,
     };
-    _slotKeys.removeWhere((key, _) => !live.contains(key));
+    _thumbKeys.removeWhere(
+      (key, _) => !widget.segments.any((s) => s.value == key),
+    );
     final stale = [
       for (final key in _nodes.keys)
         if (!live.contains(key)) key,
@@ -281,9 +298,6 @@ class _ZodiannSegmentedControlState<T>
       );
       final node = _nodeFor(segment);
       return ZodiannPressable(
-        key: node == null
-            ? null
-            : _slotKeys.putIfAbsent(segment.value, GlobalKey.new),
         focusRing: false,
         onPressed: !enabled
             ? null
@@ -295,7 +309,10 @@ class _ZodiannSegmentedControlState<T>
         inMutuallyExclusiveGroup: true,
         disabledOpacity: segment.planned ? ZodiannStates.plannedOpacity : null,
         focusNode: node,
-        child: thumb,
+        child: KeyedSubtree(
+          key: _thumbKeys.putIfAbsent(segment.value, GlobalKey.new),
+          child: thumb,
+        ),
       );
     }
 
@@ -328,14 +345,8 @@ class _ZodiannSegmentedControlState<T>
     );
 
     // The focused segment (keyboard highlight only), if any.
-    GlobalKey? ringTarget;
-    if (FocusManager.instance.highlightMode == FocusHighlightMode.traditional) {
-      for (final item in widget.segments) {
-        if (_nodes[item.value]?.hasPrimaryFocus ?? false) {
-          ringTarget = _slotKeys[item.value];
-        }
-      }
-    }
+    _ringValue = _focusedValue();
+    final ringTarget = _ringValue == null ? null : _thumbKeys[_ringValue];
 
     return Semantics(
       container: true,
@@ -374,11 +385,7 @@ class _ZodiannSegmentedControlState<T>
                 ),
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: _RingLayer(
-                      target: ringTarget,
-                      color: s.focus,
-                      thumbHeight: thumbHeight,
-                    ),
+                    child: _RingLayer(target: ringTarget, color: s.focus),
                   ),
                 ),
               ],
@@ -451,20 +458,15 @@ class _SideAction extends Action<DirectionalFocusIntent> {
 /// opaque thumb starts exactly where the ring does (the segment gap is 2 px)
 /// and would paint over it.
 class _RingLayer extends LeafRenderObjectWidget {
-  const _RingLayer({
-    required this.target,
-    required this.color,
-    required this.thumbHeight,
-  });
+  const _RingLayer({required this.target, required this.color});
 
   /// The focused segment's slot, or null for no ring.
   final GlobalKey? target;
   final Color color;
-  final double thumbHeight;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderRingLayer(target: target, color: color, thumbHeight: thumbHeight);
+      _RenderRingLayer(target: target, color: color);
 
   @override
   void updateRenderObject(
@@ -473,17 +475,12 @@ class _RingLayer extends LeafRenderObjectWidget {
   ) {
     renderObject
       ..target = target
-      ..color = color
-      ..thumbHeight = thumbHeight;
+      ..color = color;
   }
 }
 
 class _RenderRingLayer extends RenderBox {
-  _RenderRingLayer({
-    required this._target,
-    required this._color,
-    required this._thumbHeight,
-  });
+  _RenderRingLayer({required this._target, required this._color});
 
   GlobalKey? _target;
   set target(GlobalKey? v) {
@@ -499,13 +496,6 @@ class _RenderRingLayer extends RenderBox {
     markNeedsPaint();
   }
 
-  double _thumbHeight;
-  set thumbHeight(double v) {
-    if (v == _thumbHeight) return;
-    _thumbHeight = v;
-    markNeedsPaint();
-  }
-
   @override
   bool get sizedByParent => true;
 
@@ -514,18 +504,14 @@ class _RenderRingLayer extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    // Valid because nothing between the thumb and this layer is a repaint
+    // boundary: a thumb that moves repaints this layer with it. Add an
+    // explicit invalidation if one is ever introduced.
     final slot = _target?.currentContext?.findRenderObject();
     if (slot is! RenderBox || !slot.attached || !slot.hasSize) return;
-    final slotRect = MatrixUtils.transformRect(
+    final thumb = MatrixUtils.transformRect(
       slot.getTransformTo(this),
       Offset.zero & slot.size,
-    );
-    // The ring hugs the thumb, which is centred in the 44 px slot.
-    final thumb = Rect.fromLTWH(
-      slotRect.left,
-      slotRect.top + (slotRect.height - _thumbHeight) / 2,
-      slotRect.width,
-      _thumbHeight,
     );
     final canvas = context.canvas;
     canvas.save();

@@ -89,10 +89,17 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
     expect(_ring(tester).show, isTrue, reason: 'default draws it');
+    // A fresh tree, so the keyboard focus is requested again.
+    await pumpInApp(tester, const SizedBox());
     await pumpWith(false);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
+    expect(
+      FocusManager.instance.primaryFocus?.context
+          ?.findAncestorWidgetOfExactType<ZodiannPressable>(),
+      isNotNull,
+      reason: 'the pressable has keyboard focus, so a missing ring is the flag',
+    );
     expect(_ring(tester).show, isFalse);
   });
 
