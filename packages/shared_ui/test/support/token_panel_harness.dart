@@ -2,9 +2,9 @@
 // the reference's CSS border-box panels (kit.css `.panel`, `.panel-head`,
 // `.panel-body`). Boxes only, no text, so no fonts are needed.
 //
-// Every measured value comes from a token. The 1 px border inset, the 1 px
-// head rule and the 40 px content block are the harness's own literals.
-// ZOD-UI-014 builds the real panel.
+// Every measured value comes from a token; the 40 px content block is the
+// harness's own literal. Since ZOD-UI-014 the panels are the real
+// `ZodiannPanel` (an empty head, so the head height and rule are measured).
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
@@ -23,8 +23,8 @@ class TokenPanelHarness extends StatelessWidget {
   Widget build(BuildContext context) {
     final layout = ZodiannLayout.of(context);
     final s = Theme.of(context).extension<ZodiannSurfaces>()!;
-    final a = _Panel(layout: layout, surfaces: s, contentKey: firstContentKey);
-    final b = _Panel(layout: layout, surfaces: s);
+    final a = _Panel(surfaces: s, contentKey: firstContentKey);
+    final b = _Panel(surfaces: s);
     return RepaintBoundary(
       key: boundaryKey,
       child: ColoredBox(
@@ -52,45 +52,20 @@ class TokenPanelHarness extends StatelessWidget {
 }
 
 class _Panel extends StatelessWidget {
-  const _Panel({required this.layout, required this.surfaces, this.contentKey});
+  const _Panel({required this.surfaces, this.contentKey});
 
-  final ZodiannLayout layout;
   final ZodiannSurfaces surfaces;
   final Key? contentKey;
 
-  static const double _border = 1;
   static const double _contentHeight = 40;
 
   @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: surfaces.surface,
-      border: Border.all(color: surfaces.lineSoft),
-      borderRadius: ZodiannRadius.panel,
-    ),
-    child: Padding(
-      // Border-box: content sits inside the 1 px border.
-      padding: const EdgeInsets.all(_border),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // The head is panelHeadHeight including its 1 px bottom rule.
-          SizedBox(height: layout.panelHeadHeight - _border),
-          ColoredBox(
-            color: surfaces.lineSoft,
-            child: const SizedBox(height: _border),
-          ),
-          Padding(
-            padding: EdgeInsets.all(layout.panelPadding),
-            child: ColoredBox(
-              key: contentKey,
-              color: surfaces.accent,
-              child: const SizedBox(height: _contentHeight),
-            ),
-          ),
-        ],
-      ),
+  Widget build(BuildContext context) => ZodiannPanel(
+    head: const ZodiannPanelHead(),
+    child: ColoredBox(
+      key: contentKey,
+      color: surfaces.accent,
+      child: const SizedBox(height: _contentHeight),
     ),
   );
 }
