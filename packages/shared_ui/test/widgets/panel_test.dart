@@ -388,12 +388,13 @@ void main() {
   });
 
   group('clip contract', () {
-    Future<int> stripPixel(WidgetTester tester, Clip clip) async {
+    Future<int> stripPixel(WidgetTester tester, [Clip? clip]) async {
       await _pump(
         tester,
         ZodiannPanel(
           bodyPadding: EdgeInsets.zero,
-          clipBehavior: clip,
+          clipBehavior:
+              clip ?? const ZodiannPanel(child: SizedBox()).clipBehavior,
           child: Transform.translate(
             offset: const Offset(-4, 0),
             child: const ColoredBox(
@@ -413,7 +414,7 @@ void main() {
 
     testWidgets('by default a child may paint outside the panel (focus ring '
         'is not cut)', (tester) async {
-      expect(await stripPixel(tester, Clip.none), 0xFFFF0000);
+      expect(await stripPixel(tester), 0xFFFF0000);
     });
 
     testWidgets('Clip.antiAlias clips it', (tester) async {
