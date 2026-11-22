@@ -13,8 +13,8 @@ import '../theme/zodiann_surfaces.dart';
 ///   and instant under reduced motion; pressed moves it 1 px down and
 ///   darkens it 6 %;
 /// - a 2 px `focus` ring at offset 2, shown for keyboard focus only;
-/// - disabled ([onPressed] null): 42 % opacity, not focusable, inert,
-///   `forbidden` cursor;
+/// - disabled ([onPressed] null): 42 % opacity ([disabledOpacity] overrides),
+///   not focusable, inert, `forbidden` cursor;
 /// - activation by tap (including the hit margins), Enter, Space or a screen
 ///   reader; one semantics node labelled [semanticLabel];
 /// - a layout and hit box of at least 44 × 44 with [child] centred.
@@ -30,6 +30,9 @@ class ZodiannPressable extends StatefulWidget {
     this.autofocus = false,
     this.selected = false,
     this.semanticHint,
+    this.inMutuallyExclusiveGroup = false,
+    this.disabledOpacity,
+    this.focusRing = true,
   });
 
   /// Called on activation. Null disables the control.
@@ -42,6 +45,18 @@ class ZodiannPressable extends StatefulWidget {
   /// item). When false the node carries no selected state at all, as before
   /// (in Flutter "not selected" is a state of its own).
   final bool selected;
+
+  /// Whether the control is one of a mutually exclusive set (a segmented
+  /// control). When false the node carries no group flag, as before.
+  final bool inMutuallyExclusiveGroup;
+
+  /// The opacity while disabled; null is [ZodiannStates.disabledOpacity]
+  /// (42 %). A planned segmented-control option passes 40 %.
+  final double? disabledOpacity;
+
+  /// Whether to paint the keyboard focus ring itself. A parent that must draw
+  /// it above neighbouring controls (the segmented control) turns this off.
+  final bool focusRing;
 
   /// An optional accessible hint (the drawer item's description).
   final String? semanticHint;
@@ -109,6 +124,7 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
       label: widget.semanticLabel,
       hint: widget.semanticHint,
       selected: widget.selected ? true : null,
+      inMutuallyExclusiveGroup: widget.inMutuallyExclusiveGroup ? true : null,
       onTap: onPressed,
       child: FocusableActionDetector(
         enabled: enabled,
@@ -143,7 +159,9 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
             child: _TouchTarget(
               child: ExcludeSemantics(
                 child: Opacity(
-                  opacity: enabled ? 1.0 : ZodiannStates.disabledOpacity,
+                  opacity: enabled
+                      ? 1.0
+                      : widget.disabledOpacity ?? ZodiannStates.disabledOpacity,
                   child: Transform.translate(
                     offset: Offset(
                       0,
@@ -151,7 +169,7 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
                     ),
                     child: CustomPaint(
                       foregroundPainter: ZodiannFocusRingPainter(
-                        show: _focusHighlight,
+                        show: _focusHighlight && widget.focusRing,
                         color: s.focus,
                       ),
                       child: filtered,

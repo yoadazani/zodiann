@@ -112,6 +112,8 @@ void main() {
       // and its 1.5 px inset outline (today, center).
       'tag': (ZodiannSize.tag, 24),
       'tagGap': (ZodiannSize.tagGap, 6),
+      'segmentGap': (ZodiannSize.segmentGap, 2),
+      'segmentIconGap': (ZodiannSize.segmentIconGap, 6),
       'tagOutline': (ZodiannSize.tagOutline, 1.5),
     };
     sizes.forEach((name, value) {

@@ -104,6 +104,14 @@ abstract final class ZodiannSize {
   /// Segmented-control thumb: height.
   static const double segmentThumb = 32.0;
 
+  /// Segmented control: the gap between neighbouring segments (kit.css
+  /// `.seg` `gap: 2px`).
+  static const double segmentGap = 2.0;
+
+  /// Segmented control: the gap between a segment's icon and its label
+  /// (kit.css `.seg > span` `gap: 6px`).
+  static const double segmentIconGap = 6.0;
+
   /// Segmented-control track: inset around the thumbs.
   static const double segmentTrackInset = 3.0;
 

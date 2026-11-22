@@ -73,6 +73,61 @@ Future<TestGesture> _mouse(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('focusRing: false draws no ring even for keyboard focus', (
+    tester,
+  ) async {
+    Future<void> pumpWith(bool ring) => pumpInApp(
+      tester,
+      ZodiannPressable(
+        onPressed: () {},
+        semanticLabel: 'Item',
+        focusRing: ring,
+        child: _box,
+      ),
+    );
+    await pumpWith(true);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(_ring(tester).show, isTrue, reason: 'default draws it');
+    // A fresh tree, so the keyboard focus is requested again.
+    await pumpInApp(tester, const SizedBox());
+    await pumpWith(false);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(
+      FocusManager.instance.primaryFocus?.context
+          ?.findAncestorWidgetOfExactType<ZodiannPressable>(),
+      isNotNull,
+      reason: 'the pressable has keyboard focus, so a missing ring is the flag',
+    );
+    expect(_ring(tester).show, isFalse);
+  });
+
+  testWidgets(
+    'disabledOpacity overrides the disabled opacity, enabled stays 1',
+    (tester) async {
+      await pumpInApp(
+        tester,
+        const ZodiannPressable(
+          onPressed: null,
+          semanticLabel: 'Item',
+          disabledOpacity: 0.4,
+          child: _box,
+        ),
+      );
+      expect(tester.widget<Opacity>(_in(Opacity)).opacity, 0.4);
+      await pumpInApp(
+        tester,
+        ZodiannPressable(
+          onPressed: () {},
+          semanticLabel: 'Item',
+          disabledOpacity: 0.4,
+          child: _box,
+        ),
+      );
+      expect(tester.widget<Opacity>(_in(Opacity)).opacity, 1.0);
+    },
+  );
   testWidgets(
     'disabled: 42 % opacity, not focusable, forbidden cursor, enabled: false',
     (tester) async {
