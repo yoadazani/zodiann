@@ -53,13 +53,17 @@ class ZodiannSegmentedControl<T> extends StatefulWidget {
 - **Expansion:** `expand ?? (ZodiannLayout.of(context) == ZodiannLayout.phone)`. Expanded: the control fills its parent's width and every segment gets an equal share, content centred. Not expanded: content width, never wider than the parent (a narrower parent ellipsizes labels, single line).
 - **Behaviour:** tap or mouse on an enabled, unselected segment calls `onChanged(value)`. A selected segment tapped again does nothing (no repeated call). A planned segment is inert by every route: tap, mouse, Enter / Space, focus traversal, arrow keys, screen reader (`enabled: false`).
 - **Keyboard (O2 default):** each enabled segment is a tab stop; Enter / Space selects it; Left / Right (start / end by direction) move focus to the previous / next **enabled** segment without selecting.
-  - **Keyboard mechanism:** the control is a `StatefulWidget` owning one `FocusNode` per **enabled** segment (created, reused by value and disposed as `segments` change). Each segment's `ZodiannPressable` receives its node. The segment row is wrapped in `Actions` handling `DirectionalFocusIntent`: Left / Right (swapped by `Directionality`) request focus on the previous / next enabled node and are **consumed at the ends** (the default geometric traversal would leave the control); Up / Down are not handled here (the default applies). No arrow key calls `onChanged`. Tab uses normal traversal, which skips planned segments because a disabled `ZodiannPressable` is not focusable.
+  - **Keyboard mechanism:** the control is a `StatefulWidget` owning one `FocusNode` per **enabled** segment (created, reused by value and disposed as `segments` change). Each segment's `ZodiannPressable` receives its node. The segment row is wrapped in `Actions` handling `DirectionalFocusIntent`: Left / Right (swapped by `Directionality`) request focus on the previous / next enabled node and are **consumed at the ends** (the default geometric traversal would leave the control); Up / Down fall through to the default traversal (custom action, see below). No arrow key calls `onChanged`. Tab uses normal traversal, which skips planned segments because a disabled `ZodiannPressable` is not focusable.
 - **Semantics:** a group node (`explicitChildNodes`, label `semanticLabel`) with one node per segment: button, `selected` for the current one, mutually-exclusive-group flag, `enabled` false for planned. Planned labels keep their "(planned)" wording supplied by the caller.
 - **Motion:** the thumb's fill, ring and ink crossfade over 120 ms (`ZodiannStates.selectionDuration`), instant when `MediaQuery.disableAnimationsOf`.
   - **Motion mechanism:** `Curves.linear` over 120 ms, so "mid-way at 60 ms" is exact. Every segment is an `AnimatedContainer` (fill, plus a 1 px border that is transparent when unselected and `accent-line` when selected, so it lerps and takes no extra layout), its label an `AnimatedDefaultTextStyle`, its icon coloured through an `IconTheme` inside a `TweenAnimationBuilder<Color?>`. All use `Duration.zero` when `MediaQuery.disableAnimationsOf`.
   - **Opacity:** a planned segment is passed to `ZodiannPressable` with `onPressed: null` and `disabledOpacity: ZodiannStates.plannedOpacity` (0.4). The Pressable owns the one `Opacity`; the control adds none (a second would compound to about 0.17). With `onChanged: null` every non-planned segment falls back to the shared 0.42 and a planned one stays at 0.4.
   - **Unbounded width:** an expanded control in an unbounded-width parent falls back to content width (no throw). A segment slot is at least 44 wide (the shared touch target), so a very short label keeps its content-wide thumb centred in a 44 slot and the drawn gap is wider than 2 there; accepted, no label in the design is that short.
   - **Accepted deviations (the reference defines no segment focus or press visuals):** the shared focus ring has an 8 radius (the thumb is 6), and a press moves the thumb 1 px down inside the track; both are asserted in tests so they are documented behaviour.
+  - **Segment box (round 2 C1):** Flutter's `Container` adds a decoration's border width to its padding, so the segment's horizontal padding is `ZodiannSpace.s3 - ZodiannSize.hairline` (11) on each side, making border plus padding the sheet's 12. The height is fixed at `ZodiannSize.segmentThumb` (32) with the border inside it. The content box is therefore unchanged by the selection state, and test 5 asserts the label starts 12 px inside the thumb.
+  - **Crossfade endpoints (round 2 I1):** the unselected fill and ring are the **same colours with alpha 0** (`surface3.withAlpha(0)`, `accentLine.withAlpha(0)`), never `Colors.transparent` (0x00000000 would lerp through black). The weight is 500 in both states; `AnimatedDefaultTextStyle` animates colour only, so metrics never jump.
+  - **Arrow-key action (round 2 I2):** a custom `Action<DirectionalFocusIntent>` whose `isEnabled` is true only for `TraversalDirection.left` and `right` (physical directions, so the mirrored `Row` swaps them in RTL without extra code); `CallbackAction` cannot be used because it is always enabled and would swallow Up and Down. `invoke` finds the focused node by `primaryFocus` identity in the control's enabled-node list, requests focus on the neighbour, and does nothing at the ends.
+  - **Focus-node lifecycle (round 2 I3):** nodes are keyed by segment `value`; stale ones are disposed after the frame (`addPostFrameCallback`), never while the old detector still holds them; when `onChanged` is null no nodes are created and none are passed.
 - **Mirroring:** `Row` order and directional geometry only; no `Transform`.
 - **Text scale:** segments grow in height beyond 32 (the slot minimum), as the tag and buttons do; labels stay single-line.
 
@@ -107,9 +111,9 @@ Commands run from `packages/shared_ui` unless marked **root**.
 ### Task 2: Pressable group flag and disabled opacity (TDD)
 
 - [ ] **Step 1 (RED):** in `pressable_selected_test.dart` add: a `ZodiannPressable(inMutuallyExclusiveGroup: true, selected: true, …)` exposes `isInMutuallyExclusiveGroup`; the default exposes none (matcher on the semantics flags); existing button, icon button and drawer semantics tests unchanged. Run. Expected: compile error `No named parameter 'inMutuallyExclusiveGroup'`.
-- [ ] **Step 2 (GREEN):** add the field, pass it to `Semantics(inMutuallyExclusiveGroup: …)` (null when false, so existing nodes are unchanged). Run `fvm flutter test test/widgets/pressable_selected_test.dart test/widgets/button_test.dart test/widgets/icon_button_test.dart test/widgets/drawer_test.dart`: pass.
-- [ ] **Step 1b (RED):** in `pressable_selected_test.dart` (or `pressable_test.dart`) add: a disabled `ZodiannPressable` has an `Opacity` of 0.42 by default (unchanged); with `disabledOpacity: 0.4` the `Opacity` widget's value is 0.4; an enabled one is 1 in both cases. Expected: compile error `No named parameter 'disabledOpacity'`.
-- [ ] **Step 2b (GREEN):** add `disabledOpacity` and use `widget.disabledOpacity ?? ZodiannStates.disabledOpacity` where the disabled opacity is applied. Re-run the same four files: pass.
+- [ ] **Step 2 (GREEN):** add the field, pass it to `Semantics(inMutuallyExclusiveGroup: …)` (null when false, so existing nodes are unchanged). Run `fvm flutter test test/widgets/pressable_selected_test.dart test/widgets/pressable_test.dart test/widgets/button_test.dart test/widgets/button_behavior_test.dart test/widgets/icon_button_test.dart test/widgets/drawer_test.dart test/widgets/top_bar_test.dart`: pass (these assert `disabledOpacity` today).
+- [ ] **Step 1b (RED):** in `pressable_test.dart` (where the existing opacity test is) add: a disabled `ZodiannPressable` has an `Opacity` of 0.42 by default (unchanged); with `disabledOpacity: 0.4` the `Opacity` widget's value is 0.4; an enabled one is 1 in both cases. Expected: compile error `No named parameter 'disabledOpacity'`.
+- [ ] **Step 2b (GREEN):** add `disabledOpacity` and use `widget.disabledOpacity ?? ZodiannStates.disabledOpacity` where the disabled opacity is applied. Re-run the same seven files: pass. Update the Pressable doc comment ("42 % opacity") to mention the `disabledOpacity` override.
 - [ ] **Step 3:** commit `feat(ZOD-UI-006): extend the pressable for segmented controls`.
 
 ### Task 3: The control, RED first
@@ -119,22 +123,22 @@ Commands run from `packages/shared_ui` unless marked **root**.
   2. **Planned is inert by every route:** tap, mouse click, Enter and Space with focus forced onto the neighbour, Tab traversal skips it, arrow keys skip it, `tester.getSemantics` shows `enabled: false`; `onChanged` is never called; cursor is `forbidden`.
   3. **Keyboard:** Tab reaches each enabled segment in order (RTL: visual order mirrored, focus order is logical order); Enter and Space select the focused segment; Right / Left move focus to the next / previous enabled segment (swapped in RTL) and wrap nowhere (stop at the ends); moving focus does not call `onChanged`.
   4. **Semantics:** group node with `semanticLabel`; each segment is a button; only the current one is `selected`; all are in a mutually exclusive group; the planned one is disabled; the label read is the segment's label.
-  5. **Geometry (LTR, Graphite):** track 40 high (3 + 32 + 3 + 2 borders), layout height 44, thumb 32 high, 12 horizontal padding, gap 2 between segments, 6 between icon and label, track radius 8 / thumb radius 6.
+  5. **Geometry (LTR, Graphite):** the label starts 12 px inside the thumb (11 padding plus the 1 px border); track 40 high (3 + 32 + 3 + 2 borders), layout height 44, thumb 32 high, 12 horizontal padding, gap 2 between segments, 6 between icon and label, track radius 8 / thumb radius 6.
   6. **Hit target:** a tap 2 px above and 2 px below the drawn track, over a segment, selects it (44 px slot).
   7. **Expansion:** at 390 (phone) the control fills the parent width and the segments are equal width (±0.5 px); at 1440 it is content-wide; `expand: true` / `false` override both; at a parent narrower than the content the labels ellipsize on one line and nothing overflows.
   8. **Panel head:** inside `ZodiannPanelHead(leading: control, end: short hint)` at 390 the hint drops below the control; at 1440 they share a row (proves UI-014 and UI-006 compose).
   9. **RTL / Hebrew:** segment order mirrors; the thumb and ring stay on the selected segment; offsets equal the mirrored LTR ones.
-  10. **Text scale 2:** segments grow past 32, no overflow exception.
+  10. **Text scale 2:** the track is found and the segments grow past 32 (an assertion that fails on the empty stub), no overflow exception.
   11. **Motion:** after changing `value`, the selected fill is mid-way at 60 ms and final at 120 ms; with `disableAnimations` it is final immediately.
   12. **Live theme switch:** Graphite to Porcelain rebuilds with the new colours (no stale colours).
   13. **Asserts:** empty segments, duplicate values, a `value` that names no segment or a planned one all fail an assert; `onChanged: null` disables every segment.
-  14. **Planned and focus:** with the neighbour focused, Tab and the arrow keys never land on the planned segment; a planned segment given a directly requested `FocusNode` cannot take focus; arrow keys at the first and last enabled segment keep focus where it is and do not leave the control; no arrow key calls `onChanged`.
+  14. **Planned and focus:** Up and Down still follow the default traversal (not consumed); with the neighbour focused, Tab and the arrow keys never land on the planned segment; a planned segment given a directly requested `FocusNode` cannot take focus; arrow keys at the first and last enabled segment keep focus where it is and do not leave the control; no arrow key calls `onChanged`.
   15. **Planned opacity:** the planned segment's single `Opacity` is 0.4 (not 0.42, not 0.17); with `onChanged: null` a non-planned segment is 0.42 and the planned one stays 0.4.
   16. **Semantics detail:** unselected segments carry no selected state at all (as the drawer: selected is true or absent), so the matcher is `isSelected` for the current one only.
   17. **Accepted deviations are pinned:** a press moves the thumb 1 px down; the shared focus ring is drawn for keyboard focus only.
   18. **Dynamic changes:** `segments` changing length or order between builds keeps one live `FocusNode` per enabled segment (none leaked: the test disposes the tree and expects no framework error); a `value` that changes while a segment is focused or pressed keeps focus; the selected segment becoming planned in a rebuild trips the assert in debug.
-  19. **Unbounded width:** an expanded control inside an unbounded-width parent (a horizontal `SingleChildScrollView`) lays out at content width without an exception.
-  20. **Curve:** at 60 ms the fill is the exact linear mid-point of the two token colours (±1 per channel).
+  19. **Unbounded width:** an expanded control inside an unbounded-width parent (a horizontal `SingleChildScrollView`) is found, lays out at the sum of its segments' content widths and throws nothing.
+  20. **Curve:** at 60 ms the fill and ring equal the linear mid-point between the alpha-0 and final token colours, composited over the track (±1 per channel); `Colors.transparent` endpoints fail it (M19).
 - [ ] **Step 2 (GREEN):** implement `zodiann_segmented_control.dart` minimally, export it; run the file: pass.
 - [ ] **Step 3 (REFACTOR):** doc comments (O1 to O5 behaviour, hit-target layout, focus-ring contract: the ring paints 4 px beyond a segment, over the track; the control never clips); **root:** `fvm dart run melos run lint`.
 - [ ] **Step 4:** commit `feat(ZOD-UI-006): add ZodiannSegmentedControl`.
@@ -149,7 +153,7 @@ Commands run from `packages/shared_ui` unless marked **root**.
 
 ### Task 5: Mutation proof
 
-- [ ] **Step 1:** throw-away edits, each reverted, each run named: M1 thumb ring dropped; M2 thumb fill `surface-2`; M3 track fill `surface`; M4 planned opacity 0.42; M5 planned segment tappable; M6 planned segment focusable; M7 selected segment re-fires `onChanged`; M8 expansion by `flex` removed on phone; M9 hit slot 32 instead of 44; M10 crossfade 0 ms; M11 RTL order not mirrored; M12 selected `semantics.selected` dropped; M13 gap 2 to 4; M14 track inset 3 to 4; M15 selected icon colour `text` instead of `accent-strong`; M16 a second `Opacity` of 0.4 around a planned segment (compounds to 0.17); M17 arrow keys not consumed at the ends; M18 curve `ease` instead of linear. (M4 is caught by the Task 2 disabled-opacity test and Task 3 test 15.) Each must fail at least one test; record the catching tests under Verification in PROGRESS.
+- [ ] **Step 1:** throw-away edits, each reverted, each run named: M1 thumb ring dropped; M2 thumb fill `surface-2`; M3 track fill `surface`; M4 planned opacity 0.42; M5 planned segment tappable; M6 planned segment focusable; M7 selected segment re-fires `onChanged`; M8 expansion by `flex` removed on phone; M9 hit slot 32 instead of 44; M10 crossfade 0 ms; M11 RTL order not mirrored; M12 selected `semantics.selected` dropped; M13 gap 2 to 4; M14 track inset 3 to 4; M15 selected icon colour `text` instead of `accent-strong`; M16 a second `Opacity` of 0.4 around a planned segment (compounds to 0.17); M17 arrow keys not consumed at the ends; M18 curve `ease` instead of linear; M19 `Colors.transparent` as the unselected endpoint; M20 segment padding 12 beside the 1 px border (14 wide: test 5 and the sheet test).  (M4 is caught by the Task 2 disabled-opacity test and Task 3 test 15.) Each must fail at least one test; record the catching tests under Verification in PROGRESS.
 - [ ] **Step 2:** no commit unless a mutant survives (then add the test that kills it first).
 
 ### Task 6: Verification, review, documentation
@@ -164,7 +168,7 @@ Commands run from `packages/shared_ui` unless marked **root**.
 |---|---|
 | 1. Selected / unselected / planned match the component sheet pixel-for-pixel | Task 4 (three rows, two themes, extractor on both sides); Task 3 test 5 (geometry) and 11 (final state of the crossfade); mutants M1 to M4, M13, M14 |
 | 2. On a phone the control stretches to fill its row | Task 3 tests 7 and 8; mutant M8 |
-| 3. The planned option cannot be selected by tap, mouse or keyboard | Task 3 tests 2 and 3; mutants M5, M6 |
+| 3. The planned option cannot be selected by tap, mouse or keyboard | Task 3 tests 2, 3 and 14; mutants M5, M6, M17 |
 
 ## Execution mode
 
@@ -205,4 +209,16 @@ The behaviours the tests do not obviously reach: a `value` that changes while a 
 | M1 to M5 | Minor | States test location, root-command label, O5 wording, test 2 wording, semantics `selected` | Applied (Task 1, O5, tests 14 and 16) |
 | M6 | Minor | Tech-stack line | Confirmed, no change |
 
-Open items for the owner: O1 to O5 (defaults implemented). Round 2 (focused on the revision) follows.
+**Round 2** (`plan-reviewer`, focused on the revision, commit `2fa9bd4`). Verdict: approve after corrections; round 1 items confirmed applied.
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| C1 | Critical | A border in `AnimatedContainer` takes layout (`Container` adds the decoration's border to its padding), so segments would be 2 px wider than the sheet | Applied: padding `s3 - hairline` (11), height fixed at 32, test 5 label offset 12, mutant M20 |
+| I1 | Important | `Colors.transparent` endpoints lerp through black; the ring and fill are semi-transparent | Applied: same colour with alpha 0 endpoints, test 20 against them, mutant M19 |
+| I2 | Important | `CallbackAction` would swallow Up and Down | Applied: custom `Action<DirectionalFocusIntent>` enabled for left and right only; test 14 asserts Up and Down fall through |
+| I3 | Important | Disposing a `FocusNode` while the old detector holds it | Applied: keyed by value, disposed after the frame, none when `onChanged` is null |
+| I4 | Important | Task 2 regression list missed files that assert `disabledOpacity` | Applied: seven files named; step 1b names `pressable_test.dart` |
+| I5 | Important | RED claim false for tests 10 and 19 (they pass on an empty stub) | Applied: each now asserts something the stub fails |
+| M1 to M3 | Minor | Pressable doc comment; colour-only text animation; criterion 3 mapping | Applied |
+
+Two rounds are used. Open items for the owner: O1 to O5 (defaults implemented).
