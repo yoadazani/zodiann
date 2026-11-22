@@ -243,6 +243,8 @@ interaction with ZOD-TST-001. This document makes none.
   from the repository root, with network access and `gcc` (it builds
   `swiss_delta_t.c` against the vendored Swiss sources in a temporary
   directory; nothing is distributed). The helpers are spike tooling outside the
-  Melos packages; the project's lint and format gates do not cover them.
+  Melos packages but inside the workspace root package, so `dart analyze` and
+  `dart format` (the project's lint gate) do scan the Dart helper (it uses only
+  the Dart SDK); the C helper is not scanned.
 * The device run: `flutter test integration_test/astronomy_accuracy_test.dart
   -d emulator-5554` in `apps/astro_mobile`.

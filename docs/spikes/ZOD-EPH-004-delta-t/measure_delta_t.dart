@@ -40,20 +40,18 @@ Future<String> _get(Uri uri) async {
 
 Future<void> main() async {
   final root = Platform.script.resolve('../../../');
-  final fixture =
-      jsonDecode(
-            File.fromUri(
-              root.resolve(
-                'packages/ephemeris_astronomy/test/fixtures/'
-                'reference_longitudes_tt.json',
-              ),
-            ).readAsStringSync(),
-          )
-          as Map<String, Object?>;
+  final fixture = jsonDecode(
+    File.fromUri(
+      root.resolve(
+        'packages/ephemeris_astronomy/test/fixtures/'
+        'reference_longitudes_tt.json',
+      ),
+    ).readAsStringSync(),
+  ) as Map<String, Object?>;
   final seen = <String>{};
   final rows = <({String utc, double utDays, double library})>[];
-  for (final e in (fixture['entries']! as List<Object?>)
-      .cast<Map<String, Object?>>()) {
+  for (final e
+      in (fixture['entries']! as List<Object?>).cast<Map<String, Object?>>()) {
     if (!seen.add(e['utc']! as String)) continue;
     rows.add((
       utc: e['utc']! as String,
