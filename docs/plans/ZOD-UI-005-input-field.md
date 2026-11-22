@@ -35,7 +35,7 @@ class ZodiannTextField extends StatefulWidget {
     this.hintText,                  // placeholder, text-3
     this.errorText,                 // non-null: error state + message; asserts non-empty
     this.enabled = true,
-    this.ltr = false,               // dates and numbers (L-7): LTR, isolated, tabular figures
+    this.ltr = false,               // dates and numbers (L-7): LTR text direction, start-aligned (digits are tabular in every mode)
     this.keyboardType,
     this.textInputAction,
     this.inputFormatters,
@@ -128,7 +128,7 @@ Write `test/widgets/text_field_test.dart` before the widget. Each test names the
 
 ### Task 4: Mutation proof
 
-- [ ] List and run mutants, each caught by a named test: halo drawn inside (layout grows), halo colour `accent` in error, `line` border in error, error without the message row, message without the icon, disabled opacity 0.42, label dimmed when disabled, 39 or 41 px height, no label tap, `ltr` ignored, icon colour `text-2`, placeholder in `text`, focus on a disabled field, owned controller not disposed, supplied controller disposed. Record the result table in the plan's execution notes.
+- [ ] List and run mutants, each caught by a named test: halo drawn inside (layout grows), halo colour `accent` in error, `line` border in error, error without the message row, message without the icon, disabled opacity 0.42, label dimmed when disabled, 39 or 41 px height, no label tap, `ltr` ignored, icon colour `text-2`, placeholder in `text`, focus on a disabled field, error shown while disabled (message row, `danger` border or halo; caught by tests 5 and 13), whitespace-only `errorText` accepted (test 5), owned controller not disposed, supplied controller disposed. Record the result table in the plan's execution notes.
 
 ### Task 5: Verification, review, documentation
 
@@ -187,5 +187,14 @@ The behaviours the tests do not obviously reach: a `controller` swapped while fo
 | M3 | Minor | The two disabled-opacity tokens should differ | Applied: Task 1 pin |
 | M4 | Minor | Whitespace-only `errorText` | Applied: asserts (test 5) |
 | M5 | Minor | Record this review | Applied |
+
+Open items: none beyond O1 to O5 (owner defaults).
+
+**Round 2** (`plan-reviewer`, focused on the revision `ddcb63f..d348003`). Verdict: approve after corrections; no Critical, no Important; round 1 items confirmed applied.
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| M1 | Minor | The `ltr` comment in the API sketch still said tabular figures | Applied |
+| M2 | Minor | No mutant for the disabled-ignores-`errorText` behaviour | Applied (Task 4 list) |
 
 Open items: none beyond O1 to O5 (owner defaults).
