@@ -6,9 +6,9 @@ import '../storage_exception.dart';
 typedef MigrationStep = Future<void> Function(Migrator migrator);
 
 /// The shipped steps, keyed by the version each one produces. Schema v1 has
-/// none. ZOD-DAT-012 owns the real migration process, the schema dumps and the
-/// first real step; this is the template it extends (add `2: (m) async { ... }`
-/// and raise `AppDatabase.currentSchemaVersion`).
+/// none. The process for adding one (bump the version, add the step here, dump,
+/// test) is in `docs/storage/schema-migrations.md`. The map is const, so a step
+/// is a top-level function referenced by name.
 const Map<int, MigrationStep> migrationSteps = {};
 
 /// Brings a database at version [from] up to [to] by running the steps for

@@ -25,7 +25,8 @@ class SavedSquares extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
-  /// The schema version (DATA-1). Raise it with a step in `migrationSteps`.
+  /// The schema version (DATA-1). Raise it with a step in `migrationSteps`;
+  /// the full procedure is in `docs/storage/schema-migrations.md`.
   static const int currentSchemaVersion = 1;
 
   @override
