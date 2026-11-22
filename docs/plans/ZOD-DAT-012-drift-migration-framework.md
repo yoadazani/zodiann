@@ -51,7 +51,7 @@
 - Modify `packages/shared_storage/test/migrations_test.dart`: add the migration tests (new groups; existing tests untouched).
 - Create `packages/shared_storage/test/schema_dumps_test.dart`: the staleness and consistency guards.
 - Create `docs/storage/schema-migrations.md`: the process.
-- Modify `packages/shared_storage/lib/src/database/migrations.dart` (doc comment only: point to the process doc), `app_database.dart` (doc comment on `currentSchemaVersion` only).
+- Modify `packages/shared_storage/lib/src/database/migrations.dart` (the transaction wrapper and its doc comment in Task 2, then the process-doc pointer in Task 3), `app_database.dart` (doc comment on `currentSchemaVersion` only).
 - Update task file, `docs/development/TASKS.md`, `docs/PROGRESS.md`.
 
 ---
