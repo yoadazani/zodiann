@@ -74,6 +74,31 @@ Future<TestGesture> _mouse(WidgetTester tester) async {
 
 void main() {
   testWidgets(
+    'disabledOpacity overrides the disabled opacity, enabled stays 1',
+    (tester) async {
+      await pumpInApp(
+        tester,
+        const ZodiannPressable(
+          onPressed: null,
+          semanticLabel: 'Item',
+          disabledOpacity: 0.4,
+          child: _box,
+        ),
+      );
+      expect(tester.widget<Opacity>(_in(Opacity)).opacity, 0.4);
+      await pumpInApp(
+        tester,
+        ZodiannPressable(
+          onPressed: () {},
+          semanticLabel: 'Item',
+          disabledOpacity: 0.4,
+          child: _box,
+        ),
+      );
+      expect(tester.widget<Opacity>(_in(Opacity)).opacity, 1.0);
+    },
+  );
+  testWidgets(
     'disabled: 42 % opacity, not focusable, forbidden cursor, enabled: false',
     (tester) async {
       final handle = tester.ensureSemantics();

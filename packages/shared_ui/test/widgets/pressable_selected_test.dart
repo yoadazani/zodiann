@@ -26,6 +26,31 @@ Future<void> _pump(
 );
 
 void main() {
+  testWidgets('inMutuallyExclusiveGroup marks the node, the default does not', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpInApp(
+      tester,
+      ZodiannPressable(
+        onPressed: () {},
+        semanticLabel: 'Item',
+        selected: true,
+        inMutuallyExclusiveGroup: true,
+        child: _box,
+      ),
+    );
+    expect(
+      tester.getSemantics(find.byType(ZodiannPressable)),
+      isSemantics(isInMutuallyExclusiveGroup: true, isSelected: true),
+    );
+    await _pump(tester);
+    expect(
+      tester.getSemantics(find.byType(ZodiannPressable)),
+      isNot(isSemantics(isInMutuallyExclusiveGroup: true)),
+    );
+    handle.dispose();
+  });
   testWidgets('selected: true marks the node selected', (tester) async {
     final handle = tester.ensureSemantics();
     await _pump(tester, selected: true);
