@@ -32,6 +32,23 @@ double julianDayUt(DateTime utc) {
   return utc.microsecondsSinceEpoch / microsecondsPerDay + unixEpochJulianDay;
 }
 
+/// The Julian day number in TT (the `tjd_et` argument of `swe_calc`) of
+/// [ttDaysSinceJ2000], days of TT since J2000 (2000-01-01T12:00 TT), the value
+/// the Astronomy Engine test hook reports (ZOD-EPH-004 D12-O1). It is a pure
+/// shift by the Julian day of J2000, 2451545.0.
+///
+/// Throws [ArgumentError] if [ttDaysSinceJ2000] is not finite.
+double julianDayTt(double ttDaysSinceJ2000) {
+  if (!ttDaysSinceJ2000.isFinite) {
+    throw ArgumentError.value(
+      ttDaysSinceJ2000,
+      'ttDaysSinceJ2000',
+      'must be finite',
+    );
+  }
+  return ttDaysSinceJ2000 + 2451545.0;
+}
+
 /// One `swe_calc_ut` result.
 final class SwissCalcResult {
   const SwissCalcResult({

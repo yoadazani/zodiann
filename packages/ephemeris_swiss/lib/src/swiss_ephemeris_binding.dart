@@ -74,6 +74,40 @@ final class SwissEphemerisBinding {
     }
   }
 
+  /// Longitude and longitude speed of [body] at the TT Julian day
+  /// [tjdTt] (`swe_calc`, whose time argument is TT), with no UT-to-TT
+  /// conversion by Swiss Ephemeris: the caller supplies the TT. Use
+  /// [julianDayTt] (the function in `swiss_calc.dart`) to build it from days
+  /// of TT since J2000 (ZOD-EPH-004 D12-O1).
+  ///
+  /// The same warnings apply as for [calcUt]: check
+  /// [SwissCalcResult.usedSwissEphemerisFiles]. A negative return value is
+  /// the library's error and throws [StateError] with its text.
+  SwissCalcResult calcTt(
+    double tjdTt,
+    int body, {
+    int flags = seflgSwieph | seflgSpeed,
+  }) {
+    final xx = calloc<Double>(6);
+    final serr = calloc<Char>(256);
+    try {
+      final returned = native.swe_calc(tjdTt, body, flags, xx, serr);
+      final error = serr.cast<Utf8>().toDartString();
+      if (returned < 0) {
+        throw StateError('swe_calc failed: $error');
+      }
+      return SwissCalcResult(
+        longitude: xx[0],
+        speed: xx[3],
+        returnFlags: returned,
+        error: error,
+      );
+    } finally {
+      calloc.free(xx);
+      calloc.free(serr);
+    }
+  }
+
   /// Closes the library's open files (`swe_close`).
   void close() => native.swe_close();
 }

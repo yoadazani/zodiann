@@ -2,6 +2,22 @@ import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('julianDayTt', () {
+    test('J2000 in TT days is 2451545.0', () {
+      expect(julianDayTt(0), 2451545.0);
+    });
+
+    test('the TT Julian day is the days since J2000 plus 2451545.0', () {
+      expect(julianDayTt(9820.25), 2451545.0 + 9820.25);
+      expect(julianDayTt(-36525), 2451545.0 - 36525);
+    });
+
+    test('a non-finite value is rejected', () {
+      expect(() => julianDayTt(double.nan), throwsArgumentError);
+      expect(() => julianDayTt(double.infinity), throwsArgumentError);
+    });
+  });
+
   group('julianDayUt', () {
     test('J2000 noon is 2451545.0', () {
       expect(julianDayUt(DateTime.utc(2000, 1, 1, 12)), 2451545.0);
