@@ -15,6 +15,7 @@
 - Root `test/architecture/` guards are pure Dart (`package:test`), no Flutter imports.
 - The ARB files in `packages/shared_ui/lib/l10n/` are never edited in committed form; the mutation proof edits and then restores them (`git diff --stat` must be empty for them afterwards).
 - Task acceptance criteria are not changed.
+- Every local command below is run through FVM (`fvm dart test …`, `fvm dart analyze …`, `fvm dart format …`, `fvm dart run melos …`); CI uses its own SDK setup.
 
 ## Review Focus
 
@@ -88,3 +89,7 @@
 - **I2 (Important):** Task 2 step 3 did not show the root is in the Melos test path. Applied: it now uses `melos list` and `melos exec` and records the output.
 - **M1:** Goal reworded (applied). **M2:** mutation precondition and line rule (applied). **M3:** `template-arb-file` test and `@key`/`@@locale` fixtures (applied). **M4:** ci.md sentence names the test, no duplication (applied).
 - **Needs user decision:** none.
+
+### Round 2 (plan-reviewer), first attempt
+
+- The first round 2 ran against the plan before the round 1 corrections were on disk (my edit step failed), so its "not resolved" findings were stale. Its one new finding was **I3 (Important): commands must use `fvm`**. Applied as a Global Constraint. Round 2 is re-run on commit range 29d1520..HEAD.
