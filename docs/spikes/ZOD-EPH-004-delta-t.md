@@ -172,7 +172,7 @@ The conversion is not bypassed or hidden by the test:
 
 * the adapter is always called with the UTC instant, never with a TT;
 * the shim converts through one helper, and a host guard requires exactly one
-  `Astronomy_TimeFromDays` call, four helper calls, and no banned time call or
+  `Astronomy_TimeFromDays` call, five helper calls (four before the V2 retarded-velocity refinement of 2026-11-22), and no banned time call or
   `.tt` / `.ut` write in the project-authored sources (residual limit:
   upstream's own `Astronomy_AddDays` re-derives TT from UT; that is upstream
   behaviour and is not guarded);

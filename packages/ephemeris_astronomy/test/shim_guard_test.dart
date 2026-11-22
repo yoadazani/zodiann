@@ -148,7 +148,7 @@ const char* note = "Astronomy_AddDays(t, dt) is banned";
       expect(helperDefinitionCount(source), 2);
     });
 
-    test('the shim sources have one TimeFromDays call, four helper calls, '
+    test('the shim sources have one TimeFromDays call, five helper calls, '
         'one helper definition and no banned time call', () {
       var timeFromDays = 0;
       var helperCalls = 0;
@@ -162,7 +162,7 @@ const char* note = "Astronomy_AddDays(t, dt) is banned";
       }
       expect(timeFromDays, 1);
       expect(helperDefinitions, 1);
-      expect(helperCalls, 4);
+      expect(helperCalls, 5);
     });
 
     test('the helper body holds the TimeFromDays call and is defined before '
@@ -182,7 +182,7 @@ const char* note = "Astronomy_AddDays(t, dt) is banned";
           .toList();
       // The definition is the first mention; every other one is a call after it.
       expect(mentions.first, lessThanOrEqualTo(definition.end));
-      expect(mentions.where((i) => i > definition.end), hasLength(4));
+      expect(mentions.where((i) => i > definition.end), hasLength(5));
     });
   });
 

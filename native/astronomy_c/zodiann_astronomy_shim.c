@@ -6,12 +6,14 @@
  * make a version change fail loudly). It then includes zodiann_moon_rate.c, the
  * project-authored Moon series and its exact analytic derivative.
  *
- * Velocity (decision D1): for the Sun and the planets it is the library's own
- * barycentric velocity of the body minus the Earth's (Astronomy_BaryState,
- * analytic VSOP derivatives, and for Pluto the library's gravity-simulation
- * state), rotated into the true ecliptic of date. Nothing here differences
- * positions. The Moon's velocity will be project-authored code, never
- * Astronomy_GeoMoonState.
+ * Velocity (decision D1, with the owner-approved retarded-instant refinement
+ * of 2026-11-22, variant V2): for the Sun and the planets it is the library's
+ * own barycentric velocity of the body at the light-time-retarded instant
+ * t - tau, scaled by (1 - dtau/dt), minus the Earth's velocity at t
+ * (Astronomy_BaryState, analytic VSOP derivatives, and for Pluto the library's
+ * gravity-simulation state), rotated into the true ecliptic of date. Nothing
+ * here differences positions. The Moon's velocity is project-authored code,
+ * never Astronomy_GeoMoonState.
  */
 #include <math.h>
 
@@ -78,8 +80,9 @@ static int zodiann_moon_body_state(double ut_days, double* out)
 int zodiann_body_state(int body, double ut_days, double* out)
 {
     double s[ZODIANN_BODY_STATE_LENGTH];
-    astro_time_t t;
-    astro_vector_t geo, r, vel_eqj, v;
+    astro_time_t t, t_retarded;
+    astro_vector_t geo, geo_geometric, r, vel_eqj, v;
+    double dist, taudot, rhat_x, rhat_y, rhat_z;
     astro_state_vector_t body_state, earth_state;
     astro_rotation_t rot;
     int i;
@@ -99,8 +102,28 @@ int zodiann_body_state(int body, double ut_days, double* out)
     if (geo.status != ASTRO_SUCCESS)
         return geo.status;
 
-    /* Velocity of the body and of the Earth, barycentric EQJ, AU per day. */
-    body_state = Astronomy_BaryState(kShimBodies[body], t);
+    /* The light-time retardation (owner-approved refinement, 2026-11-22,
+     * variant V2). GeoVector without aberration is the retarded geometric
+     * vector; tau is its light time. The body is seen where it was at t - tau,
+     * so its velocity is taken there, and the geometric part of the apparent
+     * position moves as d/dt [x_body(t - tau) - x_earth(t)]
+     *   = v_body(t - tau) (1 - dtau/dt) - v_earth(t),
+     * with dtau/dt = rhat . (v_body(t - tau) - v_earth(t)) / (c + rhat .
+     * v_body(t - tau)). The retarded time is built through the single
+     * conversion helper (not Astronomy_AddDays); BaryState is analytic. The
+     * derivatives of the aberration correction and of the frame rotation stay
+     * omitted (docs/spikes/ZOD-EPH-004-retarded-velocity.md). */
+    geo_geometric = Astronomy_GeoVector(kShimBodies[body], t, NO_ABERRATION);
+    if (geo_geometric.status != ASTRO_SUCCESS)
+        return geo_geometric.status;
+    dist = sqrt(geo_geometric.x * geo_geometric.x +
+                geo_geometric.y * geo_geometric.y +
+                geo_geometric.z * geo_geometric.z);
+    t_retarded = zodiann_time_from_ut(ut_days - dist / C_AUDAY);
+
+    /* Velocity of the body at t - tau and of the Earth at t, barycentric EQJ,
+     * AU per day. */
+    body_state = Astronomy_BaryState(kShimBodies[body], t_retarded);
     if (body_state.status != ASTRO_SUCCESS)
         return body_state.status;
     earth_state = Astronomy_BaryState(BODY_EARTH, t);
@@ -115,10 +138,19 @@ int zodiann_body_state(int body, double ut_days, double* out)
     if (r.status != ASTRO_SUCCESS)
         return r.status;
 
+    rhat_x = geo_geometric.x / dist;
+    rhat_y = geo_geometric.y / dist;
+    rhat_z = geo_geometric.z / dist;
+    taudot = (rhat_x * (body_state.vx - earth_state.vx) +
+              rhat_y * (body_state.vy - earth_state.vy) +
+              rhat_z * (body_state.vz - earth_state.vz)) /
+             (C_AUDAY + (rhat_x * body_state.vx + rhat_y * body_state.vy +
+                         rhat_z * body_state.vz));
+
     vel_eqj.status = ASTRO_SUCCESS;
-    vel_eqj.x = body_state.vx - earth_state.vx;
-    vel_eqj.y = body_state.vy - earth_state.vy;
-    vel_eqj.z = body_state.vz - earth_state.vz;
+    vel_eqj.x = body_state.vx * (1.0 - taudot) - earth_state.vx;
+    vel_eqj.y = body_state.vy * (1.0 - taudot) - earth_state.vy;
+    vel_eqj.z = body_state.vz * (1.0 - taudot) - earth_state.vz;
     vel_eqj.t = t;
     v = Astronomy_RotateVector(rot, vel_eqj);
     if (v.status != ASTRO_SUCCESS)
