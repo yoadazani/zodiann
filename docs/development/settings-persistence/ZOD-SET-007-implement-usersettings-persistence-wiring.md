@@ -42,6 +42,7 @@ No direct design reference applies — this is the persistence wiring behind the
 
 ## Notes
 
+- 2026-11-22 (ZOD-FND-006): build `UserSettings` on the generic `SettingsStore` / `SettingsKey<T>` in `packages/shared_storage` (keys are declared by the feature, none exist yet); a read of a wrong-typed value throws `StorageException(corrupt)`, so default and carry on. Android Auto Backup is on by default and would upload the stored data to the user's Google backup (and iOS Application Support to iCloud), against DATA-5 and DATA-6; settle this (for example `android:allowBackup="false"`, `dataExtractionRules`, `NSURLIsExcludedFromBackupKey`) before wiring the stores. See the ZOD-FND-006 Notes.
 - **From ZOD-L10-007 (2026-11-14):** `UserSettings` stores visible bodies as `Body` keys and orbs keyed by `AspectKind.name`, never display names (L-9). Entity-valued fields are typed as their key enum.
 
 ---

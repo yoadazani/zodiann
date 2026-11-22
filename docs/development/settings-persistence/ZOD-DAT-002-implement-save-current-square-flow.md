@@ -41,7 +41,7 @@ Implement the primary action that captures the Square screen's current mode/anch
 
 ## Notes
 
-_No additional notes._
+- 2026-11-22 (ZOD-FND-006): save through `SquareStore.save` (an upsert by id; `createdAt` is the caller's); the 100-square limit is this task's rule, not the store's; `openSquareStore(File)` takes the database path from the app. Android Auto Backup is on by default and would upload the stored data to the user's Google backup (and iOS Application Support to iCloud), against DATA-5 and DATA-6; settle this (for example `android:allowBackup="false"`, `dataExtractionRules`, `NSURLIsExcludedFromBackupKey`) before wiring the stores. See the ZOD-FND-006 Notes.
 
 ---
 
