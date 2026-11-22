@@ -1,9 +1,24 @@
-// ZOD-EPH-004 Task 5: ACC-2 on a device. The astronomy-engine adapter, running
-// the real C library through FFI, against JPL Horizons for all ten physical
-// bodies at every instant of packages/astro_core/test/fixtures/
-// reference_dates.json, within one arcminute. Run on an Android device or
-// emulator:
+// ZOD-EPH-004 Task 5 (D12): ACC-2 on a device. The astronomy-engine adapter,
+// running the real C library through FFI, against JPL Horizons for all ten
+// physical bodies at every instant of packages/astro_core/test/fixtures/
+// reference_dates.json, within one arcminute, **at equivalent TT instants**.
+// Run on an Android device or emulator:
 //   flutter test integration_test/astronomy_accuracy_test.dart -d <device>
+//
+// The adapter is always called with the reference UTC instant, through the
+// production path. Horizons was asked at the TT that the adapter's own
+// UTC-to-TT conversion assigns to that instant; a pin test checks that the
+// device's own hook (zodiann_test_time_for_ut, the same single conversion
+// helper) reports exactly those values, within 1 millisecond, so a change of
+// the conversion fails the pin instead of silently re-aligning the reference.
+//
+// HONEST LIMIT: because the TT comes from the library's own delta T, the gate
+// has that delta T on both sides. It validates the position model given TT; it
+// cannot see an error in the library's delta T, and says nothing about which
+// delta T is closer to the truth. The UTC-input difference against Horizons
+// (asked at the same UTC instants as UT) is printed beside every body's TT
+// result as information, with no threshold. See
+// docs/spikes/ZOD-EPH-004-delta-t.md.
 //
 // The maximum error of every body is printed on its own line, so Moon and
 // Pluto are never folded into one figure.
@@ -16,6 +31,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'astronomy_reference_longitudes.dart';
+import 'astronomy_reference_longitudes_tt.dart';
 
 /// The value every double of a hook's buffer holds before the shim runs.
 const double _sentinel = 1234.5;
@@ -49,47 +65,105 @@ void main() {
     test('rejects an error just above the tolerance', () {
       expect(
         arcsecondsBetween(10.0, 10.0 + 61 / 3600),
-        greaterThan(astronomyToleranceArcseconds),
+        greaterThan(astronomyTtToleranceArcseconds),
       );
     });
 
     test('accepts an error just below it, and wraps around 360', () {
       expect(
         arcsecondsBetween(10.0, 10.0 + 59 / 3600),
-        lessThan(astronomyToleranceArcseconds),
+        lessThan(astronomyTtToleranceArcseconds),
       );
       expect(arcsecondsBetween(359.99, 0.01), closeTo(72, 1e-6));
     });
   });
 
-  test('ACC-2: all ten bodies, 53 instants, within 60 arcseconds of Horizons', () {
-    final worst = <String, ({double arcseconds, String utc})>{};
+  group('the UTC-to-TT conversion the fixture assumed (D12)', () {
+    test(
+      'the hook reports the fixture\'s UT, TT and delta T for every instant, '
+      'each within 1 millisecond',
+      () {
+        // 1 millisecond in days.
+        const millisecond = 1 / 86400000;
+        final seen = <String>{};
+        for (final reference in astronomyTtReferenceLongitudes) {
+          if (!seen.add(reference.utc)) continue;
+          // The hook is called with the instant, never with the fixture's days,
+          // so it goes through the same conversion the adapter uses.
+          final time = _native.timeForTesting(DateTime.parse(reference.utc));
+          expect(
+            time[0],
+            closeTo(reference.utDays, 1e-9),
+            reason: 'UT days at ${reference.utc}',
+          );
+          expect(
+            time[1],
+            closeTo(reference.ttDays, millisecond),
+            reason: 'TT days at ${reference.utc}',
+          );
+          expect(
+            (time[1] - time[0]) * 86400,
+            closeTo(reference.deltaTSeconds, 0.001),
+            reason: 'delta T at ${reference.utc}',
+          );
+        }
+        expect(seen, hasLength(53));
+      },
+    );
+  });
+
+  test('ACC-2 gate: all ten bodies, 53 instants, within 60 arcseconds of '
+      'Horizons at the equivalent TT instants', () {
+    // What this comparison is: the adapter is called with each reference UTC
+    // instant through the production path; Horizons was asked at the TT the
+    // adapter's own conversion assigns to it (pinned above). It validates the
+    // position model given TT. It cannot see an error in the library's delta T:
+    // that is on both sides. The UTC-input difference is printed beside it.
+    final worstTt = <String, ({double arcseconds, String utc})>{};
+    for (final reference in astronomyTtReferenceLongitudes) {
+      final utc = DateTime.parse(reference.utc);
+      final result = port.position(Body.fromJson(reference.body), utc);
+      expect(result, isA<EphemerisSuccess>(), reason: reference.body);
+      final difference = arcsecondsBetween(
+        (result as EphemerisSuccess).position.longitude,
+        reference.longitudeDegrees,
+      );
+      final previous = worstTt[reference.body];
+      if (previous == null || difference > previous.arcseconds) {
+        worstTt[reference.body] = (arcseconds: difference, utc: reference.utc);
+      }
+    }
+    // Informational, not asserted, no threshold: the same adapter calls against
+    // Horizons asked at the same UTC instants as UT (its own delta T).
+    final worstUt = <String, ({double arcseconds, String utc})>{};
     for (final reference in astronomyReferenceLongitudes) {
       final utc = DateTime.parse(reference.utc);
       final result = port.position(Body.fromJson(reference.body), utc);
       expect(result, isA<EphemerisSuccess>(), reason: reference.body);
-      final position = (result as EphemerisSuccess).position;
       final difference = arcsecondsBetween(
-        position.longitude,
+        (result as EphemerisSuccess).position.longitude,
         reference.longitudeDegrees,
       );
-      final previous = worst[reference.body];
+      final previous = worstUt[reference.body];
       if (previous == null || difference > previous.arcseconds) {
-        worst[reference.body] = (arcseconds: difference, utc: reference.utc);
+        worstUt[reference.body] = (arcseconds: difference, utc: reference.utc);
       }
     }
-    for (final entry in worst.entries) {
+    for (final entry in worstTt.entries) {
+      final ut = worstUt[entry.key]!;
       // ignore: avoid_print
       print(
-        'ACC-2 ${entry.key.padRight(8)} max ${entry.value.arcseconds.toStringAsFixed(3)}'
-        ' arcsec at ${entry.value.utc}',
+        'ACC-2 ${entry.key.padRight(8)} TT max '
+        '${entry.value.arcseconds.toStringAsFixed(3)} arcsec at '
+        '${entry.value.utc}; UTC-input (informational) max '
+        '${ut.arcseconds.toStringAsFixed(3)} arcsec at ${ut.utc}',
       );
     }
-    expect(worst.keys.toSet(), hasLength(10));
-    for (final entry in worst.entries) {
+    expect(worstTt.keys.toSet(), hasLength(10));
+    for (final entry in worstTt.entries) {
       expect(
         entry.value.arcseconds,
-        lessThanOrEqualTo(astronomyToleranceArcseconds),
+        lessThanOrEqualTo(astronomyTtToleranceArcseconds),
         reason: '${entry.key} at ${entry.value.utc}',
       );
     }
