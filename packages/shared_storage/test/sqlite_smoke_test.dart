@@ -6,7 +6,7 @@ import 'package:sqlite3/sqlite3.dart';
 void main() {
   test('the bundled SQLite opens an in-memory database', () {
     final db = sqlite3.openInMemory();
-    addTearDown(db.dispose);
+    addTearDown(db.close);
     expect(db.select('SELECT 1 AS one').single['one'], 1);
   });
 }
