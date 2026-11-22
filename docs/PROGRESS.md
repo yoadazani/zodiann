@@ -767,7 +767,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **ZOD-L10-014:** branch `task/ZOD-L10-014-key-parity-test` (from `main`; the unmerged PR #54 is only a DAT-012 record and not a dependency): plan `29d1520`..`ad06d9c`, tests `107a862`, review fixes `1157450`. PR: recorded in the follow-up commit.
+- **ZOD-L10-014:** branch `task/ZOD-L10-014-key-parity-test` (from `main`; the unmerged PR #54 is only a DAT-012 record and not a dependency): plan `29d1520`..`ad06d9c`, tests `107a862`, review fixes `1157450`. PR: [PR #55](https://github.com/yoadazani/zodiann/pull/55) (open, not merged).
 - **ZOD-DAT-012:** branch `task/ZOD-DAT-012-drift-migration-framework` (from `main` @ `e44a455`): plan `018c61e`..`6d87c28`, tests `cda7f39`, atomic `applyMigrations` `2a86074`, doc `5bf1328`, review fixes `4408c5e`. PR: [PR #53](https://github.com/yoadazani/zodiann/pull/53) (open, not merged). Unmerged dependency: none. Untracked and deliberately left alone: `grep.exe.stackdump`.
 - **ZOD-FND-006:** branch `task/ZOD-FND-006-local-storage-infrastructure`, [PR #51](https://github.com/yoadazani/zodiann/pull/51) merged as `85e5f08`; the branch is integrated into `main`. Unmerged dependency: none (it branches from `main` after ZOD-EPH-004's merge `a2c8150`). Untracked and deliberately left alone: `grep.exe.stackdump` in the repository root.
 - **ZOD-EPH-004:** branch `task/ZOD-EPH-004-astronomy-engine-adapter`, [PR #50](https://github.com/yoadazani/zodiann/pull/50) merged as `a2c8150`. Unmerged dependency: none (it branches from `main`). Untracked and deliberately left alone: `grep.exe.stackdump` in the repository root.
