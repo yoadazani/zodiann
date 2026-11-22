@@ -61,8 +61,11 @@ speed, not a light-time effect.
 
 * `apps/astro_mobile/integration_test/astronomy_retarded_velocity_test.dart`:
   eight cases (Mercury three times, Venus, Mars, the Sun, Jupiter, Pluto) whose
-  expected values come from `print_values.c`, an implementation written
-  separately from the shim (same vendored library), to 1e-10 degrees per day;
+  expected values come from `print_values.c` (which includes `estimate.c`), a
+  second implementation of the same formula by the same author, using the same
+  vendored library, to 1e-10 degrees per day. It catches a transcription or unit
+  slip in the shim; the formula itself is checked by the Swiss comparison, not
+  by this test;
   the Mercury cases also exclude the earlier value by more than 1e-4. They
   failed (RED) on the earlier shim and pass with the refinement.
 * The ACC-2 gate (positions) is unchanged to the printed precision, and the

@@ -212,7 +212,24 @@ Swiss flags are `SEFLG_SWIEPH | SEFLG_SPEED | SEFLG_NOGDEFL`.
   between two implementations, not the error against an exact derivative.
 * The stations and the speed tests run on the emulator only (D3): no CI run;
   ZOD-TST-017 owns a release-blocking run.
-
+* **Threading.** The vendored library keeps unsynchronised global state: the
+  Pluto segment cache publishes a segment (`cache[i] = calloc(...)`) before it
+  is filled, so two isolates (ARCH-1 puts long scans off the UI isolate) asking
+  for Pluto in a not-yet-cached segment at the same moment can get a wrong
+  Pluto position and speed with no error. Calls must be serialized (the same
+  rule as ZOD-FND-003 gave for Swiss); this is untested and is a carry-over to
+  ZOD-EPH-002. (A second global, the Moon's call counter, is harmless.)
+* **Positions are not fully "apparent" in the contract's sense.** The port
+  describes apparent positions corrected for light time, aberration, light
+  deflection and nutation. astronomy-engine applies light time and aberration
+  to the Sun and planets and **no gravitational deflection for any body**; the
+  Moon's position carries neither light time nor aberration (about 1 arcsecond).
+  The effect is inside the measured accuracy (section 4), so this is a
+  documentation point, not a failure; a caller must not assume deflection
+  parity with Swiss Ephemeris near solar conjunction. The adapter's class
+  documentation says so. If the owner wants the contract's wording to admit it,
+  a second sentence would be needed in `EphemerisPort.position` beside the
+  speed one of section 10; this task proposes it and does not apply it.
 ## 6. ΔT
 
 [`ZOD-EPH-004-delta-t.md`](ZOD-EPH-004-delta-t.md): the library's ΔT is +133.5 s
@@ -299,8 +316,11 @@ the ephemeris" includes an analytic derivation from the source's own state
 vectors, which this adapter does; nothing in the specification's behaviour
 changes. It records that such a speed is the derivative of the geometric
 position the library models and not of the fully apparent longitude, and that it
-differs from Swiss Ephemeris's speed by up to 0.0012 degrees per day for Mercury
-and 0.0003 for the Sun and Mars to Pluto (section 5).
+differs from Swiss Ephemeris's speed (measured at the same TT, section 5) by at most
+0.000784 degrees per day for Mercury (approved bound 0.0012), 0.000267 for Venus
+(0.00045), 0.000573 for the Moon (0.0007) and 0.000206 or less for the Sun and
+Mars to Pluto (0.0003); these are measured maxima over the sampled instants,
+not guarantees.
 
 **Consumers affected.** The crossing solver (ZOD-CRS-*), which uses the speed to
 seed and bracket crossings, and retrograde detection (ZOD-EPH-005, `speed < 0`):
@@ -320,6 +340,7 @@ a reader of `EphemerisPort` alone could take the adapter for a violation.
 * **ZOD-TST-001** has the 1-arcsecond Moon conflict (section 6): recorded in
   PROGRESS and here only; its file is not edited.
 * **ZOD-TST-017** owns a release-blocking run of the device tests.
+* **ZOD-EPH-002** also inherits two rules for any use of the backup: serialize calls into the vendored library (threading limit, section 5), and treat the backup as having no light deflection (section 5).
 * **A deflection-aware Swiss reference** for the speed is not available; if a
   later task needs one, the Swiss glitch near conjunction must be understood
   first.

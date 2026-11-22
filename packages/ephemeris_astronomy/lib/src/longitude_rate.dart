@@ -16,15 +16,17 @@ import 'dart:math' as math;
 /// vectors** (CRS-A1 forbids finite differences, and none is used). The
 /// vectors it passes in leave out, and so this result leaves out:
 ///
-/// * the time derivative of the light-time correction,
-/// * the time derivative of the aberration correction, and
+/// * the time derivative of the aberration correction (about 1e-4 degrees per
+///   day), and
 /// * the rotation rate of the ecliptic-of-date frame (precession about
-///   3.8e-5 degrees per day; nutation smaller),
+///   3.8e-5 degrees per day; nutation smaller).
 ///
-/// and the velocity is the instantaneous one at the observation instant, not
-/// at the light-time-retarded instant. **It is therefore not the derivative of
-/// the fully apparent longitude.** How good it is, is measured against Swiss
-/// Ephemeris (decision D7), not asserted here.
+/// For the Sun and the planets the velocity is the body's at the light-time
+/// retarded instant, scaled by one minus the rate of the light time, minus the
+/// Earth's at the observation instant (owner-approved refinement of
+/// 2026-11-22), so the light-time derivative is included. **It is therefore
+/// not the derivative of the fully apparent longitude.** How good it is, is
+/// measured against Swiss Ephemeris (decision D7), not asserted here.
 ///
 /// Throws [ArgumentError] if any input is not finite, or if `x` and `y` are
 /// both zero (the longitude of the origin is undefined).

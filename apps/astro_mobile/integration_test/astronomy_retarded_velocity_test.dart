@@ -4,10 +4,13 @@
 // Earth's velocity at t. Run on an Android device or emulator:
 //   flutter test integration_test/astronomy_retarded_velocity_test.dart -d <device>
 //
-// The expected values come from an independent implementation (a scratch C
-// program outside the repository, written separately from the shim, using the
-// same vendored library; docs/spikes/ZOD-EPH-004-retarded-velocity.md). `old`
-// is the speed of the formulation before the refinement, `v2` the refined one.
+// The expected values come from a separate implementation of the same formula
+// (a scratch C program outside the repository, docs/spikes/
+// ZOD-EPH-004-retarded-velocity/, using the same vendored library and written
+// by the same author). It catches a transcription or unit slip in the shim; it
+// does not check the formula itself, which the Swiss comparison does
+// (astronomy_speed_vs_swiss_test.dart). `old` is the speed of the formulation
+// before the refinement, `v2` the refined one.
 // Each instant is whole seconds UTC; the C program was given the integer
 // microseconds since J2000 and divided by 86400e6, as `daysSinceJ2000` does.
 import 'package:astro_core/astro_core.dart';

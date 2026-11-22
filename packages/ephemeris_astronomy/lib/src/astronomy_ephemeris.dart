@@ -21,15 +21,44 @@ import 'longitude_rate.dart';
 /// `docs/spikes/ZOD-EPH-004-moon-derivative.md`).
 ///
 /// **This is not claimed to equal the derivative of the fully apparent
-/// longitude.** The speed leaves out the time derivatives of the light-time
-/// and aberration corrections and the rotation rate of the ecliptic-of-date
-/// frame, and the velocity is the instantaneous one, not the light-time
-/// retarded one. For the Moon, the omitted terms are the rate of the nutation
-/// and obliquity rotation (about 5e-5 degrees per day at most) and of the time
-/// scale, and its precession rate is included. How close the result is to
-/// Swiss Ephemeris, including at planetary stations, is measured and recorded
-/// in `docs/spikes/ZOD-EPH-004-astronomy-engine-adapter.md`, not asserted
-/// here.
+/// longitude.** For the Sun and the planets the velocity is the body's at the
+/// light-time-retarded instant (scaled by one minus the rate of the light
+/// time) minus the Earth's at the observation instant, so the light-time
+/// derivative is included
+/// (`docs/spikes/ZOD-EPH-004-retarded-velocity.md`). What it leaves out is the
+/// time derivative of the aberration correction (about 1e-4 degrees per day)
+/// and the rotation rate of the ecliptic-of-date frame (precession about
+/// 3.8e-5 degrees per day). For the Moon, the omitted terms are the rate of
+/// the nutation and obliquity rotation (about 5e-5 degrees per day at most)
+/// and of the time scale, and its precession rate is included. How close the
+/// result is to Swiss Ephemeris, including at planetary stations, is measured
+/// and recorded in `docs/spikes/ZOD-EPH-004-astronomy-engine-adapter.md`, not
+/// asserted here.
+///
+/// ## Positions: what is not modelled
+///
+/// The library applies light time and aberration to the Sun and the planets
+/// and **no gravitational deflection of light for any body**; the Moon's
+/// position carries neither light time nor aberration (about 1 arcsecond). The
+/// port's contract describes apparent positions corrected for light
+/// deflection too; the effect is inside the measured accuracy (at most 17.6
+/// arcseconds against JPL Horizons at equivalent TT instants, 60 required), but
+/// a caller must not assume deflection parity with Swiss Ephemeris near solar
+/// conjunction.
+///
+/// ## Time
+///
+/// The library converts the UTC instant to TT with its own delta T model,
+/// which differs from other sources' for future dates: at UTC instants the
+/// Moon can differ from Horizons by up to 78.6 arcseconds at 2100
+/// (`docs/spikes/ZOD-EPH-004-delta-t.md`).
+///
+/// ## Threading
+///
+/// The vendored library keeps unsynchronised global state (the Pluto segment
+/// cache publishes a segment before it is filled), so calls from several
+/// isolates or threads at once can return a wrong Pluto position without any
+/// error. Serialize calls (the same rule as for the Swiss binding).
 ///
 /// ## Range
 ///
