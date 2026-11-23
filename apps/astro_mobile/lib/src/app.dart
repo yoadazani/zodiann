@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import 'localization/app_locale_provider.dart';
 import 'navigation/app_router.dart';
 import 'navigation/warm_link.dart';
 import 'theme/theme_mode_provider.dart';
@@ -24,6 +25,9 @@ class ZodiannApp extends ConsumerWidget {
       theme: ZodiannTheme.porcelain,
       darkTheme: ZodiannTheme.graphite,
       themeMode: ref.watch(themeModeProvider),
+      // The language saved or detected at launch (ZOD-L10-002); null follows
+      // the device (English fallback, L-2).
+      locale: ref.watch(appLocaleProvider),
       // Not the generated ZodiannLocalizations.localizationsDelegates: it
       // lists flutter_localizations' deprecated delegates, which register a
       // different MaterialLocalizations type than material_ui's widgets read.

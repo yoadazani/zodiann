@@ -8,6 +8,8 @@ import 'package:astro_mobile/src/navigation/screen_stub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 /// Identity is all these tests check; every member is unused.
@@ -147,16 +149,28 @@ void main() {
   });
 
   testWidgets(
-    'main() mounts ZodiannApp under a ProviderScope wired to appOverrides',
+    'main() mounts ZodiannApp under a ProviderScope wired to appOverrides '
+    'and the launch language',
     (tester) async {
-      app.main();
+      // main() builds the real settings store over the preferences platform.
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
+      tester.platformDispatcher.localesTestValue = const [Locale('he', 'IL')];
+      addTearDown(tester.platformDispatcher.clearAllTestValues);
+      await tester.runAsync(app.main);
       await tester.pump();
       expect(find.byType(ProviderScope), findsOneWidget);
-      expect(
-        tester.widget<ProviderScope>(find.byType(ProviderScope)).overrides,
-        same(appOverrides),
-      );
+      final overrides = tester
+          .widget<ProviderScope>(find.byType(ProviderScope))
+          .overrides;
+      // Every DI binding, plus the language resolved before the first frame.
+      expect(overrides.length, appOverrides.length + 1);
       expect(find.byType(ZodiannApp), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(
+        Localizations.localeOf(tester.element(find.byType(ScreenStub))),
+        const Locale('he'),
+      );
     },
   );
 
