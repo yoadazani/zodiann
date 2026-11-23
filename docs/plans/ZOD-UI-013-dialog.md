@@ -209,4 +209,21 @@ Sequential, native (`executing-plans`). No independent work: the route builds on
 
 ## Plan review
 
-_Pending: the `plan-reviewer` cycle runs next (at most two rounds); the record is added here._
+### Round 1 (comprehensive) - verdict: needs user decision (O4, O5), then approve after corrections
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| I1 | Important | A full-viewport scroll view would swallow scrim taps (`SingleChildScrollView` is opaque) | Applied: translucent hit-test behaviour, full-viewport so the shadow is not clipped (D5); test of taps at four points outside the box; shadow reach in Task 4 |
+| I2 | Important | `RawDialogRoute` never sets `namesRoute` and its barrier adds a semantics node | Applied: `ZodiannDialog` carries `namesRoute` and the label; a private route subclass with `semanticsDismissible => false` (D8, Tasks 2 and 3) |
+| I3 | Important | The Navigator's default `parentScope` traversal edge lets Tab escape to an enclosing scope | Applied: `traversalEdgeBehavior: closedLoop`; a test inside an extra `FocusScope` (D4, Task 3) |
+| I4 | Important | Focus restore is only provable for keyboard-opened triggers (buttons take no focus on a tap) | Applied: D4 reworded, tests for both paths, the lazy-list pitfall; **O6 decided by the owner** (keyboard-opened only) |
+| I5 | Important | The sheet's Save-square dialog is `width: auto`, not 420 | Applied: width resolution in D5, the sheet box width recorded in Task 1 and wrapped in a `SizedBox` in Task 4 |
+| I6 | Important | `dialogTitle` line height is 1.45 (inherited), and the role touches more files than listed | Applied: 20 / 1.45 / 600 / 0 em, every place listed, `_master` and `_withRole`; **O4 decided by the owner** (add the role) |
+| I7 | Important | No guard against a second `showZodiannDialog` | Applied: documented, notes for DAT-004, DAT-010 / SET-005 (D1, Task 5, Risks) |
+| I8 | Important | Missing tests: Escape at open, Escape inside a `ZodiannTextField` | Applied (Task 3) |
+| I9 | Important | "Pixel-for-pixel in both themes" cannot be claimed with only a dark image | Applied: acceptance mapping reworded; **O5 decided by the owner** (generate a light and a Hebrew reference; Task 4 Step 0 and a new tool) |
+| M1 to M5 | Minor | Constructor form, `Wrap` alignment and view padding, the placeholder, explicit RED text, the warm-link risk | Applied |
+
+Needs user decision: O4, O5 and the focus-return question (O6) were put to the owner and answered (2026-11-23); see "Open decisions".
+
+_Round 2 (focused on the revision) follows._
