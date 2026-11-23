@@ -134,7 +134,17 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
 
 #### Measured facts (filled in Task 1, Step 4)
 
-_Placeholders, to be replaced by measured literals before Task 3 starts:_ header height; non-last row pitch; last row height; divider colour and row; default / hover / selected fill per theme; bar x-run, colour, and whether it covers the divider row; sheet column left edges; the mobile PNG's scale (780 px wide: 2x).
+Measured 2026-11-23 from `components_{dark,light}.png` (1440 wide, 1x) and the desktop wheel screenshots (1x), by pixel scans (throwaway test, deleted):
+
+- **Row pitch 44, divider included.** A non-last row is 43 px of fill plus a 1 px `line-soft` divider as its last row of pixels (sheet dark: dividers at y 3609 and 3653, selected fill 3610..3652; light: dividers 3547, 3591, 3635).
+- **The last row is 43 px** (no divider): wheel Positions, previous divider y 948, last row fill 949..991, panel bottom border 992. So the `isLast` height is **43** (the plan's M2 alternative resolved).
+- **Header: 38 px of label area + 1 px rule = 39 in dark, 37 + 1 = 38 in light**: the same 38.4 (10 + 17.4 + 10 + 1) snapped differently by Chrome. The header-height assertion allows ±1.
+- **Fills** (opaque, over the panel's `surface`): dark default `111114`, hover `18181c`, selected `222225`, divider `1b1b20`; light default `ffffff`, hover `f4f5f7`, selected `f1f1f1`, divider `e7e9ed`.
+- **Selected and hover fills stop above the divider.** The dividers above and below a selected row stay `line-soft` (not tinted): the fill is the 43 px between them (wheel: dividers 508 and 552, fill 509..551).
+- **The bar** is 3 px wide (dark `f4f5f7` = `accent`), covers the **43 px of fill, not the divider rows** (wheel x=948: bar 509..551, dividers 508 and 552 untouched), and sits **inside the panel's 1 px border**: LTR sheet panel border x=508, bar 509..511; English screen border 946, bar 947..949; **Hebrew screen panel 24..493, bar 490..492** (right edge, inside the border).
+- **Sheet geometry for the comparison:** the table is 890 px wide (panel inner 509..1398, right border 1399). Column starts relative to 509, from the text starts less the 16 px padding: Body 0, Sign 183, Position 335 (844 - 509), Motion 439 (948 - 509), State 588 (1097 - 509), end 890; widths **183, 152, 104, 149, 302** (the flex values the sheet test uses).
+- **Compact reference:** `responsive/mobile/zodiac-wheel_mobile_en_dark.png` is 780 px wide, a 2x capture.
+- **Unexplained but irrelevant:** the sheet's table panel shows a 24 px band and a rule above the header (3458..3482 dark); the test renders the table alone and compares from the header's first row down.
 
 ### Task 2: Column spec and row layout (RED first)
 
