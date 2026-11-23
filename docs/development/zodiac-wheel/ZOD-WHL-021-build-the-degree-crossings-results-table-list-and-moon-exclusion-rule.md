@@ -50,6 +50,7 @@ Render the filtered, sorted crossing results, with the "Moon excluded from All" 
 
 ## Notes
 
+- **From ZOD-UI-010 (2026-11-23):** for up to 2,500 rows compose `ZodiannTableHeader` above a `ListView.builder` of `ZodiannTableRow(columns: …, isLast: …)`; `ZodiannTable` is the eager form. Table semantics roles exist only inside `ZodiannTable` (Flutter 3.50 asserts a row without a table parent), so this list has none: give it a labelled list semantics here if it needs them. Long plain cell text ellipsizes on one line; a cell that wraps overrides that.
 - **Button touch target (ZOD-UI-004, D3 / U2):** `ZodiannButton` takes max(drawn, 44) layout height and max(drawn width, 44) width. A container sized by its content grows by 6 (small) / 2 (regular) px per side compared with the mockup unless its padding absorbs the margin (e.g. the crossings panel head 56 → 68). Very short labels (small "OK", "1") get transparent side margins.
 
 ---
