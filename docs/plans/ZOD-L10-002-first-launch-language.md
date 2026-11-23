@@ -33,7 +33,7 @@ None taken yet. The defaults below are what the plan implements unless the owner
 - **D5. Storage failures never stop the app.** A failed read (storage unavailable) resolves from the device and does **not** write; a failed write still returns the detected language (the next launch detects again, which is correct because nothing was saved). Failures are already reported by `PrefsSettingsStore`; the banner is ZOD-NFR-014's.
 - **D6. Resolve before the first frame.** `main()` awaits the bootstrap and passes the result through a provider override, so the app never shows the wrong language first. `appLocaleProvider` defaults to `null` (follow the device, as today) so existing tests that pump `ZodiannApp` without overrides keep their meaning; a test pins that `main()` runs the bootstrap, since a null default would otherwise hide a `main()` that forgets it.
 - **D7. Android Auto Backup off:** `android:allowBackup="false"` on `<application>`, pinned by a test; nothing is uploaded to the Google backup. iOS stays as a recorded, unverified limit. *(O2)*
-- **D8. `shared_storage` becomes a runtime dependency of `astro_mobile`** (it is a dev dependency today), through `SettingsStore` only; no `SquareStore` code runs. The no-network and dependency-closure guards must stay green.
+- **D8. `shared_storage` and `shared_preferences` become runtime dependencies of `astro_mobile`** (both are dev dependencies today; `main()` imports `SharedPreferencesAsync`, which `shared_storage` does not re-export, and `depend_on_referenced_packages` would fail otherwise), and `shared_preferences_platform_interface` becomes a dev dependency (the tests use its in-memory platform). Only `SettingsStore` code runs; no `SquareStore` code does. The no-network and dependency-closure guards must stay green, and the third-party inventory is re-checked and edited (certain, not conditional: its own text says to re-check when `shared_storage` becomes a regular dependency).
 
 ## Design (API)
 
@@ -100,11 +100,19 @@ Inputs the task and spec imply and no acceptance criterion exercises; each has a
 - Create `apps/astro_mobile/lib/src/localization/language.dart`: `resolveDeviceLanguage`, `languageKey`, `loadOrDetectLanguage`.
 - Create `apps/astro_mobile/lib/src/localization/app_locale_provider.dart`: `appLocaleProvider`.
 - Create `apps/astro_mobile/lib/src/bootstrap.dart`: `bootstrapOverrides`.
-- Modify `apps/astro_mobile/lib/main.dart` (async, bootstrap), `apps/astro_mobile/lib/src/app.dart` (`locale:`), `apps/astro_mobile/pubspec.yaml` (`shared_storage` to `dependencies`), `apps/astro_mobile/android/app/src/main/AndroidManifest.xml` (`allowBackup`).
+- Modify `apps/astro_mobile/lib/main.dart` (async, bootstrap), `apps/astro_mobile/lib/src/app.dart` (`locale:`), `apps/astro_mobile/pubspec.yaml` (`shared_storage` and `shared_preferences` to `dependencies`, `shared_preferences_platform_interface: ^2.4.2` to `dev_dependencies`, and the "Dev only" and "No production wiring" comments), `apps/astro_mobile/android/app/src/main/AndroidManifest.xml` (`allowBackup`).
 - Create tests: `apps/astro_mobile/test/localization/language_test.dart` (resolver and bootstrap with a fake store), `.../first_launch_test.dart` (real store, app wiring, `main()` guard), `.../manifest_backup_test.dart` or an extension of `platform_links_test.dart`, whichever already reads the manifest.
-- Documentation: the task file (Completion notes), `docs/development/TASKS.md`, notes on ZOD-L10-003, ZOD-SET-002 and ZOD-SET-007, `docs/PROGRESS.md` (Architecture Conventions "Language", Technical Decisions, Verification, Git State, the Auto Backup item, and the record that PR #59 (ZOD-UI-010) merged as `513a088`), `docs/licensing/third-party-inventory.md` if the release closure changes.
+- Documentation: the task file (Completion notes), `docs/development/TASKS.md`, notes on ZOD-L10-003, ZOD-SET-002 and ZOD-SET-007, and the FND-006 Notes lines in the SET-007 and DAT-002 task files that mention Auto Backup; `docs/PROGRESS.md` (Architecture Conventions "Language", Technical Decisions, Verification, Git State, the Auto Backup item, the "No production wiring" statement in the FND-006 entry, and the record that PR #59 (ZOD-UI-010) merged as `513a088`); `docs/licensing/third-party-inventory.md` **(mandatory)**: its scope sentence (line about `shared_storage` becoming runtime closure) and the `drift`, `sqlite3` and `shared_preferences*` rows now say they ship.
 
 ## Tasks
+
+### Task 0: Dependencies
+
+**Files:** modify `apps/astro_mobile/pubspec.yaml`.
+
+- [ ] **Step 1: Move** `shared_storage` and `shared_preferences: ^2.5.6` from `dev_dependencies` to `dependencies`, add `shared_preferences_platform_interface: ^2.4.2` to `dev_dependencies`, and rewrite the "Dev only" and "No production wiring" comments to say the app uses `SettingsStore` from first launch (ZOD-L10-002).
+- [ ] **Step 2: Resolve:** from the root `fvm flutter pub get`, then `git checkout -- packages/shared_ui/lib/l10n` if the generated l10n files were deleted (never commit the deletion). Expected: resolves, `pubspec.lock` unchanged except for nothing new (the packages are already in the workspace lock); `fvm flutter analyze --fatal-infos` in `apps/astro_mobile` clean.
+- [ ] **Step 3: Commit** `build(ZOD-L10-002): make local storage a runtime dependency of the app`. The guard tests and the builds are in Task 4.
 
 ### Task 1: The resolver (TDD)
 
@@ -150,33 +158,35 @@ Inputs the task and spec imply and no acceptance criterion exercises; each has a
 **Interfaces:** Consumes Tasks 1 and 2, `appOverrides`. Produces `appLocaleProvider`, `bootstrapOverrides`.
 
 - [ ] **Step 1: Write the failing tests:**
-  - `a Hebrew device opens the app in Hebrew on first launch` (acceptance 1): a real `PrefsSettingsStore` over an in-memory `SharedPreferencesAsyncPlatform`, `bootstrapOverrides` with `[he_IL]`, pump `ZodiannApp`; `Localizations.localeOf` is `he`, `Directionality` is RTL, `ZodiannLocalizations.of(context).localeName` is `he`.
+  - Setup: in `setUp` set `SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty()` (from `shared_preferences_platform_interface`, as `packages/shared_storage/test/prefs_settings_store_test.dart` does) **before** any `SharedPreferencesAsync()` is built; a "second launch" builds a **new** `PrefsSettingsStore(SharedPreferencesAsync())` over the same platform object (or `InMemorySharedPreferencesAsync.withData(...)`) and drops the first.
+  - `a Hebrew device opens the app in Hebrew on first launch` (acceptance 1): a real `PrefsSettingsStore` over that in-memory platform, `bootstrapOverrides` with `[he_IL]`, pump `ZodiannApp`; `Localizations.localeOf` is `he`, `Directionality` is RTL, `ZodiannLocalizations.of(context).localeName` is `he`.
   - `a French device opens the app in English` (acceptance 2): `Locale('fr')`; locale `en`, LTR.
   - `the second launch never re-runs the detection` (acceptance 3): one store shared across two `bootstrapOverrides` calls; the first with `[he]`, the second with `[en]` after the "device language changed"; the second app is Hebrew, and a spy store shows no write on the second launch.
-  - `an explicit choice stored before the launch survives`: store seeded `'en'`, device `[he]`; English.
+  - `an explicit choice stored before the launch survives`: store seeded `'en'`, device `[he]`; English. And `a saved he with a French device stays Hebrew` (pins that a stored value is never re-resolved).
+  - `a failing store still opens the app in the device language`: a store whose `read` throws `StorageException(unavailable)`, device `[he]`; the app is Hebrew and nothing was written.
   - `ZodiannApp without overrides still follows the device` (the existing `l10n_test.dart` cases keep passing unchanged).
-  - `main() runs the bootstrap`: `lib/main.dart` source contains `bootstrapOverrides(` and `ensureInitialized` (the null default would hide a `main()` that forgets it).
+  - `main() runs the bootstrap`: `lib/main.dart` source **with its comments stripped** contains `ensureInitialized`, `await bootstrapOverrides(` and `overrides:` taking the result (the null default would hide a `main()` that forgets it; a comment must not satisfy the check).
 - [ ] **Step 2: Run** `cd apps/astro_mobile; fvm flutter test test/localization/first_launch_test.dart`; expected: compile failure (`bootstrapOverrides`, `appLocaleProvider` undefined).
 - [ ] **Step 3: Implement** the provider, `bootstrapOverrides`, the `locale:` line in `ZodiannApp`, and the async `main()` per "Design (API)". `main()` builds `PrefsSettingsStore(SharedPreferencesAsync())` itself, never at import time.
 - [ ] **Step 4: Run** the same command and `cd apps/astro_mobile; fvm flutter test` (the whole app suite, including `l10n_test.dart` and the navigation tests); all pass; analyze clean.
 - [ ] **Step 5: Commit** `feat(ZOD-L10-002): start the app in the detected language`.
 
-### Task 4: Runtime dependency and Android backup (TDD where testable)
+### Task 4: Guards, builds and Android backup (TDD where testable)
 
-**Files:** modify `apps/astro_mobile/pubspec.yaml`, `AndroidManifest.xml`; test the manifest where `platform_links_test.dart` (or the FND-007 manifest checks) already reads it.
+**Files:** modify `AndroidManifest.xml`; test the manifest in `apps/astro_mobile/test/platform_links_test.dart` (it already parses the manifest); the dependency move itself was Task 0.
 
 - [ ] **Step 1: Write the failing test** `the Android manifest turns Auto Backup off`: parses `android/app/src/main/AndroidManifest.xml` and asserts `<application android:allowBackup="false">`, and that neither `android:fullBackupContent` nor `android:dataExtractionRules` re-enables it. Run it; expected: it fails (the attribute is missing).
-- [ ] **Step 2: Implement:** add `android:allowBackup="false"`; in `pubspec.yaml` move `shared_storage` from `dev_dependencies` to `dependencies`; `fvm flutter pub get` from the root, then `git checkout -- packages/shared_ui/lib/l10n` if the l10n files were deleted.
-- [ ] **Step 3: Run** the manifest test, then, one at a time, `fvm dart test test/architecture/no_network_test.dart test/architecture/dependency_closure_test.dart` from the root and `fvm dart test test/architecture`; all pass. Record whether `shared_storage`'s runtime closure adds any package to the release closure (`fvm dart pub deps --json` filtered, as the guards do).
-- [ ] **Step 4: Build check** (the biggest risk of moving the dependency): `cd apps/astro_mobile; fvm flutter build apk --debug` succeeds (the `sqlite3` build hook needs GitHub access once); confirm with `aapt2 dump badging` / `xmltree` that the built manifest carries `allowBackup=false` and no `INTERNET` permission in the release manifest (`aapt2 dump permissions`, as ZOD-FND-007 did), and note the APK size change if the native library is now bundled.
-- [ ] **Step 5: Commit** `feat(ZOD-L10-002): ship local storage and turn off Android Auto Backup`.
+- [ ] **Step 2: Implement:** add `android:allowBackup="false"` to `<application>`.
+- [ ] **Step 3: Run** the manifest test, then, one at a time, `fvm dart test test/architecture/no_network_test.dart test/architecture/dependency_closure_test.dart` from the root and `fvm dart test test/architecture`; all pass. Record which packages `shared_storage` adds to the release closure (`drift`, `sqlite3`, `shared_preferences` and its platform plugins; `fvm dart pub deps --json` filtered as the guards do) and that none is a network package.
+- [ ] **Step 4: Build checks** (the biggest risk of the dependency move). From `apps/astro_mobile`: `fvm flutter build apk --debug` and `fvm flutter build apk --release` both succeed (the `sqlite3` build hook downloads a precompiled SQLite from GitHub at build time, now also for release, and CI builds will need that access). On the **release** APK: `aapt2 dump permissions` shows no `INTERNET`, `aapt2 dump xmltree <apk> AndroidManifest.xml` (the **merged** manifest, so a plugin manifest cannot re-enable it) shows `allowBackup` false, and `unzip -l` says whether `libsqlite3.so` is present (tree-shaking may drop it because `openSquareStore` is unused). Record the APK size either way.
+- [ ] **Step 5: Commit** `feat(ZOD-L10-002): turn off Android Auto Backup`.
 
 ### Task 5: Verification, device check, review, documentation
 
 - [ ] **Step 1: Device check, if an emulator or a device is available** (no device was authorized in earlier sessions; ask before touching a physical device): install the debug APK, set the device language to Hebrew, clear app data, launch (Hebrew, RTL); clear app data, set French, launch (English); with the app in Hebrew, switch the device to English and relaunch without clearing data (still Hebrew). Record each result; if no device is available, record "not verified on a device" and keep the widget-level proof.
 - [ ] **Step 2: Verification:** from the root, one process at a time: `fvm dart run melos run lint`, `fvm dart run melos run test`; record counts, exit codes and the head commit.
 - [ ] **Step 3: Whole-branch review** by a fresh reviewer (`requesting-code-review`), given the Review Focus; fix Critical and Important findings test-first.
-- [ ] **Step 4: Documentation** after verification: the task file (tick the criteria, Completion notes), `TASKS.md`, notes on ZOD-L10-003 (turn `appLocaleProvider` into a notifier; the `language` key and `he` / `en` values; `System`), ZOD-SET-002 and ZOD-SET-007 (the key exists and is saved from first launch), `docs/PROGRESS.md` (Architecture Conventions "Language", Technical Decisions D1 to D8, Verification, Git State, close the Auto Backup owner item for Android and keep iOS open, and record that PR #59 merged as `513a088`), the licensing inventory if the closure changed.
+- [ ] **Step 4: Documentation** after verification: the task file (tick the criteria, Completion notes), `TASKS.md`, notes on ZOD-L10-003 (turn `appLocaleProvider` into a notifier; the `language` key and `he` / `en` values; the meaning of `System`), ZOD-SET-002, and ZOD-SET-007 (**`UserSettings` must include or migrate the existing `language` key so it does not become a second source of truth**; L10-003 and L-3 say the choice is "saved in the user settings"), the FND-006 Notes lines in the SET-007 and DAT-002 task files (Auto Backup is now off on Android), `docs/PROGRESS.md` (Architecture Conventions "Language", Technical Decisions D1 to D8, Verification, Git State, close the Auto Backup owner item for Android and keep iOS open, correct the "No production wiring" statement, and record that PR #59 merged as `513a088`), and the licensing inventory (mandatory, see File structure).
 - [ ] **Step 5: Commit, push, open the PR** per the workflow; record the PR link in `docs/PROGRESS.md` as a small follow-up commit.
 
 ## Acceptance criteria mapping
@@ -207,4 +217,20 @@ Sequential, native (`executing-plans`). No independent work: the tasks build on 
 
 ## Plan review
 
-_Pending: the `plan-reviewer` cycle runs next (at most two rounds); the record is added here._
+### Round 1 (comprehensive) - verdict: approve after corrections
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| C1 | Critical | `main()` imports `shared_preferences`, which is only a dev dependency of the app | Applied: both `shared_storage` and `shared_preferences` move to `dependencies` (D8, File structure, Task 0) |
+| I1 | Important | The dependency move (Task 4) came after the code and tests that need it; the tests import `shared_preferences_platform_interface`, not declared in the app | Applied: new Task 0 makes all pubspec changes first, including the dev dependency; Task 4 renamed "Guards, builds and Android backup" |
+| I2 | Important | The runtime-closure change and the licensing inventory were treated as conditional | Applied: inventory edit mandatory; Task 4 builds `--release` too, checks permissions, the merged manifest and whether `libsqlite3.so` ships, and records the size and the CI GitHub-access note |
+| I3 | Important | The first-launch test did not say how the platform is set up | Applied: `SharedPreferencesAsyncPlatform.instance` in `setUp`; a second launch builds a new store over the same platform object |
+| M1 | Minor | The `main()` guard is a source grep a comment could satisfy | Applied: comments stripped, three tokens required |
+| M2 | Minor | Check the merged manifest, not only the source one | Applied (Task 4 Step 4) |
+| M3 | Minor | Stale doc text ("Dev only", "No production wiring", FND-006 Notes lines) | Applied (File structure, Task 0, Task 5) |
+| M4 | Minor | `UserSettings` must include or migrate the `language` key | Applied (Task 5 notes) |
+| M5 | Minor | Add a failing-store wiring test and a saved-`he`-with-French-device test | Applied (Task 3) |
+
+Needs user decision: none new. Tell the owner: O2 is the Auto Backup decision the PROGRESS owner item asked for before wiring, and O3 means a later device-language change never takes effect.
+
+_Round 2 (focused on the revision) follows._
