@@ -16,6 +16,20 @@ void main() {
       dotAll: true,
     ).allMatches(manifest).map((m) => m.group(1)!).toList();
 
+    // ZOD-L10-002 (decision D7): the saved language, and later every setting,
+    // stays on the device (DATA-5, DATA-6). Android Auto Backup is on unless
+    // the attribute says otherwise, and would upload it to the Google backup.
+    test('turns Android Auto Backup off', () {
+      expect(
+        RegExp(r'<application[^>]*android:allowBackup="false"')
+            .hasMatch(manifest),
+        isTrue,
+        reason: '<application android:allowBackup="false">',
+      );
+      expect(manifest, isNot(contains('android:fullBackupContent')));
+      expect(manifest, isNot(contains('android:dataExtractionRules')));
+    });
+
     test('has exactly one BROWSABLE intent filter, for the zodiann scheme', () {
       final browsable = [
         for (final f in filters)
