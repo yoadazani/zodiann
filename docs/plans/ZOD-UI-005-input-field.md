@@ -198,3 +198,16 @@ Open items: none beyond O1 to O5 (owner defaults).
 | M2 | Minor | No mutant for the disabled-ignores-`errorText` behaviour | Applied (Task 4 list) |
 
 Open items: none beyond O1 to O5 (owner defaults).
+
+## Execution notes (2026-11-23)
+
+- **Owner approval:** the plan was approved with the defaults O1 to O5 as written.
+- **Ledger of rulings and deviations** (what, why, cost if wrong):
+  - `inputWidth` added: the sheet's `width: 120px` is on `.input` only, so one field width wrapped the long label. Additive, optional; cost: one extra parameter.
+  - A formatter strips unpaired UTF-16 surrogates (runs last): a bare `EditableText` throws `ArgumentError` on them, typed or set programmatically (measured). Cost: text a caller puts in the controller directly is the caller's to keep well-formed (documented).
+  - Non-const constructor: the blank-message assert needs `trim()`. Cost: no `const ZodiannTextField(...)`; labels are runtime strings anyway.
+  - Selection controls are the "Handle" variants: Material's on Android, Fuchsia and iOS, the desktop ones on macOS, Linux and Windows. Cupertino-native iOS handles need `cupertino_ui` as a direct dependency (it is only transitive through `material_ui`), which the plan's no-pubspec-change constraint forbids; **left to the owner**. Cost: iOS handles are round Material ones.
+  - Sheet fidelity measures ink as the pixel nearest the token (Flutter text has colour fringes), icons within 12 of the token and 8 of the sheet, the label's bottom edge within 3 rows, and the focused value short of the last glyph (the caret). Cost: ink colour is proved mainly by the widget style tests.
+  - The architecture tests are run with `dart test test/architecture` (as CI does); `flutter test` hangs on the tests that spawn `Platform.resolvedExecutable`.
+- **Mutation proof:** 23 mutants of the widget plus 6 for the review fixes, all caught by at least one test (recorded in `docs/PROGRESS.md`, Verification).
+- **Whole-branch review (fresh reviewer, 2026-11-23):** no Critical. **I1** iOS had no selection handles (the desktop controls draw none) and **I2** only the 20 px text line took taps, not the 40 px box: both fixed test-first (RED, then GREEN). **M2** the error message is now its own live-region node and **M1** the sanitizer runs last, with the doc narrowed to typed and pasted text: both fixed with tests. Deferred minors are listed in `docs/PROGRESS.md` (Current Task), including that the field-in-a-panel and scrolling-parent halo tests promised in Risks were not written.
