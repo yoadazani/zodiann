@@ -565,6 +565,45 @@ void main() {
     });
   });
 
+  testWidgets(
+    '16. inputWidth narrows the box; label and message keep the width',
+    (tester) async {
+      await pumpInApp(
+        tester,
+        SizedBox(
+          width: 400,
+          child: ZodiannTextField(
+            label: 'Cells, disabled until Custom is chosen',
+            errorText: _message,
+            inputWidth: 120,
+          ),
+        ),
+      );
+      expect(tester.getSize(_box).width, 120);
+      expect(
+        tester
+            .getSize(find.text('Cells, disabled until Custom is chosen'))
+            .height,
+        lessThan(2 * 12 * 1.45),
+        reason: 'the label is on one line',
+      );
+      expect(tester.getSize(find.text(_message)).width, greaterThan(200));
+      // The box sits at the start edge, also in a Hebrew layout.
+      await pumpInApp(
+        tester,
+        SizedBox(
+          width: 400,
+          child: ZodiannTextField(label: 'x', inputWidth: 120),
+        ),
+        hebrew: true,
+      );
+      expect(
+        tester.getRect(_box).right,
+        closeTo(tester.getRect(find.byType(ZodiannTextField)).right, 0.5),
+      );
+    },
+  );
+
   testWidgets('15. both themes read their own surfaces', (tester) async {
     for (final theme in [graphite, porcelain]) {
       await pumpInApp(tester, _field(errorText: _message), theme: theme);

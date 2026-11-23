@@ -42,6 +42,7 @@ class ZodiannTextField extends StatefulWidget {
     this.errorText,
     this.enabled = true,
     this.ltr = false,
+    this.inputWidth,
     this.keyboardType,
     this.textInputAction,
     this.inputFormatters,
@@ -76,6 +77,11 @@ class ZodiannTextField extends StatefulWidget {
 
   /// Lay the value out left to right, start-aligned (L-7: dates and numbers).
   final bool ltr;
+
+  /// A fixed width for the input box alone, at the start edge; the label and
+  /// the error message keep the field's full width (the component sheet's
+  /// 120 px Cells field, kit.css `width: 120px` on `.input`). Null fills.
+  final double? inputWidth;
 
   /// The soft keyboard to show.
   final TextInputType? keyboardType;
@@ -306,6 +312,12 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
           radius: ZodiannRadius.control.topLeft.x,
         ),
         child: input,
+      );
+    }
+    if (widget.inputWidth != null) {
+      input = Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: SizedBox(width: widget.inputWidth, child: input),
       );
     }
 
