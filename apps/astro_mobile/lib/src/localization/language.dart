@@ -43,9 +43,13 @@ const SettingsKey<String> languageKey = SettingsKey<String>('language');
 /// choice: it is treated as a first launch. Storage failures never stop the
 /// app: an unreadable store resolves from the device and writes nothing, and a
 /// failed write still returns the detected language (the next launch detects
-/// again, which is right because nothing was saved). `PrefsSettingsStore`
-/// already reports failures; the banner is ZOD-NFR-014's. Other errors are
+/// again, which is right because nothing was saved). Other errors are
 /// bugs and propagate.
+///
+/// Storage failures are not announced anywhere yet: `main()` builds the store
+/// without a `StorageFailureReporter` (the banner, ZOD-NFR-014, listens on a
+/// broadcast stream that does not exist before `runApp`, so a bootstrap
+/// failure would need to be kept and replayed to it).
 Future<Locale> loadOrDetectLanguage({
   required SettingsStore store,
   required List<Locale> deviceLocales,

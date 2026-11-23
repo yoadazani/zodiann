@@ -38,6 +38,7 @@ Wire the red "storage unavailable" banner ([ZOD-UI-012](../shared-ui-design-syst
 ## Notes
 
 - 2026-11-22 (ZOD-FND-006): the real failure path is `StorageFailureReporter.failures` (a broadcast stream of `StorageException` with `kind` unavailable, full, corrupt or unsupportedVersion); every store reports a failure and then throws it. The read-only degraded mode against last-known state is this task's.
+- **From ZOD-L10-002 (2026-11-23):** `main()` builds `PrefsSettingsStore` **without** a `StorageFailureReporter` and awaits the first storage read (the saved language) before `runApp`, so a failure at that moment is reported nowhere, and `failures` is a broadcast stream that does not exist before the app starts. This task decides whether the bootstrap keeps its failure and replays it to the banner once it subscribes.
 
 ---
 

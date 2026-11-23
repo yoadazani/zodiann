@@ -55,8 +55,5 @@ dev_dependencies:
     sdk: flutter
   # ZOD-FND-003: copies the bundled data files to a real directory.
   path_provider: ^2.1.6
-  # ZOD-FND-006: the storage persistence integration test reads the real
-  # preferences, and the ZOD-FND-006 dev test builds a SquareConfig above.
-  # Dev only. (shared_preferences itself is a regular dependency, see above.)
   # ZOD-L10-002: the in-memory preferences platform the tests install.
   shared_preferences_platform_interface: ^2.4.2

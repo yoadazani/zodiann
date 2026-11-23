@@ -45,6 +45,7 @@ Build the language selector, English date-order toggle, read-only time-format no
 ## Notes
 
 - 2026-11-12 (per the [ZOD-GAN-003](../computation-engine/ZOD-GAN-003-implement-gann-date-number-mapping-per-mode.md) time-zone decision): the read-only time-zone row is NFR-A3's "shown to the user" part of the decided rule — date-and-time cells are shown in this device zone.
+- **From ZOD-L10-002 (2026-11-23):** the language is saved from the first launch (`he` or `en`, key `language`, see ZOD-L10-003's notes); what the "System" segment stores or means is decided with ZOD-L10-003.
 
 ---
 

@@ -253,7 +253,7 @@ Primary design reference: `design-reference/zodiann/screens/04-settings_{desktop
 | ID | Task | Priority | Status |
 |---|---|---|---|
 | ZOD-L10-001 | [Set up ARB files and `gen-l10n`](localization/ZOD-L10-001-set-up-arb-files-and-gen-l10n.md) | Critical | Done |
-| ZOD-L10-002 | [Implement first-launch language detection](localization/ZOD-L10-002-implement-first-launch-language-detection.md) | High | Not Started |
+| ZOD-L10-002 | [Implement first-launch language detection](localization/ZOD-L10-002-implement-first-launch-language-detection.md) | High | Done |
 | ZOD-L10-003 | [Implement the in-app language override](localization/ZOD-L10-003-implement-the-in-app-language-override.md) | High | Not Started |
 | ZOD-L10-004 | [Audit and enforce logical (directional) layout properties app-wide](localization/ZOD-L10-004-audit-and-enforce-logical-directional-layout-properties-app-wide.md) | Critical | Not Started |
 | ZOD-L10-005 | [Verify never-mirrored exceptions stay unmirrored](localization/ZOD-L10-005-verify-never-mirrored-exceptions-stay-unmirrored.md) | High | Not Started |
