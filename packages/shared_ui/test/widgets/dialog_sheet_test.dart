@@ -119,23 +119,22 @@ DialogFeatures _mine(_Shot shot) => measureDialog(
 // gets 60.9, so our box is a pixel or two shorter and, centred in the
 // viewport, sits on a half pixel: its top and bottom edges anti-alias, so the
 // ring is compared on the left side only (an edge on a whole pixel).
-bool ringWithin(int got, {required int line, required int reference}) {
-  for (final shift in [0, 8, 16]) {
-    final g = (got >> shift) & 0xff;
-    final l = (line >> shift) & 0xff;
-    final r = (reference >> shift) & 0xff;
-    final lo = (l < r ? l : r) - 2;
-    final hi = (l > r ? l : r) + 2;
-    if (g < lo || g > hi) return false;
+/// flutter_test turns shadows off (`debugDisableShadows`), which drops every
+/// blur: a pixel test of a shadow must turn them on, and must turn them off
+/// again before its body ends (the binding checks the flag before tear-down).
+Future<void> _withShadows(Future<void> Function() body) async {
+  debugDisableShadows = false;
+  try {
+    await body();
+  } finally {
+    debugDisableShadows = true;
   }
-  return true;
 }
 
 void _expectSimilar(
   DialogFeatures got,
   DialogFeatures want,
   String label, {
-  required int line,
   bool absoluteLeft = true,
 }) {
   expect(got.width, want.width, reason: '$label width');
@@ -146,17 +145,16 @@ void _expectSimilar(
   );
   if (absoluteLeft) expect(got.left, want.left, reason: '$label left');
   expect(near(got.fill, want.fill), isTrue, reason: '$label fill');
-  // The ring is the `line` colour, darkened by the shadow over it in the
-  // kit (the kit darkens it by about 30 % at the sides). Flutter's
-  // rasteriser darkens it far less with the same shadow definition (known
-  // limit, see the plan's Completion notes), so the check is that it is
-  // present, never lighter than `line`, and never darker than the reference.
+  // The ring is the `line` colour with the floating shadow painted over it, as
+  // in the kit (it darkens the ring by about 30 % at the sides). Our shadow is
+  // 0.55 where the kit's is 0.6 (MASTER wins, UI-003), so the ring may differ
+  // by a level or two.
   expect(
-    ringWithin(got.ringSide, line: line, reference: want.ringSide),
+    near(got.ringSide, want.ringSide, 3),
     isTrue,
     reason:
         '$label side ring ${got.ringSide.toRadixString(16)} vs reference '
-        '${want.ringSide.toRadixString(16)}, line ${line.toRadixString(16)}',
+        '${want.ringSide.toRadixString(16)}',
   );
   // Rows of ink: the title and the message lines relative to the box top, the
   // buttons relative to the box bottom (the message is a pixel shorter here,
@@ -255,45 +253,39 @@ void main() {
   };
 
   for (final entry in references.entries) {
-    testWidgets('the delete dialog matches ${entry.key}', (tester) async {
-      final (theme, hebrew, path, probeY) = entry.value;
-      final ref = path == 'designer'
-          ? (await tester.runAsync(
-              () => decodeDesignPng(
-                'screens/04-settings_delete-dialog_desktop_en_dark.png',
-              ),
-            ))!.argb
-          : (await tester.runAsync(() => decodeFile(path)))!.at;
-      final want = measureDialog(ref, probeX: 520, probeY: probeY);
-      final shot = await _renderDelete(tester, theme, hebrew: hebrew);
-      final got = _mine(shot);
-      // Centred in the viewport, as the reference is.
-      expect(shot.dialog.center.dx, closeTo(720, 0.5));
-      expect(shot.dialog.center.dy, closeTo(450, 0.5));
-      _expectSimilar(
-        got,
-        want,
-        entry.key,
-        line: theme
-            .extension<ZodiannElevation>()!
-            .floatingOutline
-            .color
-            .toARGB32(),
-      );
-      // The scrim over the page: a bare page here, the settings page there,
-      // compared on the empty left margin.
-      expect(
-        near(shot.image.argb(50, 300), ref(50, 300), 1),
-        isTrue,
-        reason:
-            'scrim over the page ${shot.image.argb(50, 300).toRadixString(16)} '
-            'vs ${ref(50, 300).toRadixString(16)}',
-      );
-      // The shadow: darker just below the box than far below it.
-      final below = shot.image.argb(720, got.bottom + 8) & 0xff;
-      final far = shot.image.argb(720, got.bottom + 120) & 0xff;
-      expect(below, lessThanOrEqualTo(far));
-    });
+    testWidgets(
+      'the delete dialog matches ${entry.key}',
+      (tester) => _withShadows(() async {
+        final (theme, hebrew, path, probeY) = entry.value;
+        final ref = path == 'designer'
+            ? (await tester.runAsync(
+                () => decodeDesignPng(
+                  'screens/04-settings_delete-dialog_desktop_en_dark.png',
+                ),
+              ))!.argb
+            : (await tester.runAsync(() => decodeFile(path)))!.at;
+        final want = measureDialog(ref, probeX: 520, probeY: probeY);
+        final shot = await _renderDelete(tester, theme, hebrew: hebrew);
+        final got = _mine(shot);
+        // Centred in the viewport, as the reference is.
+        expect(shot.dialog.center.dx, closeTo(720, 0.5));
+        expect(shot.dialog.center.dy, closeTo(450, 0.5));
+        _expectSimilar(got, want, entry.key);
+        // The scrim over the page: a bare page here, the settings page there,
+        // compared on the empty left margin.
+        expect(
+          near(shot.image.argb(50, 300), ref(50, 300), 1),
+          isTrue,
+          reason:
+              'scrim over the page ${shot.image.argb(50, 300).toRadixString(16)} '
+              'vs ${ref(50, 300).toRadixString(16)}',
+        );
+        // The shadow: darker just below the box than far below it.
+        final below = shot.image.argb(720, got.bottom + 8) & 0xff;
+        final far = shot.image.argb(720, got.bottom + 120) & 0xff;
+        expect(below, lessThanOrEqualTo(far));
+      }),
+    );
   }
 
   // The sheet's Save-square dialog: a message with a 16 margin, a Name field
@@ -303,88 +295,90 @@ void main() {
     'dark': (ZodiannTheme.graphite, 'components_dark.png', 5190),
     'light': (ZodiannTheme.porcelain, 'components_light.png', 5173),
   }.entries) {
-    testWidgets('the Save-square dialog matches the component sheet '
-        '(${entry.key})', (tester) async {
-      final (theme, sheetFile, sheetTop) = entry.value;
-      final s = theme.extension<ZodiannSurfaces>()!;
-      final sheet = (await tester.runAsync(
-        () => decodeDesignPng('components/$sheetFile'),
-      ))!;
-      // The sheet's box: fill from x 65, the row 20 below its top edge.
-      final want = measureDialog(sheet.argb, probeX: 75, probeY: sheetTop + 20);
-      tester.view.physicalSize = const Size(900, 700);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
-      final node = FocusNode();
-      addTearDown(node.dispose);
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: theme,
-          debugShowCheckedModeBanner: false,
-          home: RepaintBoundary(
-            key: _boundary,
-            child: Scaffold(
-              backgroundColor: s.bg,
-              body: Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(100, 100, 0, 0),
-                  child: SizedBox(
-                    width: 423,
-                    child: ZodiannDialog(
-                      title: 'Save square',
-                      message: 'Saves the mode, anchor, size and highlights.',
-                      content: ZodiannTextField(
-                        label: 'Name',
-                        focusNode: node,
-                        controller: TextEditingController(
-                          text: 'Spring equinox 2026',
+    testWidgets(
+      'the Save-square dialog matches the component sheet '
+      '(${entry.key})',
+      (tester) => _withShadows(() async {
+        final (theme, sheetFile, sheetTop) = entry.value;
+        final s = theme.extension<ZodiannSurfaces>()!;
+        final sheet = (await tester.runAsync(
+          () => decodeDesignPng('components/$sheetFile'),
+        ))!;
+        // The sheet's box: fill from x 65, the row 20 below its top edge.
+        final want = measureDialog(
+          sheet.argb,
+          probeX: 75,
+          probeY: sheetTop + 20,
+        );
+        tester.view.physicalSize = const Size(900, 700);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final node = FocusNode();
+        addTearDown(node.dispose);
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme,
+            debugShowCheckedModeBanner: false,
+            home: RepaintBoundary(
+              key: _boundary,
+              child: Scaffold(
+                backgroundColor: s.bg,
+                body: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(100, 100, 0, 0),
+                    child: SizedBox(
+                      width: 423,
+                      child: ZodiannDialog(
+                        title: 'Save square',
+                        message: 'Saves the mode, anchor, size and highlights.',
+                        content: ZodiannTextField(
+                          label: 'Name',
+                          focusNode: node,
+                          controller: TextEditingController(
+                            text: 'Spring equinox 2026',
+                          ),
                         ),
+                        actions: [
+                          ZodiannButton(
+                            label: 'Cancel',
+                            variant: ZodiannButtonVariant.quiet,
+                            onPressed: () {},
+                          ),
+                          ZodiannButton(
+                            label: 'Save',
+                            variant: ZodiannButtonVariant.primary,
+                            onPressed: () {},
+                          ),
+                        ],
                       ),
-                      actions: [
-                        ZodiannButton(
-                          label: 'Cancel',
-                          variant: ZodiannButtonVariant.quiet,
-                          onPressed: () {},
-                        ),
-                        ZodiannButton(
-                          label: 'Save',
-                          variant: ZodiannButtonVariant.primary,
-                          onPressed: () {},
-                        ),
-                      ],
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      node.requestFocus();
-      await tester.pump();
-      final image = await Pixels.capture(
-        tester,
-        tester.renderObject<RenderRepaintBoundary>(find.byKey(_boundary)),
-      );
-      final rect = tester.getRect(find.byType(ZodiannDialog));
-      final got = measureDialog(
-        image.argb,
-        probeX: rect.left.round() + 10,
-        probeY: rect.top.round() + 20,
-      );
-      _expectSimilar(
-        got,
-        want,
-        'Save square (${entry.key})',
-        absoluteLeft: false,
-        line: theme
-            .extension<ZodiannElevation>()!
-            .floatingOutline
-            .color
-            .toARGB32(),
-      );
-    });
+        );
+        node.requestFocus();
+        await tester.pump();
+        final image = await Pixels.capture(
+          tester,
+          tester.renderObject<RenderRepaintBoundary>(find.byKey(_boundary)),
+        );
+        final rect = tester.getRect(find.byType(ZodiannDialog));
+        final got = measureDialog(
+          image.argb,
+          probeX: rect.left.round() + 10,
+          probeY: rect.top.round() + 20,
+        );
+        _expectSimilar(
+          got,
+          want,
+          'Save square (${entry.key})',
+          absoluteLeft: false,
+        );
+      }),
+    );
   }
 
   test('the manifest hashes still match the kit files', () {
