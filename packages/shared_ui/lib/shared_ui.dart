@@ -31,5 +31,6 @@ export 'src/widgets/zodiann_logo.dart';
 export 'src/widgets/zodiann_panel.dart';
 export 'src/widgets/zodiann_segmented_control.dart';
 export 'src/widgets/zodiann_tag.dart';
+export 'src/widgets/zodiann_text_field.dart' show ZodiannTextField;
 export 'src/widgets/zodiann_tag_style.dart';
 export 'src/widgets/zodiann_top_bar.dart';

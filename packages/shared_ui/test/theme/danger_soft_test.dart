@@ -11,9 +11,8 @@ import 'samples.dart';
 
 /// `rgba(r, g, b, a)` from kit.css, built as the token files build it.
 Color _rgba(String css) {
-  final m = RegExp(
-    r'rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\s*\)',
-  ).firstMatch(css)!;
+  final m = RegExp(r'rgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\s*\)')
+      .firstMatch(css)!;
   return Color.fromRGBO(
     int.parse(m.group(1)!),
     int.parse(m.group(2)!),
@@ -23,15 +22,13 @@ Color _rgba(String css) {
 }
 
 String _kitDangerSoft(String header) {
-  final css = File(
-    '../../design-reference/zodiann/_source/kit.css',
-  ).readAsStringSync();
+  final css = File('../../design-reference/zodiann/_source/kit.css')
+      .readAsStringSync();
   final start = css.indexOf(header);
   expect(start, isNot(-1), reason: 'kit.css block $header');
   final end = css.indexOf('}', start);
-  final m = RegExp(
-    r'--danger-soft\s*:\s*([^;]+);',
-  ).firstMatch(css.substring(start, end));
+  final m = RegExp(r'--danger-soft\s*:\s*([^;]+);')
+      .firstMatch(css.substring(start, end));
   expect(m, isNotNull, reason: '--danger-soft in $header');
   return m!.group(1)!.trim();
 }
