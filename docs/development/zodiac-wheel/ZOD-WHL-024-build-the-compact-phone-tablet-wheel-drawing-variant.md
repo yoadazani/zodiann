@@ -40,6 +40,8 @@ Apply the compact proportion set from [ZOD-WHL-001](../zodiac-wheel/ZOD-WHL-001-
 
 ZOD-WHL-001 owns the desktop / compact proportion-table switch at the 1100 breakpoint (`WheelScreen`, decided 2026-11-17). This task applies the compact sizes inside each layer and applies ZOD-WHL-005's 16° display-spread threshold in compact mode (design decision D6, still pending approval); it does not re-implement the switch.
 
+**From ZOD-UI-010 (2026-11-23):** the kit's compact table range is `max-width: 1100px` (inclusive, `wheel.html`), while `ZodiannBreakpoint` treats 1100 as desktop. `ZodiannTable` does not read the breakpoint: the screen passes `ZodiannTableDensity.compact`, so this task decides the exact width.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Zodiac Wheel" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

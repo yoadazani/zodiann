@@ -30,6 +30,9 @@ export 'src/widgets/zodiann_icon_button.dart';
 export 'src/widgets/zodiann_logo.dart';
 export 'src/widgets/zodiann_panel.dart';
 export 'src/widgets/zodiann_segmented_control.dart';
+export 'src/widgets/zodiann_table.dart';
+export 'src/widgets/zodiann_table_column.dart'
+    show ZodiannTableAlign, ZodiannTableColumn, ZodiannTableDensity;
 export 'src/widgets/zodiann_tag.dart';
 export 'src/widgets/zodiann_text_field.dart' show ZodiannTextField;
 export 'src/widgets/zodiann_tag_style.dart';

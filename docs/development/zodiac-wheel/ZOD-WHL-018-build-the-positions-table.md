@@ -44,6 +44,7 @@ Build the 11-row table listing every body's glyph, name, sign, position, and mot
 
 ## Notes
 
+- **From ZOD-UI-010 (2026-11-23):** build it with `ZodiannTable` (`columns` of `ZodiannTableColumn`, one `ZodiannTableRow` per body with `selected` for the body under the pointer, `onTap` plus a localized `semanticLabel` to rotate the wheel, `ZodiannTableDensity.compact` below the kit's `max-width: 1100px`). The table needs a bounded width and does not clip: give its panel `clipBehavior: Clip.antiAlias`. The sheet's column ratios (183 / 152 / 104 / 149 / 302 flex) are in `table_sheet_test.dart`.
 - **From ZOD-L10-007 (2026-11-14):** row names come from `ZodiannLocalizations.bodyName(Body)` and `signName(ZodiacSign)` (`ZodiannEntityNames`, `shared_ui`). Rows are keyed by the enum, never by the translated string.
 
 ---

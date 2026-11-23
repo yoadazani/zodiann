@@ -118,6 +118,19 @@ abstract final class ZodiannSize {
   /// Table rows: height.
   static const double tableRow = 44.0;
 
+  /// Table header: block padding above and below the label (kit.css
+  /// `.tbl th` `padding: 10px var(--s4)`).
+  static const double tableHeaderPadding = 10.0;
+
+  /// Compact table density: inline padding of every cell and header label
+  /// (wheel.html's `padding-inline: 10px` below 1100 px; regular is
+  /// [ZodiannSpace.s4]).
+  static const double tableCompactPadding = 10.0;
+
+  /// The selected table row's accent bar on the start edge (kit.css
+  /// `.tbl tr.on td:first-child`, an inset 3 px shadow).
+  static const double tableSelectedBar = 3.0;
+
   /// Hamburger and icon buttons: width and height (the tap target).
   static const double iconButton = 46.0;
 

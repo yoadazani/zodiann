@@ -223,4 +223,29 @@ void main() {
     expect(_px(tag, 'gap'), ZodiannSize.tagGap, reason: '.tag');
     expect(_px(tag, 'padding-inline'), ZodiannSpace.s2, reason: '.tag');
   });
+
+  // ZOD-UI-010. The selected bar's 3 px is an inset shadow in the kit, which
+  // cannot be parsed as a property, so it is asserted as a value.
+  test("the table's header padding, compact padding and bar", () {
+    final css = _kitCss();
+    expect(
+      _px(_rule(css, '.tbl th'), 'padding'),
+      ZodiannSize.tableHeaderPadding,
+      reason: '.tbl th padding-block',
+    );
+    final wheel = File('../../design-reference/zodiann/_source/wheel.html')
+        .readAsStringSync();
+    expect(
+      wheel,
+      contains(
+        '.pos-panel .tbl th { padding-inline: '
+        '${ZodiannSize.tableCompactPadding.toInt()}px; }',
+      ),
+      reason: 'wheel.html compact padding-inline',
+    );
+    expect(ZodiannSize.tableHeaderPadding, 10);
+    expect(ZodiannSize.tableCompactPadding, 10);
+    expect(ZodiannSize.tableSelectedBar, 3);
+    expect(css, contains('inset 3px 0 0 var(--accent)'), reason: 'bar width');
+  });
 }
