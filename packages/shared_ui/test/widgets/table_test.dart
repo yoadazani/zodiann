@@ -2,10 +2,16 @@
 // declared columns (flex or fixed), alignment, density padding, overflow
 // contract and the table scope. Later tasks add states and interaction.
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
+
+import 'dart:ui' show SemanticsRole;
+
+import 'package:flutter/semantics.dart' show SemanticsNode;
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import '../support/button_harness.dart' show pumpInApp;
 import '../support/load_bundled_fonts.dart';
 
 const _tableKey = Key('table');
@@ -452,6 +458,7 @@ void main() {
           rows: [
             ZodiannTableRow(
               onTap: tappable ? () {} : null,
+              semanticLabel: tappable ? 'row' : null,
               cells: [
                 Text('Sun', key: _k(0, 0)),
                 Text('17', key: _k(0, 1)),
@@ -460,6 +467,7 @@ void main() {
             ZodiannTableRow(
               selected: selectedSecond,
               onTap: tappable ? () {} : null,
+              semanticLabel: tappable ? 'row' : null,
               cells: [
                 Text('Moon', key: _k(1, 0)),
                 Text('18', key: _k(1, 1)),
@@ -467,6 +475,7 @@ void main() {
             ),
             ZodiannTableRow(
               onTap: tappable ? () {} : null,
+              semanticLabel: tappable ? 'row' : null,
               cells: [
                 Text('Venus', key: _k(2, 0)),
                 Text('22', key: _k(2, 1)),
@@ -638,6 +647,7 @@ void main() {
             ZodiannTableRow(
               selected: true,
               onTap: () {},
+              semanticLabel: 'שמש',
               cells: const [
                 Text('שמש', key: Key('he0')),
                 Directionality(
@@ -662,6 +672,201 @@ void main() {
         tester.getTopRight(find.byKey(const Key('he0'))).dx,
         lessThanOrEqualTo(row.right - 16 + 0.01),
       );
+    });
+  });
+
+  group('interaction', () {
+    final s = ZodiannTheme.graphite.extension<ZodiannSurfaces>()!;
+    final calls = <int>[];
+
+    Widget three({int? readOnly}) => ZodiannTable(
+      columns: _two,
+      rows: [
+        for (var i = 0; i < 3; i++)
+          ZodiannTableRow(
+            onTap: i == readOnly ? null : () => calls.add(i),
+            semanticLabel: i == readOnly ? null : 'row $i',
+            cells: [
+              Text('n$i', key: _k(i, 0)),
+              Text('v$i', key: _k(i, 1)),
+            ],
+          ),
+      ],
+    );
+
+    Future<void> pumpKeys(WidgetTester t, Widget child) async {
+      calls.clear();
+      // A MaterialApp gives the tree its primary focus, shortcuts and
+      // traversal actions, as in the app (and in the button tests).
+      await pumpInApp(t, SizedBox(width: 600, child: child));
+    }
+
+    Finder ring() => find.byWidgetPredicate(
+      (w) =>
+          w is DecoratedBox &&
+          w.decoration is BoxDecoration &&
+          (w.decoration as BoxDecoration).border?.top.color == s.focus,
+    );
+
+    testWidgets('a tap activates onTap', (tester) async {
+      await pumpKeys(tester, three());
+      await tester.tap(find.byType(ZodiannTableRow).at(1));
+      expect(calls, [1]);
+    });
+
+    testWidgets('Enter and Space activate the focused row', (tester) async {
+      await pumpKeys(tester, three());
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(calls, [0, 0]);
+    });
+
+    testWidgets('Tab skips a row without onTap', (tester) async {
+      await pumpKeys(tester, three(readOnly: 0));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(calls, [1]);
+    });
+
+    testWidgets('the keyboard ring is 2 px, inside the row, keyboard only', (
+      tester,
+    ) async {
+      await pumpKeys(tester, three());
+      expect(ring(), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(ring(), findsOneWidget);
+      final box =
+          tester.widget<DecoratedBox>(ring()).decoration as BoxDecoration;
+      expect(box.border!.top.width, ZodiannStates.focusRingWidth);
+      final row = tester.getRect(find.byType(ZodiannTableRow).at(0));
+      final r = tester.getRect(ring());
+      expect(row.contains(r.topLeft), isTrue);
+      expect(row.contains(r.bottomRight - const Offset(0.5, 0.5)), isTrue);
+      await tester.tap(find.byType(ZodiannTableRow).at(1));
+      await tester.pump();
+      expect(ring(), findsNothing);
+    });
+
+    test('a tappable row needs a semantic label', () {
+      expect(
+        () => ZodiannTableRow(columns: _two, onTap: () {}, cells: const []),
+        throwsAssertionError,
+      );
+    });
+  });
+
+  group('semantics', () {
+    List<SemanticsNode> nodes(WidgetTester t) {
+      final out = <SemanticsNode>[];
+      void walk(SemanticsNode n) {
+        out.add(n);
+        n.visitChildren((c) {
+          walk(c);
+          return true;
+        });
+      }
+
+      // The root owner has no semantics in flutter_test; the deprecated
+      // accessor is the one that does.
+      // ignore: deprecated_member_use
+      walk(t.binding.pipelineOwner.semanticsOwner!.rootSemanticsNode!);
+      return out;
+    }
+
+    SemanticsRole role(SemanticsNode n) => n.getSemanticsData().role;
+
+    Widget rows({bool header = false}) => Column(
+      children: [
+        if (header) const ZodiannTableHeader(columns: _two),
+        for (var i = 0; i < 3; i++)
+          ZodiannTableRow(
+            columns: _two,
+            isLast: i == 2,
+            selected: i == 1,
+            onTap: () {},
+            semanticLabel: 'row $i',
+            cells: [Text('n$i'), Text('v$i')],
+          ),
+      ],
+    );
+
+    testWidgets(
+      'inside ZodiannTable: table, row, columnHeader and cell roles',
+      (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pump(
+          tester,
+          ZodiannTable(
+            columns: _two,
+            rows: [
+              for (var i = 0; i < 3; i++)
+                ZodiannTableRow(
+                  selected: i == 1,
+                  onTap: () {},
+                  semanticLabel: 'row $i',
+                  cells: [Text('n$i'), Text('v$i')],
+                ),
+            ],
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        final all = nodes(tester);
+        int count(SemanticsRole r) => all.where((n) => role(n) == r).length;
+        expect(count(SemanticsRole.table), 1);
+        expect(count(SemanticsRole.row), 4);
+        expect(count(SemanticsRole.columnHeader), 2);
+        expect(count(SemanticsRole.cell), 6);
+        final table = all.firstWhere((n) => role(n) == SemanticsRole.table);
+        final kids = <SemanticsNode>[];
+        table.visitChildren((c) {
+          kids.add(c);
+          return true;
+        });
+        expect(kids.length, 4);
+        expect(kids.every((k) => role(k) == SemanticsRole.row), isTrue);
+        handle.dispose();
+      },
+    );
+
+    testWidgets('standalone rows and header carry no table roles', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await _pump(tester, rows(header: true));
+      expect(tester.takeException(), isNull);
+      for (final n in nodes(tester)) {
+        expect(
+          {
+            SemanticsRole.table,
+            SemanticsRole.row,
+            SemanticsRole.cell,
+            SemanticsRole.columnHeader,
+          }.contains(role(n)),
+          isFalse,
+          reason: 'node ${n.label}',
+        );
+      }
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('row 0')),
+        isSemantics(isButton: true, hasTapAction: true),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('selected is a state only on the selected row', (tester) async {
+      final handle = tester.ensureSemantics();
+      await _pump(tester, rows());
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('row 1')),
+        isSemantics(isSelected: true, hasSelectedState: true),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('row 0')),
+        isNot(isSemantics(hasSelectedState: true)),
+      );
+      handle.dispose();
     });
   });
 }

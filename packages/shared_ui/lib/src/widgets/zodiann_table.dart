@@ -1,6 +1,9 @@
+import 'dart:ui' show SemanticsRole;
+
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/tokens/zodiann_dimensions.dart';
+import '../theme/tokens/zodiann_states.dart';
 import '../theme/zodiann_surfaces.dart';
 import '../theme/zodiann_text_styles.dart';
 import 'zodiann_table_column.dart';
@@ -51,13 +54,17 @@ class ZodiannTable extends StatelessWidget {
         return _TableScope(
           columns: columns,
           density: density,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ZodiannTableHeader(columns: columns, density: density),
-              for (var i = 0; i < rows.length; i++)
-                i == rows.length - 1 ? _LastRow(child: rows[i]) : rows[i],
-            ],
+          child: Semantics(
+            container: true,
+            role: SemanticsRole.table,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ZodiannTableHeader(columns: columns, density: density),
+                for (var i = 0; i < rows.length; i++)
+                  i == rows.length - 1 ? _LastRow(child: rows[i]) : rows[i],
+              ],
+            ),
           ),
         );
       },
@@ -90,6 +97,7 @@ class ZodiannTableHeader extends StatelessWidget {
     final s = theme.extension<ZodiannSurfaces>()!;
     final styles = theme.extension<ZodiannTextStyles>()!;
     final pad = _inlinePadding(density);
+    final inTable = _TableScope.maybeOf(context) != null;
     return LayoutBuilder(
       builder: (context, constraints) {
         assert(
@@ -97,35 +105,42 @@ class ZodiannTableHeader extends StatelessWidget {
           'ZodiannTableHeader needs a bounded width.',
         );
         final widths = resolveTableColumnWidths(columns, constraints.maxWidth);
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: ZodiannSize.tableHeaderPadding,
-              ),
-              child: Row(
-                children: [
-                  for (var i = 0; i < columns.length; i++)
-                    SizedBox(
-                      width: widths[i],
-                      child: _Slot(
-                        padding: pad,
-                        alignment: columns[i].alignment,
-                        child: Text(
-                          columns[i].label,
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.ellipsis,
-                          style: styles.label.copyWith(color: s.text3),
+        return Semantics(
+          container: true,
+          role: inTable ? SemanticsRole.row : SemanticsRole.none,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: ZodiannSize.tableHeaderPadding,
+                ),
+                child: Row(
+                  children: [
+                    for (var i = 0; i < columns.length; i++)
+                      SizedBox(
+                        width: widths[i],
+                        child: _Slot(
+                          padding: pad,
+                          alignment: columns[i].alignment,
+                          role: inTable
+                              ? SemanticsRole.columnHeader
+                              : SemanticsRole.none,
+                          child: Text(
+                            columns[i].label,
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            style: styles.label.copyWith(color: s.text3),
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            _Rule(color: s.lineSoft),
-          ],
+              _Rule(color: s.lineSoft),
+            ],
+          ),
         );
       },
     );
@@ -145,11 +160,16 @@ class ZodiannTableRow extends StatefulWidget {
     required this.cells,
     this.selected = false,
     this.onTap,
+    this.semanticLabel,
     this.isLast = false,
     this.density,
   }) : assert(
          columns == null || columns.length == cells.length,
          'a row needs one cell per column',
+       ),
+       assert(
+         onTap == null || semanticLabel != null,
+         'a tappable row needs a semanticLabel (its spoken name)',
        );
 
   /// The columns, or null inside a [ZodiannTable] (read from its scope).
@@ -168,6 +188,10 @@ class ZodiannTableRow extends StatefulWidget {
   /// has no hover fill.
   final VoidCallback? onTap;
 
+  /// The row's spoken name (a screen reader announces it with "button");
+  /// required when [onTap] is set. The caller localizes it.
+  final String? semanticLabel;
+
   /// Whether this is the last row: it draws no divider and is 1 px shorter
   /// (kit.css `tr:last-child td { border-bottom: 0 }`). [ZodiannTable] sets
   /// it for its last row.
@@ -182,6 +206,7 @@ class ZodiannTableRow extends StatefulWidget {
 
 class _ZodiannTableRowState extends State<ZodiannTableRow> {
   bool _hover = false;
+  bool _focusRing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -205,6 +230,7 @@ class _ZodiannTableRowState extends State<ZodiannTableRow> {
       '${cols.length} columns',
     );
     final d = density ?? scope?.density ?? ZodiannTableDensity.regular;
+    final inTable = scope != null;
     final last = widget.isLast || _LastRow.isIn(context);
     final theme = Theme.of(context);
     final s = theme.extension<ZodiannSurfaces>()!;
@@ -242,6 +268,9 @@ class _ZodiannTableRowState extends State<ZodiannTableRow> {
                         child: _Slot(
                           padding: pad,
                           alignment: cols[i].alignment,
+                          role: inTable
+                              ? SemanticsRole.cell
+                              : SemanticsRole.none,
                           child: cells[i],
                         ),
                       ),
@@ -257,15 +286,61 @@ class _ZodiannTableRowState extends State<ZodiannTableRow> {
                 width: ZodiannSize.tableSelectedBar,
                 child: ColoredBox(color: s.accent),
               ),
+            // The keyboard ring sits inside the row's edge, so no clipping
+            // ancestor (a panel with Clip.antiAlias) can hide it.
+            if (_focusRing)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: s.focus,
+                        width: ZodiannStates.focusRingWidth,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         );
-        if (widget.onTap != null) {
-          body = MouseRegion(
-            onEnter: (_) => setState(() => _hover = true),
-            onExit: (_) => setState(() => _hover = false),
-            child: body,
+        final onTap = widget.onTap;
+        if (onTap != null) {
+          body = FocusableActionDetector(
+            mouseCursor: SystemMouseCursors.click,
+            onShowFocusHighlight: (v) {
+              if (_focusRing != v) setState(() => _focusRing = v);
+            },
+            actions: <Type, Action<Intent>>{
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (_) {
+                  onTap();
+                  return null;
+                },
+              ),
+            },
+            child: MouseRegion(
+              onEnter: (_) => setState(() => _hover = true),
+              onExit: (_) => setState(() => _hover = false),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                excludeFromSemantics: true,
+                onTap: onTap,
+                child: body,
+              ),
+            ),
           );
         }
+        // Outermost, so the focus semantics merge into this node and, inside
+        // a table, the table's children are all rows.
+        body = Semantics(
+          container: true,
+          role: inTable ? SemanticsRole.row : SemanticsRole.none,
+          button: onTap != null,
+          label: widget.semanticLabel,
+          selected: widget.selected ? true : null,
+          onTap: onTap,
+          child: body,
+        );
         return last
             ? body
             : Column(
@@ -308,11 +383,16 @@ class _Slot extends StatelessWidget {
   const _Slot({
     required this.padding,
     required this.alignment,
+    required this.role,
     required this.child,
   });
 
   final double padding;
   final ZodiannTableAlign alignment;
+
+  /// `cell` or `columnHeader` inside a table, `none` standalone (table roles
+  /// need a table parent; Flutter 3.50 asserts otherwise).
+  final SemanticsRole role;
   final Widget child;
 
   @override
@@ -324,7 +404,7 @@ class _Slot extends StatelessWidget {
           alignment: alignment == ZodiannTableAlign.end
               ? AlignmentDirectional.centerEnd
               : AlignmentDirectional.centerStart,
-          child: child,
+          child: Semantics(container: true, role: role, child: child),
         ),
       ),
     );
