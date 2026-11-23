@@ -215,6 +215,10 @@ abstract final class ZodiannSize {
   /// kit.css `.drawer-head`).
   static const double drawerHead = 76.0;
 
+  /// The dialog's width (MASTER §10; kit.css `.dialog`): never wider than the
+  /// screen less 2 x [ZodiannSpace.s4] (`max-width: calc(100vw - 32px)`).
+  static const double dialogWidth = 420.0;
+
   /// The drawer item's icon column (kit.css `.nav-item`
   /// `grid-template-columns: 24px 1fr`).
   static const double navIconColumn = 24.0;

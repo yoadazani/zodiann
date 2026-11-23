@@ -36,6 +36,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
     required this.displayReadoutPhone,
     required this.sectionTitle,
     required this.drawerWordmark,
+    required this.dialogTitle,
     required this.screenTitle,
     required this.panelTitle,
     required this.body,
@@ -65,6 +66,11 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
   /// Drawer header wordmark: 20 / 1.45, 600, −0.01 em.
   final TextStyle drawerWordmark;
 
+  /// Dialog title: 20 / 1.45, 600, no tracking. Derived from kit.css
+  /// (`.dialog h3`), not a row of MASTER section 3 (section 10 says only
+  /// "title 20/600").
+  final TextStyle dialogTitle;
+
   /// Top bar title: 18 / 1.2, 600, −0.01 em.
   final TextStyle screenTitle;
 
@@ -90,7 +96,8 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
   /// size ("per context"); use with `ZodiannGlyphs`.
   final TextStyle glyph;
 
-  /// Field name → style, in MASTER §3's order.
+  /// Field name → style, in MASTER §3's order (`dialogTitle` follows
+  /// `drawerWordmark`: a kit-derived role that MASTER §3 does not list).
   Map<String, TextStyle> get roles => {
     'heroWordmark': heroWordmark,
     'heroWordmarkPhone': heroWordmarkPhone,
@@ -98,6 +105,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
     'displayReadoutPhone': displayReadoutPhone,
     'sectionTitle': sectionTitle,
     'drawerWordmark': drawerWordmark,
+    'dialogTitle': dialogTitle,
     'screenTitle': screenTitle,
     'panelTitle': panelTitle,
     'body': body,
@@ -116,6 +124,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
     TextStyle? displayReadoutPhone,
     TextStyle? sectionTitle,
     TextStyle? drawerWordmark,
+    TextStyle? dialogTitle,
     TextStyle? screenTitle,
     TextStyle? panelTitle,
     TextStyle? body,
@@ -131,6 +140,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
     displayReadoutPhone: displayReadoutPhone ?? this.displayReadoutPhone,
     sectionTitle: sectionTitle ?? this.sectionTitle,
     drawerWordmark: drawerWordmark ?? this.drawerWordmark,
+    dialogTitle: dialogTitle ?? this.dialogTitle,
     screenTitle: screenTitle ?? this.screenTitle,
     panelTitle: panelTitle ?? this.panelTitle,
     body: body ?? this.body,
@@ -152,6 +162,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
       displayReadoutPhone: l(displayReadoutPhone, other.displayReadoutPhone),
       sectionTitle: l(sectionTitle, other.sectionTitle),
       drawerWordmark: l(drawerWordmark, other.drawerWordmark),
+      dialogTitle: l(dialogTitle, other.dialogTitle),
       screenTitle: l(screenTitle, other.screenTitle),
       panelTitle: l(panelTitle, other.panelTitle),
       body: l(body, other.body),
@@ -173,6 +184,7 @@ final class ZodiannTextStyles extends ThemeExtension<ZodiannTextStyles> {
       other.displayReadoutPhone == displayReadoutPhone &&
       other.sectionTitle == sectionTitle &&
       other.drawerWordmark == drawerWordmark &&
+      other.dialogTitle == dialogTitle &&
       other.screenTitle == screenTitle &&
       other.panelTitle == panelTitle &&
       other.body == body &&
@@ -225,6 +237,7 @@ ZodiannTextStyles buildZodiannTextStyles(
     displayReadoutPhone: ui(34, 1.0, light, -0.03),
     sectionTitle: ui(26, 1.2, semibold, -0.02),
     drawerWordmark: ui(20, 1.45, semibold, -0.01),
+    dialogTitle: ui(20, 1.45, semibold, 0),
     screenTitle: ui(18, 1.2, semibold, -0.01),
     panelTitle: ui(16, 1.3, semibold, 0),
     body: ui(14, 1.45, regular, 0),

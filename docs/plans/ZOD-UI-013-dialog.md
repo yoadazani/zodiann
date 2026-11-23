@@ -117,7 +117,15 @@ Inputs the task implies and no acceptance criterion exercises; each has a test i
 
 #### Measured facts (filled in Task 1, Step 4)
 
-_Placeholders, to be replaced by measured literals before Task 4 Step 1 (the generated light and Hebrew literals are added in Task 4 Step 0): box geometry, fill and outline colours, shadow reach, title and message positions, button boxes, the scrim over the page; the sheet dialog's geometry in both themes._
+Measured 2026-11-23 by pixel scans (throwaway test, deleted) of the designer's `screens/04-settings_delete-dialog_desktop_en_dark.png` (1440 x 900) and `components/components_{dark,light}.png` (1440 wide):
+
+- **Delete dialog (dark), box:** fill `111114` over x 510..929 (**420 wide**) and y 345..554 (**210 high**), centred in the viewport (centre y 449.5). A 1 px ring sits **outside** the fill at x 509 and 930, y 344 and 555.
+- **The ring is darkened by the shadow over it:** `242429` at the top (y 344), `1d1d22` at the sides (x 509, 930), `161619` at the bottom (y 555). The kit stacks the shadow **above** the ring (CSS paints the first listed shadow on top), so a flat `line` ring on top of the shadow would differ at the bottom. **Task 2 does not pin the order of `ZodiannElevation.floating` and the outline in `boxShadow`; Task 4's pixels decide it** (UI-003's note says "after `floating`"; if Flutter's list order paints the ring on top, put the outline first).
+- **Scrim and shadow (dark):** the page under the scrim reads `020203` (page `08080a`, so the scrim is about 72 % black) and just below the box `010101`, easing back to `020203` about 57 px below (y 556 `010101` to y 577 `020202`): the dark shadow is nearly invisible (1 level), so its check is weak in dark.
+- **Vertical rhythm:** the title's ink spans rows 376..390 (a 29 px line box, 20 x 1.45, from y 369), the message's three lines 411..423, 431..443, 452..464 (pitch 20.3 = 14 x 1.45) from y 405, the buttons' boxes 491..530 (**40 high**, border `2a2a30`), 24 px of padding below (y 531..554). That is padding 24, title 29, gap 8, message 61, gap 24, button 40, padding 24 = **210**, so the `dialogTitle` role is 20 / 1.45.
+- **Horizontal:** title ink starts at x 535 (padding 24 plus a 1 px side bearing from x 510); Cancel `18181c` fill, border `2a2a30`, x 694..770 (**77 wide**); a **8 px gap** (771..778); Delete all data solid `f2555a` from x 779 to the content edge x 905 (**127 wide**); the right padding is 24 (906..929).
+- **Sheet Save-square dialog:** box fill x 65..487 (**423 wide**, not 420: `width: auto` in a three-column board), outline ring at x 64 and 488. Dark: fill `111114` y 5190..5438 (**249 high**), ring `242429` / `25252a` at y 5189 and `19191c` at y 5439; the focused field's border `f4f5f7` at y 5311 and 5350. Light: ring `cfd2d7` / `d3d6db` at x 64 and y 5172, `c1c4c8` at y 5421, fill y 5173..5420 (**248 high**, the same layout snapped differently), field border `0b0c0e` at y 5293 and 5332.
+- **Not yet measured:** the generated light and Hebrew delete-dialog images (Task 4 Step 0 adds their literals before Step 1).
 
 ### Task 2: The dialog box (RED first)
 
@@ -132,7 +140,7 @@ _Placeholders, to be replaced by measured literals before Task 4 Step 1 (the gen
   - `the actions sit at the end edge` (LTR right, RTL left), `their order follows reading order` (first action nearest the start).
   - `a long button row wraps`, `a message with 2x text scale wraps and the box grows`, `a content taller than the viewport scrolls and does not overflow` (a 300 px high viewport and 400 px of content: no `FlutterError`, the last action reachable by scrolling).
   - `the box rises above the keyboard`: a `MediaQuery` with `viewInsets.bottom` 300 on a 600 px viewport keeps the box inside the visible area, with a `ZodiannTextField` inside it.
-  - `the floating shadow and the outside outline are painted`: the decoration's `boxShadow` is `ZodiannElevation.floating` followed by a spread of `floatingOutline.width` in its colour, in both themes.
+  - `the floating shadow and the outside outline are painted`: the decoration's `boxShadow` contains `ZodiannElevation.floating`'s shadows and a spread of `floatingOutline.width` in its colour, in both themes; their order is **not** pinned here (Task 4's pixels decide it, see Measured facts).
   - `an empty actions list asserts` (a dialog without an action is a bug).
 - [ ] **Step 2: Run** `cd packages/shared_ui; fvm flutter test test/widgets/dialog_test.dart`; expected: a compile failure (`ZodiannDialog` undefined).
 - [ ] **Step 3: Implement** `ZodiannDialog` per D5, D6 and D8's header, and export it.

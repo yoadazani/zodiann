@@ -14,6 +14,9 @@ const _master = <String, (double, double, FontWeight, double)>{
   'displayReadoutPhone': (34, 1.0, FontWeight.w300, -0.03),
   'sectionTitle': (26, 1.2, FontWeight.w600, -0.02),
   'drawerWordmark': (20, 1.45, FontWeight.w600, -0.01),
+  // ZOD-UI-013: derived from kit.css (.dialog h3: 20 px, 600, body's 1.45), not
+  // a row of MASTER section 3 (section 10 says only "title 20/600").
+  'dialogTitle': (20, 1.45, FontWeight.w600, 0),
   'screenTitle': (18, 1.2, FontWeight.w600, -0.01),
   'panelTitle': (16, 1.3, FontWeight.w600, 0),
   'body': (14, 1.45, FontWeight.w400, 0),
@@ -298,6 +301,7 @@ ZodiannTextStyles _withRole(ZodiannTextStyles r, String role, TextStyle s) =>
       'displayReadoutPhone' => r.copyWith(displayReadoutPhone: s),
       'sectionTitle' => r.copyWith(sectionTitle: s),
       'drawerWordmark' => r.copyWith(drawerWordmark: s),
+      'dialogTitle' => r.copyWith(dialogTitle: s),
       'screenTitle' => r.copyWith(screenTitle: s),
       'panelTitle' => r.copyWith(panelTitle: s),
       'body' => r.copyWith(body: s),
