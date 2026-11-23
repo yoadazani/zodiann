@@ -14,7 +14,7 @@
 
 - **kit.css:** `.dialog` = `surface` fill, radius `--r-xl` (16), `--shadow-float`, padding `--s6` (24), width 420, `max-width: calc(100vw - 32px)`. `h3` 20 (`--fs-xl`) / 600, margin-bottom `--s2` (8); `p` `text-2`; `.actions` = flex, `justify-content: flex-end`, `gap: --s2` (8), `margin-top: --s6` (24). `.scrim` = `position: fixed; inset: 0; background: var(--scrim)`. No animation is specified for the dialog; MASTER §12 says "No decorative or ambient motion, ... no entrance animations", and its only dialog-like motion is the drawer's.
 - **The mocked dialog** (settings, delete all data): English title "Delete all data?", a three-line message, actions "Cancel" (secondary) and "Delete all data" (solid danger), centred in the 1440 x 900 viewport over a darkened page; the box measures about 420 x 211 (x 510..930, y 345..556), measured exactly in Task 1.
-- **The sheet's dialog** ("Save square", a message with a 16 margin, a `Name` field in its focused state, `quiet` Cancel and `primary` Save) exists in **both** themes; the settings screen has **no** light delete-dialog screenshot, so light is proved from the sheet.
+- **The sheet's dialog** ("Save square", a message with a 16 margin, a `Name` field in its focused state, `quiet` Cancel and `primary` Save) exists in **both** themes; the settings screen has no light delete-dialog screenshot from the designer; a light and a Hebrew one are generated from the kit (O5, D10), and the sheet's dialog adds the field and primary-button variant in both themes.
 - **Tokens that exist:** `ZodiannRadius.dialog` (16), `ZodiannSpace` (`s2` 8, `s4` 16, `s6` 24), `ZodiannElevation.floating` and `floatingOutline`, `ZodiannSurfaces.surface`, `text`, `text2`, `scrim`, `ZodiannTextStyles.body` and `small`. **Missing:** a dialog width token (420) and a dialog title role (20 / 600): `drawerWordmark` is 20 / 600 but is a wordmark with its own tracking, `panelTitle` is 16.
 - **Existing pattern:** `showZodiannDrawer` pushes a custom modal route on the root navigator, reads the scrim from `ZodiannSurfaces.scrim`, ignores a second call while one is open, and instant-switches under reduced motion.
 - **Flutter route behaviour (to be proved by Task 3's tests, not assumed):** a `ModalRoute`'s `FocusScope` keeps Tab inside the route; popping restores focus to the previous route's last focused control; the modal barrier dismisses on a tap and on Escape (`DismissIntent`) when dismissible.
@@ -93,11 +93,11 @@ Inputs the task implies and no acceptance criterion exercises; each has a test i
 ## File structure
 
 - Modify `packages/shared_ui/lib/src/theme/tokens/zodiann_dimensions.dart`: `ZodiannSize.dialogWidth`.
-- Modify `packages/shared_ui/lib/src/theme/zodiann_text_styles.dart`: `dialogTitle` role (constructor, field, `roles` map, `copyWith`, `lerp`, `==`, the `buildZodiannTextStyles` call; `hashCode` follows `roles`). Modify `packages/shared_ui/test/theme/typography_test.dart` (`_master` entry after `drawerWordmark`, with a comment that it is kit-derived and not in MASTER §3; the `_withRole` case) and optionally `test/support/typography_specimen.dart`.
+- Modify `packages/shared_ui/lib/src/theme/zodiann_text_styles.dart`: `dialogTitle` role (constructor, field, `roles` map with `'dialogTitle'` inserted right after `'drawerWordmark'`, in the same position as the `_master` entry, and the map's doc comment amended to note a kit-derived role, `copyWith`, `lerp`, `==`, the `buildZodiannTextStyles` call; `hashCode` follows `roles`). Modify `packages/shared_ui/test/theme/typography_test.dart` (`_master` entry after `drawerWordmark`, with a comment that it is kit-derived and not in MASTER §3; the `_withRole` case) and optionally `test/support/typography_specimen.dart`.
 - Create `packages/shared_ui/lib/src/widgets/zodiann_dialog.dart`: `ZodiannDialog` (the box).
 - Create `packages/shared_ui/lib/src/widgets/zodiann_dialog_route.dart`: `showZodiannDialog` and the private route.
 - Modify `packages/shared_ui/lib/shared_ui.dart` (exports).
-- Create `tool/dialog/render_dialog_references.dart` (modelled on `tool/drawer/render_drawer_references.dart`: Chrome from `C:/Program Files/Google/Chrome/Application/chrome.exe` or `CHROME`; writes `packages/shared_ui/test/fixtures/dialog/generated_<theme>_<lang>_desktop.png` for dark and light, English and Hebrew, plus `manifest.json` with the Chrome version and the SHA-256 of the kit files, LF-normalised) and a `README.md` beside the images saying they are generated, not designer assets.
+- Create `tool/dialog/render_dialog_references.dart` (modelled on `tool/drawer/render_drawer_references.dart`: Chrome from `C:/Program Files/Google/Chrome/Application/chrome.exe` or `CHROME`; writes `packages/shared_ui/test/fixtures/dialog/generated_<theme>_<lang>_desktop.png` for dark and light, English and Hebrew, plus `manifest.json` with the Chrome version and the SHA-256 of `settings.html`, `kit.css`, `kit.js`, `assets/fonts/fonts.css` and both logo SVGs, LF-normalised; the same Chrome flags and device as the drawer tool, `--headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files --force-color-profile=srgb --font-render-hinting=none --force-device-scale-factor=1 --window-size=1440,900 --virtual-time-budget=5000`; URL `settings.html?lang=<lang>&theme=<theme>&dialog=delete`, the designer's own job in `_source/render/jobs.json`; assert a 1440 x 900 PNG) and a `README.md` beside the images saying they are generated, not designer assets.
 - Create tests: `test/widgets/dialog_test.dart` (layout, RTL, text scale, keyboard inset, semantics), `test/widgets/dialog_route_test.dart` (dismissal, focus trap and restore, stacking, results), `test/widgets/dialog_sheet_test.dart` (pixels), support `test/support/dialog_features.dart` if the run helpers need more than `table_features.dart`.
 - Documentation: the task file (Completion notes), `docs/development/TASKS.md`, notes on ZOD-NAV-004, ZOD-DAT-002, ZOD-DAT-004, ZOD-DAT-010 / ZOD-SET-005, `docs/PROGRESS.md` (Architecture Conventions "Dialog", Technical Decisions, Verification, Git State, the record that PR #60 (ZOD-L10-002) merged as `5e60667`).
 
@@ -117,7 +117,7 @@ Inputs the task implies and no acceptance criterion exercises; each has a test i
 
 #### Measured facts (filled in Task 1, Step 4)
 
-_Placeholders, to be replaced by measured literals before Task 4: box geometry, fill and outline colours, shadow reach, title and message positions, button boxes, the scrim over the page; the sheet dialog's geometry in both themes._
+_Placeholders, to be replaced by measured literals before Task 4 Step 1 (the generated light and Hebrew literals are added in Task 4 Step 0): box geometry, fill and outline colours, shadow reach, title and message positions, button boxes, the scrim over the page; the sheet dialog's geometry in both themes._
 
 ### Task 2: The dialog box (RED first)
 
@@ -164,7 +164,7 @@ _Placeholders, to be replaced by measured literals before Task 4: box geometry, 
 
 **Files:** create `tool/dialog/render_dialog_references.dart`, `packages/shared_ui/test/fixtures/dialog/` (generated PNGs, `manifest.json`, `README.md`), `test/widgets/dialog_sheet_test.dart` (and a support file if needed).
 
-- [ ] **Step 0: Generate the references.** Write the tool (see File structure) and run `fvm dart run tool/dialog/render_dialog_references.dart` from the root; commit the PNGs, the manifest and the README. Check that the tool's **dark English** render equals the designer's `04-settings_delete-dialog_desktop_en_dark.png` (same box, fill, outline and text within 1 per channel over the dialog area), which proves the tool reproduces the designer's image; if it does not, stop and report before relying on its light and Hebrew output.
+- [ ] **Step 0: Generate the references.** Write the tool (see File structure) and run `fvm dart run tool/dialog/render_dialog_references.dart` from the root; commit the PNGs, the manifest and the README. Check that the tool's **dark English** render equals the designer's `04-settings_delete-dialog_desktop_en_dark.png` (same box, fill, outline and text within 1 per channel over the dialog area), which proves the tool reproduces the designer's image; if it does not, stop and report before relying on its light and Hebrew output. **Then run the Task 1 Step 4 measurements on the generated light and Hebrew images** (box, fill, outline, shadow, text and button positions), add the literals to "Measured facts", and check the box height against the 210 hand arithmetic; the Task 4 test asserts those values. **The test file's header and the Completion notes state that the light and Hebrew images are generated, not the designer's.**
 - [ ] **Step 1: Write the test** (acceptance 1), the dark delete dialog against the **designer's** screenshot and the **light** and **Hebrew** delete dialogs against the generated references, through one extractor. Dark delete dialog: render the same page behind the dialog is not possible, so compare the dialog against the screenshot by the Task 1 features: box left, right, top, bottom (420 x measured height), fill (±1 per channel), outline pixel, shadow reach and colour at the bottom edge (the shadow must not be clipped to the box: it reaches beyond it, as in the screenshot), the title and message text positions and colour (ink ±3), both buttons' boxes and the 8 gap, the box centred in the viewport; and the scrim: `Color.alphaBlend(scrim, bg)` against the screenshot's page colour at a point with no panel under it. Sheet Save-square dialog in **both** themes (rendered inside a `SizedBox` of the sheet box's measured width, which is not 420, D5): the same box, fill, outline, title, message, the 16 gap, the focused field box and the two buttons, through one extractor on the sheet and on the render.
 - [ ] **Step 2: Add the Hebrew case:** the dialog in RTL against the generated Hebrew reference (actions at the left edge, text aligned to the start), and the geometry mirrored from the LTR measurement.
 - [ ] **Step 3: Run** `cd packages/shared_ui; fvm flutter test test/widgets/dialog_sheet_test.dart`; a geometry failure is fixed in the implementation, never in a tolerance; if the reference and the kit disagree record it (the kit wins over MASTER's prose, as in UI-009 and UI-010).
@@ -191,7 +191,7 @@ Sequential, native (`executing-plans`). No independent work: the route builds on
 ## Risks
 
 - **Flutter 3.50's modal-route focus behaviour** may differ from the assumption (restore, Tab confinement, Escape on the barrier). Task 3's tests are the early check, and the plan allows minimal explicit code for any gap.
-- **No light delete-dialog reference:** light is proved from the sheet's Save-square dialog, which has a field and a primary button rather than a danger button; the danger button's light look is covered by UI-004's sheet.
+- **The light and Hebrew references are generated, not the designer's:** they come from `kit.css` through headless Chrome (O5). Only the dark English image is the designer's. The tool's dark output is compared with it (Task 4 Step 0) before the light and Hebrew output is relied on. The phone (390 px) width has no reference and is covered by the max-width tests.
 - **The scrim colour over a real page** can only be checked against the screenshot's page colours (the page is not rebuilt here).
 - **Keyboard insets in tests** are simulated with `MediaQuery`; a real soft keyboard is not exercised (no device).
 - **A dialog opened while another route's animation runs** (a drawer closing) is not specially handled.
@@ -226,4 +226,17 @@ Sequential, native (`executing-plans`). No independent work: the route builds on
 
 Needs user decision: O4, O5 and the focus-return question (O6) were put to the owner and answered (2026-11-23); see "Open decisions".
 
-_Round 2 (focused on the revision) follows._
+### Round 2 (focused on the revision, `a831088..20c38c8`) - verdict: approve after corrections
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| I1 | Important | A stale Risks bullet still said light is proved from the sheet | Applied: replaced by the generated-reference wording |
+| I2 | Important | The Facts bullet said the same | Applied |
+| I3 | Important | The generated light and Hebrew images were not measured anywhere before the test | Applied: Task 4 Step 0 measures them after the dark equality check, adds the literals to Measured facts, and the placeholder now says "before Task 4 Step 1" |
+| M1 | Minor | The manifest inputs were not named | Applied (`settings.html`, `kit.css`, `kit.js`, `assets/fonts/fonts.css`, both logo SVGs) |
+| M2 | Minor | Chrome flags, the dpr 1 device and the URL | Applied (the drawer tool's flags; `settings.html?lang=…&theme=…&dialog=delete`, the designer's own job in `jobs.json`; a 1440 x 900 assertion) |
+| M3 | Minor | The `roles` map position | Applied (`dialogTitle` right after `drawerWordmark`, doc comment amended) |
+| M4 | Minor | Typography contracts | Verified by the reviewer, no change |
+| M5 | Minor | "Label generated" needs a mechanism | Applied (test file header and Completion notes) |
+
+Open items after two rounds: none. Needs user decision: none new; O1 to O3 stand as plan defaults.
