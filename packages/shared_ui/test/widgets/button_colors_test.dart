@@ -25,6 +25,12 @@ void main() {
     expect(ZodiannStates.pressedBrightness, 0.94);
     expect(ZodiannStates.pressedOffset, 1);
     expect(ZodiannStates.disabledOpacity, 0.42);
+    // ZOD-UI-005: MASTER §10 Inputs, a different value from the buttons.
+    expect(ZodiannStates.fieldDisabledOpacity, 0.45);
+    expect(
+      ZodiannStates.fieldDisabledOpacity,
+      isNot(ZodiannStates.disabledOpacity),
+    );
     expect(ZodiannStates.focusRingWidth, 2);
     expect(ZodiannStates.focusRingGap, 2);
     expect(ZodiannStates.dangerBorderOpacity, 0.45);

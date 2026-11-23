@@ -18,6 +18,10 @@ abstract final class ZodiannStates {
   /// Disabled controls render at 42 % opacity.
   static const double disabledOpacity = 0.42;
 
+  /// A disabled input renders at 45 % opacity (MASTER §10 Inputs; not the
+  /// 42 % of buttons).
+  static const double fieldDisabledOpacity = 0.45;
+
   /// The keyboard focus ring's stroke width (2 px `focus`).
   static const double focusRingWidth = 2.0;
 

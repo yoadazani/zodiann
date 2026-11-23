@@ -25,6 +25,7 @@ ZodiannSurfaces sampleSurfaces(int seed) => ZodiannSurfaces(
   scrim: sampleColor(seed, 16),
   danger: sampleColor(seed, 17),
   ok: sampleColor(seed, 18),
+  dangerSoft: sampleColor(seed, 19),
 );
 
 SquareColors sampleSquare(int seed) => SquareColors(
@@ -95,6 +96,7 @@ ZodiannSurfaces copyAllZodiannSurfaces(ZodiannSurfaces a, ZodiannSurfaces b) =>
       scrim: b.scrim,
       danger: b.danger,
       ok: b.ok,
+      dangerSoft: b.dangerSoft,
     );
 
 /// `a.copyWith` of every field taken from [b].
