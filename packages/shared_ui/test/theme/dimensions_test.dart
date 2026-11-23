@@ -233,9 +233,8 @@ void main() {
       ZodiannSize.tableHeaderPadding,
       reason: '.tbl th padding-block',
     );
-    final wheel = File(
-      '../../design-reference/zodiann/_source/wheel.html',
-    ).readAsStringSync();
+    final wheel = File('../../design-reference/zodiann/_source/wheel.html')
+        .readAsStringSync();
     expect(
       wheel,
       contains(
