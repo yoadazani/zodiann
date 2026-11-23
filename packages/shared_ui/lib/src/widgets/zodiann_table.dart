@@ -255,11 +255,19 @@ class _ZodiannTableRowState extends State<ZodiannTableRow> {
           children: [
             if (fill != null) Positioned.fill(child: ColoredBox(color: fill)),
             ConstrainedBox(
+              // Keyed so the fill added above and the bar added below do not
+              // make Flutter rebuild every cell when the selection changes.
+              key: const ValueKey('zodiann-table-row-content'),
               constraints: const BoxConstraints(
                 minHeight: ZodiannSize.tableRow - ZodiannSize.hairline,
               ),
               child: DefaultTextStyle(
                 style: textStyle,
+                // kit.css `td` is nowrap: a plain long text ellipsizes on
+                // one line; a cell that wants to wrap overrides this.
+                softWrap: false,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 child: Row(
                   children: [
                     for (var i = 0; i < cols.length; i++)

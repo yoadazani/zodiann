@@ -869,4 +869,79 @@ void main() {
       handle.dispose();
     });
   });
+
+  group('cells', () {
+    testWidgets('selecting a row keeps its stateful cells alive', (
+      tester,
+    ) async {
+      var inits = 0;
+      Widget table(bool selected) => ZodiannTable(
+        columns: _two,
+        rows: [
+          ZodiannTableRow(
+            selected: selected,
+            onTap: () {},
+            semanticLabel: 'row',
+            cells: [
+              _Counting(onInit: () => inits++),
+              const Text('x'),
+            ],
+          ),
+        ],
+      );
+      await _pump(tester, table(false));
+      expect(inits, 1);
+      await _pump(tester, table(true));
+      await _pump(tester, table(false));
+      expect(inits, 1, reason: 'a selection change must not remount cells');
+    });
+
+    testWidgets('a long plain text stays on one line (kit nowrap)', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        width: 390,
+        ZodiannTable(
+          columns: const [
+            ZodiannTableColumn(label: 'a', flex: 2),
+            ZodiannTableColumn(label: 'b'),
+          ],
+          rows: [
+            ZodiannTableRow(
+              cells: [
+                Text('a very long body name that cannot fit ' * 3),
+                const Text('x'),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getSize(find.byType(ZodiannTableRow)).height,
+        ZodiannSize.tableRow - 1, // the only row is the last one
+      );
+    });
+  });
+}
+
+class _Counting extends StatefulWidget {
+  const _Counting({required this.onInit});
+
+  final VoidCallback onInit;
+
+  @override
+  State<_Counting> createState() => _CountingState();
+}
+
+class _CountingState extends State<_Counting> {
+  @override
+  void initState() {
+    super.initState();
+    widget.onInit();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 10, height: 10);
 }
