@@ -242,6 +242,10 @@ void main() {
     await tester.tap(_editable, warnIfMissed: false);
     await tester.pump();
     expect(node.hasFocus, isFalse);
+    // Programmatic focus is refused too (the field is out of the focus tree).
+    node.requestFocus();
+    await tester.pump();
+    expect(node.hasFocus, isFalse);
     expect(_halo, findsNothing);
     final editable = tester.widget<EditableText>(_editable);
     expect(editable.readOnly, isTrue);
@@ -308,6 +312,9 @@ void main() {
   });
 
   group('9. invalid input never crashes (NFR-R2)', () {
+    // A lone surrogate cannot be written as a Dart literal (the front end turns
+    // it into U+FFFD), so it is built from its code unit.
+    String lone(int unit) => String.fromCharCode(unit);
     final fuzz = <String>[
       '',
       'abc',
@@ -316,7 +323,7 @@ void main() {
       '😀📅',
       '\u0000',
       'line one\nline two',
-      '\uD800',
+      lone(0xD800),
     ];
     testWidgets('a parser harness turns text in a date field into an error', (
       tester,
@@ -603,6 +610,129 @@ void main() {
       );
     },
   );
+
+  group('17. selection handles on every platform (review I1)', () {
+    for (final entry in {
+      TargetPlatform.android: materialTextSelectionHandleControls,
+      TargetPlatform.fuchsia: materialTextSelectionHandleControls,
+      TargetPlatform.iOS: materialTextSelectionHandleControls,
+      TargetPlatform.macOS: desktopTextSelectionHandleControls,
+      TargetPlatform.linux: desktopTextSelectionHandleControls,
+      TargetPlatform.windows: desktopTextSelectionHandleControls,
+    }.entries) {
+      testWidgets('${entry.key.name} uses controls that draw handles', (
+        tester,
+      ) async {
+        await pumpInApp(
+          tester,
+          _field(),
+          theme: graphite.copyWith(platform: entry.key),
+        );
+        expect(
+          tester.widget<EditableText>(_editable).selectionControls,
+          same(entry.value),
+        );
+      });
+    }
+  });
+
+  group('18. the whole 40 px box takes taps (review I2)', () {
+    for (final spot in <(String, Offset Function(WidgetTester))>[
+      ('near the top edge', (t) => t.getTopLeft(_box) + const Offset(150, 3)),
+      (
+        'near the bottom edge',
+        (t) => t.getBottomLeft(_box) + const Offset(150, -4),
+      ),
+      (
+        'in the left padding',
+        (t) => t.getRect(_box).centerLeft + const Offset(4, 0),
+      ),
+      ('on the leading icon', (t) => t.getCenter(_icon(ZodiannIcons.calendar))),
+      (
+        'in the right padding',
+        (t) => t.getRect(_box).centerRight - const Offset(4, 0),
+      ),
+    ]) {
+      testWidgets('a tap ${spot.$1} focuses the field', (tester) async {
+        final node = FocusNode();
+        addTearDown(node.dispose);
+        await pumpInApp(
+          tester,
+          _field(focusNode: node, leadingIcon: ZodiannIcons.calendar),
+        );
+        expect(node.hasFocus, isFalse);
+        await tester.tapAt(spot.$2(tester));
+        await tester.pump();
+        expect(node.hasFocus, isTrue);
+      });
+    }
+  });
+
+  testWidgets('19. the error message is its own live-region node (review M2)', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    Widget host(String message) => Semantics(
+      container: true,
+      label: 'host',
+      child: _field(errorText: message),
+    );
+    await pumpInApp(tester, host('First problem'));
+    var node = tester.getSemantics(find.text('First problem'));
+    var data = node.getSemanticsData();
+    expect(data.label, 'First problem');
+    expect(data.flagsCollection.isLiveRegion, isTrue);
+    await pumpInApp(tester, host('Second problem'));
+    node = tester.getSemantics(find.text('Second problem'));
+    data = node.getSemanticsData();
+    expect(data.label, 'Second problem');
+    expect(data.flagsCollection.isLiveRegion, isTrue);
+    handle.dispose();
+  });
+
+  group('20. well-formed text (review M1)', () {
+    String lone(int unit) => String.fromCharCode(unit);
+    testWidgets('unpaired surrogates are removed, pairs are kept', (
+      tester,
+    ) async {
+      await pumpInApp(tester, _field());
+      for (final (input, want) in [
+        ('a${lone(0xD800)}b', 'ab'),
+        ('${lone(0xDC00)}x', 'x'),
+        ('${lone(0xD800)}A', 'A'),
+        ('😀', '😀'),
+        ('a😀b', 'a😀b'),
+      ]) {
+        await tester.enterText(_editable, input);
+        await tester.pump();
+        expect(
+          tester.widget<EditableText>(_editable).controller.text,
+          want,
+          reason: input.codeUnits.toString(),
+        );
+        expect(tester.takeException(), isNull);
+      }
+    });
+
+    testWidgets('a caller formatter that splits a pair cannot leave half', (
+      tester,
+    ) async {
+      await pumpInApp(
+        tester,
+        _field(
+          inputFormatters: [
+            TextInputFormatter.withFunction(
+              (o, n) => n.copyWith(text: n.text.substring(0, 1)),
+            ),
+          ],
+        ),
+      );
+      await tester.enterText(_editable, '😀');
+      await tester.pump();
+      expect(tester.widget<EditableText>(_editable).controller.text, '');
+      expect(tester.takeException(), isNull);
+    });
+  });
 
   testWidgets('15. both themes read their own surfaces', (tester) async {
     for (final theme in [graphite, porcelain]) {

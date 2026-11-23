@@ -23,7 +23,9 @@ import '../theme/zodiann_text_styles.dart';
 ///   the label keeps full strength.
 ///
 /// The widget parses and validates nothing: the caller decides when a value is
-/// invalid and passes the message. Any string is accepted without throwing.
+/// invalid and passes the message. Any text typed or pasted is accepted without
+/// throwing (unpaired surrogates are dropped); a value the caller puts in the
+/// controller directly is the caller's to keep well-formed.
 ///
 /// A tap on the label, or in the gap beneath it, focuses the field (as an HTML
 /// `label`). [ltr] is for dates and numbers (L-7): the value is laid out left
@@ -211,7 +213,9 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
           AdaptiveTextSelectionToolbar.editableText(editableTextState: state),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
-      inputFormatters: [_wellFormedText, ...?widget.inputFormatters],
+      // The sanitizer runs last, so a caller formatter that splits a surrogate
+      // pair cannot leave half of it.
+      inputFormatters: [...?widget.inputFormatters, _wellFormedText],
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
       autofocus: enabled && widget.autofocus,
@@ -223,10 +227,6 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
       textAlign: TextAlign.start,
       scrollPadding: const EdgeInsets.all(ZodiannSpace.s5),
       rendererIgnoresPointer: true,
-    );
-    editable = _gestures.buildGestureDetector(
-      behavior: HitTestBehavior.translucent,
-      child: editable,
     );
     if (widget.hintText != null) {
       final hint = Positioned.fill(
@@ -258,10 +258,7 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
         ],
       );
     }
-    editable = ExcludeFocus(
-      excluding: !enabled,
-      child: IgnorePointer(ignoring: !enabled, child: editable),
-    );
+    editable = ExcludeFocus(excluding: !enabled, child: editable);
 
     Widget input = DecoratedBox(
       key: ZodiannTextField.inputBoxKey,
@@ -292,6 +289,15 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
             ),
           ),
         ),
+      ),
+    );
+    // The whole drawn box is the tap target (padding, icon and the 9 px above
+    // and below the text line included), as Material wraps its decorator.
+    input = IgnorePointer(
+      ignoring: !enabled,
+      child: _gestures.buildGestureDetector(
+        behavior: HitTestBehavior.translucent,
+        child: input,
       ),
     );
     if (!enabled) {
@@ -362,6 +368,7 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
           Padding(
             padding: const EdgeInsets.only(top: ZodiannSize.fieldGap),
             child: Semantics(
+              container: true,
               liveRegion: true,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,11 +398,18 @@ class _ZodiannTextFieldState extends State<ZodiannTextField>
     );
   }
 
+  /// Controls that draw draggable handles. The "Handle" variants are for use
+  /// with a [contextMenuBuilder] (supplied above). iOS gets Material's round
+  /// handles: Cupertino's need `cupertino_ui` as a direct dependency, which is
+  /// an owner decision (ZOD-UI-005 review, finding I1).
   TextSelectionControls _selectionControls(TargetPlatform platform) =>
       switch (platform) {
         TargetPlatform.android ||
-        TargetPlatform.fuchsia => materialTextSelectionControls,
-        _ => desktopTextSelectionControls,
+        TargetPlatform.fuchsia ||
+        TargetPlatform.iOS => materialTextSelectionHandleControls,
+        TargetPlatform.macOS ||
+        TargetPlatform.linux ||
+        TargetPlatform.windows => desktopTextSelectionHandleControls,
       };
 }
 
