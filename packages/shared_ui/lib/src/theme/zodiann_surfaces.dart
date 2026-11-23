@@ -25,6 +25,7 @@ final class ZodiannSurfaces extends ThemeExtension<ZodiannSurfaces> {
     required this.scrim,
     required this.danger,
     required this.ok,
+    required this.dangerSoft,
   });
 
   /// `bg`.
@@ -84,6 +85,10 @@ final class ZodiannSurfaces extends ThemeExtension<ZodiannSurfaces> {
   /// `ok`.
   final Color ok;
 
+  /// `danger-soft`: the input's error halo. Defined by kit.css, not by MASTER
+  /// §2.1, so it is deliberately **not** in [tokens] (ZOD-UI-005, O1).
+  final Color dangerSoft;
+
   /// Every colour token under its MASTER name, in MASTER order.
   Map<String, Color> get tokens => {
     'bg': bg,
@@ -128,6 +133,7 @@ final class ZodiannSurfaces extends ThemeExtension<ZodiannSurfaces> {
     Color? scrim,
     Color? danger,
     Color? ok,
+    Color? dangerSoft,
   }) => ZodiannSurfaces(
     bg: bg ?? this.bg,
     bgRaised: bgRaised ?? this.bgRaised,
@@ -148,6 +154,7 @@ final class ZodiannSurfaces extends ThemeExtension<ZodiannSurfaces> {
     scrim: scrim ?? this.scrim,
     danger: danger ?? this.danger,
     ok: ok ?? this.ok,
+    dangerSoft: dangerSoft ?? this.dangerSoft,
   );
 
   @override
@@ -173,6 +180,7 @@ final class ZodiannSurfaces extends ThemeExtension<ZodiannSurfaces> {
       scrim: Color.lerp(scrim, other.scrim, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
       ok: Color.lerp(ok, other.ok, t)!,
+      dangerSoft: Color.lerp(dangerSoft, other.dangerSoft, t)!,
     );
   }
 }

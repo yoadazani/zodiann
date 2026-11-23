@@ -79,6 +79,7 @@ const ZodiannSurfaces _surfaces = ZodiannSurfaces(
   scrim: Color.fromRGBO(11, 12, 14, 0.40),
   danger: Color(0xFFDC3545),
   ok: Color(0xFF15803D),
+  dangerSoft: Color.fromRGBO(220, 53, 69, 0.08),
 );
 
 /// MASTER §4: floating layers cast `0 24 56 rgba(21,25,31,.18)` and carry

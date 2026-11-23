@@ -159,6 +159,11 @@ void main() {
     expect(ZodiannStates.drawerFlingVelocity, 365);
   });
 
+  test("the field gap and halo are kit.css's 6 and 3 px (ZOD-UI-005)", () {
+    expect(ZodiannSize.fieldGap, 6.0);
+    expect(ZodiannSize.fieldHalo, 3.0);
+  });
+
   test("the hairline is MASTER §4's 1 px rule (ZOD-UI-014)", () {
     expect(ZodiannSize.hairline, 1.0);
   });

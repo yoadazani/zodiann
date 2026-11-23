@@ -139,6 +139,14 @@ abstract final class ZodiannSize {
   /// The 1 px rule of borders and head rules (MASTER §1, §4).
   static const double hairline = 1.0;
 
+  /// Field: gap from the label to the input, and from the input to its
+  /// error message, and inside the message row (kit.css `.field` gap 6).
+  static const double fieldGap = 6.0;
+
+  /// Field: the width of the focus and error halo painted outside the
+  /// border (kit.css `0 0 0 3px`; MASTER §10).
+  static const double fieldHalo = 3.0;
+
   /// Panel head: height above phone width, including its 1 px bottom rule.
   static const double panelHead = 56.0;
 
