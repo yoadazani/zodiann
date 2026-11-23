@@ -26,12 +26,12 @@
 Defaults the plan implements unless the owner says otherwise (see "Open decisions"). **D1 to D3 are product-visible.**
 
 - **D1. Declared columns, not content-measured.** `ZodiannTableColumn(label:, alignment:, flex:, width:)`; a column is `flex` (default 1) or a fixed `width`, never both. The browser sizes `.tbl` columns from content; a lazy 2,500-row list cannot, and WHL-021 needs the list. Consumers choose the flex ratios that reproduce the designer's screens; the sheet test pins the ratios it uses.
-- **D2. Selected beats hover**, and hover and selection apply to the **whole row**, from edge to edge (the cells carry no gaps). Hover applies only to a row that has `onTap` (a read-only row such as an About row is not interactive, so it must not look it).
+- **D2. Selected beats hover**, and hover and selection apply to the **whole row**, from edge to edge (the cells carry no gaps). Hover applies only to a row that has `onTap` (a read-only row such as an About row is not interactive, so it must not look it). Hover has no effect on touch, and a pressed state is deliberately absent (D5).
 - **D3. Two densities.** `ZodiannTableDensity.regular` (inline padding 16, 14 text) and `.compact` (inline padding 10, 13 `small` text, the kit's override under 1100 px). The **caller** picks it per breakpoint (WHL-024); the table does not read the breakpoint itself, because only the screen knows it is in the compact layout.
 - **D4. The table never clips.** A panel that holds a table passes `clipBehavior: Clip.antiAlias` so a hovered or selected last row does not square off the corner; row focus is drawn inside the row (D5), so clipping hides nothing. Task 6 proves it. `ZodiannPanel`'s default stays `Clip.none` (UI-014).
 - **D5. Own interaction layer on `Focus` + `MouseRegion` + `GestureDetector`/`Actions`:** tap and Enter / Space activate, a keyboard-only 2 px `focus` ring is drawn **inside** the row's edge (inset, so it is never clipped), hover is tracked with `MouseRegion`. No press look and no brightness filter.
-- **D6. Minimum height 44, grows with the text scale** (as the tag): a row is `ConstrainedBox(minHeight: ZodiannSize.tableRow)`, the divider is part of the 44. Cells do not ellipsize or wrap by themselves (kit `nowrap`): the caller's cell widget decides.
-- **D7. Semantics:** the table is `SemanticsRole.table`, the header and each row `row`, each header label `columnHeader`, each cell `cell`; a tappable row is a button, a selected row `selected: true`; a row that is not selected carries **no** selected state (as UI-004: in Flutter 3.50 `false` is a state a screen reader announces).
+- **D6. Minimum height 44, grows with the text scale** (as the tag): a row is `ConstrainedBox(minHeight: ZodiannSize.tableRow)`, the divider is part of the 44. **Overflow (decided):** each cell sits in a clipped, tight-width slot (`ClipRect` over `AlignmentDirectional`), so a cell wider than its column never throws a `RenderFlex` overflow and never moves another column; the header's labels are `maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis` (the kit's `nowrap`); body cells are the caller's widgets, which wrap long text in `Flexible` or an ellipsis. A table needs a bounded width (flex columns use `Expanded`): in an unbounded-width parent (a horizontal scroll) it asserts with a message, and the caller gives it a `SizedBox(width:)` instead.
+- **D7. Semantics:** the table roles (`SemanticsRole.table`, `row`, `columnHeader`, `cell`) are emitted **only inside `ZodiannTable`** (eager). Flutter 3.50's role checks (`semantics.dart:350-388`) require a `row` to have a `table` parent and a table's children to be rows, so a standalone `ZodiannTableRow` or `ZodiannTableHeader` in a lazy `ListView` (WHL-021) would assert in debug if it carried a role. Standalone parts therefore carry **no** table, row, cell or columnHeader role: only `Semantics(container: true)`, button and tap semantics for a tappable row, and `selected: true` for the selected row. A lazy list has no table semantics; WHL-021 owns an alternative (for example a labelled list) if it needs one. A row that is not selected carries **no** selected state (as UI-004: in Flutter 3.50 `false` is a state a screen reader announces). Each row and cell is `container: true` so they do not merge into the parent node.
 
 ## Design (API)
 
@@ -66,19 +66,19 @@ class ZodiannTableHeader extends StatelessWidget {
 class ZodiannTableRow extends StatelessWidget {
   const ZodiannTableRow({
     super.key,
-    required this.columns,                     // the same list the header has
+    this.columns,                              // null inside a ZodiannTable (read from its scope); required outside
     required this.cells,                       // cells.length == columns.length (assert)
     this.selected = false,
     this.onTap,                                // null: read-only row, no hover, no focus
     this.semanticLabel,                        // the row's spoken name; required when onTap != null
-    this.isLast = false,                       // true: no divider (kit `tr:last-child td`)
-    this.density = ZodiannTableDensity.regular,
+    this.isLast = false,                       // standalone lists only; ZodiannTable sets it for its last row
+    this.density,                              // null inside a ZodiannTable (scope); regular outside
   });
 }
 ```
 
 - A cell is any widget. `ZodiannTableRow` wraps each in a directional alignment (start or end, vertically centred), the density's inline padding, and `DefaultTextStyle` of `body` (or `small` when compact) in `text`. The caller styles inside the cell (`pos` is 14 / 500).
-- `ZodiannTable` builds `[header, ...rows]` in a `Column` and marks the **last** row `isLast` itself, so callers of the eager form never set it; a lazy list sets `isLast` on its last item (or accepts the divider under it, which the kit does not draw).
+- **Mechanism** (rows are already-built widgets, so the table cannot set their fields): `ZodiannTable` wraps its header and rows in a private `_TableScope` `InheritedWidget` (columns, density, `inTable: true`) and wraps the last row in a private `_LastRow` marker. A `ZodiannTableRow` reads `columns` and `density` from the scope when its own are null; outside a table with `columns == null` it asserts "ZodiannTableRow outside a ZodiannTable needs columns". Inside a table a row must not pass its own `columns` or `density` (debug assert: a row that disagrees with the table would silently misalign). Callers of the eager form never set `isLast`; a lazy list sets it on its last item (or accepts the divider under it, which the kit does not draw). Roles (D7) are emitted only when `inTable` is true.
 - Fill order (bottom to top): `surface` (the panel) < hover `surface-2` < selected `accent-soft`, then the divider (bottom 1 px, `line-soft`), then the 3 px selected bar at the start edge, then the keyboard ring.
 
 ## Global Constraints
@@ -95,9 +95,11 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
 
 1. **Hebrew / RTL with a bidi cell:** a Hebrew label and an LTR number (`17°03′`) in one row; the end-aligned column must stay at the end edge, the bar on the right. (Task 3, Task 5)
 2. **Text scale 1.5 or more:** a row grows and its divider and bar still span the whole row; the header grows. (Task 3)
-3. **A cell wider than its column / a narrow table (phone width 390):** a fixed-width plus flex mix must not throw an overflow and must keep all rows aligned. (Task 2)
+3. **A narrow table (phone width 390):** a fixed-width plus flex mix must not throw an overflow and must keep all rows aligned. (Task 2)
 4. **Selected and hovered at once, and a selected last row in a clipped panel:** selected wins; the corner is not squared. (Task 3, Task 6)
-5. **A row with `onTap` but no semantic label, or `cells.length != columns.length`:** an assertion in debug, never a silent misalignment. (Task 2, Task 4)
+5. **A row with `onTap` but no semantic label, `cells.length != columns.length`, or its own `columns` inside a table:** an assertion in debug, never a silent misalignment. (Task 2, Task 4)
+6. **A cell wider than its column, and a table in an unbounded-width parent:** no overflow stripes and no moved columns; the unbounded case fails with a clear message. (Task 2)
+7. **Hebrew, text scale 1.5 and a selected row together.** (Task 3)
 
 ## Out of scope
 
@@ -120,15 +122,19 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
 
 ### Task 1: Tokens and the measured oracle
 
-**Files:** modify `zodiann_dimensions.dart`; test `test/theme/` (extend the existing dimension-token test, whichever file holds `ZodiannSize.tableRow`); a scratch measurement (scratchpad, not committed) whose results are recorded under "Measured facts" below.
+**Files:** modify `packages/shared_ui/lib/src/theme/tokens/zodiann_dimensions.dart`; test `packages/shared_ui/test/theme/dimensions_test.dart` (it holds `tableRow` at line 93 and parses `kit.css` at lines 200-221); a throwaway measurement test (not committed) whose results are written under "Measured facts" below.
 
 **Interfaces:** Produces `ZodiannSize.tableHeaderPadding` (10.0), `ZodiannSize.tableCompactPadding` (10.0), `ZodiannSize.tableSelectedBar` (3.0).
 
-- [ ] **Step 1: RED.** In the existing token test, assert the three values and that each has a doc comment naming its kit.css source (the file's convention); run it and confirm it fails because the constants do not exist.
+- [ ] **Step 1: RED.** In `dimensions_test.dart`, following the file's convention of parsing the kit, assert the three values and that the kit agrees where it can be parsed: `.tbl th` padding-block is 10 (`_rule(css, '.tbl th')`) and `wheel.html`'s `padding-inline: 10px`; the 3 px bar is not parseable from kit.css (`inset 3px`), so assert the value only. Write a doc comment on each constant naming its kit source. Run `cd packages/shared_ui; fvm flutter test test/theme/dimensions_test.dart`; expected: a compile failure naming the three missing constants.
 - [ ] **Step 2: Implement** the three constants in `ZodiannSize`.
-- [ ] **Step 3: Run** the token test and `dart test test/architecture` (the magic-dimension guard reads this directory as exempt); both pass.
-- [ ] **Step 4: Measure the sheet** (both themes) and the three screenshots with a scratch Dart script using `package:image`: for the four sheet rows, header height, row tops, divider row y, fill colours at the cell centre (default, hover, selected), the selected bar's x-run and colour, whether the bar covers the divider row, the last row's height without a divider, and the column left edges. Write each into "Measured facts" as a literal. If a measured value differs from the expectation (header ≈ 38.4: 10 + 17.4 + 10 + 1; row 44 including the divider; bar 3 wide over the row height), the measured value is the oracle and the difference is recorded.
+- [ ] **Step 3: Run** the same test command and `dart test test/architecture` (from the repo root; one process at a time); both pass.
+- [ ] **Step 4: Measure the sheet** (both themes) and the screenshots with a throwaway `flutter_test` file in `packages/shared_ui/test/` that decodes the PNGs with `dart:ui` as `test/support/pixels.dart` does (`package:image` is a root dev dependency only; do not use it from a scratchpad script). Measure: for the four sheet rows, header height, row tops, divider row y, fill colours at the cell centre (default, hover, selected), the selected bar's x-run and colour, whether the bar covers the divider row, the last row's height without a divider, and the column left edges. Write each into "Measured facts" as a literal, then delete the throwaway file. If a measured value differs from the expectation (header ≈ 38.4: 10 + 17.4 + 10 + 1; row 44 including the divider; bar 3 wide), the measured value is the oracle and the difference is recorded. The "row is 44 including its divider" test is for non-last rows; the `isLast` test equals the measured value (43 or 44).
 - [ ] **Step 5: Commit** `feat(ZOD-UI-010): add the table size tokens`.
+
+#### Measured facts (filled in Task 1, Step 4)
+
+_Placeholders, to be replaced by measured literals before Task 3 starts:_ header height; non-last row pitch; last row height; divider colour and row; default / hover / selected fill per theme; bar x-run, colour, and whether it covers the divider row; sheet column left edges; the mobile PNG's scale (780 px wide: 2x).
 
 ### Task 2: Column spec and row layout (RED first)
 
@@ -142,9 +148,13 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
   - `inline padding is 16 regular and 10 compact`, read from the first cell's offset.
   - `a narrow parent does not overflow` (390 px with `flex 3 / 2 / fixed 120 / flex 1`): no `FlutterError` from the test binding, all rows aligned.
   - `cells.length must equal columns.length` and `a fixed width and a flex are mutually exclusive` throw `AssertionError` in debug (`expect(() => …, throwsAssertionError)`).
-- [ ] **Step 2: Run** them and confirm they fail because the symbols are missing.
-- [ ] **Step 3: Implement** `ZodiannTableColumn` (with its asserts) and the shared column layout (`Row` of `Expanded(flex:)` and `SizedBox(width:)` children under a directional alignment), the header and row skeleton with padding and alignment only.
-- [ ] **Step 4: Run** the tests; all pass.
+  - `a cell wider than its column does not overflow or move the other columns`: a deliberately wide `SizedBox` cell; no `FlutterError` from the binding, the other columns' offsets equal those of a row without it.
+  - `a table in an unbounded-width parent asserts with a message` (a horizontal `SingleChildScrollView` without a `SizedBox`).
+  - `a row inside ZodiannTable inherits columns and density` (the row passes neither), and `a row that passes its own columns inside a table asserts`, and `a row outside a table without columns asserts "needs columns"`.
+  - `ZodiannTable gives the last row no divider without the caller setting isLast`.
+- [ ] **Step 2: Run** `cd packages/shared_ui; fvm flutter test test/widgets/table_test.dart`; expected: a compile failure ("Undefined class 'ZodiannTableColumn'" and the other missing symbols).
+- [ ] **Step 3: Implement** `ZodiannTableColumn` (with its asserts), the shared column layout (`Row` of `Expanded(flex:)` and `SizedBox(width:)` slots, each a `ClipRect` over `AlignmentDirectional`), the private `_TableScope` and `_LastRow`, and the header and row skeleton with padding and alignment only.
+- [ ] **Step 4: Run** the same command; all pass.
 - [ ] **Step 5: Commit** `feat(ZOD-UI-010): add table columns and row layout`.
 
 ### Task 3: Header, row, hover and selected looks, RTL and text scale
@@ -159,11 +169,12 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
   - `hover fills surface-2 on a row with onTap`, using `TestGesture` with a mouse pointer; `a row without onTap does not react to hover`.
   - `selected fills accent-soft and wins over hover`.
   - `the selected bar is 3 wide on the start edge` in LTR (left) and in RTL (right): read from the painted `BorderDirectional` / positioned bar widget's resolved rect, not from colour.
-  - `a row grows with the text scale` (`TextScaler.linear(1.5)` and a 2.0 case): height > 44, the bar and divider still span the row's height.
+  - `a row grows with the text scale` (`TextScaler.linear(1.5)` and a 2.0 case): height > 44, the fill and the bar still span the row's height; the divider stays 1 px at the bottom.
   - `an RTL row mirrors the order of the cells`.
-- [ ] **Step 2: Run** them; confirm each fails for the expected reason (no fill, no bar).
-- [ ] **Step 3: Implement** the row's states: `ColoredBox` fill, directional bar (`PositionedDirectional(start: 0, width: tableSelectedBar)` over the row's full height, inside the divider rule), divider as the bottom `BorderSide` of a `DecoratedBox`, honouring `isLast`; header with the rule. Pull colours from `ZodiannSurfaces`.
-- [ ] **Step 4: Run** the tests; all pass; run `fvm flutter analyze --fatal-infos` for `shared_ui`.
+  - `Hebrew, text scale 1.5 and a selected row together`: RTL, a Hebrew label with an LTR number, scale 1.5, selected; the bar is on the right, the end-aligned column ends at the left edge's mirror, no overflow.
+- [ ] **Step 2: Run** `cd packages/shared_ui; fvm flutter test test/widgets/table_test.dart`; expected: assertion failures per new test (no fill, no bar).
+- [ ] **Step 3: Implement** the row's states: `ColoredBox` fill, directional bar (`PositionedDirectional(start: 0, width: tableSelectedBar)`), divider as the bottom `BorderSide` of a `DecoratedBox`, honouring `isLast`; header with the rule. Whether the bar covers the divider row follows the measured fact from Task 1 (the kit's inset shadow lies inside the cell's padding box, so the expectation is that it does not); the test asserts the measured behaviour. Pull colours from `ZodiannSurfaces`.
+- [ ] **Step 4: Run** the same command; all pass; then `cd packages/shared_ui; fvm flutter analyze --fatal-infos`.
 - [ ] **Step 5: Commit** `feat(ZOD-UI-010): paint table header, rows, hover and selected`.
 
 ### Task 4: Interaction and semantics
@@ -173,11 +184,13 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
 - [ ] **Step 1: Write the failing tests:**
   - `tap and Enter and Space activate onTap`; a row without `onTap` is not focusable (`Tab` skips it).
   - `keyboard focus draws a 2 px focus ring inside the row`, only after keyboard traversal (not after a mouse tap), and the ring's rect lies within the row's rect (never outside).
-  - `semantics tree`: table node has `SemanticsRole.table`; the header and each row `row`; each header label `columnHeader`; each cell `cell`; a tappable row has the button and tap flags and the label; a selected row has `isSelected` true; an unselected row has **no** selected flag (`SemanticsFlag.hasSelectedState` absent); no `SemanticsNode` throws the role assertions with `ZodiannTableRow`s used standalone in a `ListView`.
+  - `inside ZodiannTable: roles table / row / columnHeader / cell, no assertion thrown`, and the node tree shape is table, then the header row and the rows, then their cells (each row and cell `container: true`).
+  - `standalone rows and header in a ListView: no role assertion thrown`, tappable rows are buttons with their label, and no node carries a table, row, cell or columnHeader role.
+  - `a tappable row has the button and tap flags and the label; a selected row has isSelected true; an unselected row has no selected state` (`SemanticsFlag.hasSelectedState` absent).
   - `a tappable row without semanticLabel asserts`.
-- [ ] **Step 2: Run** them; confirm they fail.
-- [ ] **Step 3: Implement** D5 and D7: `Focus` with a `focusHighlightMode` check (keyboard-only ring, as `ZodiannPressable` decides it), `Actions` for `ActivateIntent`, `MouseRegion` for hover, `Semantics` roles. Reuse `ZodiannPressable`'s keyboard-only test only if it is exposed; otherwise read `FocusManager.instance.highlightMode` directly.
-- [ ] **Step 4: Run** the tests; pass.
+- [ ] **Step 2: Run** `cd packages/shared_ui; fvm flutter test test/widgets/table_test.dart`; expected: failures per new test (no `Focus`, no roles).
+- [ ] **Step 3: Implement** D5 and D7 on `FocusableActionDetector(onShowFocusHighlight:, onShowHoverHighlight:, actions: {ActivateIntent: …})` (which supplies the Enter and Space mapping and reacts when the highlight mode changes, as `ZodiannPressable` does with `onShowFocusHighlight`; a bare `Actions` + `Focus` works only under a `WidgetsApp` shortcut table, which a test harness lacks). The ring width is `ZodiannStates.focusRingWidth` (2.0), drawn **inside** the row's edge (inset, not `focusRingGap`). Roles come from the `_TableScope.inTable` flag (D7).
+- [ ] **Step 4: Run** the same command; pass.
 - [ ] **Step 5: Commit** `feat(ZOD-UI-010): make table rows interactive and accessible`.
 
 ### Task 5: Pixel proof against the designer's sheet, both themes, RTL and compact
@@ -186,15 +199,15 @@ Inputs the spec implies and no acceptance criterion exercises; each has a test i
 
 - [ ] **Step 1: Write the test** (acceptance criterion 1). For each theme, render the sheet's four rows (Default, Hover, Selected, Default; columns Body, Sign, Position, Motion, State with the flex ratios that reproduce the sheet's measured column edges, recorded in the test) at an integer origin and compare with `components_{dark,light}.png` under the tag test's tolerances (fill ±1 per channel; text ±3; geometry exact): header height, row pitch, divider row and colour, the three fills, the bar's width and colour. The cell contents are plain text and ASCII-safe shapes (the glyph and sign cells are WHL-018's), so the comparison covers geometry and fills, not glyph pixels.
 - [ ] **Step 2: Add the RTL case** (criterion 2): the bar's pixel run in `01-zodiac-wheel_desktop_he_dark.png` is on the right edge of the Sun row, and the same render in RTL puts it on the right; in LTR on the left (`..._en_dark.png`). Both runs are 3 px wide with the `accent` colour at the cell's vertical centre.
-- [ ] **Step 3: Add the compact case:** the mobile wheel PNG's compact positions rows (inline padding 10, 13 text) against `ZodiannTableDensity.compact`: padding, row height, divider.
-- [ ] **Step 4: Run** the sheet test; if it fails for a geometry reason, fix the implementation, never the tolerance; if the reference and the kit disagree, record it (the NAV-002 / UI-009 precedent: the kit wins over MASTER's prose; MASTER is not edited).
+- [ ] **Step 3: Add the compact case:** the mobile wheel PNG is 780 px wide, a **2x** capture (a 44 px row is about 88 px, the 10 px padding 20 px); compare at that factor the compact positions rows (inline padding 10, cell text 13 `small`) against `ZodiannTableDensity.compact`: padding, row height, divider. In compact the **header stays `label` (12)**: the kit's override sets only the body's 13. The kit's compact breakpoint is `max-width: 1100px`, inclusive, while `ZodiannBreakpoint` treats 1100 as desktop; the table does not read the breakpoint (D3), and a note on WHL-024 records the difference.
+- [ ] **Step 4: Run** `cd packages/shared_ui; fvm flutter test test/widgets/table_sheet_test.dart`; if it fails for a geometry reason, fix the implementation, never the tolerance; if the reference and the kit disagree, record it (the NAV-002 / UI-009 precedent: the kit wins over MASTER's prose; MASTER is not edited).
 - [ ] **Step 5: Commit** `test(ZOD-UI-010): match the sheet's table rows in both themes`.
 
 ### Task 6: Panel integration, export, verification, review, documentation
 
 **Files:** create `test/widgets/table_panel_test.dart`; modify `shared_ui.dart`; documentation per "File structure".
 
-- [ ] **Step 1: Write and run** `a table in an antiAlias panel keeps its rounded corner`: a `ZodiannPanel(clipBehavior: Clip.antiAlias, bodyPadding: EdgeInsets.zero)` whose last row is selected; the pixel at the panel's inner bottom corner is the panel's border/background, not `accent-soft`. And the same panel without a clip squares the corner (documents D4's reason).
+- [ ] **Step 1: Write and run** `cd packages/shared_ui; fvm flutter test test/widgets/table_panel_test.dart`: `a table in an antiAlias panel keeps its rounded corner`: a `ZodiannPanel(clipBehavior: Clip.antiAlias, bodyPadding: EdgeInsets.zero)` around an eager `ZodiannTable` whose last row is selected, on a scaffold of a known colour. Sample the pixel diagonally inside the square corner but outside the arc, at about `(1, h - 2)` of the panel: with `Clip.antiAlias` it equals the page backdrop; with the default `Clip.none` it equals `accent-soft` blended (documents D4's reason). A pixel well inside the row is `accent-soft` in both cases.
 - [ ] **Step 2: Export** `ZodiannTable`, `ZodiannTableHeader`, `ZodiannTableRow`, `ZodiannTableColumn`, `ZodiannTableAlign`, `ZodiannTableDensity` from `shared_ui.dart` (alphabetical among the widgets).
 - [ ] **Step 3: Verification:** `fvm dart run melos run lint`, `fvm dart run melos run test`, `dart test test/architecture` (separately, one process at a time); record counts and exit codes and the head commit.
 - [ ] **Step 4: Whole-branch review** by a fresh reviewer (`requesting-code-review`); fix Important findings test-first.
@@ -212,7 +225,8 @@ Sequential, native (`executing-plans`). No independent work: the tasks share two
 
 ## Risks
 
-- **Flutter 3.50 semantics roles** may be stricter than the SDK source suggests (the table role validates its children). Task 4's tree test is the early check; fall back to row and cell roles only if the table role cannot hold a lazy list.
+- **Flutter 3.50 semantics roles** are strict (`semantics.dart:350-388`): hence D7, roles only inside `ZodiannTable`. A lazy list has no table semantics (WHL-021 owns an alternative). Task 4's tree tests are the early check.
+- **A table in a zero-padding panel** (`bodyPadding: EdgeInsets.zero`) is the intended use and is covered in Task 6.
 - **Sheet cell contents** use glyph fonts; the test compares geometry and fills only, so a font difference cannot fail it.
 - **Row height with text scale**: a row is a minimum height, so the 44 is exact only at scale 1.
 - **Declared flex ratios** are an approximation of the browser's content sizing; the sheet test pins one set, WHL-018 / 021 re-verify against their own screens.
@@ -227,4 +241,20 @@ Sequential, native (`executing-plans`). No independent work: the tasks share two
 
 ## Plan review
 
-_Pending: the `plan-reviewer` cycle runs next (at most two rounds); the record is added here._
+### Round 1 (comprehensive) - verdict: approve after corrections
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| C1 | Critical | Table roles cannot hold standalone rows or a pinned header (`semantics.dart:350-388`) | Applied: D7 rewritten, roles only inside `ZodiannTable`; Task 4 tests split in two; Risks updated |
+| I1 | Important | `isLast`, columns and density mechanism undefined for already-built rows | Applied: private `_TableScope` and `_LastRow`, nullable row parameters, asserts, three tests |
+| I2 | Important | A cell wider than its column and `nowrap` undecided | Applied: D6 overflow decision (clipped slots, header ellipsis, unbounded-width assert), two tests |
+| I3 | Important | Commands for widget tests and analyze missing | Applied: explicit commands and expected failures in Tasks 1 to 6 |
+| I4 | Important | Task 1 token test unrunnable as worded; `package:image` unavailable; no Measured facts section | Applied: the kit-parsing convention of `dimensions_test.dart`, a throwaway `flutter_test` measurement, a Measured facts section |
+| I5 | Important | Focus ring via a non-reactive `highlightMode` read | Applied: `FocusableActionDetector`, `ZodiannStates.focusRingWidth`, inset ring |
+| I6 | Important | Panel clip test pixel would not discriminate | Applied: sample at about `(1, h - 2)`, backdrop versus `accent-soft` |
+| I7 | Important | Mobile PNG is 2x; header stays 12 in compact; kit breakpoint is `<= 1100` | Applied in Task 5 Step 3 (and a WHL-024 note) |
+| M1 to M4 | Minor | Zero-padding panel case, Hebrew + scale + selected test, `isLast` height, bar versus divider wording, hover on touch | Applied (Risks, Task 3, Task 1 Step 4, D2) |
+
+Needs user decision: none new; O1 to O5 stand. To tell the owner: C1 (a lazy list gets no table semantics; WHL-021 owns an alternative) and I2 (the overflow behaviour is now decided).
+
+_Round 2 (focused on the revision) follows._
