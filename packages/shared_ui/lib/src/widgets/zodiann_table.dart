@@ -97,29 +97,35 @@ class ZodiannTableHeader extends StatelessWidget {
           'ZodiannTableHeader needs a bounded width.',
         );
         final widths = resolveTableColumnWidths(columns, constraints.maxWidth);
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: ZodiannSize.tableHeaderPadding,
-          ),
-          child: Row(
-            children: [
-              for (var i = 0; i < columns.length; i++)
-                SizedBox(
-                  width: widths[i],
-                  child: _Slot(
-                    padding: pad,
-                    alignment: columns[i].alignment,
-                    child: Text(
-                      columns[i].label,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.ellipsis,
-                      style: styles.label.copyWith(color: s.text3),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: ZodiannSize.tableHeaderPadding,
+              ),
+              child: Row(
+                children: [
+                  for (var i = 0; i < columns.length; i++)
+                    SizedBox(
+                      width: widths[i],
+                      child: _Slot(
+                        padding: pad,
+                        alignment: columns[i].alignment,
+                        child: Text(
+                          columns[i].label,
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          style: styles.label.copyWith(color: s.text3),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-            ],
-          ),
+                ],
+              ),
+            ),
+            _Rule(color: s.lineSoft),
+          ],
         );
       },
     );
@@ -131,12 +137,14 @@ class ZodiannTableHeader extends StatelessWidget {
 /// Inside a [ZodiannTable] it reads the table's columns and density (pass
 /// neither). Standalone, in a lazy list, pass [columns] (the same list the
 /// header has) and set [isLast] on the last item.
-class ZodiannTableRow extends StatelessWidget {
+class ZodiannTableRow extends StatefulWidget {
   /// A row of [cells], one per column.
   const ZodiannTableRow({
     super.key,
     this.columns,
     required this.cells,
+    this.selected = false,
+    this.onTap,
     this.isLast = false,
     this.density,
   }) : assert(
@@ -151,6 +159,15 @@ class ZodiannTableRow extends StatelessWidget {
   /// column's width and clipped to it.
   final List<Widget> cells;
 
+  /// Whether this is the selected row (the one under the pointer, the open
+  /// item): an `accent-soft` fill and a 3 px `accent` bar on the start edge.
+  /// Selected wins over hover.
+  final bool selected;
+
+  /// Called when the row is activated, or null for a read-only row, which
+  /// has no hover fill.
+  final VoidCallback? onTap;
+
   /// Whether this is the last row: it draws no divider and is 1 px shorter
   /// (kit.css `tr:last-child td { border-bottom: 0 }`). [ZodiannTable] sets
   /// it for its last row.
@@ -160,7 +177,17 @@ class ZodiannTableRow extends StatelessWidget {
   final ZodiannTableDensity? density;
 
   @override
+  State<ZodiannTableRow> createState() => _ZodiannTableRowState();
+}
+
+class _ZodiannTableRowState extends State<ZodiannTableRow> {
+  bool _hover = false;
+
+  @override
   Widget build(BuildContext context) {
+    final columns = widget.columns;
+    final cells = widget.cells;
+    final density = widget.density;
     final scope = _TableScope.maybeOf(context);
     assert(
       scope == null || (columns == null && density == null),
@@ -178,7 +205,7 @@ class ZodiannTableRow extends StatelessWidget {
       '${cols.length} columns',
     );
     final d = density ?? scope?.density ?? ZodiannTableDensity.regular;
-    final last = isLast || _LastRow.isIn(context);
+    final last = widget.isLast || _LastRow.isIn(context);
     final theme = Theme.of(context);
     final s = theme.extension<ZodiannSurfaces>()!;
     final styles = theme.extension<ZodiannTextStyles>()!;
@@ -193,30 +220,78 @@ class ZodiannTableRow extends StatelessWidget {
           'ZodiannTableRow needs a bounded width.',
         );
         final widths = resolveTableColumnWidths(cols!, constraints.maxWidth);
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: ZodiannSize.tableRow - (last ? ZodiannSize.hairline : 0),
-          ),
-          child: DefaultTextStyle(
-            style: textStyle,
-            child: Row(
-              children: [
-                for (var i = 0; i < cols.length; i++)
-                  SizedBox(
-                    width: widths[i],
-                    child: _Slot(
-                      padding: pad,
-                      alignment: cols[i].alignment,
-                      child: cells[i],
-                    ),
-                  ),
-              ],
+        // Fill order: hover (surface-2) under selected (accent-soft); the
+        // fill and the bar stop above the divider, as the kit draws them.
+        final fill = widget.selected
+            ? s.accentSoft
+            : (_hover && widget.onTap != null ? s.surface2 : null);
+        Widget body = Stack(
+          children: [
+            if (fill != null) Positioned.fill(child: ColoredBox(color: fill)),
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                minHeight: ZodiannSize.tableRow - ZodiannSize.hairline,
+              ),
+              child: DefaultTextStyle(
+                style: textStyle,
+                child: Row(
+                  children: [
+                    for (var i = 0; i < cols.length; i++)
+                      SizedBox(
+                        width: widths[i],
+                        child: _Slot(
+                          padding: pad,
+                          alignment: cols[i].alignment,
+                          child: cells[i],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
-          ),
+            if (widget.selected)
+              PositionedDirectional(
+                start: 0,
+                top: 0,
+                bottom: 0,
+                width: ZodiannSize.tableSelectedBar,
+                child: ColoredBox(color: s.accent),
+              ),
+          ],
         );
+        if (widget.onTap != null) {
+          body = MouseRegion(
+            onEnter: (_) => setState(() => _hover = true),
+            onExit: (_) => setState(() => _hover = false),
+            child: body,
+          );
+        }
+        return last
+            ? body
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  body,
+                  _Rule(color: s.lineSoft),
+                ],
+              );
       },
     );
   }
+}
+
+/// A 1 px `line-soft` rule across the full width (a divider or the header's
+/// bottom edge).
+class _Rule extends StatelessWidget {
+  const _Rule({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+    color: color,
+    child: const SizedBox(width: double.infinity, height: ZodiannSize.hairline),
+  );
 }
 
 double _inlinePadding(ZodiannTableDensity density) =>

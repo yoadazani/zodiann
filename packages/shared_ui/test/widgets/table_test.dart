@@ -1,6 +1,7 @@
 // ZOD-UI-010: ZodiannTable, ZodiannTableHeader and ZodiannTableRow. Task 2:
 // declared columns (flex or fixed), alignment, density padding, overflow
 // contract and the table scope. Later tasks add states and interaction.
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
@@ -434,6 +435,233 @@ void main() {
       final rows = find.byType(ZodiannTableRow);
       expect(tester.getSize(rows.at(0)).height, ZodiannSize.tableRow);
       expect(tester.getSize(rows.at(1)).height, ZodiannSize.tableRow - 1);
+    });
+  });
+
+  group('states', () {
+    final s = ZodiannTheme.graphite.extension<ZodiannSurfaces>()!;
+
+    Finder fill(Color c, int row) => find.descendant(
+      of: find.byType(ZodiannTableRow).at(row),
+      matching: find.byWidgetPredicate((w) => w is ColoredBox && w.color == c),
+    );
+
+    Widget table({bool selectedSecond = false, bool tappable = true}) =>
+        ZodiannTable(
+          columns: _two,
+          rows: [
+            ZodiannTableRow(
+              onTap: tappable ? () {} : null,
+              cells: [
+                Text('Sun', key: _k(0, 0)),
+                Text('17', key: _k(0, 1)),
+              ],
+            ),
+            ZodiannTableRow(
+              selected: selectedSecond,
+              onTap: tappable ? () {} : null,
+              cells: [
+                Text('Moon', key: _k(1, 0)),
+                Text('18', key: _k(1, 1)),
+              ],
+            ),
+            ZodiannTableRow(
+              onTap: tappable ? () {} : null,
+              cells: [
+                Text('Venus', key: _k(2, 0)),
+                Text('22', key: _k(2, 1)),
+              ],
+            ),
+          ],
+        );
+
+    Future<TestGesture> mouse(WidgetTester t) async {
+      final g = await t.createGesture(kind: PointerDeviceKind.mouse);
+      await g.addPointer(location: const Offset(-50, -50));
+      addTearDown(g.removePointer);
+      return g;
+    }
+
+    testWidgets('the header is the label style over text-3 with a rule', (
+      tester,
+    ) async {
+      await _pump(tester, table());
+      final style = tester.widget<Text>(find.text('a')).style!;
+      final styles = ZodiannTheme.graphite.extension<ZodiannTextStyles>()!;
+      expect(style.fontSize, styles.label.fontSize);
+      expect(style.fontWeight, styles.label.fontWeight);
+      expect(style.color, s.text3);
+      final header = find.byType(ZodiannTableHeader);
+      final rule = find.descendant(
+        of: header,
+        matching: find.byWidgetPredicate(
+          (w) => w is ColoredBox && w.color == s.lineSoft,
+        ),
+      );
+      expect(rule, findsOneWidget);
+      final h = tester.getRect(header);
+      final r = tester.getRect(rule);
+      expect(r.height, ZodiannSize.hairline);
+      expect(r.bottom, h.bottom);
+      expect(r.width, h.width);
+      // 10 + the label's line + 10 above the rule.
+      final label = tester.getSize(find.text('a')).height;
+      expect(
+        h.height,
+        closeTo(2 * ZodiannSize.tableHeaderPadding + label + 1, 0.01),
+      );
+    });
+
+    testWidgets('a header label keeps its case', (tester) async {
+      await _pump(
+        tester,
+        const ZodiannTableHeader(
+          columns: [ZodiannTableColumn(label: 'Local date and time')],
+        ),
+      );
+      expect(find.text('Local date and time'), findsOneWidget);
+    });
+
+    testWidgets('a row is 44 high including its divider; the last has none', (
+      tester,
+    ) async {
+      await _pump(tester, table());
+      for (var i = 0; i < 2; i++) {
+        final row = tester.getRect(find.byType(ZodiannTableRow).at(i));
+        expect(row.height, ZodiannSize.tableRow);
+        final rule = tester.getRect(fill(s.lineSoft, i));
+        expect(rule.height, ZodiannSize.hairline);
+        expect(rule.bottom, row.bottom);
+        expect(rule.width, row.width);
+      }
+      expect(fill(s.lineSoft, 2), findsNothing);
+    });
+
+    testWidgets('hover fills surface-2 on a row with onTap only', (
+      tester,
+    ) async {
+      await _pump(tester, table());
+      final g = await mouse(tester);
+      await g.moveTo(tester.getCenter(find.byType(ZodiannTableRow).at(0)));
+      await tester.pump();
+      final row = tester.getRect(find.byType(ZodiannTableRow).at(0));
+      expect(fill(s.surface2, 0), findsOneWidget);
+      final f = tester.getRect(fill(s.surface2, 0));
+      expect(f.left, row.left);
+      expect(f.width, row.width);
+      expect(f.height, row.height - ZodiannSize.hairline);
+      expect(fill(s.surface2, 1), findsNothing);
+      await g.moveTo(const Offset(-50, -50));
+      await tester.pump();
+      expect(fill(s.surface2, 0), findsNothing);
+    });
+
+    testWidgets('a row without onTap does not react to hover', (tester) async {
+      await _pump(tester, table(tappable: false));
+      final g = await mouse(tester);
+      await g.moveTo(tester.getCenter(find.byType(ZodiannTableRow).at(0)));
+      await tester.pump();
+      expect(fill(s.surface2, 0), findsNothing);
+    });
+
+    testWidgets('selected fills accent-soft and wins over hover', (
+      tester,
+    ) async {
+      await _pump(tester, table(selectedSecond: true));
+      expect(fill(s.accentSoft, 1), findsOneWidget);
+      final g = await mouse(tester);
+      await g.moveTo(tester.getCenter(find.byType(ZodiannTableRow).at(1)));
+      await tester.pump();
+      expect(fill(s.accentSoft, 1), findsOneWidget);
+      expect(fill(s.surface2, 1), findsNothing);
+      expect(fill(s.accentSoft, 0), findsNothing);
+    });
+
+    for (final dir in TextDirection.values) {
+      testWidgets('the selected bar is 3 wide on the start edge ($dir)', (
+        tester,
+      ) async {
+        await _pump(tester, direction: dir, table(selectedSecond: true));
+        final row = tester.getRect(find.byType(ZodiannTableRow).at(1));
+        expect(fill(s.accent, 0), findsNothing);
+        final bar = tester.getRect(fill(s.accent, 1));
+        expect(bar.width, ZodiannSize.tableSelectedBar);
+        expect(bar.top, row.top);
+        // The bar covers the fill, not the divider row below it.
+        expect(bar.height, row.height - ZodiannSize.hairline);
+        if (dir == TextDirection.ltr) {
+          expect(bar.left, row.left);
+        } else {
+          expect(bar.right, row.right);
+        }
+      });
+    }
+
+    testWidgets('a row stays 44 at 1.5x text and grows at 3x', (tester) async {
+      await _pump(tester, textScale: 1.5, table(selectedSecond: true));
+      expect(
+        tester.getSize(find.byType(ZodiannTableRow).at(1)).height,
+        ZodiannSize.tableRow,
+      );
+      await _pump(tester, textScale: 3, table(selectedSecond: true));
+      final row = tester.getRect(find.byType(ZodiannTableRow).at(1));
+      expect(row.height, greaterThan(ZodiannSize.tableRow));
+      expect(
+        tester.getRect(fill(s.accentSoft, 1)).height,
+        row.height - ZodiannSize.hairline,
+      );
+      expect(
+        tester.getRect(fill(s.accent, 1)).height,
+        row.height - ZodiannSize.hairline,
+      );
+      expect(tester.getRect(fill(s.lineSoft, 1)).height, ZodiannSize.hairline);
+    });
+
+    testWidgets('an RTL row mirrors the order of the cells', (tester) async {
+      await _pump(tester, table());
+      expect(_left(tester, 0, 0) < _left(tester, 0, 1), isTrue);
+      await _pump(tester, direction: TextDirection.rtl, table());
+      expect(_left(tester, 0, 0) > _left(tester, 0, 1), isTrue);
+    });
+
+    testWidgets('Hebrew, 1.5x text and a selected row together', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        direction: TextDirection.rtl,
+        textScale: 1.5,
+        theme: withZodiannScript(ZodiannTheme.graphite, ZodiannScript.hebrew),
+        ZodiannTable(
+          columns: _two,
+          rows: [
+            ZodiannTableRow(
+              selected: true,
+              onTap: () {},
+              cells: const [
+                Text('שמש', key: Key('he0')),
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text('17°03′', key: Key('he1')),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final row = tester.getRect(find.byType(ZodiannTableRow));
+      expect(tester.getRect(fill(s.accent, 0)).right, row.right);
+      // Column a is the right-hand one; b is end-aligned to the left edge.
+      expect(
+        tester.getTopLeft(find.byKey(const Key('he1'))).dx -
+            tester.getTopLeft(find.byKey(_tableKey)).dx,
+        closeTo(200 + 16, 0.01),
+      );
+      expect(
+        tester.getTopRight(find.byKey(const Key('he0'))).dx,
+        lessThanOrEqualTo(row.right - 16 + 0.01),
+      );
     });
   });
 }
