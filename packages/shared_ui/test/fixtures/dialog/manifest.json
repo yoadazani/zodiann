@@ -1,0 +1,17 @@
+{
+  "note": "Generated visual references, not designer-provided assets; kit.css and MASTER.md remain authoritative.",
+  "chrome": "158.0.8127.36",
+  "device": {
+    "viewportWidth": 1440,
+    "viewportHeight": 900,
+    "dpr": 1
+  },
+  "sha256": {
+    "design-reference/zodiann/_source/settings.html": "8bcf00d28c8d89d0fbe329a7d72d0e71c5dea4757c2a52ff300bf326083cf2fd",
+    "design-reference/zodiann/_source/kit.css": "b22b18324758f80b7d2e1c69fc227af0b41919d163f3222389dd57ba099127a7",
+    "design-reference/zodiann/_source/kit.js": "e5acb102b95bea643f1610f86e4493c027a2ac1fb1dab6cbd5de4cdeb6f87c15",
+    "design-reference/zodiann/assets/fonts/fonts.css": "04fb8cfbb9ee3dce5bb470a96e831e095f6f6f07ea6908bab127f9f471ada75a",
+    "design-reference/zodiann/assets/zodiann-logo-on-dark.svg": "cb1809a1a8af1269e93b278968e7eb5e9d35a68ab7b8507538b0ab9a04942eaf",
+    "design-reference/zodiann/assets/zodiann-logo-on-light.svg": "06937389667f8de3200af04571a20d4020c58a6a5d7d1ce63fda7136b5ac656b"
+  }
+}

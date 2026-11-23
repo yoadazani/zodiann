@@ -67,6 +67,22 @@ Widget _delete({List<Widget>? actions, String? message = _message}) =>
       actions: actions ?? _buttons(),
     );
 
+/// The dialog's two decoration layers: the ring (outer, underneath) and the
+/// surface with the floating shadow (inner).
+({BoxDecoration ring, BoxDecoration shadow}) _layers(WidgetTester t) {
+  final boxes = t
+      .widgetList<DecoratedBox>(
+        find.descendant(
+          of: find.byType(ZodiannDialog),
+          matching: find.byType(DecoratedBox),
+        ),
+      )
+      .map((b) => b.decoration)
+      .whereType<BoxDecoration>()
+      .toList();
+  return (ring: boxes[0], shadow: boxes[1]);
+}
+
 Rect _rect(WidgetTester t, Finder f) => t.getRect(f);
 
 void main() {
@@ -80,18 +96,7 @@ void main() {
       final title = _rect(tester, find.text(_title));
       expect(title.left - box.left, ZodiannSpace.s6);
       expect(title.top - box.top, ZodiannSpace.s6);
-      final deco =
-          tester
-                  .widget<DecoratedBox>(
-                    find
-                        .descendant(
-                          of: find.byType(ZodiannDialog),
-                          matching: find.byType(DecoratedBox),
-                        )
-                        .first,
-                  )
-                  .decoration
-              as BoxDecoration;
+      final deco = _layers(tester).shadow;
       expect(deco.borderRadius, ZodiannRadius.dialog);
       expect(
         deco.color,
@@ -262,34 +267,17 @@ void main() {
           '(${entry.key})', (tester) async {
         final elevation = entry.value.extension<ZodiannElevation>()!;
         await _pump(tester, _delete(), theme: entry.value);
-        final deco =
-            tester
-                    .widget<DecoratedBox>(
-                      find
-                          .descendant(
-                            of: find.byType(ZodiannDialog),
-                            matching: find.byType(DecoratedBox),
-                          )
-                          .first,
-                    )
-                    .decoration
-                as BoxDecoration;
-        final shadows = deco.boxShadow!;
-        for (final floating in elevation.floating) {
-          expect(shadows, contains(floating));
-        }
-        final ring = shadows.where(
-          (s) =>
-              s.color == elevation.floatingOutline.color &&
-              s.spreadRadius == elevation.floatingOutline.width &&
-              s.blurRadius == 0,
-        );
+        final layers = _layers(tester);
+        final shadows = layers.shadow.boxShadow!;
+        expect(shadows, equals(elevation.floating));
+        // The ring is its own layer underneath: the floating shadow paints
+        // over it, as the kit's box-shadow does (measured in Task 1).
+        final ring = layers.ring.boxShadow!;
         expect(ring, hasLength(1), reason: 'the 1 px outline ring');
-        expect(
-          deco.border,
-          isNull,
-          reason: 'the ring is outside, not a border',
-        );
+        expect(ring.single.color, elevation.floatingOutline.color);
+        expect(ring.single.spreadRadius, elevation.floatingOutline.width);
+        expect(ring.single.blurRadius, 0);
+        expect(layers.shadow.border, isNull, reason: 'the ring is outside');
       });
     }
   });

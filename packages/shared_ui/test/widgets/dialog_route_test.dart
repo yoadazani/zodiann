@@ -211,6 +211,21 @@ void main() {
       expect(p.deleteCalls, 1);
     });
 
+    testWidgets('text in the dialog has no debug underline', (tester) async {
+      final p = _Probe();
+      addTearDown(p.dispose);
+      await _pumpApp(tester, p);
+      await _openByTap(tester);
+      for (final label in [_title, 'This cannot be undone.', 'Cancel']) {
+        final style = DefaultTextStyle.of(tester.element(find.text(label)));
+        expect(
+          style.style.decoration ?? TextDecoration.none,
+          TextDecoration.none,
+          reason: label,
+        );
+      }
+    });
+
     testWidgets('appears and disappears without animation', (tester) async {
       final p = _Probe();
       addTearDown(p.dispose);

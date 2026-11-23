@@ -74,54 +74,67 @@ class ZodiannDialog extends StatelessWidget {
         // it is given, up to 420.
         child: SizedBox(
           width: double.infinity,
+          // Two layers, so the paint order does not depend on how a shadow
+          // list is ordered: the outline ring outside the box underneath (a
+          // BorderSide would sit inside), then the box with the floating
+          // shadow over the ring. The kit's `box-shadow: <float>, 0 0 0 1px
+          // var(--line)` paints the first shadow on top, so the ring darkens
+          // under the shadow (measured in ZOD-UI-013: 242429 above the box,
+          // 161619 below it).
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: s.surface,
               borderRadius: ZodiannRadius.dialog,
-              // The floating shadow and the outline ring outside the box
-              // (a BorderSide would sit inside).
               boxShadow: [
-                ...elevation.floating,
                 BoxShadow(color: outline.color, spreadRadius: outline.width),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                ZodiannSpace.s6,
-                ZodiannSpace.s6,
-                ZodiannSpace.s6,
-                ZodiannSpace.s6 - _tapMargin,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: s.surface,
+                borderRadius: ZodiannRadius.dialog,
+                boxShadow: elevation.floating,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      title,
-                      style: styles.dialogTitle.copyWith(color: s.text),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  ZodiannSpace.s6,
+                  ZodiannSpace.s6,
+                  ZodiannSpace.s6,
+                  ZodiannSpace.s6 - _tapMargin,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        title,
+                        style: styles.dialogTitle.copyWith(color: s.text),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: afterTitle),
-                  if (message != null)
-                    Text(message!, style: styles.body.copyWith(color: s.text2)),
-                  if (content != null) ...[
+                    SizedBox(height: afterTitle),
                     if (message != null)
-                      const SizedBox(height: ZodiannSpace.s4),
-                    content!,
-                    const SizedBox(height: ZodiannSpace.s6 - _tapMargin),
-                  ] else if (message != null)
-                    const SizedBox(height: ZodiannSpace.s6 - _tapMargin),
-                  Wrap(
-                    alignment: WrapAlignment.end,
-                    runAlignment: WrapAlignment.end,
-                    spacing: ZodiannSpace.s2,
-                    runSpacing: ZodiannSpace.s2,
-                    textDirection: Directionality.of(context),
-                    children: actions,
-                  ),
-                ],
+                      Text(
+                        message!,
+                        style: styles.body.copyWith(color: s.text2),
+                      ),
+                    if (content != null) ...[
+                      if (message != null)
+                        const SizedBox(height: ZodiannSpace.s4),
+                      content!,
+                      const SizedBox(height: ZodiannSpace.s6 - _tapMargin),
+                    ] else if (message != null)
+                      const SizedBox(height: ZodiannSpace.s6 - _tapMargin),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      runAlignment: WrapAlignment.end,
+                      spacing: ZodiannSpace.s2,
+                      runSpacing: ZodiannSpace.s2,
+                      textDirection: Directionality.of(context),
+                      children: actions,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

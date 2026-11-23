@@ -81,20 +81,27 @@ class _DialogLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    return Padding(
-      // The keyboard: the visible area shrinks and the box re-centres in it.
-      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          hitTestBehavior: HitTestBehavior.translucent,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Center(
-              child: Padding(
-                // 16 from every edge (kit.css max-width calc(100vw - 32px)),
-                // plus whatever a notch or a system bar already takes.
-                padding: EdgeInsets.all(ZodiannSpace.s4) + media.viewPadding,
-                child: builder(context),
+    // A route sits in the overlay, above the page and outside any Material:
+    // without one, text falls back to Flutter's debug style with a yellow
+    // double underline. A transparent Material gives it the theme's default
+    // text style (and ink for any control inside).
+    return Material(
+      type: MaterialType.transparency,
+      child: Padding(
+        // The keyboard: the visible area shrinks and the box re-centres in it.
+        padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            hitTestBehavior: HitTestBehavior.translucent,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Padding(
+                  // 16 from every edge (kit.css max-width calc(100vw - 32px)),
+                  // plus whatever a notch or a system bar already takes.
+                  padding: EdgeInsets.all(ZodiannSpace.s4) + media.viewPadding,
+                  child: builder(context),
+                ),
               ),
             ),
           ),
