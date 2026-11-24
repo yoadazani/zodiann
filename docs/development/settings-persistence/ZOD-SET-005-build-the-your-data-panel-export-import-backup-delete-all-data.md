@@ -42,6 +42,7 @@ Build the backup export/import rows and the destructive delete-all-data action w
 
 ## Notes
 
+- **From ZOD-UI-013 (2026-11-23):** open it with `showZodiannDialog<T>(context, builder: ...)` returning a `ZodiannDialog(title:, message:, actions:)`; the caller localizes every string and builds the `ZodiannButton`s. Escape, a scrim tap and the back button complete the future with `null` and run no callback, so treat only an explicit value (the confirm button pops `true`) as consent. Put `autofocus: true` on Cancel for a destructive confirmation. There is **no re-entry guard**: disable the trigger while the future is pending, or a second tap stacks a second dialog.
 - **Button touch target (ZOD-UI-004, D3 / U2):** `ZodiannButton` takes max(drawn, 44) layout height and max(drawn width, 44) width. A container sized by its content grows by 6 (small) / 2 (regular) px per side compared with the mockup unless its padding absorbs the margin (e.g. the crossings panel head 56 → 68). Very short labels (small "OK", "1") get transparent side margins.
 
 ---

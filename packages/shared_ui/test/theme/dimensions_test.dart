@@ -248,4 +248,23 @@ void main() {
     expect(ZodiannSize.tableSelectedBar, 3);
     expect(css, contains('inset 3px 0 0 var(--accent)'), reason: 'bar width');
   });
+
+  // ZOD-UI-013: the dialog's width, padding and gaps (kit.css `.dialog`).
+  test("the dialog's width, padding and gaps are the kit's", () {
+    final css = _kitCss();
+    final kit = _kitPx(css);
+    final dialog = _rule(css, '.dialog');
+    expect(_px(dialog, 'width'), ZodiannSize.dialogWidth, reason: '.dialog');
+    expect(ZodiannSize.dialogWidth, 420);
+    expect(dialog, contains('padding: var(--s6)'));
+    expect(kit['s6'], ZodiannSpace.s6);
+    expect(dialog, contains('border-radius: var(--r-xl)'));
+    expect(kit['r-xl'], ZodiannRadius.xl);
+    expect(_rule(css, '.dialog h3'), contains('margin-bottom: var(--s2)'));
+    final actions = _rule(css, '.dialog .actions');
+    expect(actions, contains('gap: var(--s2)'));
+    expect(actions, contains('margin-top: var(--s6)'));
+    expect(actions, contains('justify-content: flex-end'));
+    expect(kit['s2'], ZodiannSpace.s2);
+  });
 }

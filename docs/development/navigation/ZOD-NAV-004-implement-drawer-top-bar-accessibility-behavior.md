@@ -42,7 +42,7 @@ No direct design reference applies — this is a behavioral/accessibility task l
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-UI-013 (2026-11-23):** the dialog pattern to follow is `showZodiannDialog` (`packages/shared_ui/lib/src/widgets/zodiann_dialog_route.dart`): a modal route on the root navigator whose scope traps Tab (`TraversalEdgeBehavior.closedLoop`), restores the focus that held it when it opened (a keyboard-opened trigger gets it back; `ZodiannButton` and `ZodiannPressable` never take focus on a pointer tap, so a tapped hamburger holds none), names itself through a `namesRoute` node and adds no semantics node for the scrim (`semanticsDismissible => false`). The drawer route (`_ZodiannDrawerRoute`) is its own route class; align its focus and semantics with these tests rather than copying code.
 
 ---
 
