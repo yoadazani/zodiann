@@ -22,6 +22,7 @@ export 'src/theme/zodiann_surfaces.dart';
 export 'src/theme/zodiann_text_styles.dart';
 export 'src/theme/zodiann_theme.dart';
 export 'src/theme/zodiann_tokens.dart';
+export 'src/widgets/zodiann_body_chip.dart';
 export 'src/widgets/zodiann_button_colors.dart';
 export 'src/widgets/zodiann_button.dart' hide ZodiannFocusRingPainter;
 export 'src/widgets/zodiann_dialog.dart';
