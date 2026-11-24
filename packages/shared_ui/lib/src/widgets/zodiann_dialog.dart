@@ -9,7 +9,10 @@ import '../theme/zodiann_text_styles.dart';
 /// of invisible margin that the kit's `.actions` (a flex row of 40 high
 /// buttons) does not have. The dialog takes it out of the gap above the
 /// actions and out of the bottom padding, so the drawn buttons sit exactly
-/// where the reference has them (ZOD-UI-004's note on tap targets).
+/// where the reference has them (ZOD-UI-004's note on tap targets). **This
+/// assumes regular (40 high) buttons**: a small button (32 drawn in a 44 box)
+/// or any other action sits 4 px or more off, and wrapped rows are drawn
+/// 8 + 2 x 2 apart. The kit's `.actions` never wraps.
 const double _tapMargin =
     (ZodiannSize.minTouchTarget - ZodiannSize.control) / 2;
 

@@ -37,7 +37,7 @@ Implement the delete action on a saved square, gated by the shared confirmation 
 
 ## Notes
 
-_No additional notes._
+- **From ZOD-UI-013 (2026-11-23):** open it with `showZodiannDialog<T>(context, builder: ...)` returning a `ZodiannDialog(title:, message:, actions:)`; the caller localizes every string and builds the `ZodiannButton`s. Escape, a scrim tap and the back button complete the future with `null` and run no callback, so treat only an explicit value (the confirm button pops `true`) as consent. Put `autofocus: true` on Cancel for a destructive confirmation. There is **no re-entry guard**: disable the trigger while the future is pending, or a second tap stacks a second dialog.
 
 ---
 
