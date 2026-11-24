@@ -54,6 +54,8 @@ Build the `TextTheme`/text-style set for every role in the type scale, with the 
 - IBM Plex Sans Hebrew lacks ′ (U+2032) and ″ (U+2033), used in positions such as `17°03′` (MASTER §7.3). In Hebrew mode add `fontFamilyFallback: [ZodiannFonts.plexSans]`, as the mockup's stack does (`_source/kit.css:108`).
 - Neither Plex family has a `tnum` feature, but digits 0–9 are already equal width (600 units) in all eight files, so figures are tabular by default; keep `FontFeature.tabularFigures()` per the spec, and the jitter test still proves it.
 
+- **iOS split (2026-11-24, owner decision):** the iOS run of `glyph_presentation_test.dart` moved to [ZOD-IOS-005](../ios/tasks/ZOD-IOS-005-run-the-glyph-presentation-test-on-ios.md). Criterion 3 stays ticked on its host and Android evidence ("any tested platform/font configuration").
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

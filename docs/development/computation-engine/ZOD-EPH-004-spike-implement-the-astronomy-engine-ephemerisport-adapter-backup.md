@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Completed (Android and host; iOS not verified, see Notes)
+- **Status:** Completed (Android and host; the iOS verification is [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md))
 - **Scope:** MVP
 
 ## Description
@@ -46,6 +46,8 @@ No direct design reference applies — pure computation / native binding.
 - **Implementation Details bullet 3 ("Wire as the automatic fallback…") is deferred to ZOD-EPH-002 by the owner's decision of 2026-11-21 (D5):** the Swiss adapter does not exist yet, so there is nothing to fall back from; this task delivers the DI-swappable adapter (criterion 2, proved by a host test) and no production fallback wiring. No criterion is edited for this.
 - **Scope: Android and host. iOS is not verified** (no macOS access, no spending: owner constraint of 2026-11-20); the iOS checklist is in the findings.
 - **Findings:** [`docs/spikes/ZOD-EPH-004-astronomy-engine-adapter.md`](../../spikes/ZOD-EPH-004-astronomy-engine-adapter.md) (including the proposed, unapplied `EphemerisPort` wording for an analytically derived speed). Plan: [`docs/plans/ZOD-EPH-004-astronomy-engine-adapter.md`](../../plans/ZOD-EPH-004-astronomy-engine-adapter.md).
+
+- **iOS split (2026-11-24, owner decision):** the iOS checklist (findings section 9) moved to [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md), which also holds ZOD-FND-003's iOS half. The Android and host scope here is unchanged.
 
 ---
 

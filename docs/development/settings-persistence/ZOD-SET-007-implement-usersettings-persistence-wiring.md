@@ -46,6 +46,8 @@ No direct design reference applies — this is the persistence wiring behind the
 - **2026-11-23 (ZOD-L10-002):** the language is already saved from the first launch, as `SettingsKey<String>('language')` with the value `he` or `en` (`apps/astro_mobile/lib/src/localization/language.dart`), through `SharedPreferencesAsync` (on Android a DataStore file). `UserSettings` must **include or migrate that key** so it does not become a second source of truth (L-3 says the choice is saved in the user settings), and must use the same async preferences backend: mixing in the legacy `SharedPreferences` API would hide the saved value.
 - **From ZOD-L10-007 (2026-11-14):** `UserSettings` stores visible bodies as `Body` keys and orbs keyed by `AspectKind.name`, never display names (L-9). Entity-valued fields are typed as their key enum.
 
+- **iOS split (2026-11-24, owner decision):** the iOS side of the backup item above (`NSURLIsExcludedFromBackupKey`, iCloud) is [ZOD-IOS-003](../ios/tasks/ZOD-IOS-003-verify-local-storage-on-ios-and-exclude-it-from-icloud-backup.md). Android Auto Backup is already off (ZOD-L10-002), so this task is not held up by it on Android; the exclusion must be in place before an iOS production build wires the stores.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Settings & Persistence" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

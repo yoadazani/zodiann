@@ -41,7 +41,9 @@ No direct design reference applies — this is a data/content decision. The resu
 
 ## Notes
 
-- **From ZOD-FND-003 (2026-11-20): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. Whether this decision, which needs only the platform-independent size measurements already in the findings (section 4), may start before the iOS half is an owner decision; it is not taken.
+- **From ZOD-FND-003 (2026-11-20; superseded by the 2026-11-24 note at the end of these Notes): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. Whether this decision, which needs only the platform-independent size measurements already in the findings (section 4), may start before the iOS half is an owner decision; it is not taken.
+
+- **iOS split (2026-11-24, owner decision):** ZOD-FND-003 is Done for its Android and shared scope (its iOS half is [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md)), so this task's dependency is satisfied and it is no longer blocked. The earlier open question, whether this decision may start before the iOS half, is resolved: it needs only the platform-independent size measurements in the findings (section 4). The iOS size is added by [ZOD-IOS-009](../ios/tasks/ZOD-IOS-009-finalize-and-verify-the-ios-release-build-pipeline.md). Scope and acceptance criteria are unchanged.
 
 ---
 

@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Completed (Android and host; iOS not verified, see Notes)
+- **Status:** Completed (Android and host; iOS verification and the iOS backup item are [ZOD-IOS-003](../ios/tasks/ZOD-IOS-003-verify-local-storage-on-ios-and-exclude-it-from-icloud-backup.md))
 - **Scope:** MVP
 
 ## Description
@@ -48,6 +48,8 @@ No direct design reference applies to the storage layer itself; the failure-path
 - 2026-11-22: merged ([PR #51](https://github.com/yoadazani/zodiann/pull/51), merge commit `85e5f08`).
 - **Open owner item (found in the whole-branch review), kept open and required before any task wires the stores into production:** Android Auto Backup is on by default (the manifest has no `allowBackup`, `fullBackupContent` or `dataExtractionRules`), so wired storage would be uploaded to the user's Google backup and restored on another device, against DATA-5 and DATA-6; on iOS, Application Support is backed up to iCloud unless excluded (`NSURLIsExcludedFromBackupKey`). Not changed here: nothing ships it yet (`shared_storage` is only a dev dependency of the app) and it changes app configuration. Decide before ZOD-SET-007 or ZOD-DAT-002 wire the stores.
 - The 100-square limit (DATA-2) and the "Delete all data" flow are not enforced here: ZOD-DAT-002 and ZOD-DAT-010 own them (`SquareStore.deleteAll` and `SettingsStore.clear` are the primitives).
+
+- **iOS split (2026-11-24, owner decision):** the iOS verification run and the iOS side of the backup item above (`NSURLIsExcludedFromBackupKey`, iCloud) moved to [ZOD-IOS-003](../ios/tasks/ZOD-IOS-003-verify-local-storage-on-ios-and-exclude-it-from-icloud-backup.md). The Android Auto Backup side of that item stays an owner decision here, and ZOD-L10-002 already turned it off in the manifest.
 
 ---
 

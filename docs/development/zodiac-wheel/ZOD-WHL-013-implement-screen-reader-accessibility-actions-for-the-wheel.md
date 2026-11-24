@@ -24,7 +24,7 @@ No direct design reference applies — this is a non-visual accessibility behavi
 
 ## Acceptance Criteria
 
-- [ ] VoiceOver and TalkBack can both move the wheel by 1° and 10° via accessibility actions.
+- [ ] TalkBack can move the wheel by 1° and 10° via accessibility actions. *(Split 2026-11-24: the original read "VoiceOver and TalkBack can both move the wheel…"; the VoiceOver clause is criterion 4 of [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md).)*
 - [ ] The wheel's accessibility label announces the current under-pointer reading.
 
 ## Dependencies

@@ -51,6 +51,8 @@ _No additional notes._
 - **Limits recorded:** the component sheet has no radio list (MASTER §10 and the task file say it does), so the settings screens are the only visual source and the light theme is proved with the Hebrew light screen; Chrome sets the comma of a mixed Hebrew and Latin label with about 8 px of space each side, so label width is compared for Latin-only labels (the start edge, height and centre for all); see `test/fixtures/radio/README.md`.
 - **Not covered:** a device (touch, TalkBack and VoiceOver wording of a radio row); the real ephemeris wiring (ZOD-SET-006).
 
+- **iOS split (2026-11-24, owner decision):** the VoiceOver half of the "Not covered" device check moved to [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md); the touch and TalkBack half stays here as an Android device check.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

@@ -26,10 +26,21 @@ docs/development/
 ├── testing-qa/                            ← 17 tasks
 ├── performance-accessibility-reliability/ ← 17 tasks
 ├── release-preparation/                   ← 7 tasks
-└── optional-extensions/                   ← 12 tasks  (Scope: Optional Extension — all other folders are MVP)
+├── optional-extensions/                   ← 12 tasks  (Scope: Optional Extension — all other folders are MVP)
+└── ios/
+    └── tasks/                             ← 11 iOS-specific tasks (ZOD-IOS-001 … 011), one file each
 ```
 
-Each folder groups tasks by development area, matching §4 of the original single-file `TASKS.md` one-for-one. MVP tasks (194) and the Optional Extension tasks (12, all in `optional-extensions/`) are never mixed in the same folder.
+Each folder groups tasks by development area, matching §4 of the original single-file `TASKS.md` one-for-one. MVP tasks (194 shared and Android, plus 11 iOS in `ios/tasks/`) and the Optional Extension tasks (12, all in `optional-extensions/`) are never mixed in the same folder.
+
+### Organizing convention: iOS tasks are kept apart (permanent)
+
+All iOS-specific tasks live in `docs/development/ios/tasks/` and use IDs `ZOD-IOS-NNN`. Shared and Android tasks stay in the category folders above. The rules:
+
+- **One canonical file per task.** A task definition is never copied between folders.
+- **A cross-platform task is not moved whole.** Its shared and Android part stays in its category folder under its original ID. Its iOS part becomes a `ZOD-IOS-NNN` task that names the parent in its `Parent task` field. The parent marks each split criterion (the Android clause stays, the iOS clause points to the iOS task) and keeps the original wording quoted, so no criterion is lost.
+- **Android and shared work never waits on iOS.** A parent can be Done on its Android and shared verification; the iOS task is tracked on its own and needs macOS.
+- **Task IDs never change** when work is split or moved. `TASKS.md` §4 has an iOS table; `docs/PROGRESS.md` tracks iOS work in its own entries.
 
 ## What each folder contains
 
@@ -89,9 +100,13 @@ Store packaging, the native build pipeline, licensing/distribution decisions, th
 
 Everything explicitly out of MVP scope: editable orbs, true node, extra bodies, sidereal zodiac, houses, rotating rings, on-square planets, user-defined highlights, jump-to-cell, configurable spiral direction, ICS export, and the Phase 5 server/accounts/sync expansion.
 
+### `ios/tasks/`
+
+The iOS-specific work split from cross-platform tasks (Xcode and device verification, the iOS build pipeline, iCloud backup exclusion, deep-link configuration, the minimum iOS version, VoiceOver, the Apple App Store path). Eleven tasks, `ZOD-IOS-001` to `ZOD-IOS-011`. Each names its parent task, which keeps the shared and Android scope.
+
 ## How to find a task by ID
 
-Every task ID is namespaced by category (e.g. `ZOD-WHL-010` is always in `zodiac-wheel/`), and every filename starts with its exact ID:
+Every task ID is namespaced by category (e.g. `ZOD-WHL-010` is always in `zodiac-wheel/`; every `ZOD-IOS-NNN` is in `ios/tasks/`), and every filename starts with its exact ID:
 
 | Namespace | Folder | Area |
 |---|---|---|
@@ -113,6 +128,7 @@ Every task ID is namespaced by category (e.g. `ZOD-WHL-010` is always in `zodiac
 | `ZOD-NFR-###` | [`performance-accessibility-reliability/`](performance-accessibility-reliability/) | Cross-cutting performance/accessibility/reliability |
 | `ZOD-REL-###` | [`release-preparation/`](release-preparation/) | Release preparation |
 | `ZOD-EXT-###` | [`optional-extensions/`](optional-extensions/) | Optional future extensions |
+| `ZOD-IOS-###` | [`ios/tasks/`](ios/tasks/) | iOS-specific work split from cross-platform tasks (file is `ios/tasks/<ID>-<slug>.md`) |
 
 The fastest way to find a specific task:
 
@@ -134,7 +150,7 @@ Each task file's **Metadata** block has a `Status` field. When you start, pause,
 2. Update the matching row in `TASKS.md`'s task index table (§4) to the same status, so the master index stays accurate without anyone having to open every file to check progress.
 3. **The individual task file is always the source of truth for the task's details** (description, acceptance criteria, dependencies). `TASKS.md` only mirrors ID / title / priority / status for at-a-glance scanning and linking — if you need to change scope, acceptance criteria, or dependencies, edit the task file, not `TASKS.md`.
 
-All 206 tasks currently start at `Not Started` — none of this plan has been implemented yet.
+All 217 tasks (206 shared and Android, 11 iOS) started at `Not Started`; the current status of each is in `TASKS.md` §4 and `docs/PROGRESS.md`.
 
 ## Design reference — unchanged, still the source of truth
 

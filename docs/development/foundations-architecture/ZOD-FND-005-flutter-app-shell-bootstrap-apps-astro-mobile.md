@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Done (iOS build/runtime verification outstanding)
+- **Status:** Done (Android and shared scope; iOS build and runtime are [ZOD-IOS-002](../ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md))
 - **Scope:** MVP
 
 ## Description
@@ -26,12 +26,12 @@ No direct design reference applies to wiring; the resulting shell's visual chrom
 
 ## Acceptance Criteria
 
-- [ ] App boots to a blank themed screen on iOS and Android.
+- [x] App boots to a blank themed screen on Android. *(Split 2026-11-24: the original read "…on iOS and Android"; the iOS clause is criterion 1 of [ZOD-IOS-002](../ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md).)*
   - [x] Widget-level shell verification (`test/app_shell_test.dart`: blank screen, light/dark/live switch, English fallback, Hebrew RTL and Hebrew Material strings).
   - [x] Android debug APK builds (`flutter build apk --debug`).
   - [x] Android on-device run: installed and launched on emulator-5554 (AOSP Android 9, API 28, x86 with ARM translation), blank light screen and blank dark screen in night mode, no crash (2026-11-13).
   - [x] iOS project scaffolded (`com.zodiann.app`; checked statically only).
-  - [ ] **Outstanding:** iOS build + runtime (needs a Mac; ZOD-FND-004's task file includes no macOS runner or iOS build).
+  - [ ] **Moved to [ZOD-IOS-002](../ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md):** iOS build + runtime (needs a Mac; ZOD-FND-004's task file includes no macOS runner or iOS build).
 - [x] Swapping the injected `EphemerisPort` (e.g., to a fake) requires touching only the DI wiring, not feature code. Evidence: `one override binds the port`, `boots with a fake EphemerisPort bound by one override`, `main() mounts ZodiannApp under a ProviderScope wired to appOverrides`.
 - [x] The app has a single root `ProviderScope` (in `main()`) as the app-wide Riverpod container, with no nested scopes. ARCH-3's "screen state is kept in one provider per screen (Riverpod), and derived values (cells, highlights) are pure functions of the state" is verified by the screen tasks once screens exist: ZOD-WHL-001 (wheel) and ZOD-SQR-001 (square).
 
@@ -59,6 +59,8 @@ Product-owner decisions (2026-11-12, plan `docs/plans/ZOD-FND-005-flutter-app-sh
 **Provider boundary:** `ephemerisPortProvider` (`apps/astro_mobile/lib/src/di/`) is an app-level placeholder and not a provider contract for feature packages. The first task that consumes `EphemerisPort` from a feature package decides where the feature-accessible contract lives and how `appOverrides` binds it.
 
 **Flutter 3.50 note:** `package:flutter/material.dart` and `flutter_localizations`' `GlobalMaterialLocalizations` are deprecated; app code imports `package:material_ui/material_ui.dart`.
+
+**iOS split (2026-11-24, owner decision):** the iOS build and runtime verification, with the launch-screen and `CFBundleLocalizations` items that no task owned, moved to [ZOD-IOS-002](../ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md). Criterion 1 is now ticked for Android on the evidence listed above (widget tests, APK build, emulator run), which ends the conscious departure recorded in decision 5; the iOS clause is tracked there, not dropped.
 
 ---
 
