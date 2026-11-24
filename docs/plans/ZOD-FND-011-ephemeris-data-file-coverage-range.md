@@ -84,7 +84,7 @@ Selecting Moshier (ZOD-EPH-003) or the backup is only ever an explicit user choi
 - Create `packages/ephemeris_swiss/test/data_files_test.dart`; modify `packages/ephemeris_swiss/pubspec.yaml` (comment only).
 - Modify `packages/shared_ui/lib/l10n/app_en.arb`, `app_he.arb`; regenerate `packages/shared_ui/lib/l10n/zodiann_localizations*.dart`; create `packages/shared_ui/test/l10n/range_copy_test.dart`.
 - Create `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`.
-- Task 6 (after approval of this plan; Notes lines only, no criterion changed): the task files in the ownership table, plus `docs/development/TASKS.md` and `docs/PROGRESS.md`.
+- Task 6 (after approval of this plan; Notes lines only if Q6b is answered "apply", no criterion changed): the task files in the ownership table; unconditionally, `docs/development/TASKS.md` and `docs/PROGRESS.md`.
 
 ## Tasks
 
@@ -97,9 +97,9 @@ Selecting Moshier (ZOD-EPH-003) or the backup is only ever an explicit user choi
 - Produces: `abstract final class SupportedDateRange` with `static final DateTime start`, `static final DateTime end`, `static final UtcRange range`, `static SupportedRangeSide classify(DateTime utc)` (throws `ArgumentError` if `!utc.isUtc`, like `UtcRange.contains`), and `enum SupportedRangeSide { before, inside, after }`. Pure Dart; no localization.
 
 - [ ] **Step 1: Write the failing tests** in `supported_date_range_test.dart`: `start` equals `DateTime.utc(1900, 1, 1)` and `end` equals `DateTime.utc(2100, 12, 31, 23, 59, 59, 999, 999)`; `range == UtcRange(start, end)`; `classify(start)` is `inside` and `classify(start.subtract(Duration(microseconds: 1)))` is `before`; `classify(end)` is `inside` and `classify(end.add(Duration(microseconds: 1)))` is `after`; `classify(DateTime.utc(2100, 12, 31, 12))` is `inside` (a whole 2100-12-31); `classify(DateTime.utc(1899, 12, 31, 10))` is `before` (the UTC+14 local 1900-01-01 00:00 case); `classify(DateTime.utc(2101, 1, 1, 9))` is `after` (the UTC-10 local 2100-12-31 23:00 case); `classify(DateTime.utc(2000, 1, 1, 12))` is `inside`; `classify(DateTime(2000))` (local) throws `ArgumentError`; `range.contains(DateTime.utc(1900, 1, 1))` is true and `range.contains(DateTime.utc(1899, 12, 31, 12))` is false; and a fixture check reads `test/fixtures/reference_dates.json` (key `dates`) and asserts every instant from 1900-01-01T00:00Z onward is inside and the only instant outside is 1899-12-31T12:00Z.
-- [ ] **Step 2: Run to verify failure.** `cd packages/astro_core && dart test test/ephemeris/supported_date_range_test.dart`. Expected: FAIL, `SupportedDateRange` is not defined.
+- [ ] **Step 2: Run to verify failure.** `cd packages/astro_core && fvm dart test test/ephemeris/supported_date_range_test.dart`. Expected: FAIL, `SupportedDateRange` is not defined.
 - [ ] **Step 3: Implement** `SupportedDateRange` and `SupportedRangeSide` in `supported_date_range.dart`, with a library doc comment that states the two ranges are different things (physical coverage 1800 to 2400 belongs to the adapter; this is the product range, 1900 to 2100, judged on the UTC instant after local-to-UTC conversion, Decision D2) and names the consumers. `range` is built from `start` and `end`; `classify` checks `isUtc` once (same `ArgumentError` style as `UtcRange`) and then uses `range.contains`. Export it from `astro_core.dart`.
-- [ ] **Step 4: Run** the same command (as `fvm dart test ...`). Expected: PASS. Then `fvm dart test` in `packages/astro_core` and `fvm dart analyze --fatal-infos` there: all green, existing `ephemeris_port_contract_test.dart` unchanged.
+- [ ] **Step 4: Run** `cd packages/astro_core && fvm dart test test/ephemeris/supported_date_range_test.dart`. Expected: PASS. Then `fvm dart test` in `packages/astro_core` and `fvm dart analyze --fatal-infos` there: all green, existing `ephemeris_port_contract_test.dart` unchanged.
 - [ ] **Step 5: Commit** `git add packages/astro_core/lib/src/ephemeris/supported_date_range.dart packages/astro_core/lib/astro_core.dart packages/astro_core/test/ephemeris/supported_date_range_test.dart`; message `feat(ZOD-FND-011): add the central supported date range (1900 to 2100)`.
 
 ### Task 2: Pin the packaged data-file set (test first) and update the stale comment
@@ -110,7 +110,7 @@ Selecting Moshier (ZOD-EPH-003) or the backup is only ever an explicit user choi
 - Consumes: the directory `packages/ephemeris_swiss/assets/ephe/`. `ephemeris_swiss` has **no** `astro_core` dependency (verified in its pubspec); this task does not add one and does not touch the pubspec dependencies.
 - Produces: nothing for other tasks (a guard).
 
-- [ ] **Step 1: Write the guard test** `data_files_test.dart`: the files in `assets/ephe/` are exactly `semo_18.se1` and `sepl_18.se1` (no neighbouring block, no other file); sizes are 1,304,771 and 484,061 bytes (the measured raw sizes, F1); test-local literals `productStart = DateTime.utc(1900)` and `productEnd = DateTime.utc(2100, 12, 31, 23, 59, 59, 999, 999)` (comment: must equal `SupportedDateRange`; Task 1's test pins that constant) and `nominalStart = DateTime.utc(1800)`, `nominalEnd = DateTime.utc(2400)` (comment: nominal, from the upstream block names, informational until EPH-002 measures the edges on a device, F9) satisfy `nominalStart` before `productStart` by at least 36,500 days and `productEnd` before `nominalEnd` by at least 100,000 days. Use a path relative to the package, as `reference_fixture_test.dart` does for its fixture. (If the owner prefers a real link instead of literals, the alternative is `astro_core` as a **dev** dependency, which then must pass `dependency_closure_test`; the literals are recommended.)
+- [ ] **Step 1: Write the guard test** `data_files_test.dart`: the files in `assets/ephe/` are exactly `semo_18.se1` and `sepl_18.se1` (no neighbouring block, no other file); sizes are 1,304,771 and 484,061 bytes (the measured raw sizes, F1); test-local literals `productStart = DateTime.utc(1900)` and `productEnd = DateTime.utc(2100, 12, 31, 23, 59, 59, 999, 999)` (comment: must equal `SupportedDateRange`; Task 1's test pins that constant) and `nominalStart = DateTime.utc(1800)`, `nominalEnd = DateTime.utc(2400)` (comment: nominal, from the upstream block names, informational until EPH-002 measures the edges on a device, F9) satisfy `nominalStart` before `productStart` by at least 36,500 days and `productEnd` before `nominalEnd` by at least 100,000 days. Use a path relative to the package, as `packages/ephemeris_astronomy/test/reference_fixture_test.dart` does for its fixture. (If the owner prefers a real link instead of literals, the alternative is `astro_core` as a **dev** dependency, which then must pass `dependency_closure_test`; the literals are recommended.)
 - [ ] **Step 2: Run, expecting PASS** (a guard over existing state, so there is no red phase): `cd packages/ephemeris_swiss && fvm dart test test/data_files_test.dart`. Then three mutation checks, restoring after each with `git checkout -- packages/ephemeris_swiss/assets/ephe` and deleting any dummy file: (a) add a dummy `sepl_19.se1`, expect FAIL on the exact-file-set assertion; (b) rename `sepl_18.se1`, expect FAIL; (c) truncate only `semo_18.se1`, expect FAIL on the size assertion. Record the three results in the commit body.
 - [ ] **Step 3: Update the comment** in `packages/ephemeris_swiss/pubspec.yaml` to say FND-011 decided: keep the `_18` pair only (1800 to 2400), the product range is 1900 to 2100 (`SupportedDateRange`), no neighbouring blocks. Nothing else in the file changes; the regular dependency in `apps/astro_mobile/pubspec.yaml` stays.
 - [ ] **Step 4: Run** `fvm dart test` in `packages/ephemeris_swiss` and, from the root, `fvm dart test test/architecture/pure_dart_test.dart test/architecture/dependency_closure_test.dart test/architecture/swisseph_vendored_test.dart`. Expected: PASS.
@@ -136,7 +136,7 @@ Selecting Moshier (ZOD-EPH-003) or the backup is only ever an explicit user choi
 
 **Interfaces:** Produces the document EPH-002, NFR-017, CRS-004, WHL-0xx, SQR-002 and XLS-017 read.
 
-- [ ] **Step 1: Write the record** with these sections, in order: the decision (Option 2, date, owner); the two ranges and the exact bounds (D2); the data-file set and the size impact (F1) with the Android-only caveat; the boundary-behavior table above verbatim; the accuracy statement and the widening checklist; the consumer and enforcement map (F8, D5) with, per consumer, the task that owns it; the Excel cross-check (the 1900 limit is satisfied by the product range for every ephemeris date; the Square is not ephemeris-bound (F5); the export rule is XLS-017's; F7 recorded as an open item); a "Spec deviation" section (F10: spec line 368 versus the narrower product range; spec text unchanged); the proposed, **unapplied** `EphemerisPort`/`EphemerisFailure` wording for D3-A (exact doc-comment text for `coveredRange`, the `OutsideSupportedRange` subtype and the node exception); the message keys and their copy; and the open questions Q1 to Q5.
+- [ ] **Step 1: Write the record** with these sections, in order: the decision (Option 2, date, owner); the two ranges and the exact bounds (D2); the data-file set and the size impact (F1) with the Android-only caveat; the boundary-behavior table above verbatim; the accuracy statement and the widening checklist; the consumer and enforcement map (F8, D5) with, per consumer, the task that owns it; the Excel cross-check (the 1900 limit is satisfied by the product range for every ephemeris date; the Square is not ephemeris-bound (F5); the export rule is XLS-017's; F7 recorded as an open item); a "Spec deviation" section (F10: spec line 368 versus the narrower product range; spec text unchanged); the proposed, **unapplied** `EphemerisPort`/`EphemerisFailure` wording for D3-A (exact doc-comment text for `coveredRange`, the `OutsideSupportedRange` subtype and the node exception); the message keys and their copy; and the open questions Q1 to Q6.
 - [ ] **Step 2: Verify** every number in it against its source: F1 against spike section 4; F3 against `astronomy_ephemeris.dart:78-80`; F6 by reading `reference_dates.json`'s first and last instants again; every relative link in the record points at an existing file (list each target with `ls`).
 - [ ] **Step 3: Commit** `git add docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`; message `docs(ZOD-FND-011): record the coverage-range decision`.
 
@@ -169,7 +169,7 @@ No acceptance criterion, status, scope or dependency of any other task changes. 
 ## Acceptance criteria mapping (FND-011, unchanged)
 
 1. *A documented date range is chosen and recorded:* Tasks 1 and 4 (constant plus decision record).
-2. *The "outside range" message text exists and is ready for translation (feeds ZOD-L10):* Task 3 (en + he in the ARB files, key parity and generated output green; Hebrew pending owner review).
+2. *The "outside range" message text exists and is ready for translation (feeds ZOD-L10):* Task 3 (en + he in the ARB files, key parity and generated output green; Hebrew pending owner review); **gated on Q5**: if the owner declines, the copy is recorded in the decision record (Task 4) and criterion 2 is met by that; not ticked before approval.
 3. *The chosen range is cross-checked against the Excel pre-1900 limitation:* Task 4 (every supported date is at or after 1900-01-01; the limit concerns the square export only; F7 recorded).
 
 ## Unresolved questions for the owner
@@ -191,4 +191,21 @@ Sequential, native (`executing-plans`): each task consumes the previous one and 
 
 ## Plan review
 
-*(To be filled by the plan-reviewer cycle.)*
+Reviewer: `plan-reviewer`, two rounds (static review; no tests run). Round 2 was a focused review of the revision at `d5e70f6`.
+
+**Round 1: needs user decision.**
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| C1 | Critical | Task 2 imported `astro_core`, which `ephemeris_swiss` does not depend on | Applied: test-local literals, no dependency edge, stated in Global Constraints and Task 2 |
+| I1 | Important | Spec line 368 ("coverage of the data files that are packaged") conflicts with the narrower product range | Applied: Finding F10, "Spec deviation" section in Task 4, question Q6a |
+| I2 | Important | Task 6 applied ownership Notes to about 25 task files although the owner asked for "documented, not applied" | Applied as a conditional: Task 6 and Q6b, recommended default is the decision record only |
+| I3 | Important | New copy versus the kit.js-only copy rule | Applied: Task 3 gated, Q5, criterion 2 not ticked before approval |
+| I4 | Important | Vague fixture assertion in Task 1 | Applied: concrete assertions |
+| I5 | Important | Commands did not follow the `fvm` convention | Applied (one residual, see round 2) |
+| I6 | Important | Task 2 had no real RED step | Applied: PASS expected plus three mutation checks |
+| M1 to M5 | Minor | Link-check command, node-row note, `classify` detail, F5 reproducibility, architecture tests named | Applied |
+
+**Round 2: approve after corrections.** Critical none. Important: one bare `dart` command in Task 1 Step 2 (applied). Minor: "Q1 to Q5" now Q1 to Q6; criterion 2 mapping and the File structure Task 6 bullet made conditional; wrong precedent path for `reference_fixture_test.dart` (all applied). Task 2 margins verified (36,524 and 109,207 days against the 36,500 and 100,000 floors). No new owner decision.
+
+**Open items for the owner:** Q1 (contract A or B), Q2 (the last 364 days of 2100 and the backup's range), Q3 (Square anchors), Q4 (Excel floor), Q5 (new copy as an exception to kit.js-only, the SQ-10 citation), Q6 (spec row 368; whether to write hand-off Notes into other task files now).
