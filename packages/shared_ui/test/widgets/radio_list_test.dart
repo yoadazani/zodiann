@@ -648,6 +648,204 @@ void main() {
     });
   });
 
+  group('the drawn row', () {
+    Rect rect(WidgetTester tester, Finder f) => tester.getRect(f);
+
+    testWidgets(
+      'dot, label, badge and rows sit where settings.html puts them',
+      (tester) async {
+        final p = _probes();
+        await _pump(
+          tester,
+          _Scene(before: p.before, after: p.after, initial: 'files'),
+        );
+        await tester.pumpAndSettle();
+        final list = rect(tester, find.byType(ZodiannRadioList<String>));
+        expect(list.width, 360);
+        for (var i = 0; i < 3; i++) {
+          final dot = rect(tester, find.byKey(_dotKey(i)));
+          expect(dot.size, const Size.square(18), reason: 'dot $i');
+          expect(_dot(tester, i).shape, BoxShape.circle);
+          final label = rect(tester, find.text(_options[i].label));
+          expect(label.left - dot.right, 12, reason: 'gap $i');
+          final slot = rect(tester, _row(i));
+          expect(slot.height, greaterThanOrEqualTo(44), reason: 'row $i');
+          expect(slot.width, 360, reason: 'row $i full width');
+          expect(dot.center.dy, closeTo(slot.center.dy, 0.5), reason: 'dot $i');
+          if (i > 0) {
+            expect(
+              slot.top,
+              rect(tester, _row(i - 1)).bottom,
+              reason: 'no gap',
+            );
+          }
+          final badge = _options[i].badge;
+          if (badge != null) {
+            expect(rect(tester, find.text(badge)).right, list.right);
+          }
+        }
+        expect(_dotBorder(tester, 0), 5);
+        expect(_dotBorder(tester, 1), 1.5);
+        // An 8 px hole: 18 minus two 5 px rings.
+        expect(18 - 2 * _dotBorder(tester, 0), 8);
+      },
+    );
+
+    testWidgets('a tap on the seam between rows reaches the row it is in', (
+      tester,
+    ) async {
+      final p = _probes();
+      final calls = <String>[];
+      await _pump(
+        tester,
+        _Scene(
+          before: p.before,
+          after: p.after,
+          initial: 'files',
+          accept: false,
+          spy: calls.add,
+        ),
+      );
+      final seam = rect(tester, _row(1)).bottom;
+      await tester.tapAt(Offset(rect(tester, _row(1)).center.dx, seam - 1));
+      await tester.tapAt(Offset(rect(tester, _row(1)).center.dx, seam + 1));
+      expect(calls, ['moshier', 'engine']);
+    });
+
+    for (final entry in {
+      'Graphite': (ZodiannTheme.graphite, graphiteTokens),
+      'Porcelain': (ZodiannTheme.porcelain, porcelainTokens),
+    }.entries) {
+      testWidgets('${entry.key}: label text, badge text-3, dot per state', (
+        tester,
+      ) async {
+        final t = entry.value.$2.surfaces;
+        final p = _probes();
+        await _pump(
+          tester,
+          _Scene(before: p.before, after: p.after, initial: 'files'),
+          theme: entry.value.$1,
+        );
+        await tester.pumpAndSettle();
+        final label = tester.widget<Text>(find.text(_options[0].label));
+        expect(label.style!.color, t.text);
+        expect(label.style!.fontSize, 14);
+        final badge = tester.widget<Text>(find.text('Recommended')).style!;
+        expect(badge.color, t.text3);
+        expect(badge.fontSize, 12);
+        expect(badge.fontWeight, FontWeight.w400);
+        expect(((_dot(tester, 0).border! as Border).top).color, t.accent);
+        expect(((_dot(tester, 1).border! as Border).top).color, t.line);
+      });
+    }
+
+    testWidgets('Hebrew: dot at the right edge, badge at the left', (
+      tester,
+    ) async {
+      final p = _probes();
+      await _pump(
+        tester,
+        _Scene(before: p.before, after: p.after, initial: 'files'),
+        hebrew: true,
+      );
+      await tester.pumpAndSettle();
+      final list = rect(tester, find.byType(ZodiannRadioList<String>));
+      final dot = rect(tester, find.byKey(_dotKey(0)));
+      expect(dot.right, list.right);
+      final label = rect(tester, find.text(_options[0].label));
+      expect(dot.left - label.right, 12);
+      expect(rect(tester, find.text('Recommended')).left, list.left);
+      expect(rect(tester, find.text('Backup')).left, list.left);
+    });
+
+    testWidgets('a long label wraps, the row grows, nothing overflows', (
+      tester,
+    ) async {
+      final p = _probes();
+      await _pump(
+        tester,
+        _Scene(before: p.before, after: p.after, initial: 'files', width: 170),
+      );
+      expect(tester.takeException(), isNull);
+      expect(rect(tester, _row(1)).height, greaterThan(44));
+      final badge = rect(tester, find.text('Recommended'));
+      final label = rect(tester, find.text(_options[0].label));
+      expect(label.right, lessThanOrEqualTo(badge.left));
+    });
+
+    testWidgets('text scale 2: rows grow, nothing clips, the dot stays 18', (
+      tester,
+    ) async {
+      final p = _probes();
+      await _pump(
+        tester,
+        Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(2)),
+            child: _Scene(before: p.before, after: p.after, initial: 'files'),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(rect(tester, _row(0)).height, greaterThan(44));
+      expect(rect(tester, find.byKey(_dotKey(0))).size, const Size.square(18));
+    });
+
+    testWidgets('the ring crossfades over 120 ms, linearly', (tester) async {
+      final p = _probes();
+      await _pump(
+        tester,
+        _Scene(before: p.before, after: p.after, initial: 'files'),
+      );
+      await tester.pumpAndSettle();
+      final t = graphiteTokens.surfaces;
+      await tester.tap(_row(1));
+      await tester.pump(); // starts the animation
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(_dotBorder(tester, 1), closeTo(1.5 + (5 - 1.5) / 2, 0.15));
+      expect(_dotBorder(tester, 0), closeTo(5 - (5 - 1.5) / 2, 0.15));
+      final mid = (_dot(tester, 1).border! as Border).top.color;
+      expect(mid, Color.lerp(t.line, t.accent, 0.5));
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(_dotBorder(tester, 1), 5);
+      expect(_dotBorder(tester, 0), 1.5);
+    });
+
+    testWidgets('instant under reduced motion', (tester) async {
+      final p = _probes();
+      await _pump(
+        tester,
+        Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(disableAnimations: true),
+            child: _Scene(before: p.before, after: p.after, initial: 'files'),
+          ),
+        ),
+      );
+      await tester.tap(_row(1));
+      await tester.pump();
+      expect(_dotBorder(tester, 1), 5);
+      expect(_dotBorder(tester, 0), 1.5);
+    });
+
+    testWidgets('a live theme switch leaves no stale colours', (tester) async {
+      final p = _probes();
+      final scene = _Scene(before: p.before, after: p.after, initial: 'files');
+      await _pump(tester, scene, theme: ZodiannTheme.graphite);
+      await tester.pumpAndSettle();
+      await _pump(tester, scene, theme: ZodiannTheme.porcelain);
+      await tester.pumpAndSettle();
+      final t = porcelainTokens.surfaces;
+      expect(
+        tester.widget<Text>(find.text(_options[0].label)).style!.color,
+        t.text,
+      );
+      expect((_dot(tester, 0).border! as Border).top.color, t.accent);
+      expect((_dot(tester, 1).border! as Border).top.color, t.line);
+    });
+  });
+
   group('keyboard focus ring', () {
     testWidgets('shows for keyboard focus only', (tester) async {
       final p = _probes();
