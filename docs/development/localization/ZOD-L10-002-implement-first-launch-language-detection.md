@@ -48,6 +48,8 @@ No direct design reference applies.
 - **Verified on an emulator** with Android's per-app locale override (`cmd locale set-app-locales`; the emulator is not rootable, so this is not a true system-language change): Hebrew on cleared data gave a Hebrew title with the menu button on the right and the `language` key saved; switching the locale to English and relaunching without clearing data kept Hebrew; French on cleared data gave English. The release APK has no `INTERNET` permission, a merged manifest with `allowBackup=false`, and no `libsqlite3.so`.
 - **Not covered:** a physical device and iOS (no macOS access); a read timeout on the first storage read (a store that never answers would hold the native splash; recorded as a known limit); announcing a bootstrap storage failure (ZOD-NFR-014, note added); the in-app override (ZOD-L10-003).
 
+- **iOS split (2026-11-24, owner decision):** the iOS run (first-launch detection on iOS, a true system-language change) and the iOS `NSUserDefaults` backup limit moved to [ZOD-IOS-003](../ios/tasks/ZOD-IOS-003-verify-local-storage-on-ios-and-exclude-it-from-icloud-backup.md). The Android and host scope here is unchanged and Done.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Localization" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

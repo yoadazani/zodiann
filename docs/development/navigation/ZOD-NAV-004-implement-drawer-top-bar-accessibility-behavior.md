@@ -25,7 +25,7 @@ No direct design reference applies — this is a behavioral/accessibility task l
 
 ## Acceptance Criteria
 
-- [ ] VoiceOver/TalkBack announces the hamburger's expanded/collapsed state correctly.
+- [ ] TalkBack announces the hamburger's expanded/collapsed state correctly. *(Split 2026-11-24: the original read "VoiceOver/TalkBack announces…"; the VoiceOver clause is criterion 3 of [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md).)*
 - [ ] Focus lands on the active item when the drawer opens via keyboard or screen reader.
 - [ ] Focus returns to the hamburger exactly on close, every time, including via the Android back button.
 

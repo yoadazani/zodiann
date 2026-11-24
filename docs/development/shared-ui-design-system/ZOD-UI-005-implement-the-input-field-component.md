@@ -50,6 +50,8 @@ _No additional notes._
 - **Deviations from the approved plan, all ruled and recorded in `docs/PROGRESS.md`:** an optional `inputWidth` (the sheet narrows only the input box to 120 px, the label keeps the column); an internal sanitizer that removes unpaired UTF-16 surrogates (the engine throws on them); a non-const constructor; a disabled field ignores `errorText` instead of asserting; iOS uses Material's round selection handles because Cupertino's need `cupertino_ui` as a direct dependency (owner decision, open).
 - **Not covered:** the Body select (O3); parsing and validating values and their messages; Cupertino-native iOS handles; a device check of touch typing, the selection toolbar in English and Hebrew and the soft keyboard types (no device was authorized); screen-reader announcement of the error message.
 
+- **iOS split (2026-11-24, owner decision):** the open owner decision on Cupertino-native iOS selection handles and the iOS device checks (touch typing, selection toolbar in English and Hebrew, keyboard types) moved to [ZOD-IOS-006](../ios/tasks/ZOD-IOS-006-decide-and-implement-native-ios-selection-handles-and-verify-text-input.md). The Android and host scope here is unchanged.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

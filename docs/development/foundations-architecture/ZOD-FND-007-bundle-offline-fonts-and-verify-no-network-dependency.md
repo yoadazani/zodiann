@@ -47,6 +47,8 @@ Ship IBM Plex Sans, IBM Plex Sans Hebrew, and the Noto Sans Symbols families as 
 - **Criterion 1 evidence:** `apps/astro_mobile/integration_test/offline_fonts_test.dart` on emulator-5554 (AOSP Android 9, x86 with ARM translation): online run fails only "the device is offline"; with `cmd connectivity airplane-mode enable` all pass. Flutter 3.50 lists this image as unsupported for `flutter test -d`, so the test runs as a debug APK: `fvm flutter build apk --debug -t integration_test/offline_fonts_test.dart`, `adb install -r`, `adb shell am start -n com.zodiann.app/.MainActivity`, then `adb logcat -s flutter` (look for "All tests passed"). The release APK contains all 11 TTFs and 5 `OFL.txt`.
 - **iOS:** static checks only (no Mac). `integration_test` (dev) is the app's first plugin, so the outstanding iOS build (FND-005) will generate a Podfile / SwiftPM setup.
 
+- **iOS split (2026-11-24, owner decision):** the iOS offline-font run and the re-check of the generated iOS project (Podfile or SwiftPM) for network permissions moved to [ZOD-IOS-002](../ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md). Every criterion here stays ticked on its Android and static evidence; nothing was dropped.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Foundations & Architecture" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

@@ -15,7 +15,7 @@ End-to-end screen-reader walkthrough of the whole app: drawer open/close, cell n
 
 ## Implementation Details
 
-- Full manual pass with VoiceOver (iOS) and TalkBack (Android) covering every interactive element built in `navigation/` through `settings-persistence/`.
+- Full manual pass with VoiceOver (iOS) and TalkBack (Android) covering every interactive element built in `navigation/` through `settings-persistence/`. *(The VoiceOver pass is [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md); TalkBack stays here.)*
 - File any gap found as a bug against the specific owning task rather than fixing ad hoc in this task.
 
 ## Design Reference
@@ -24,8 +24,8 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] NFR-X2 passes: full navigation with a screen reader and external keyboard works across drawer, wheel, and square.
-- [ ] Every finding is filed against its owning component task with a specific repro.
+- [ ] NFR-X2 passes: full navigation with TalkBack and external keyboard works across drawer, wheel, and square. *(Split 2026-11-24: the original read "…with a screen reader and external keyboard…" and covered VoiceOver and TalkBack; the VoiceOver clause is criterion 1 of [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md).)*
+- [ ] Every finding is filed against its owning component task with a specific repro. *(TalkBack findings here; VoiceOver findings are criterion 2 of [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md).)*
 
 ## Dependencies
 
@@ -39,7 +39,7 @@ No direct design reference applies.
 
 ## Notes
 
-_No additional notes._
+- **iOS split (2026-11-24, owner decision):** the VoiceOver pass moved to [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md); this task is verifiable on Android alone and no longer waits on macOS.
 
 ---
 

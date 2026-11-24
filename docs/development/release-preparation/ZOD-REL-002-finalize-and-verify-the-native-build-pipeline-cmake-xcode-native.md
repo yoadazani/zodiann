@@ -24,8 +24,8 @@ No direct design reference applies.
 
 ## Acceptance Criteria
 
-- [ ] A clean CI machine can produce a release build for both platforms with no manual developer-machine-specific steps.
-- [ ] Final app size is documented and acceptable for store submission.
+- [ ] A clean CI machine can produce an Android release build with no manual developer-machine-specific steps. *(Split 2026-11-24: the original read "…a release build for both platforms…". The iOS clause is criterion 1 of [ZOD-IOS-009](../ios/tasks/ZOD-IOS-009-finalize-and-verify-the-ios-release-build-pipeline.md).)*
+- [ ] Final app size is documented and acceptable for store submission. *(Android here; the final iOS size is criterion 2 of [ZOD-IOS-009](../ios/tasks/ZOD-IOS-009-finalize-and-verify-the-ios-release-build-pipeline.md).)*
 
 ## Dependencies
 
@@ -39,7 +39,9 @@ No direct design reference applies.
 
 ## Notes
 
-- **From ZOD-FND-003 (2026-11-20): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. The findings record the Android build setup, the 16 KB alignment check and the provisional native-assets decision.
+- **From ZOD-FND-003 (2026-11-20; superseded by the 2026-11-24 note at the end of these Notes): blocked.** The owner split ZOD-FND-003: its Android half is verified (findings: [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md)) and its iOS half is pending (no macOS access; no spending allowed). The specification (R-7, ARCH-6) requires both platforms, so this task stays blocked until a real iOS computation is verified. Its status, scope and acceptance criteria are unchanged. The findings record the Android build setup, the 16 KB alignment check and the provisional native-assets decision.
+
+- **iOS split (2026-11-24, owner decision):** the iOS and Xcode build requirements moved to [ZOD-IOS-009](../ios/tasks/ZOD-IOS-009-finalize-and-verify-the-ios-release-build-pipeline.md). ZOD-FND-003 is Done for its Android and shared scope, so this task's Android and shared work is no longer blocked by the iOS half. The 16 KB alignment check, recorded as a manual check in the FND-003 review minors, is still this task's to script.
 
 ---
 

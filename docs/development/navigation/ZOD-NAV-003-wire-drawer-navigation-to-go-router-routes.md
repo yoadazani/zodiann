@@ -51,6 +51,8 @@ No direct design reference applies to the routing wiring itself; the resulting n
   - **Back:** back currently replaces rather than stacks (`go`; `canPop()` is false).
   - **Contract:** `AppRoute` is an app-level placeholder, not a public contract. Feature packages must never import the app layer.
 
+- **iOS split and scope transfer (2026-11-24, owner decision):** the iOS deep-link configuration ("the Android and iOS link configuration belongs here") and the unverified iOS `zodiann://` delivery moved to [ZOD-IOS-007](../ios/tasks/ZOD-IOS-007-configure-and-verify-ios-deep-links.md). **This task keeps its Done status**: no Android or shared criterion was found incomplete by this restructuring. Criteria 1 and 2 stay open exactly as recorded above (the relaunch clause in ZOD-DAT-007, the real playback proof in ZOD-WHL-017); that state is older than this split and is not changed by it.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Navigation & App Shell" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

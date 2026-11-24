@@ -57,9 +57,12 @@ Phase 1 Foundations ─► Phase 2 Zodiac wheel ─► Phase 3 Gann square ─�
 | [`performance-accessibility-reliability/`](performance-accessibility-reliability/) | Performance, Accessibility & Reliability | 17 |
 | [`release-preparation/`](release-preparation/) | Release Preparation | 7 |
 | [`optional-extensions/`](optional-extensions/) | Optional Extensions | 12 |
-| | **Total** | **206** |
+| [`ios/tasks/`](ios/tasks/) | iOS (platform-specific work split from the folders above) | 11 |
+| | **Total** | **217** (206 shared and Android, 11 iOS) |
 
 See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph description of what each folder covers.
+
+**Organizing convention (permanent, set 2026-11-24):** shared and Android tasks live in the category folders above; **every iOS-specific task lives in [`ios/tasks/`](ios/tasks/)** with an ID `ZOD-IOS-NNN`. A cross-platform task is not moved: its shared and Android part stays in its category folder under its original ID, and its iOS part becomes a `ZOD-IOS-NNN` task that names the parent. Each task has exactly one canonical file.
 
 ---
 
@@ -71,12 +74,12 @@ See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph descr
 |---|---|---|---|
 | ZOD-FND-001 | [Set up the Melos monorepo workspace](foundations-architecture/ZOD-FND-001-set-up-the-melos-monorepo-workspace.md) | Critical | Done |
 | ZOD-FND-002 | [Define the `EphemerisPort` interface contract](foundations-architecture/ZOD-FND-002-define-the-ephemerisport-interface-contract.md) | Critical | Done |
-| ZOD-FND-003 | [Spike: Swiss Ephemeris FFI binding on Android and iOS](foundations-architecture/ZOD-FND-003-spike-swiss-ephemeris-ffi-binding-on-android-and-ios.md) | Critical | In Progress (Android done; iOS pending) |
+| ZOD-FND-003 | [Spike: Swiss Ephemeris FFI binding on Android and iOS](foundations-architecture/ZOD-FND-003-spike-swiss-ephemeris-ffi-binding-on-android-and-ios.md) | Critical | Done (Android and shared; iOS in ZOD-IOS-001) |
 | ZOD-FND-004 | [Set up the CI pipeline](foundations-architecture/ZOD-FND-004-set-up-the-ci-pipeline.md) | High | Done |
-| ZOD-FND-005 | [Flutter app shell bootstrap (`apps/astro_mobile`)](foundations-architecture/ZOD-FND-005-flutter-app-shell-bootstrap-apps-astro-mobile.md) | Critical | Done (iOS build/runtime verification outstanding) |
-| ZOD-FND-006 | [Local storage infrastructure: `shared_preferences` + SQLite (drift) schema v1](foundations-architecture/ZOD-FND-006-local-storage-infrastructure-shared-preferences-sqlite-drift-schema-v1.md) | High | Completed (Android and host; iOS not verified) |
+| ZOD-FND-005 | [Flutter app shell bootstrap (`apps/astro_mobile`)](foundations-architecture/ZOD-FND-005-flutter-app-shell-bootstrap-apps-astro-mobile.md) | Critical | Done (Android and shared; iOS in ZOD-IOS-002) |
+| ZOD-FND-006 | [Local storage infrastructure: `shared_preferences` + SQLite (drift) schema v1](foundations-architecture/ZOD-FND-006-local-storage-infrastructure-shared-preferences-sqlite-drift-schema-v1.md) | High | Completed (Android and host; iOS in ZOD-IOS-003) |
 | ZOD-FND-007 | [Bundle offline fonts and verify no network dependency](foundations-architecture/ZOD-FND-007-bundle-offline-fonts-and-verify-no-network-dependency.md) | Medium | Done |
-| ZOD-FND-008 | [Package and integrate the app icon / logo asset set](foundations-architecture/ZOD-FND-008-package-and-integrate-the-app-icon-logo-asset-set.md) | Medium | Done |
+| ZOD-FND-008 | [Package and integrate the app icon / logo asset set](foundations-architecture/ZOD-FND-008-package-and-integrate-the-app-icon-logo-asset-set.md) | Medium | Done (iOS check in ZOD-IOS-004) |
 | ZOD-FND-009 | [Integrate the 33-icon set as SVG assets](foundations-architecture/ZOD-FND-009-integrate-the-33-icon-set-as-svg-assets.md) | Medium | Done |
 | ZOD-FND-010 | [Research and document the Swiss Ephemeris license decision](foundations-architecture/ZOD-FND-010-research-and-document-the-swiss-ephemeris-license-decision.md) | Critical | Done (see task notes) |
 | ZOD-FND-011 | [Decide and document the ephemeris data-file coverage range](foundations-architecture/ZOD-FND-011-decide-and-document-the-ephemeris-data-file-coverage-range.md) | High | Not Started |
@@ -94,7 +97,7 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 | ZOD-EPH-001 | [Implement the mean ascending lunar node formula](computation-engine/ZOD-EPH-001-implement-the-mean-ascending-lunar-node-formula.md) | Critical | Done |
 | ZOD-EPH-002 | [Implement the Swiss Ephemeris `EphemerisPort` adapter (data-file mode)](computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md) | Critical | Not Started |
 | ZOD-EPH-003 | [Implement the Swiss Ephemeris built-in (Moshier) fallback mode](computation-engine/ZOD-EPH-003-implement-the-swiss-ephemeris-built-in-moshier-fallback-mode.md) | Medium | Not Started |
-| ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Completed (Android and host; iOS not verified) |
+| ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Completed (Android and host; iOS in ZOD-IOS-001) |
 | ZOD-EPH-005 | [Implement retrograde detection and position formatting](computation-engine/ZOD-EPH-005-implement-retrograde-detection-and-position-formatting.md) | High | Not Started |
 | ZOD-CRS-001 | [Implement segment splitting at stationary points](computation-engine/ZOD-CRS-001-implement-segment-splitting-at-stationary-points.md) | Critical | Not Started |
 | ZOD-CRS-002 | [Implement the per-segment crossing solver (bisection/Brent + Newton refinement)](computation-engine/ZOD-CRS-002-implement-the-per-segment-crossing-solver-bisection-brent-newton.md) | Critical | Not Started |
@@ -119,7 +122,7 @@ Every task in this section implements a component that is **already fully design
 | ZOD-UI-005 | [Implement the input/field component](shared-ui-design-system/ZOD-UI-005-implement-the-input-field-component.md) | High | Done |
 | ZOD-UI-006 | [Implement the segmented control component](shared-ui-design-system/ZOD-UI-006-implement-the-segmented-control-component.md) | High | Done |
 | ZOD-UI-007 | [Implement switch, stepper, and body-chip components](shared-ui-design-system/ZOD-UI-007-implement-switch-stepper-and-body-chip-components.md) | Medium | Done |
-$1Done$2
+| ZOD-UI-008 | [Implement the radio-list component (ephemeris source selector)](shared-ui-design-system/ZOD-UI-008-implement-the-radio-list-component-ephemeris-source-selector.md) | Low | Done |
 | ZOD-UI-009 | [Implement the tag component (highlight tags, mode tags, Today/Center outline tags)](shared-ui-design-system/ZOD-UI-009-implement-the-tag-component-highlight-tags-mode-tags-today-center.md) | Medium | Done |
 | ZOD-UI-010 | [Implement the table component (header, rows, hover, selected)](shared-ui-design-system/ZOD-UI-010-implement-the-table-component-header-rows-hover-selected.md) | High | Done |
 | ZOD-UI-011 | [Implement the toast/feedback component (export status, progress with Stop)](shared-ui-design-system/ZOD-UI-011-implement-the-toast-feedback-component-export-status-progress-with.md) | High | Not Started |
@@ -359,6 +362,24 @@ These are **out of MVP scope**. Each is listed in the spec's "Planned extensions
 | ZOD-EXT-011 | [ICS calendar export for degree crossings](optional-extensions/ZOD-EXT-011-ics-calendar-export-for-degree-crossings.md) | Low | Not Started |
 | ZOD-EXT-012 | [Server, accounts, and cross-device sync (Phase 5 expansion)](optional-extensions/ZOD-EXT-012-server-accounts-and-cross-device-sync-phase-5-expansion.md) | Low | Not Started |
 
+### iOS (`ios/tasks/`)
+
+iOS-specific work, split from the cross-platform tasks named in the Parent column (the parent keeps its shared and Android scope, status and original ID). All of it needs macOS and Xcode except ZOD-IOS-008 (the choice of the number) and ZOD-IOS-010 (a decision); the owner allows no spending (2026-11-20), so macOS access is an open blocker (`docs/PROGRESS.md`, Blockers). No shared or Android task waits on this folder (owner decision 2026-11-24).
+
+| ID | Task | Priority | Parent task(s) | Status |
+|---|---|---|---|---|
+| ZOD-IOS-001 | [Verify the Swiss Ephemeris and astronomy-engine FFI bindings on iOS](ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md) | Critical | ZOD-FND-003, ZOD-EPH-004 | Not Started (needs macOS) |
+| ZOD-IOS-002 | [Verify the app shell build and runtime on iOS](ios/tasks/ZOD-IOS-002-verify-the-app-shell-build-and-runtime-on-ios.md) | Critical | ZOD-FND-005, ZOD-FND-007 | Not Started (needs macOS) |
+| ZOD-IOS-003 | [Verify local storage on iOS and exclude it from iCloud backup](ios/tasks/ZOD-IOS-003-verify-local-storage-on-ios-and-exclude-it-from-icloud-backup.md) | High | ZOD-FND-006, ZOD-L10-002 | Not Started (needs macOS) |
+| ZOD-IOS-004 | [Verify the launcher icon set in Xcode and App Store Connect](ios/tasks/ZOD-IOS-004-verify-the-launcher-icon-set-in-xcode-and-app-store-connect.md) | Medium | ZOD-FND-008, ZOD-REL-001 | Not Started (needs macOS) |
+| ZOD-IOS-005 | [Run the glyph presentation test on iOS](ios/tasks/ZOD-IOS-005-run-the-glyph-presentation-test-on-ios.md) | High | ZOD-UI-002 | Not Started (needs macOS) |
+| ZOD-IOS-006 | [Decide and implement native iOS selection handles, and verify text input on iOS](ios/tasks/ZOD-IOS-006-decide-and-implement-native-ios-selection-handles-and-verify-text-input.md) | Medium | ZOD-UI-005 | Not Started (needs macOS) |
+| ZOD-IOS-007 | [Configure and verify iOS deep links](ios/tasks/ZOD-IOS-007-configure-and-verify-ios-deep-links.md) | Critical | ZOD-NAV-003 | Not Started (needs macOS) |
+| ZOD-IOS-008 | [Define and document the minimum supported iOS version](ios/tasks/ZOD-IOS-008-define-and-document-the-minimum-supported-ios-version.md) | Medium | ZOD-NFR-011 | Not Started |
+| ZOD-IOS-009 | [Finalize and verify the iOS release build pipeline](ios/tasks/ZOD-IOS-009-finalize-and-verify-the-ios-release-build-pipeline.md) | Critical | ZOD-REL-002 | Not Started (needs macOS) |
+| ZOD-IOS-010 | [Confirm the Apple App Store path and its licensing obligations](ios/tasks/ZOD-IOS-010-confirm-the-apple-app-store-path-and-its-licensing-obligations.md) | Critical | ZOD-REL-003 | Not Started (conditional on the channel) |
+| ZOD-IOS-011 | [Audit VoiceOver and verify iOS device behavior](ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md) | High | ZOD-NFR-006, ZOD-NAV-004, ZOD-WHL-013, ZOD-UI-007, ZOD-UI-008, ZOD-UI-013 | Not Started (needs macOS) |
+
 ---
 
 # 5. Dependencies and task order
@@ -398,7 +419,7 @@ Settings and persistence (`settings-persistence/`) depend on nearly everything u
 
 ## 5.3 Tasks that require technical investigation before estimation
 
-- **ZOD-FND-003** (Swiss Ephemeris FFI spike) — R-7's named risk; blocks ZOD-EPH-002 and therefore nearly everything.
+- **ZOD-FND-003** (Swiss Ephemeris FFI spike) — R-7's named risk. **Done for Android and shared scope (2026-11-24; the Android half merged 2026-11-20); its iOS half is [ZOD-IOS-001](ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md)**, which no longer blocks ZOD-EPH-002 or the shared critical path (owner decision 2026-11-24; the risk that iOS shows a different binding design is accepted and recorded in ZOD-IOS-001).
 - **ZOD-EPH-004** (astronomy-engine FFI spike) — same category of risk, lower severity since it's a backup. **Done 2026-11-22 (Android and host; iOS not verified):** it found that ZOD-TST-001's 1-arcsecond Moon bound against Horizons cannot be met at far-future UT instants by any adapter because sources assume different future ΔT; recorded in [`docs/spikes/ZOD-EPH-004-delta-t.md`](../spikes/ZOD-EPH-004-delta-t.md) and PROGRESS (Blockers), ZOD-TST-001's criteria unchanged, an owner decision needed before ZOD-TST-001 and ZOD-TST-005 are implemented.
 - **ZOD-XLS-001** (OOXML generation spike) — R-8's named risk; blocks all of `excel-export/`.
 - **ZOD-FND-011** (data-file coverage range) — affects app size and every date-range limit in the UI; should resolve early in Phase 1.
@@ -472,14 +493,14 @@ These don't block a specific task the way the decisions above do, but each has a
 | R-4 | DST causes a skipped/duplicated cell in date-and-time mode | ZOD-TST-012; DST rule decided 2026-11-12 (ZOD-GAN-003 Notes, §6.2) |
 | R-5 | A result mistaken for financial/astrological advice | ZOD-ABT-005, ZOD-XLS-006/017 |
 | R-6 | Swiss Ephemeris licensing blocks store distribution | ZOD-FND-010, ZOD-FND-015, ZOD-REL-003 |
-| R-7 | FFI build complexity on iOS/Android | ZOD-FND-003, ZOD-REL-002 |
+| R-7 | FFI build complexity on iOS/Android | ZOD-FND-003, ZOD-REL-002 (Android and shared); ZOD-IOS-001, ZOD-IOS-009 (iOS) |
 | R-8 | No proven Dart library for formula-bearing Excel export | ZOD-XLS-001 |
 
 ---
 
 ## 7. MVP vs. Future Extensions overview
 
-194 of 206 tasks are **MVP** scope (required for the first shipping version, phases 1–4). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
+205 of 217 tasks are **MVP** scope (194 shared and Android, 11 iOS) (required for the first shipping version, phases 1–4). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
 
 | Folder | MVP tasks | Optional Extension tasks |
 |---|---|---|
@@ -497,7 +518,8 @@ These don't block a specific task the way the decisions above do, but each has a
 | [`performance-accessibility-reliability/`](performance-accessibility-reliability/) | 17 | 0 |
 | [`release-preparation/`](release-preparation/) | 7 | 0 |
 | [`optional-extensions/`](optional-extensions/) | 0 | 12 |
-| **Total** | **194** | **12** |
+| [`ios/tasks/`](ios/tasks/) | 11 | 0 |
+| **Total** | **205** | **12** |
 
 No MVP folder contains an Optional Extension task and vice versa — the separation is structural (by folder), not just a per-task label.
 

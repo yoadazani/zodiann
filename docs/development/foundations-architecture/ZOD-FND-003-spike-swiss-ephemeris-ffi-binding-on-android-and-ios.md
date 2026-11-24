@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** In Progress (Android half verified; iOS half pending: see Completion notes)
+- **Status:** Done (Android and shared scope verified; the iOS half is [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md), see Completion notes)
 - **Scope:** MVP
 
 ## Description
@@ -17,7 +17,7 @@ De-risk the single biggest technical unknown (R-7) before any feature work start
 
 - Vendor the Swiss Ephemeris C source into `native/swisseph/`.
 - Generate Dart bindings with `ffigen`.
-- Build via CMake (Android) and Xcode (iOS), or native assets if stable enough at the time of implementation (ARCH-6).
+- Build via CMake (Android) and Xcode (iOS), or native assets if stable enough at the time of implementation (ARCH-6). *(The Xcode and iOS parts of this and the next bullets are [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).)*
 - Run one real computation (e.g., Sun longitude on a known date) on a physical or emulated device of each platform and compare against a known-good value.
 - Decide and document how the ephemeris data files are packaged as app assets and loaded at runtime (flat files vs. compressed bundle).
 - Record build-time, binary-size, and licensing findings for [ZOD-REL-003](../release-preparation/ZOD-REL-003-finalize-store-distribution-and-swiss-ephemeris-licensing-path.md).
@@ -28,10 +28,10 @@ No direct design reference applies — native build spike.
 
 ## Acceptance Criteria
 
-- [ ] A single FFI call returns a correct longitude on both an Android and an iOS build.
-- [ ] Data files are packaged and readable from the app sandbox on both platforms.
-- [ ] Spike findings (build setup, gotchas, size) are written up for the team/agent picking up ZOD-EPH-002.
-- [ ] A decision is recorded on native assets vs. CMake/Xcode for the production build.
+- [x] A single FFI call returns a correct longitude on an Android build. *(Split 2026-11-24: the original read "…on both an Android and an iOS build"; the iOS clause is criterion 1 of [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).)*
+- [x] Data files are packaged and readable from the app sandbox on Android. *(Split 2026-11-24: the original read "…on both platforms"; the iOS clause is criterion 2 of [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).)*
+- [x] Spike findings (build setup, gotchas, size) are written up for the team/agent picking up ZOD-EPH-002. *(Written for Android and the shared parts, `docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`; the iOS sections are criterion 3 of [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).)*
+- [x] A decision is recorded on native assets vs. CMake/Xcode for the production build, **for Android**. *(Android scope only: this tick does not imply any iOS verification. The decision is recorded on the Android evidence: native assets, `hook/build.dart`; findings section 5, where it is marked PROVISIONAL and "not final because iOS is untested". The decision itself is unchanged. Whether it holds for the production build on iOS, or is reversed to CMake on Android and an Xcode target on iOS, is open and owned by criterion 4 of [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).)*
 
 ## Dependencies
 
@@ -56,7 +56,9 @@ No direct design reference applies — native build spike.
 3. **Criterion 3 (findings written up for the agent picking up ZOD-EPH-002): written for Android; incomplete.** The findings document covers the Android build, gotchas, measurements and what EPH-002 must know. The iOS sections are an explicit checklist, not results.
 4. **Criterion 4 (native assets versus CMake/Xcode decision recorded): provisional.** Native assets were chosen on the Android evidence; the decision is confirmed or reversed by the iOS half (condition stated in the findings, section 5).
 
-**Remaining to close this task:** the iOS checklist in the findings, section 8. Every task that lists this one under Dependencies (ZOD-EPH-002, ZOD-FND-011, ZOD-NFR-011, ZOD-REL-002) stays blocked meanwhile.
+**Remaining to close this task (as written 2026-11-20, superseded below):** the iOS checklist in the findings, section 8. Every task that lists this one under Dependencies (ZOD-EPH-002, ZOD-FND-011, ZOD-NFR-011, ZOD-REL-002) stays blocked meanwhile.
+
+**Scope split, approved by the owner on 2026-11-24 (supersedes the paragraphs above on status and blocking):** the iOS-specific implementation, Xcode build and verification requirements moved, with their meaning unchanged, to [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md) (the iOS checklist in the findings, section 8, is its list). Every original criterion is kept: each is split into an Android clause here and an iOS clause there; none was weakened or dropped. This task is Done for its Android and shared scope on the evidence recorded in `docs/PROGRESS.md` (Verification, `ZOD-FND-003 (Android half), final run on 2026-11-20`, on `9d3df06`; PR #48, merged as `61a1ff0`): the emulator run (Sun and Moon within 0.03 to 0.24 arcseconds of JPL Horizons, files proved used, an empty-directory control falling back to Moshier), the APK contents and the 16 KB alignment check. **Known gaps that stay open and are not iOS:** arm64-v8a and armeabi-v7a were built and alignment-checked but never executed; library thread-safety was not tested. The tasks that list this one under Dependencies (ZOD-EPH-002, ZOD-FND-011, ZOD-NFR-011, ZOD-REL-002) are no longer blocked for their Android and shared work; their iOS parts depend on [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md).
 
 ---
 

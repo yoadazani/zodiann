@@ -52,6 +52,8 @@ _No additional notes._
 - **Limits recorded:** Flutter draws the symbol-font glyph about 2 to 3 px higher than Chrome inside a chip, so glyph ink is compared within 3 px (other ink within 2); the sheet has LCD text fringes, so ink colours are compared per channel at their extreme; the chip's on/off contrast is faint by design (about 1.56:1 border on vs off in Graphite, 1.50 in Porcelain, fill 1.17 and 1.13), recorded for ZOD-NFR-008.
 - **Not covered:** a device (touch, TalkBack and VoiceOver wording for the switch, which is a button with a toggled state); the stepper in a parent narrower than 122 px; the real orb limits (ZOD-ASP-002, D-1).
 
+- **iOS split (2026-11-24, owner decision):** the VoiceOver half of the "Not covered" device check moved to [ZOD-IOS-011](../ios/tasks/ZOD-IOS-011-audit-voiceover-and-verify-ios-device-behavior.md); the TalkBack half stays here as an Android device check.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Shared UI & Design System" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*
