@@ -22,7 +22,7 @@
 
 ## Product-owner decisions
 
-None taken yet. Open items are listed at the end; the defaults below are implemented unless the owner changes them.
+**O1 (owner, 2026-11-24): sheet-exact chips, no check icon;** accessibility rests on `checked` semantics, the tint and border change and the focus ring, and the faint contrast is recorded for ZOD-NFR-008. The remaining open items (O2 to O7) are listed at the end; their defaults are implemented unless the owner changes them.
 
 ## Design (API)
 
@@ -201,7 +201,7 @@ Sequential, native. The three widgets are small and disjoint, but they share the
 
 ## Open decisions (for the owner; defaults are implemented)
 
-- **O1: chip check mark.** Default: sheet-exact chips, with accessibility from `checked` semantics, luminance / border difference and the focus ring. Alternative: add a check icon when on (clear without colour, deviates from the sheet and MASTER §10).
+- **O1: chip check mark (DECIDED 2026-11-24: sheet-exact).** Default: sheet-exact chips, with accessibility from `checked` semantics, luminance / border difference and the focus ring. Alternative: add a check icon when on (clear without colour, deviates from the sheet and MASTER §10).
 - **O2: switch motion.** Default: 120 ms linear crossfade of thumb and colours (MASTER §12 "selection changes"), instant under reduced motion; kit.css has none. Alternative: instant.
 - **O3: stepper in RTL.** Default: the row mirrors (kit.css flex row), so `−` is on the right in Hebrew, the value text stays LTR. To be checked against the Hebrew settings screens in Task 6; if they show `−` on the left, follow them and say so. Alternative: always `−` left.
 - **O4: stepper value type.** Default: `double` with `step` (whole degrees in the design); the caller formats `valueLabel`. Alternative: `int` only.
@@ -227,4 +227,4 @@ A switch or chip toggled while hovered or pressed; stepper at a bound while its 
 - **D1** (chip on/off without a check mark, criterion 3 against the sheet): **needs owner decision** (O1); the reviewer leans to the sheet-exact default.
 - **D2** (stepper hit width): same as O6.
 
-Open items: O1, O6, O7. Round 2 (focused on the revision) runs after the owner answers, since O1 may change the chip design.
+Open items: O6, O7 (defaults implemented). O1 was decided by the owner on 2026-11-24: sheet-exact chips. Round 2 (focused on the revision) follows.
