@@ -33,6 +33,10 @@ class ZodiannPressable extends StatefulWidget {
     this.inMutuallyExclusiveGroup = false,
     this.disabledOpacity,
     this.focusRing = true,
+    this.toggled,
+    this.checked,
+    this.slotAlignment = Alignment.center,
+    this.focusRingRadius = ZodiannRadius.md,
   });
 
   /// Called on activation. Null disables the control.
@@ -57,6 +61,23 @@ class ZodiannPressable extends StatefulWidget {
   /// Whether to paint the keyboard focus ring itself. A parent that must draw
   /// it above neighbouring controls (the segmented control) turns this off.
   final bool focusRing;
+
+  /// The on / off state of a switch; null (the default) adds no toggle state
+  /// to the node.
+  final bool? toggled;
+
+  /// The checked state of a checkbox-like control (a body chip); null (the
+  /// default) adds no check state to the node.
+  final bool? checked;
+
+  /// Where the drawn [child] sits inside the 44 x 44 slot (centre by default).
+  /// A control whose drawn box must sit against one edge of its parent (an
+  /// orb stepper button) aligns its child to that edge.
+  final AlignmentGeometry slotAlignment;
+
+  /// The corner radius of the keyboard focus ring around [child] (8 by
+  /// default; a switch or a pill chip passes its own).
+  final double focusRingRadius;
 
   /// An optional accessible hint (the drawer item's description).
   final String? semanticHint;
@@ -125,6 +146,8 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
       hint: widget.semanticHint,
       selected: widget.selected ? true : null,
       inMutuallyExclusiveGroup: widget.inMutuallyExclusiveGroup ? true : null,
+      toggled: widget.toggled,
+      checked: widget.checked,
       onTap: onPressed,
       child: FocusableActionDetector(
         enabled: enabled,
@@ -157,6 +180,7 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
             onTapCancel: enabled ? () => _setPressed(false) : null,
             onTap: onPressed,
             child: _TouchTarget(
+              alignment: widget.slotAlignment,
               child: ExcludeSemantics(
                 child: Opacity(
                   opacity: enabled
@@ -171,6 +195,7 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
                       foregroundPainter: ZodiannFocusRingPainter(
                         show: _focusHighlight && widget.focusRing,
                         color: s.focus,
+                        radius: widget.focusRingRadius,
                       ),
                       child: filtered,
                     ),
@@ -193,15 +218,42 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
 /// it stretches to the slot, otherwise it is content-wide, and narrower than
 /// 44 only for very short content.
 class _TouchTarget extends SingleChildRenderObjectWidget {
-  const _TouchTarget({required super.child});
+  const _TouchTarget({required super.child, required this.alignment});
+
+  final AlignmentGeometry alignment;
 
   @override
   _RenderTouchTarget createRenderObject(BuildContext context) =>
-      _RenderTouchTarget();
+      _RenderTouchTarget(alignment, Directionality.of(context));
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderTouchTarget renderObject,
+  ) {
+    renderObject
+      ..alignment = alignment
+      ..textDirection = Directionality.of(context);
+  }
 }
 
 class _RenderTouchTarget extends RenderShiftedBox {
-  _RenderTouchTarget() : super(null);
+  _RenderTouchTarget(this._alignment, this._textDirection) : super(null);
+
+  AlignmentGeometry _alignment;
+  TextDirection _textDirection;
+
+  set alignment(AlignmentGeometry value) {
+    if (_alignment == value) return;
+    _alignment = value;
+    markNeedsLayout();
+  }
+
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
 
   static const double _min = ZodiannSize.minTouchTarget;
 
@@ -232,10 +284,9 @@ class _RenderTouchTarget extends RenderShiftedBox {
     final child = this.child!;
     child.layout(_childConstraints(constraints), parentUsesSize: true);
     size = _sizeFor(constraints, child.size);
-    (child.parentData! as BoxParentData).offset = Offset(
-      (size.width - child.size.width) / 2,
-      (size.height - child.size.height) / 2,
-    );
+    (child.parentData! as BoxParentData).offset = _alignment
+        .resolve(_textDirection)
+        .alongOffset((size - child.size) as Offset);
   }
 
   double _atLeastMin(double v) => v < _min ? _min : v;
@@ -266,17 +317,25 @@ ColorFilter _brightness(double k) => ColorFilter.matrix(<double>[
 ]);
 
 /// Paints the keyboard focus ring outside its child's bounds: a 2 px
-/// [color] ring at a 2 px gap, following the 8 px corner radius.
+/// [color] ring at a 2 px gap, following the corner [radius] (8 px unless a
+/// control passes its own).
 @visibleForTesting
 final class ZodiannFocusRingPainter extends CustomPainter {
   /// A ring in [color], painted only when [show].
-  const ZodiannFocusRingPainter({required this.show, required this.color});
+  const ZodiannFocusRingPainter({
+    required this.show,
+    required this.color,
+    this.radius = ZodiannRadius.md,
+  });
 
   /// Whether the ring is visible (keyboard focus highlight only).
   final bool show;
 
   /// The `focus` token.
   final Color color;
+
+  /// The corner radius of the ring's inner edge.
+  final double radius;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -286,7 +345,7 @@ final class ZodiannFocusRingPainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         (Offset.zero & size).inflate(outset),
-        Radius.circular(ZodiannRadius.md + outset),
+        Radius.circular(radius + outset),
       ),
       Paint()
         ..style = PaintingStyle.stroke
@@ -297,5 +356,7 @@ final class ZodiannFocusRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ZodiannFocusRingPainter oldDelegate) =>
-      oldDelegate.show != show || oldDelegate.color != color;
+      oldDelegate.show != show ||
+      oldDelegate.color != color ||
+      oldDelegate.radius != radius;
 }
