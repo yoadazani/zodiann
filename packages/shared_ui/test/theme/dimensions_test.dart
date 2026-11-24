@@ -115,6 +115,16 @@ void main() {
       'segmentGap': (ZodiannSize.segmentGap, 2),
       'segmentIconGap': (ZodiannSize.segmentIconGap, 6),
       'tagOutline': (ZodiannSize.tagOutline, 1.5),
+      // ZOD-UI-007: kit.css `.switch::after`, `.stepper`, `.chk`.
+      'switchThumb': (ZodiannSize.switchThumb, 16),
+      'switchThumbInset': (ZodiannSize.switchThumbInset, 3),
+      'stepperButtonWidth': (ZodiannSize.stepperButtonWidth, 34),
+      'stepperValueMinWidth': (ZodiannSize.stepperValueMinWidth, 52),
+      'bodyChipHeight': (ZodiannSize.bodyChipHeight, 34),
+      'bodyChipPaddingStart': (ZodiannSize.bodyChipPaddingStart, 10),
+      'bodyChipPaddingEnd': (ZodiannSize.bodyChipPaddingEnd, 12),
+      'bodyChipGap': (ZodiannSize.bodyChipGap, 8),
+      'bodyChipGlyph': (ZodiannSize.bodyChipGlyph, 15),
     };
     sizes.forEach((name, value) {
       expect(value.$1, value.$2, reason: name);
@@ -218,6 +228,33 @@ void main() {
     expect(_px(sw, 'width'), ZodiannSize.switchWidth, reason: '.switch');
     expect(_px(sw, 'height'), ZodiannSize.switchHeight, reason: '.switch');
     expect(_px(_rule(css, '.tbl td'), 'height'), ZodiannSize.tableRow);
+    // ZOD-UI-007.
+    final thumb = _rule(css, '.switch::after');
+    expect(_px(thumb, 'width'), ZodiannSize.switchThumb, reason: 'thumb');
+    expect(_px(thumb, 'height'), ZodiannSize.switchThumb, reason: 'thumb');
+    expect(_px(thumb, 'top'), ZodiannSize.switchThumbInset, reason: 'thumb');
+    expect(
+      _px(_rule(css, '.stepper button'), 'width'),
+      ZodiannSize.stepperButtonWidth,
+      reason: '.stepper button',
+    );
+    expect(
+      _px(_rule(css, '.stepper .v'), 'min-width'),
+      ZodiannSize.stepperValueMinWidth,
+      reason: '.stepper .v',
+    );
+    final chk = _rule(css, '.chk');
+    expect(_px(chk, 'height'), ZodiannSize.bodyChipHeight, reason: '.chk');
+    expect(_px(chk, 'gap'), ZodiannSize.bodyChipGap, reason: '.chk');
+    final pad = RegExp(r'padding-inline:\s*(\d+)px\s+(\d+)px').firstMatch(chk);
+    expect(pad, isNotNull, reason: '.chk padding-inline');
+    expect(double.parse(pad!.group(1)!), ZodiannSize.bodyChipPaddingStart);
+    expect(double.parse(pad.group(2)!), ZodiannSize.bodyChipPaddingEnd);
+    expect(
+      _px(_rule(css, '.chk .glyph'), 'font-size'),
+      ZodiannSize.bodyChipGlyph,
+      reason: '.chk .glyph',
+    );
     final tag = _rule(css, '.tag');
     expect(_px(tag, 'height'), ZodiannSize.tag, reason: '.tag');
     expect(_px(tag, 'gap'), ZodiannSize.tagGap, reason: '.tag');
