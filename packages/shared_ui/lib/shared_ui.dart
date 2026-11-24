@@ -22,6 +22,7 @@ export 'src/theme/zodiann_surfaces.dart';
 export 'src/theme/zodiann_text_styles.dart';
 export 'src/theme/zodiann_theme.dart';
 export 'src/theme/zodiann_tokens.dart';
+export 'src/widgets/zodiann_body_chip.dart';
 export 'src/widgets/zodiann_button_colors.dart';
 export 'src/widgets/zodiann_button.dart' hide ZodiannFocusRingPainter;
 export 'src/widgets/zodiann_dialog.dart';
@@ -31,7 +32,9 @@ export 'src/widgets/zodiann_drawer_route.dart' show showZodiannDrawer;
 export 'src/widgets/zodiann_icon_button.dart';
 export 'src/widgets/zodiann_logo.dart';
 export 'src/widgets/zodiann_panel.dart';
+export 'src/widgets/zodiann_orb_stepper.dart';
 export 'src/widgets/zodiann_segmented_control.dart';
+export 'src/widgets/zodiann_switch.dart';
 export 'src/widgets/zodiann_table.dart';
 export 'src/widgets/zodiann_table_column.dart'
     show ZodiannTableAlign, ZodiannTableColumn, ZodiannTableDensity;

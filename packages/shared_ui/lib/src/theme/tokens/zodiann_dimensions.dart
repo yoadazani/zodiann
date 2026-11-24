@@ -146,8 +146,47 @@ abstract final class ZodiannSize {
   /// Switch: height.
   static const double switchHeight = 24.0;
 
+  /// Switch: the thumb's diameter (kit.css `.switch::after`).
+  static const double switchThumb = 16.0;
+
+  /// Switch: the thumb's inset from the inside of the 1 px border (kit.css
+  /// `.switch::after` `top: 3px`; the off thumb sits 3 px from the start).
+  static const double switchThumbInset = 3.0;
+
   /// Orb stepper: height.
   static const double stepper = 36.0;
+
+  /// Orb stepper: the height inside the 1 px border (kit.css `.stepper`
+  /// `height: 36px` with a border-box, so the buttons are 34 high).
+  static const double stepperInnerHeight = stepper - 2 * hairline;
+
+  /// Orb stepper: the width of each − and + button (kit.css
+  /// `.stepper button`).
+  static const double stepperButtonWidth = 34.0;
+
+  /// Orb stepper: the font size of the − and + glyphs (kit.css
+  /// `.stepper button` `font-size: 18px`).
+  static const double stepperGlyph = 18.0;
+
+  /// Orb stepper: the least width of the value between the buttons (kit.css
+  /// `.stepper .v`).
+  static const double stepperValueMinWidth = 52.0;
+
+  /// Body chip: height (kit.css `.chk`).
+  static const double bodyChipHeight = 34.0;
+
+  /// Body chip: padding on the start side, next to the glyph (kit.css `.chk`
+  /// `padding-inline: 10px 12px`).
+  static const double bodyChipPaddingStart = 10.0;
+
+  /// Body chip: padding on the end side, after the label.
+  static const double bodyChipPaddingEnd = 12.0;
+
+  /// Body chip: the gap between the glyph and the label (kit.css `.chk`).
+  static const double bodyChipGap = 8.0;
+
+  /// Body chip: the glyph's font size (kit.css `.chk .glyph`).
+  static const double bodyChipGlyph = 15.0;
 
   /// The 1 px rule of borders and head rules (MASTER §1, §4).
   static const double hairline = 1.0;
