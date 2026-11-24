@@ -119,6 +119,7 @@ void main() {
       'switchThumb': (ZodiannSize.switchThumb, 16),
       'switchThumbInset': (ZodiannSize.switchThumbInset, 3),
       'stepperButtonWidth': (ZodiannSize.stepperButtonWidth, 34),
+      'stepperGlyph': (ZodiannSize.stepperGlyph, 18),
       'stepperValueMinWidth': (ZodiannSize.stepperValueMinWidth, 52),
       'bodyChipHeight': (ZodiannSize.bodyChipHeight, 34),
       'bodyChipPaddingStart': (ZodiannSize.bodyChipPaddingStart, 10),
@@ -236,6 +237,11 @@ void main() {
     expect(
       _px(_rule(css, '.stepper button'), 'width'),
       ZodiannSize.stepperButtonWidth,
+      reason: '.stepper button',
+    );
+    expect(
+      _px(_rule(css, '.stepper button'), 'font-size'),
+      ZodiannSize.stepperGlyph,
       reason: '.stepper button',
     );
     expect(

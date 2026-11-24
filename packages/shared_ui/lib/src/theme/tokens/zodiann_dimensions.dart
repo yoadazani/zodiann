@@ -160,6 +160,10 @@ abstract final class ZodiannSize {
   /// `.stepper button`).
   static const double stepperButtonWidth = 34.0;
 
+  /// Orb stepper: the font size of the − and + glyphs (kit.css
+  /// `.stepper button` `font-size: 18px`).
+  static const double stepperGlyph = 18.0;
+
   /// Orb stepper: the least width of the value between the buttons (kit.css
   /// `.stepper .v`).
   static const double stepperValueMinWidth = 52.0;

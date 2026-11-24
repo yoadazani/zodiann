@@ -31,6 +31,7 @@ export 'src/widgets/zodiann_drawer_route.dart' show showZodiannDrawer;
 export 'src/widgets/zodiann_icon_button.dart';
 export 'src/widgets/zodiann_logo.dart';
 export 'src/widgets/zodiann_panel.dart';
+export 'src/widgets/zodiann_orb_stepper.dart';
 export 'src/widgets/zodiann_segmented_control.dart';
 export 'src/widgets/zodiann_switch.dart';
 export 'src/widgets/zodiann_table.dart';
