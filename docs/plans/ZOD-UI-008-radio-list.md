@@ -22,7 +22,7 @@
 
 ## Product-owner decisions
 
-None yet. O1 to O7 at the end carry defaults that are implemented unless the owner changes them. O1 (row height) is the one that changes what is drawn.
+**O1 (owner, 2026-11-24): option (a), 44 px rows with no gap.** The 8 px inter-target clause of MASTER §14 is waived for these dense, full-width list rows; to be recorded in PROGRESS Technical Decisions at completion. O2 to O7 at the end carry defaults that are implemented unless the owner changes them.
 
 ## Design (API)
 
@@ -44,12 +44,13 @@ class ZodiannRadioList<T> extends StatefulWidget {
 }
 ```
 
-- **Row (drawn):** `Row` in the inline direction: dot (18, `Border.all`, round) · 12 · label (`Expanded`-style, wraps, 14 px `body` role, `text`) · 12 minimum · badge (12 px, `text-3`, trailing, never wraps its own line away from the row: it takes its natural width, and the label gets the rest). Vertical padding 8 around the content, as the kit. Dot colours: off `line` border at 1.5; on `accent` border at 5. `BoxBorder` interpolates between the two widths and colours, so the 120 ms crossfade is one `AnimatedContainer` (`Curves.linear`; `Duration.zero` under `MediaQuery.disableAnimationsOf`).
-- **Layout and hit slot:** each row is a `ZodiannPressable`, so its slot is at least 44 high and as wide as the list (tight width: the rows stack in a `Column` with `crossAxisAlignment: stretch`). Per O1 the list has no extra gap between rows; the drawn row (about 36.3 at 14 px) sits centred in its 44 slot. A row grows with the text scale and with a wrapped label.
+- **Why not Flutter's `RadioGroup` / `Radio`:** they would not give the project's pressable states, 44 px slot and focus ring, and they add Material styling. The widget builds on `ZodiannPressable` and sets the radio-group semantics itself (see Semantics).
+- **Row (drawn):** `Row` in the inline direction: dot (18, `Border.all`, round, `ValueKey('zodiann-radio-dot-$i')` so tests can find it) · 12 · label (`Expanded`-style, wraps, `ZodiannTextStyles.body`, colour `text`) · 12 minimum · badge (`ZodiannTextStyles.body.copyWith(fontSize: ZodiannSize.radioBadgeText, color: text3)`: regular weight, 12 px; not the `label` role, which is weight 500; trailing, takes its natural width, and the label gets the rest). Vertical padding 8 around the content, as the kit. Dot colours: off `line` border at 1.5; on `accent` border at 5. `BoxBorder` interpolates between the two widths and colours, so the 120 ms crossfade is one `AnimatedContainer` (`Curves.linear`; `Duration.zero` under `MediaQuery.disableAnimationsOf`).
+- **Layout and hit slot:** each row is a `ZodiannPressable` (tests find rows with `find.byType(ZodiannPressable)` and the focus ring through `ZodiannFocusRingPainter`, as the UI-006 / UI-007 tests do), so its slot is at least 44 high and as wide as the list (tight width: the rows stack in a `Column` with `crossAxisAlignment: stretch`). Per O1 the list has no extra gap between rows; the drawn row (about 36.3 at 14 px) sits centred in its 44 slot. A row grows with the text scale and with a wrapped label.
 - **Behaviour:** tap, mouse click, Enter, Space on a row call `onChanged(option.value)` once. Activating the already selected row does nothing (no call). A controlled parent updates `value`; the widget keeps no selection state of its own.
-- **Keyboard (roving tab stop, NFR-X2):** exactly one row is in the Tab order: the selected row, or the first row when `value` is null. Tab enters the group at that row and the next Tab leaves it. **Down and Right** select and focus the next row, **Up and Left** the previous one; in RTL, Left and Right swap (Left is next). Selection wraps at the ends (O2). Each arrow press calls `onChanged` with the new value and moves focus to that row. Home and End are not handled (not in the criterion). Mechanism: one `FocusNode` per row, owned by the state; a row's node has `canRequestFocus` true when it is the tab stop or currently focused; the arrow handler makes the target requestable, requests focus, then calls `onChanged` (so a controlled parent rejecting the change leaves the tab stop on the selected row, and focus returns to it on the next Tab). Arrow handling is an `Actions` entry for `DirectionalFocusIntent` above the rows, following the segmented control's `_SideAction`, except that all four directions are consumed inside the group only while a row has focus; a key pressed with no row focused falls through to the enclosing handler.
-- **Semantics:** one group node (`container`, `explicitChildNodes`, label `semanticLabel`) with one node per row: button role, label = the option's label, `checked` = selected, `inMutuallyExclusiveGroup: true` (Flutter exposes this combination as a radio button on Android and iOS), `semanticHint` = the badge text when present (read after the label, no hard-coded separator). The dot and the visible badge text are excluded from the tree (the pressable already excludes its subtree). Disabled rows report `enabled: false`.
-- **Disabled:** `onChanged: null` disables all rows (0.42, inert by tap, key, focus traversal, `forbidden` cursor); the selected row keeps its on look at the lower opacity.
+- **Keyboard (roving tab stop, NFR-X2):** exactly one row is in the Tab order: the selected row, or the first row when `value` is null. Tab enters the group at that row and the next Tab leaves it. **Down and Right** select and focus the next row, **Up and Left** the previous one; in RTL, Left and Right swap (Left is next). Selection wraps at the ends (O2). Each arrow press calls `onChanged` with the new value and moves focus to that row. Home and End are not handled (not in the criterion). Mechanism: one `FocusNode` per row, owned by the state, kept in a map keyed by option value (the segmented control's `_nodes` precedent) and disposed when an option disappears. An external node is not touched by `FocusableActionDetector(enabled: false)` (`Focus` skips `canRequestFocus` for external nodes), so the widget sets it itself: every build and `didUpdateWidget` sets `node.canRequestFocus = enabled && (option is the tab stop || node.hasFocus)`; a listener on each node calls `setState` when focus is lost so a stale node returns to non-requestable; `onChanged == null` sets every node to `canRequestFocus = false` and unfocuses the one that holds focus. The arrow handler makes the target requestable, focuses it with `FocusTraversalPolicy.defaultTraversalRequestFocusCallback` (focus and scroll into view, as the segmented control does), then calls `onChanged` (so a controlled parent rejecting the change leaves the tab stop on the selected row). A single-option list calls nothing on an arrow; with `value == null` an arrow selects the first (Down, Right) or last (Up, Left) row. Arrow handling is an `Actions` entry for `DirectionalFocusIntent` above the rows, following the segmented control's `_SideAction`: while a row has focus all four directions are consumed by the group. The list's `Actions` is not in the focus chain when no row has focus, so nothing special is needed for that case.
+- **Semantics:** one group node (`container`, `explicitChildNodes`, `role: SemanticsRole.radioGroup`, label `semanticLabel`) with one node per row: button role, label = the option's label, `checked` = selected, `inMutuallyExclusiveGroup: true` (expected to read as a radio button on TalkBack and VoiceOver; not verified on a device), `semanticHint` = the badge text when present (read after the label, no hard-coded separator). The dot and the visible badge text are excluded from the tree (the pressable already excludes its subtree). Disabled rows report `enabled: false`.
+- **Disabled:** `onChanged: null` disables all rows (0.42, inert by tap, key, focus traversal, `forbidden` cursor; the Enter and Space action is absent because `FocusableActionDetector` adds it only when enabled, the arrow action does nothing, every node has `canRequestFocus` false and a row that had focus loses it); the selected row keeps its on look at the lower opacity.
 - **Directionality:** `Row` and `AlignmentDirectional` only, no mirroring `Transform`. The dot never mirrors (it is round). Badge and label follow the inline direction (the Hebrew screen).
 - **Text scale:** the label grows and wraps; the badge grows; rows grow; no clipping or overflow at 2x. The dot stays 18.
 
@@ -73,7 +74,7 @@ class ZodiannRadioList<T> extends StatefulWidget {
 
 | File | Action |
 |---|---|
-| `packages/shared_ui/lib/src/theme/tokens/zodiann_dimensions.dart` | add `radioDot` (18), `radioDotBorder` (1.5), `radioDotSelectedBorder` (5), `radioRowPadding` (8) |
+| `packages/shared_ui/lib/src/theme/tokens/zodiann_dimensions.dart` | add `radioDot` (18), `radioDotBorder` (1.5), `radioDotSelectedBorder` (5), `radioRowPadding` (8), `radioBadgeText` (12) |
 | `packages/shared_ui/lib/src/widgets/zodiann_radio_list.dart` | new (`ZodiannRadioOption<T>`, `ZodiannRadioList<T>`) |
 | `packages/shared_ui/lib/shared_ui.dart` | export the new file |
 | `test/theme/dimensions_test.dart` | pin the new size tokens against `settings.html` |
@@ -87,35 +88,37 @@ Commands run from `packages/shared_ui` unless marked **root**.
 
 ### Task 1: Tokens (TDD)
 
-- [ ] **Step 1 (RED):** in `dimensions_test.dart` pin `radioDot 18`, `radioDotBorder 1.5`, `radioDotSelectedBorder 5`, `radioRowPadding 8`, and extend the kit.css cross-check there to read `settings.html` `.radio .dot` and `.radio label`. Expected: compile errors `Member not found`.
+- [ ] **Step 1 (RED):** in `dimensions_test.dart` pin `radioDot 18`, `radioDotBorder 1.5`, `radioDotSelectedBorder 5`, `radioRowPadding 8`, `radioBadgeText 12`. The existing kit.css helper there reads kit.css only, so add a second helper that reads `../../design-reference/zodiann/_source/settings.html` and parses the `.radio` rules (lines 21 to 25: dot size and borders, label padding, badge `font-size: var(--fs-xs)`). Expected: compile errors `Member not found`.
 - [ ] **Step 2 (GREEN):** add the constants with doc comments citing `settings.html` lines. Run: pass. **Root:** `fvm dart test test/architecture/no_magic_dimensions_test.dart`.
 - [ ] **Step 3:** commit `feat(ZOD-UI-008): add the radio list tokens`.
 
 ### Task 2: Selection, keyboard and semantics, RED first
 
-- [ ] **Step 1 (RED), `test/widgets/radio_list_test.dart`** against an empty stub (assertion failures, not compile errors):
+- [ ] **Step 0 (stub and harness):** create a compiling stub `zodiann_radio_list.dart` (`ZodiannRadioOption<T>`, `ZodiannRadioList<T>` rendering nothing), add the export to `shared_ui.dart`, and write the test harness in `radio_list_test.dart`: a `MaterialApp` with the Graphite / Porcelain theme (the `ZodiannSurfaces` extension), a `Directionality` parameter, text scale and `disableAnimations` parameters, an optional enclosing `Actions` for test 6, and probe focus nodes before and after the list for the Tab tests.
+- [ ] **Step 1 (RED), `test/widgets/radio_list_test.dart`** against the stub (assertion failures, not compile errors):
   1. Tap, mouse click, Enter and Space on an unselected row call `onChanged(value)` once; on the selected row they call nothing; a controlled rebuild moves the dot.
   2. Roving tab stop: with a selection, Tab from before the group focuses the selected row, the next Tab leaves the group (focus lands on a probe after it), Shift+Tab re-enters at the selected row; with `value: null` Tab enters at the first row.
   3. Arrow keys (LTR): Down and Right select and focus the next row, Up and Left the previous; the callback receives each value once per press; wrap from last to first and first to last; Home, End and other keys do nothing.
   4. Arrow keys (RTL): Left is next, Right is previous; Up and Down unchanged.
-  5. A parent that ignores `onChanged`: focus moves to the pressed row's neighbour, the selection stays, Tab from there leaves the group and Shift+Tab returns to the selected row (the roving stop did not move).
-  6. A key with no row focused falls through to an enclosing `Actions` handler (the segmented control's outer-handler precedent); with a row focused, an outer handler does not see the four directions.
-  7. Semantics: one group node labelled `semanticLabel`; per row a node with the option label, `isChecked` / unchecked, `inMutuallyExclusiveGroup`, a hint equal to the badge when present and none otherwise; no node for the dot or the badge text.
-  8. Disabled (`onChanged: null`): all rows `enabled: false`, 0.42 opacity, inert by tap, Enter, Space and arrows, not in the Tab order, cursor `forbidden`; the selected row keeps its on look.
+  5. A parent that ignores `onChanged`: focus moves to the pressed row's neighbour, the selection stays, Tab from there leaves the group, a fresh Tab from before the group lands on the selected row (not on the neighbour: its `canRequestFocus` went back to false), and Shift+Tab from after returns to the selected row.
+  6. With a row focused, an enclosing `Actions` handler for `DirectionalFocusIntent` does not see the four directions; Tab and other keys still pass through to the enclosing shortcuts.
+  6b. Edge cases: a single-option list calls nothing on an arrow; `value: null` with Down / Right selects the first row and with Up / Left the last; changing `options` or `value` at runtime (an option added, one removed, `value` changed) re-derives the tab stop and disposes the removed row's node (no exception, no leak); a long list inside a `SingleChildScrollView`: an arrow selects the next row and scrolls it into view.
+  7. Semantics: one group node labelled `semanticLabel` with `SemanticsRole.radioGroup`; per row a node with the option label, `isChecked` / unchecked, `inMutuallyExclusiveGroup`, a hint equal to the badge when present and none otherwise; no node for the dot or the badge text.
+  8. Disabled (`onChanged: null`): all rows `enabled: false`, 0.42 opacity, inert by tap, Enter, Space and arrows, not in the Tab order, cursor `forbidden`; the selected row keeps its on look; a row that held focus when the list became disabled loses it.
   9. Asserts: empty options, duplicate values, blank label, `value` not among the options.
   10. Focus ring appears for keyboard focus only (pinned like the UI-006 / UI-007 tests); `autofocus` focuses the tab-stop row.
-- [ ] **Step 2 (GREEN):** implement `zodiann_radio_list.dart` (state, focus nodes, `Actions`, semantics); run: pass.
+- [ ] **Step 2 (GREEN):** implement `zodiann_radio_list.dart` (state, focus nodes, `Actions`, semantics, and a minimal drawn row: dot with its key, label, badge); run: pass. Task 3 adds geometry, motion and theming to the drawn row.
 - [ ] **Step 3:** doc comments (roving stop, arrows select, wrap); commit `feat(ZOD-UI-008): add ZodiannRadioList`.
 
 ### Task 3: Layout, motion and theming, RED first
 
 - [ ] **Step 1 (RED), same file:**
   1. Geometry (LTR, Graphite): dot 18 × 18 round; off border 1.5 `line`, on border 5 `accent` with an 8 px hole; label starts 12 after the dot; badge ends at the list's end edge; each row slot is at least 44 high and full width; a tap 2 px above and below the drawn row still hits its own row and does not hit the neighbour's.
-  2. Colours both themes from tokens: label `text`, badge `text-3`, dot per state.
+  2. Colours both themes from tokens: label `text` (`body` role), badge `text-3` at weight 400 and size 12, dot per state.
   3. RTL (Hebrew): dot at the right edge, badge at the left, offsets equal the mirrored LTR offsets; a label with a comma and parentheses is laid out as plain text in the line's direction.
   4. Long label wraps onto a second line, the row grows, the badge stays on the first line's baseline side without clipping; a row with a badge and a very narrow parent gives the label the leftover width, no overflow.
   5. Text scale 2: rows grow, nothing clips or overflows, the dot stays 18.
-  6. Motion: after the selection changes the dot border is mid-way at 60 ms and final at 120 ms (`Curves.linear`); instant under `disableAnimations`; the off dot's endpoint colour is a real colour with alpha, not `Colors.transparent` (UI-006 lesson).
+  6. Motion: after the selection changes, `pump()` starts the animation; `pump(60 ms)` shows the dot border colour and width at the lerp of off (`line`, 1.5) and on (`accent`, 5) at t = 0.5 (a tolerance on the lerp, not exact equality) and `pump(60 ms)` more shows the final state (`Curves.linear`); instant under `disableAnimations`.
   7. Live theme switch (no stale colours).
 - [ ] **Step 2 (GREEN):** finish the drawn row; run: pass.
 - [ ] **Step 3:** commit `feat(ZOD-UI-008): draw the radio rows as the settings screen does`.
@@ -128,7 +131,7 @@ Commands run from `packages/shared_ui` unless marked **root**.
 
 ### Task 5: Mutation proof
 
-- [ ] **Step 1:** throw-away edits, each reverted, each named, each must fail a test: R1 selected border 4; R2 off border 2; R3 selected dot colour `accentSoft`; R4 no 120 ms animation; R5 arrows move focus only (no `onChanged`); R6 no wrap-around; R7 Left and Right not swapped in RTL; R8 every row in the Tab order; R9 the roving stop on the first row instead of the selected one; R10 `checked` dropped; R11 `inMutuallyExclusiveGroup` dropped; R12 badge not exposed as the hint; R13 tapping the selected row calls `onChanged`; R14 disabled list still reacts to arrows; R15 label ellipsized instead of wrapped; R16 badge colour `text2`; R17 gap 8 instead of 12; R18 row slot below 44; R19 `Colors.transparent` endpoint; R20 arrow keys leak to an outer handler while a row has focus.
+- [ ] **Step 1:** throw-away edits, each reverted, each named, each must fail a test: R1 selected border 4; R2 off border 2; R3 selected dot colour `accentSoft`; R4 no 120 ms animation; R5 arrows move focus only (no `onChanged`); R6 no wrap-around; R7 Left and Right not swapped in RTL; R8 every row in the Tab order; R9 the roving stop on the first row instead of the selected one; R10 `checked` dropped; R11 `inMutuallyExclusiveGroup` dropped; R12 badge not exposed as the hint; R13 tapping the selected row calls `onChanged`; R14 disabled list still reacts to arrows; R15 label ellipsized instead of wrapped; R16 badge colour `text2`; R17 gap 8 instead of 12; R18 row slot below 44; R19 badge uses the `label` role (weight 500); R20 arrow keys leak to an outer handler while a row has focus; R21 a blurred row keeps `canRequestFocus` true (stale tab stop); R22 `SemanticsRole.radioGroup` dropped; R23 disabled list leaves a row focusable.
 - [ ] **Step 2:** no commit unless a mutant survives (then add the killing test first). Record the catching tests in PROGRESS Verification.
 
 ### Task 6: Verification, review, documentation
@@ -150,7 +153,7 @@ Sequential, native. One new widget, one token edit, one export and one test file
 
 ## Risks
 
-- **Row pitch against the mock (O1):** at 44 px rows the Ephemeris block grows by about 17 px (three rows, 44 against about 38.3), a visible deviation from the mock that follows MASTER §14. The pixel test compares positions relative to each row, not the absolute pitch. If the owner prefers the mock's pitch, the hit slot would fall under 44 and the §14 rule is knowingly broken for these rows.
+- **Row pitch against the mock (O1):** MASTER §14 has two clauses: targets of at least 44, and at least 8 between targets. The mock (about 36.3 high rows, 2 px gap) meets neither. At 44 px rows with no gap the Ephemeris block is about 19 px taller than the mock (3 × 44 = 132 against about 113); this meets the 44 clause and waives the 8 px clause. The pixel test compares positions relative to each row, not the absolute pitch.
 - **Roving tab stop under a controlled parent:** the target row is made requestable and focused before `onChanged` runs; Flutter's focus scope must accept a node whose `canRequestFocus` flips in the same frame. A probe in Task 2 step 1 (test 5) proves it; if it fails the fallback is a `FocusTraversalGroup` policy that filters descendants to the tab stop.
 - **Arrow keys and ancestors:** Flutter 3.50 resolves `Actions.maybeFind` to the nearest action even when disabled (UI-006 finding), so the widget must consume the four directions itself while a row has focus; test 6 pins both sides.
 - **Radio role wording:** `checked` plus `inMutuallyExclusiveGroup` should read as "radio button, selected" on TalkBack and VoiceOver; wording needs a device and is not verified here (recorded as not done).
@@ -159,7 +162,7 @@ Sequential, native. One new widget, one token edit, one export and one test file
 
 ## Open decisions (for the owner; defaults are implemented)
 
-- **O1: row height.** Default: each row is a 44 px touch target with no extra gap (MASTER §14), so rows are 44 apart where the mock shows about 38. Alternative: the mock's pitch (about 38.3, 2 px gap), which breaks the 44 px rule for these rows.
+- **O1: row height and gap.** Options: (a) 44 px slots, no gap: meets "at least 44", waives "at least 8 between targets", about 19 px taller than the mock (the default, recommended by the plan reviewer, recorded as a waiver in PROGRESS Technical Decisions); (b) 44 px slots plus an 8 px gap (52 pitch): meets all of §14, about 40 px taller than the mock; (c) the mock's pitch (about 38.3, 2 px gap): matches the screenshot, breaks both clauses.
 - **O2: arrow keys at the ends.** Default: selection wraps (ARIA radio group). Alternative: stop at the first and last row.
 - **O3: focus ring.** Default: the keyboard ring surrounds the whole row (the hit target), radius 8. Alternative: a ring around the dot only.
 - **O4: motion.** Default: 120 ms linear crossfade of the dot's border (MASTER §12), instant under reduced motion; the kit has none. Alternative: instant.
@@ -170,3 +173,27 @@ Sequential, native. One new widget, one token edit, one export and one test file
 ## Review Focus
 
 Roving tab stop and focus when the parent rejects a change; RTL arrow direction against the Hebrew screen; whether the list works inside `ZodiannPanel` (`stack` row) at phone width; arrow keys while a row inside a scrolling parent is focused (scroll into view); the radio semantics flags; the O1 vertical deviation against the pixel test.
+
+## Plan review
+
+### Round 1 (2026-11-24, `plan-reviewer`)
+
+**Verdict:** needs user decision (O1); no Critical.
+
+| ID | Severity | Finding | Done |
+|---|---|---|---|
+| I1 | Important | Badge size and weight had no token or role (`label` is weight 500) | Applied: token `radioBadgeText` 12, badge style `body.copyWith(fontSize, color)`, tests and mutant R19 |
+| I2 | Important | No way for tests to find dot, rows, ring; Task 2 / Task 3 split inconsistent; no stub step | Applied: dot key, finders, Task 2 Step 0 (stub, export, harness), minimal drawn row in Task 2 |
+| I3 | Important | Roving focus mechanism under-specified (external nodes ignore `enabled`, stale `canRequestFocus`) | Applied: per-build rule, blur listener, disabled handling, tests 5 and 8, mutants R21, R23 |
+| I4 | Important | O1 default breaks the 8 px clause of §14; wording and "17 px" wrong | Applied: wording and figure (about 19) corrected; owner decided O1 (a) |
+| I5 | Important | Group node lacked `SemanticsRole.radioGroup`; `RadioGroup` choice unexplained; radio-role claim stated as fact | Applied: role added and tested (mutant R22), rationale sentence, claim reworded as unverified |
+| M1 | Minor | Test 6 half vacuous | Applied: replaced by Tab and other keys passing through |
+| M2 | Minor | Scroll into view unspecified | Applied: `defaultTraversalRequestFocusCallback` and a scroll test (6b) |
+| M3 | Minor | Edge cases missing | Applied: test 6b, nodes keyed by value and disposed |
+| M4 | Minor | R19 transparent endpoint not applicable | Applied: dropped; motion test uses the lerp of `line` and `accent` |
+| M5 | Minor | `settings.html` needs its own helper in `dimensions_test` | Applied in Task 1 |
+| M6 | Minor | Motion test pump sequence | Applied in Task 3 test 6 |
+| M7 | Minor | Disabled list details | Applied in the Disabled bullet |
+| M8 | Minor | PROGRESS header hygiene | Kept in Task 6 |
+
+**Open items:** none beyond O2 to O7 defaults. Round 2 follows.
