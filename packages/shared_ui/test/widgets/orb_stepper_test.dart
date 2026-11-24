@@ -550,6 +550,11 @@ void main() {
         tester.widget<Text>(find.byKey(_value)).style!.fontWeight,
         FontWeight.w500,
       );
+      expect(
+        tester.widget<Text>(find.byKey(_value)).style!.fontFeatures,
+        contains(const FontFeature.tabularFigures()),
+        reason: 'numbers in tabular figures (the font may default to them, so the style is pinned)',
+      );
       final glyph = tester.widget<Text>(
         find.descendant(of: find.byKey(_plusArea), matching: find.byType(Text)),
       );
