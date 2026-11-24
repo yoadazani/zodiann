@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/tokens/zodiann_dimensions.dart';

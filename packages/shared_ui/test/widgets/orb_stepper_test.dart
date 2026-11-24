@@ -8,7 +8,6 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
-import 'package:shared_ui/src/widgets/zodiann_orb_stepper.dart';
 import 'package:shared_ui/src/widgets/zodiann_pressable.dart';
 
 import '../support/button_harness.dart';
@@ -386,10 +385,9 @@ void main() {
         _stepper(value: 19, onChanged: calls.add, withLabelFor: true),
       );
       final group = find.byType(ZodiannOrbStepper);
-      final id = tester.getSemantics(group).id;
-      final owner = tester.binding.pipelineOwner.semanticsOwner!;
-      owner.performAction(id, SemanticsAction.increase);
-      owner.performAction(id, SemanticsAction.decrease);
+      final node = find.semantics.byLabel('Conjunction orb');
+      tester.semantics.performAction(node, SemanticsAction.increase);
+      tester.semantics.performAction(node, SemanticsAction.decrease);
       expect(calls, [20, 18]);
       calls.clear();
       await pumpInApp(

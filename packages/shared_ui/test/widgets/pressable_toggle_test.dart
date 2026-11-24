@@ -3,7 +3,6 @@
 // `slotAlignment` (where the drawn child sits in the 44 x 44 slot) and
 // `focusRingRadius`. Their defaults must leave every existing node and look
 // as it was.
-import 'package:flutter/rendering.dart' show RenderBox;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
