@@ -9,5 +9,6 @@ export 'src/ephemeris/ecliptic_position.dart';
 export 'src/ephemeris/ephemeris_port.dart';
 export 'src/ephemeris/ephemeris_result.dart';
 export 'src/ephemeris/mean_node.dart';
+export 'src/ephemeris/supported_date_range.dart';
 export 'src/ephemeris/utc_range.dart';
 export 'src/zodiac/zodiac_sign.dart';
