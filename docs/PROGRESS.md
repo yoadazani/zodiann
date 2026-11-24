@@ -888,7 +888,7 @@ ZOD-FND-001, final run on 2026-11-12 (Flutter 3.50.0 / Dart 3.14.0 via FVM):
 
 ## Git State
 
-- **iOS backlog split:** branch `task/ZOD-IOS-001-011-ios-backlog-split` (from `main` @ `46944d9`), committed locally with explicit staging paths as `d32ecf5` (38 files: 11 new, 27 modified), **not pushed, no PR**. The owner said not to push; push and PR need a follow-up instruction. Unrelated untracked file left alone: `grep.exe.stackdump`.
+- **iOS backlog split:** branch `task/ZOD-IOS-001-011-ios-backlog-split` (from `main` @ `46944d9`), committed locally with explicit staging paths as `d32ecf5` (38 files: 11 new, 27 modified), pushed, [PR #64](https://github.com/yoadazani/zodiann/pull/64) open (not merged). The owner said not to push; push and PR need a follow-up instruction. Unrelated untracked file left alone: `grep.exe.stackdump`.
 - **ZOD-UI-008:** branch `task/ZOD-UI-008-radio-list` (from `main` @ `aae9176`): plan `598e4ef`, review rounds `e27b7b4`, `5147be6`; tokens `ede7277`; list `75ed986`; layout tests `646abce`; screen proof `007969d`; format `0afb749`; review fixes `bc0e831`; documentation `59fe066`. PR: [PR #63](https://github.com/yoadazani/zodiann/pull/63) (open; merge needs the owner's approval). Unmerged dependency: none (ZOD-UI-007 is merged). Untracked and deliberately left alone: `grep.exe.stackdump`.
 - **ZOD-UI-007:** merged, [PR #62](https://github.com/yoadazani/zodiann/pull/62), `aae9176`.
 
