@@ -149,7 +149,7 @@ class ZodiannOrbStepper extends StatelessWidget {
       child: SizedBox(
         key: areaKey,
         width: ZodiannSize.stepperButtonWidth,
-        height: ZodiannSize.stepper - 2 * ZodiannSize.hairline,
+        height: ZodiannSize.stepperInnerHeight,
         child: Center(
           child: Text(
             glyph,
@@ -194,7 +194,7 @@ class ZodiannOrbStepper extends StatelessWidget {
                 padding: const EdgeInsets.all(ZodiannSize.hairline),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    minHeight: ZodiannSize.stepper - 2 * ZodiannSize.hairline,
+                    minHeight: ZodiannSize.stepperInnerHeight,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

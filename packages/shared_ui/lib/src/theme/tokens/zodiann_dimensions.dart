@@ -156,6 +156,10 @@ abstract final class ZodiannSize {
   /// Orb stepper: height.
   static const double stepper = 36.0;
 
+  /// Orb stepper: the height inside the 1 px border (kit.css `.stepper`
+  /// `height: 36px` with a border-box, so the buttons are 34 high).
+  static const double stepperInnerHeight = stepper - 2 * hairline;
+
   /// Orb stepper: the width of each − and + button (kit.css
   /// `.stepper button`).
   static const double stepperButtonWidth = 34.0;

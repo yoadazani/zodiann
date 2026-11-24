@@ -119,6 +119,7 @@ void main() {
       'switchThumb': (ZodiannSize.switchThumb, 16),
       'switchThumbInset': (ZodiannSize.switchThumbInset, 3),
       'stepperButtonWidth': (ZodiannSize.stepperButtonWidth, 34),
+      'stepperInnerHeight': (ZodiannSize.stepperInnerHeight, 34),
       'stepperGlyph': (ZodiannSize.stepperGlyph, 18),
       'stepperValueMinWidth': (ZodiannSize.stepperValueMinWidth, 52),
       'bodyChipHeight': (ZodiannSize.bodyChipHeight, 34),
