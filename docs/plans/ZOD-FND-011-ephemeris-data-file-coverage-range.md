@@ -303,20 +303,20 @@ Reviewer: `plan-reviewer`, two rounds (static review; no tests run). Round 2 was
 
 ### Plan review of the Task 7 revision
 
-Reviewer:  (static review plus throwaway regex scripts outside the repo). The revision under review is commit  (Task 7 and the scope statements).
+Reviewer: `plan-reviewer` (static review plus throwaway regex scripts outside the repo). The revision under review is commit `89c2caa` (Task 7 and the scope statements).
 
 **Round 1: approve after corrections** (no Critical, no user decision needed).
 
 | ID | Severity | Finding | Done |
 |---|---|---|---|
-| I1 | Important | Bare ,  and  commands throughout Task 7 | Applied: every Task 7 command is , ,  |
-| I2 | Important | The no-bypass guard misses string interpolation:  blanks  holes (confirmed by a throwaway script) | Applied: a second pass over  bodies, with controls that must and must not match |
-| I3 | Important | Path separators and the leading  are unspecified, so the allowlist fails on Windows | Applied: a named normaliser (relative to the root, no ,  separators) with its own test and a backslash end-to-end case |
-| I4 | Important | R1 would flag legitimate future uses ( imports, multi-line reads, , prefixed use); R2 missed  and  | Applied: directives removed before the rules, tolerant R1 read forms, R2 reuses the member-segment tolerance of , tests for each form |
-| I5 | Important | Stale and contradictory wording: plan lines still saying the amendment is only documented, the EPH-002 table row, "push and open the PR", the Execution line; and the repo claimed a finished state (task file Done, TASKS.md Done, PROGRESS "IMPLEMENTED and VERIFIED", "applied by EPH-002") | Applied: plan wording fixed; the task file Status, the TASKS.md row and PROGRESS Current Task and Completed row now say In Progress (Task 7 pending); 7.5 Step 1 lists every location to rewrite after Task 7 |
-| M1 | Minor | 7.4 Step 1 red/green wording incoherent; no restore command | Applied: a characterization test with a mutation proof and a  restore |
+| I1 | Important | Bare `dart`, `flutter` and `melos` commands throughout Task 7 | Applied: every Task 7 command is `fvm dart ...`, `fvm flutter ...` or `fvm dart run melos ...` |
+| I2 | Important | The no-bypass guard misses string interpolation: `cleanDartSource` blanks `${...}` holes (confirmed by a throwaway script) | Applied: a second pass over `${...}` bodies, with controls that must and must not match |
+| I3 | Important | Path separators and a leading `./` are unspecified, so the allowlist fails on Windows | Applied: a named normaliser (relative to the root, no leading `./`, `/` separators) with its own test and a backslash end-to-end case |
+| I4 | Important | R1 would flag legitimate future uses (`show` imports, multi-line reads, `ref.watch<T>(...)`, a prefixed use); R2 missed `Provider.family` and `.autoDispose` | Applied: directives removed before the rules, tolerant R1 read forms, R2 reuses the member-segment tolerance of `wheel_single_provider.dart`, a test for each form |
+| I5 | Important | Stale and contradictory wording: plan lines still saying the amendment is only documented, the EPH-002 table row, "push and open the PR", the Execution line; and the repo claimed a finished state (task file Done, TASKS.md Done, PROGRESS "IMPLEMENTED and VERIFIED", "applied by EPH-002") | Applied: plan wording fixed; the task file Status, the TASKS.md row and the PROGRESS Current Task and Completed row now say In Progress (Task 7 pending); 7.5 Step 1 lists every location to rewrite after Task 7 |
+| M1 | Minor | 7.4 Step 1 red/green wording incoherent; no restore command | Applied: a characterization test with a mutation proof and a `git checkout --` restore |
 | M2 | Minor | R3 missed tear-offs and prefixed names; a SwissLike case needs its class in the map; single-expression wrapping unstated | Applied: R3 matches any identifier occurrence; tests and the EPH-002 hand-off state the single-expression rule |
 | M3 | Minor | Residuals of the guards not stated | Applied: listed in 7.5 Step 1 |
 | M4 | Minor | Future sources (EPH-003) must add their files to the allowlist | Applied: EPH-003/004 hand-off row |
 
-**Round 2** (focused on the revision of round 1): see below.
+**Round 2** (focused on the round 1 revision): see below.
