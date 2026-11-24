@@ -318,9 +318,8 @@ void main() {
 // settings.html's `.radio` rules (the kit has no radio of its own).
 void _radioRulesMatchTokens() {
   test("the radio list's tokens are settings.html's `.radio` rules", () {
-    final html = File(
-      '../../design-reference/zodiann/_source/settings.html',
-    ).readAsStringSync();
+    final html = File('../../design-reference/zodiann/_source/settings.html')
+        .readAsStringSync();
     expect(
       html,
       contains(
@@ -344,9 +343,7 @@ void _radioRulesMatchTokens() {
     );
     expect(
       html,
-      contains(
-        'padding: ${ZodiannSize.radioRowPadding.toInt()}px 0;',
-      ),
+      contains('padding: ${ZodiannSize.radioRowPadding.toInt()}px 0;'),
       reason: '.radio label padding',
     );
     expect(
@@ -355,9 +352,7 @@ void _radioRulesMatchTokens() {
       reason: '.radio small uses --fs-xs',
     );
     expect(ZodiannSize.radioBadgeText, 12, reason: '--fs-xs is 12px');
-    final kitXs = RegExp(r'--fs-xs:\s*(\d+)px')
-        .firstMatch(_kitCss())!
-        .group(1);
+    final kitXs = RegExp(r'--fs-xs:\s*(\d+)px').firstMatch(_kitCss())!.group(1);
     expect(kitXs, '12', reason: 'kit.css --fs-xs');
   });
 }
