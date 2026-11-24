@@ -192,4 +192,13 @@ class ZodiannLocalizationsHe extends ZodiannLocalizations {
 
   @override
   String get drawerOffline => 'כל הנתונים נשארים במכשיר';
+
+  @override
+  String rangeOutsideSupported(String start, String end) {
+    return 'התאריך מחוץ לטווח הנתמך ($start עד $end). בחרו תאריך בתוך הטווח.';
+  }
+
+  @override
+  String get rangeDataUnavailable =>
+      'נתוני המיקום לתאריך זה אינם זמינים במכשיר.';
 }
