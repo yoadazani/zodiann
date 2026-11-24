@@ -36,6 +36,7 @@ double _px(String body, String property) {
 }
 
 void main() {
+  _radioRulesMatchTokens();
   test("the spacing scale is MASTER's 4-based scale", () {
     expect(ZodiannSpace.scale, [4, 8, 12, 16, 20, 24, 32, 40, 48]);
     expect(ZodiannSpace.s1, 4);
@@ -310,5 +311,48 @@ void main() {
     expect(actions, contains('margin-top: var(--s6)'));
     expect(actions, contains('justify-content: flex-end'));
     expect(kit['s2'], ZodiannSpace.s2);
+  });
+}
+
+// ZOD-UI-008: the radio list's dot, borders, row padding and badge size are
+// settings.html's `.radio` rules (the kit has no radio of its own).
+void _radioRulesMatchTokens() {
+  test("the radio list's tokens are settings.html's `.radio` rules", () {
+    final html = File('../../design-reference/zodiann/_source/settings.html')
+        .readAsStringSync();
+    expect(
+      html,
+      contains(
+        '.radio .dot { width: ${ZodiannSize.radioDot.toInt()}px; '
+        'height: ${ZodiannSize.radioDot.toInt()}px;',
+      ),
+      reason: '.radio .dot size',
+    );
+    expect(
+      html,
+      contains('border: ${ZodiannSize.radioDotBorder}px solid var(--line)'),
+      reason: '.radio .dot border',
+    );
+    expect(
+      html,
+      contains(
+        '.radio .on .dot { border: '
+        '${ZodiannSize.radioDotSelectedBorder.toInt()}px solid var(--accent)',
+      ),
+      reason: '.radio .on .dot border',
+    );
+    expect(
+      html,
+      contains('padding: ${ZodiannSize.radioRowPadding.toInt()}px 0;'),
+      reason: '.radio label padding',
+    );
+    expect(
+      html,
+      contains('font-size: var(--fs-xs); }'),
+      reason: '.radio small uses --fs-xs',
+    );
+    expect(ZodiannSize.radioBadgeText, 12, reason: '--fs-xs is 12px');
+    final kitXs = RegExp(r'--fs-xs:\s*(\d+)px').firstMatch(_kitCss())!.group(1);
+    expect(kitXs, '12', reason: 'kit.css --fs-xs');
   });
 }

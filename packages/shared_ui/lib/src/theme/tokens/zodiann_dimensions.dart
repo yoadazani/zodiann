@@ -188,6 +188,25 @@ abstract final class ZodiannSize {
   /// Body chip: the glyph's font size (kit.css `.chk .glyph`).
   static const double bodyChipGlyph = 15.0;
 
+  /// Radio list: the dot's diameter (settings.html `.radio .dot`).
+  static const double radioDot = 18.0;
+
+  /// Radio list: the dot's border when not selected (`border: 1.5px solid
+  /// var(--line)`).
+  static const double radioDotBorder = 1.5;
+
+  /// Radio list: the dot's border when selected (`.radio .on .dot`
+  /// `border: 5px solid var(--accent)`, which leaves an 8 px hole).
+  static const double radioDotSelectedBorder = 5.0;
+
+  /// Radio list: the padding above and below a row's content
+  /// (`.radio label` `padding: 8px 0`).
+  static const double radioRowPadding = 8.0;
+
+  /// Radio list: the trailing badge's font size (`.radio small`
+  /// `font-size: var(--fs-xs)`).
+  static const double radioBadgeText = 12.0;
+
   /// The 1 px rule of borders and head rules (MASTER §1, §4).
   static const double hairline = 1.0;
 

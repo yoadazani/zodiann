@@ -119,7 +119,7 @@ Every task in this section implements a component that is **already fully design
 | ZOD-UI-005 | [Implement the input/field component](shared-ui-design-system/ZOD-UI-005-implement-the-input-field-component.md) | High | Done |
 | ZOD-UI-006 | [Implement the segmented control component](shared-ui-design-system/ZOD-UI-006-implement-the-segmented-control-component.md) | High | Done |
 | ZOD-UI-007 | [Implement switch, stepper, and body-chip components](shared-ui-design-system/ZOD-UI-007-implement-switch-stepper-and-body-chip-components.md) | Medium | Done |
-| ZOD-UI-008 | [Implement the radio-list component (ephemeris source selector)](shared-ui-design-system/ZOD-UI-008-implement-the-radio-list-component-ephemeris-source-selector.md) | Low | Not Started |
+$1Done$2
 | ZOD-UI-009 | [Implement the tag component (highlight tags, mode tags, Today/Center outline tags)](shared-ui-design-system/ZOD-UI-009-implement-the-tag-component-highlight-tags-mode-tags-today-center.md) | Medium | Done |
 | ZOD-UI-010 | [Implement the table component (header, rows, hover, selected)](shared-ui-design-system/ZOD-UI-010-implement-the-table-component-header-rows-hover-selected.md) | High | Done |
 | ZOD-UI-011 | [Implement the toast/feedback component (export status, progress with Stop)](shared-ui-design-system/ZOD-UI-011-implement-the-toast-feedback-component-export-status-progress-with.md) | High | Not Started |
