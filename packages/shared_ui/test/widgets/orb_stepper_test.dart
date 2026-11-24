@@ -441,42 +441,94 @@ void main() {
       expect(calls, [7, 9]);
     });
 
-    testWidgets('a focused + that reaches the maximum is disabled cleanly', (
+    // A keyboard user repeating a step must not lose their place when the
+    // button they are on reaches its bound: focus moves to the other button.
+    for (final up in [true, false]) {
+      testWidgets(
+        'focus moves to the other button when ${up ? '+' : '-'} reaches its bound',
+        (tester) async {
+          double current = up ? 19 : 1;
+          await pumpInApp(
+            tester,
+            StatefulBuilder(
+              builder: (context, setState) => _stepper(
+                value: current,
+                min: 0,
+                max: 20,
+                onChanged: (v) => setState(() => current = v),
+              ),
+            ),
+          );
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          if (up) await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pump();
+          expect(_focusedLabel(), up ? 'Increase' : 'Decrease');
+          await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+          await tester.pump();
+          await tester.pump();
+          expect(current, up ? 20 : 0);
+          expect(tester.takeException(), isNull);
+          final handle = tester.ensureSemantics();
+          expect(
+            tester.getSemantics(up ? _plus : _minus),
+            isSemantics(hasEnabledState: true, isEnabled: false),
+          );
+          expect(_focusedLabel(), up ? 'Decrease' : 'Increase');
+          // And it keeps working from there.
+          await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+          await tester.pump();
+          expect(current, up ? 19 : 1);
+          handle.dispose();
+        },
+      );
+    }
+
+    testWidgets('focus is not stolen when the button is not the focused one', (
       tester,
     ) async {
       double current = 19;
-      late StateSetter set;
       await pumpInApp(
         tester,
         StatefulBuilder(
-          builder: (context, setState) {
-            set = setState;
-            return _stepper(
-              value: current,
-              max: 20,
-              onChanged: (v) => setState(() => current = v),
-            );
-          },
+          builder: (context, setState) => _stepper(
+            value: current,
+            onChanged: (v) => setState(() => current = v),
+          ),
         ),
       );
-      set(() {});
-      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      // Focus the minus button, then reach max with a tap on plus.
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pump();
-      expect(_focusedLabel(), 'Increase');
-      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.tap(_plus);
+      await tester.pump();
       await tester.pump();
       expect(current, 20);
-      expect(tester.takeException(), isNull);
-      final handle = tester.ensureSemantics();
-      expect(
-        tester.getSemantics(_plus),
-        isSemantics(hasEnabledState: true, isEnabled: false),
-      );
-      // The framework drops focus from a control that became disabled.
-      expect(_focusedLabel(), isNot('Increase'));
-      handle.dispose();
+      expect(_focusedLabel(), 'Decrease');
     });
+
+    testWidgets(
+      'disabling the whole stepper leaves focus alone (nowhere to go)',
+      (tester) async {
+        var enabled = true;
+        late StateSetter set;
+        await pumpInApp(
+          tester,
+          StatefulBuilder(
+            builder: (context, setState) {
+              set = setState;
+              return _stepper(onChanged: enabled ? (_) {} : null);
+            },
+          ),
+        );
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        set(() => enabled = false);
+        await tester.pump();
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+        expect(_focusedLabel(), isNull);
+      },
+    );
   });
 
   group('text and theme', () {

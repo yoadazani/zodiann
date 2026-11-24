@@ -55,11 +55,18 @@ double? orbStepperNext({
 /// inert value area. The buttons' focus rings surround the 34 × 34 button
 /// areas and paint over the border and the value; the control never clips.
 ///
+/// A [value] outside the bounds asserts in debug. In release the buttons
+/// enable by the clamped value (a stale value never lets a button step past a
+/// bound) while the shown text stays the caller's [valueLabel].
+///
+/// When a keyboard-focused button reaches its bound and goes inert, focus
+/// moves to the other button so a repeating user keeps their place.
+///
 /// The row follows the reading direction (the minus button is on the start
 /// side: on the right in Hebrew); the value stays left to right (L-7).
 /// The group is one semantics node with [semanticLabel] and the value, with
 /// the two buttons beneath it and increase / decrease actions.
-class ZodiannOrbStepper extends StatelessWidget {
+class ZodiannOrbStepper extends StatefulWidget {
   /// A stepper showing [valueLabel] for [value].
   ZodiannOrbStepper({
     super.key,
@@ -115,36 +122,75 @@ class ZodiannOrbStepper extends StatelessWidget {
   /// only when this is given (the two buttons always work).
   final String Function(double value)? valueLabelFor;
 
+  @override
+  State<ZodiannOrbStepper> createState() => _ZodiannOrbStepperState();
+}
+
+double? _next(ZodiannOrbStepper w, int direction) => orbStepperNext(
+  value: w.value,
+  step: w.step,
+  min: w.min,
+  max: w.max,
+  direction: direction,
+);
+
+class _ZodiannOrbStepperState extends State<ZodiannOrbStepper> {
   /// The minus and plus glyphs (not user copy: the kit's `−` and `+`).
   static const String _minus = '−';
   static const String _plus = '+';
+
+  final FocusNode _minusNode = FocusNode(debugLabel: 'ZodiannOrbStepper minus');
+  final FocusNode _plusNode = FocusNode(debugLabel: 'ZodiannOrbStepper plus');
+
+  @override
+  void dispose() {
+    _minusNode.dispose();
+    _plusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ZodiannOrbStepper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A keyboard user repeating a step must not lose their place when the
+    // button they are on reaches its bound (an inert button cannot hold
+    // focus): move focus to the other button, once the frame has settled.
+    // A stepper that is disabled as a whole has nowhere to move focus to.
+    final enabled = widget.onChanged != null;
+    final minusInert = !enabled || _next(widget, -1) == null;
+    final plusInert = !enabled || _next(widget, 1) == null;
+    FocusNode? to;
+    if (_minusNode.hasFocus && minusInert && !plusInert) to = _plusNode;
+    if (_plusNode.hasFocus && plusInert && !minusInert) to = _minusNode;
+    if (to != null) {
+      final target = to;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) target.requestFocus();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final s = theme.extension<ZodiannSurfaces>()!;
     final styles = theme.extension<ZodiannTextStyles>()!;
-    final callback = onChanged;
+    final callback = widget.onChanged;
 
-    double? next(int direction) => orbStepperNext(
-      value: value,
-      step: step,
-      min: min,
-      max: max,
-      direction: direction,
-    );
-    final down = callback == null ? null : next(-1);
-    final up = callback == null ? null : next(1);
+    final down = callback == null ? null : _next(widget, -1);
+    final up = callback == null ? null : _next(widget, 1);
 
     Widget button({
       required Key areaKey,
       required String label,
       required String glyph,
+      required FocusNode node,
       required double? target,
       required AlignmentGeometry alignment,
     }) => ZodiannPressable(
       onPressed: target == null ? null : () => callback!(target),
       semanticLabel: label,
+      focusNode: node,
       slotAlignment: alignment,
       child: SizedBox(
         key: areaKey,
@@ -168,16 +214,16 @@ class ZodiannOrbStepper extends StatelessWidget {
     return Semantics(
       container: true,
       explicitChildNodes: true,
-      label: semanticLabel,
-      value: valueLabel,
-      onIncrease: up == null || valueLabelFor == null
+      label: widget.semanticLabel,
+      value: widget.valueLabel,
+      onIncrease: up == null || widget.valueLabelFor == null
           ? null
           : () => callback!(up),
-      increasedValue: up == null ? null : valueLabelFor?.call(up),
-      onDecrease: down == null || valueLabelFor == null
+      increasedValue: up == null ? null : widget.valueLabelFor?.call(up),
+      onDecrease: down == null || widget.valueLabelFor == null
           ? null
           : () => callback!(down),
-      decreasedValue: down == null ? null : valueLabelFor?.call(down),
+      decreasedValue: down == null ? null : widget.valueLabelFor?.call(down),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -211,7 +257,7 @@ class ZodiannOrbStepper extends StatelessWidget {
                             textDirection: TextDirection.ltr,
                             child: ExcludeSemantics(
                               child: Text(
-                                valueLabel,
+                                widget.valueLabel,
                                 key: const ValueKey('zodiann-stepper-value'),
                                 maxLines: 1,
                                 softWrap: false,
@@ -238,8 +284,9 @@ class ZodiannOrbStepper extends StatelessWidget {
             bottom: 0,
             child: button(
               areaKey: const ValueKey('zodiann-stepper-minus-area'),
-              label: decrementLabel,
+              label: widget.decrementLabel,
               glyph: _minus,
+              node: _minusNode,
               target: down,
               alignment: AlignmentDirectional.centerStart,
             ),
@@ -250,8 +297,9 @@ class ZodiannOrbStepper extends StatelessWidget {
             bottom: 0,
             child: button(
               areaKey: const ValueKey('zodiann-stepper-plus-area'),
-              label: incrementLabel,
+              label: widget.incrementLabel,
               glyph: _plus,
+              node: _plusNode,
               target: up,
               alignment: AlignmentDirectional.centerEnd,
             ),

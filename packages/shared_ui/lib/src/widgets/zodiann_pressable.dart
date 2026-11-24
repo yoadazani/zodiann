@@ -211,7 +211,8 @@ class _ZodiannPressableState extends State<ZodiannPressable> {
 }
 
 /// The control's layout and hit box (UI-004 D3): at least 44 × 44, with the
-/// drawn box centred inside it.
+/// drawn box placed inside it by [ZodiannPressable.slotAlignment] (centred by
+/// default).
 ///
 /// The drawn box keeps its own height (loose), but takes the incoming width
 /// constraint as is: in a tight-width slot (full-width controls, MASTER §6)

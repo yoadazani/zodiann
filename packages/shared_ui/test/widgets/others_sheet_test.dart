@@ -42,7 +42,7 @@ const List<_Chip> _chips = [
   (body: Body.node, label: 'Mean node', on: false, x0: 1062, x1: 1200),
 ];
 
-const _themes = {'dark': (-0), 'light': (-18)};
+const _themes = {'dark': 0, 'light': (-18)};
 
 Future<PixelAt> _render(
   WidgetTester tester,
@@ -171,8 +171,6 @@ void main() {
     late int bg;
 
     group('$name sheet', () {
-      setUp(() {});
-
       Future<void> load(WidgetTester tester) async {
         final img = await tester.runAsync(
           () => decodeDesignPng('components/components_$name.png'),
