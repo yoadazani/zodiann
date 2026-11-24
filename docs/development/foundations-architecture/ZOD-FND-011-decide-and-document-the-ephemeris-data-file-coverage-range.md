@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** Done (see Completion notes)
+- **Status:** In Progress (Task 7 pending: the mean-node and product-range enforcement approved on 2026-11-25; see Completion notes)
 - **Scope:** MVP
 
 ## Description
@@ -47,7 +47,8 @@ No direct design reference applies — this is a data/content decision. The resu
 
 ## Completion notes
 
-- **Done 2026-11-25** on branch `task/ZOD-FND-011-ephemeris-data-file-coverage-range`. Plan: [`docs/plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (two plan-review rounds). Decision record: [`docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md).
+- **Interim status 2026-11-25:** the criteria below were met by Tasks 1 to 6; the task is held at In Progress because the owner required the product range to be enforced for every body, the mean node included (Task 7 of the plan), and it is not yet implemented. The statements below that the amendment is "applied by ZOD-EPH-002" are superseded and will be rewritten when Task 7 is done.
+- **Tasks 1 to 6 done 2026-11-25** on branch `task/ZOD-FND-011-ephemeris-data-file-coverage-range`. Plan: [`docs/plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (two plan-review rounds). Decision record: [`docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md).
 - **What was decided:** keep `sepl_18` and `semo_18` (nominally 1800 to 2400, **not device-verified**; ZOD-EPH-002 measures the edges); the supported product range is 1900-01-01 to 2100-12-31 inclusive, judged on the UTC instant. The FND-002 contract amendment (physical `coveredRange`, a sealed `OutsideSupportedRange`, a product-range decorator that also covers the mean node) is **approved and documented, and applied by ZOD-EPH-002**; this task changed no adapter or port.
 - **Not changed:** the specification (line 368 deviation recorded in the decision record), the Square anchor scope, the Excel floor, the ΔT warning, and every other task file. The ownership and hand-off map is in the decision record only; a task gets its Notes line when it is planned.
 - **Citation corrected (owner-approved):** the Description cited SQ-10 (square size) for anchors; anchors are SQ-5.
