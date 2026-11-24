@@ -29,7 +29,7 @@ Each rule below is stated once, in the section that owns it. Other sections poin
 
 ## Task Documentation
 
-`docs/development/README.md` and the per-category task files under `docs/development/<category>/` define each task's scope, implementation requirements, specification references, dependencies, acceptance criteria and expected behavior. Verify the actual directory structure before assuming file locations.
+`docs/development/README.md` and the per-category task files under `docs/development/<category>/` define each task's scope, implementation requirements, specification references, dependencies, acceptance criteria and expected behavior. Shared and Android task files stay under `docs/development/<category>/`; iOS-specific task files live under `docs/development/ios/tasks/` and use the `ZOD-IOS-NNN` ID convention (a new iOS task names its parent task in its `Parent task` field and keeps the parent's shared and Android scope in the parent file). Verify the actual directory structure before assuming file locations.
 
 ## Design Reference
 

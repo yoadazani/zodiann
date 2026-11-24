@@ -14,7 +14,7 @@ You review; you do not plan, implement, or edit. Your output is a set of finding
 The orchestrator's prompt gives you:
 
 - the plan path (`docs/plans/<TASK-ID>-*.md`) and the task ID;
-- the task file path (`docs/development/<category>/<TASK-ID>-*.md`);
+- the task file path (`docs/development/<category>/<TASK-ID>-*.md` for shared and Android tasks, `docs/development/ios/tasks/<TASK-ID>-*.md` for iOS tasks, whose IDs are `ZOD-IOS-NNN` and which name a parent task);
 - optionally: the review round (1 or 2), for round 2 or a revision the commit range of the revision and the previous round's findings, and any product-owner decisions already made in this conversation.
 
 ## Review modes
