@@ -198,6 +198,9 @@ class _ZodiannRadioListState<T> extends State<ZodiannRadioList<T>> {
       final selected = i == _selectedIndex;
       final badge = option.badge;
       return ZodiannPressable(
+        // Keyed by value: an inserted or moved option must not hand its
+        // neighbour's focus node, hover or dot state to another row.
+        key: ObjectKey(option.value),
         onPressed: onChanged == null
             ? null
             : selected
@@ -274,8 +277,9 @@ class _ZodiannRadioListState<T> extends State<ZodiannRadioList<T>> {
 
 void _noop() {}
 
-/// Tab order inside the list: the tab-stop row and the row that holds focus
-/// (after an arrow key a rejected change leaves focus off the stop).
+/// Tab order inside the list: the row that holds focus while one does (after
+/// an arrow key a rejected change leaves focus off the stop, and one Tab or
+/// Shift+Tab must still leave the group), otherwise the tab-stop row.
 class _RovingTabPolicy extends ReadingOrderTraversalPolicy {
   _RovingTabPolicy({required this.stop});
 
@@ -285,9 +289,12 @@ class _RovingTabPolicy extends ReadingOrderTraversalPolicy {
   Iterable<FocusNode> sortDescendants(
     Iterable<FocusNode> descendants,
     FocusNode currentNode,
-  ) => super
-      .sortDescendants(descendants, currentNode)
-      .where((n) => n == stop || n.hasFocus);
+  ) {
+    final sorted = super.sortDescendants(descendants, currentNode).toList();
+    final focused = sorted.where((n) => n.hasFocus).toList();
+    if (focused.isNotEmpty) return focused;
+    return sorted.where((n) => n == stop);
+  }
 }
 
 /// The four arrow keys while a row has focus: Down and Right the next row, Up

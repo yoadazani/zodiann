@@ -362,6 +362,46 @@ void main() {
       expect(_focused(), 'radio-row-0');
     });
 
+    testWidgets('after a rejected arrow one Tab leaves the group, either way', (
+      tester,
+    ) async {
+      // Forward: the stop is row 1, an Up is rejected, focus sits on row 0.
+      final p = _probes();
+      await _pump(
+        tester,
+        _Scene(
+          before: p.before,
+          after: p.after,
+          initial: 'moshier',
+          accept: false,
+        ),
+      );
+      await _enter(tester, p.before);
+      expect(_focused(), 'radio-row-1');
+      await _key(tester, LogicalKeyboardKey.arrowUp);
+      expect(_focused(), 'radio-row-0');
+      await _key(tester, LogicalKeyboardKey.tab);
+      expect(_focused(), 'after', reason: 'Tab leaves from the off-stop row');
+
+      // Backward: the stop is row 0, a Down is rejected, focus sits on row 1.
+      await _pump(tester, const SizedBox());
+      final q = _probes();
+      await _pump(
+        tester,
+        _Scene(
+          before: q.before,
+          after: q.after,
+          initial: 'files',
+          accept: false,
+        ),
+      );
+      await _enter(tester, q.before);
+      await _key(tester, LogicalKeyboardKey.arrowDown);
+      expect(_focused(), 'radio-row-1');
+      await _shiftTab(tester);
+      expect(_focused(), 'before', reason: 'Shift+Tab leaves too');
+    });
+
     testWidgets('with a row focused an outer handler does not see the '
         'arrows; Tab and other keys still pass through', (tester) async {
       final p = _probes();
@@ -482,6 +522,47 @@ void main() {
       await _enter(tester, p.before);
       expect(_focused(), 'radio-row-2');
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('an option inserted in front keeps focus on the focused row', (
+      tester,
+    ) async {
+      final p = _probes();
+      Widget list(List<ZodiannRadioOption<String>> options) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Focus(
+            focusNode: p.before,
+            child: const SizedBox(width: 10, height: 10),
+          ),
+          SizedBox(
+            width: 360,
+            child: ZodiannRadioList<String>(
+              options: options,
+              value: 'moshier',
+              onChanged: (_) {},
+              semanticLabel: 'x',
+            ),
+          ),
+        ],
+      );
+      await _pump(tester, list(_options));
+      await _enter(tester, p.before);
+      expect(_focused(), 'radio-row-1');
+      // An option arrives in front while the keyboard focus is on a row.
+      await _pump(
+        tester,
+        list([
+          const ZodiannRadioOption(value: 'new', label: 'New'),
+          ..._options,
+        ]),
+      );
+      await tester.pump();
+      expect(_focused(), 'radio-row-2', reason: 'still on the moshier row');
+      // The dot states follow the options, not the positions.
+      await tester.pumpAndSettle();
+      expect(_dotBorder(tester, 2), 5);
+      expect(_dotBorder(tester, 1), 1.5);
     });
 
     testWidgets('inside a scroll view an arrow scrolls the row into view', (
