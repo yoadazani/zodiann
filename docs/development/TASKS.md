@@ -44,7 +44,7 @@ Phase 1 Foundations ─► Phase 2 Zodiac wheel ─► Phase 3 Gann square ─�
 | Folder | Area | Tasks |
 |---|---|---|
 | [`foundations-architecture/`](foundations-architecture/) | Foundations & Architecture | 15 |
-| [`computation-engine/`](computation-engine/) | Computation Engine | 14 |
+| [`computation-engine/`](computation-engine/) | Computation Engine | 16 |
 | [`shared-ui-design-system/`](shared-ui-design-system/) | Shared UI & Design System | 15 |
 | [`navigation/`](navigation/) | Navigation & App Shell | 5 |
 | [`zodiac-wheel/`](zodiac-wheel/) | Zodiac Wheel | 25 |
@@ -58,7 +58,7 @@ Phase 1 Foundations ─► Phase 2 Zodiac wheel ─► Phase 3 Gann square ─�
 | [`release-preparation/`](release-preparation/) | Release Preparation | 7 |
 | [`optional-extensions/`](optional-extensions/) | Optional Extensions | 12 |
 | [`ios/tasks/`](ios/tasks/) | iOS (platform-specific work split from the folders above) | 11 |
-| | **Total** | **217** (206 shared and Android, 11 iOS) |
+| | **Total** | **219** (208 shared and Android, 11 iOS) |
 
 See [`README.md`](README.md#what-each-folder-contains) for a one-paragraph description of what each folder covers.
 
@@ -99,6 +99,8 @@ All tasks in this section live in `packages/astro_core` and `packages/gann_core`
 | ZOD-EPH-003 | [Implement the Swiss Ephemeris built-in (Moshier) fallback mode](computation-engine/ZOD-EPH-003-implement-the-swiss-ephemeris-built-in-moshier-fallback-mode.md) | Medium | Not Started |
 | ZOD-EPH-004 | [Spike + implement the astronomy-engine `EphemerisPort` adapter (backup/oracle)](computation-engine/ZOD-EPH-004-spike-implement-the-astronomy-engine-ephemerisport-adapter-backup.md) | High | Completed (Android and host; iOS in ZOD-IOS-001) |
 | ZOD-EPH-005 | [Implement retrograde detection and position formatting](computation-engine/ZOD-EPH-005-implement-retrograde-detection-and-position-formatting.md) | High | Not Started |
+| ZOD-EPH-006 | [Align the backup source's time-scale conversion with the primary source](computation-engine/ZOD-EPH-006-align-the-backup-source-time-scale-conversion-with-the-primary.md) | Medium | Not Started |
+| ZOD-EPH-007 | [Updatable Earth-rotation and leap-second data](computation-engine/ZOD-EPH-007-updatable-earth-rotation-and-leap-second-data.md) | Low | Not Started (deferred, post-MVP) |
 | ZOD-CRS-001 | [Implement segment splitting at stationary points](computation-engine/ZOD-CRS-001-implement-segment-splitting-at-stationary-points.md) | Critical | Not Started |
 | ZOD-CRS-002 | [Implement the per-segment crossing solver (bisection/Brent + Newton refinement)](computation-engine/ZOD-CRS-002-implement-the-per-segment-crossing-solver-bisection-brent-newton.md) | Critical | Not Started |
 | ZOD-CRS-003 | [Implement the retrograde mark on crossing results](computation-engine/ZOD-CRS-003-implement-the-retrograde-mark-on-crossing-results.md) | Medium | Not Started |
@@ -400,7 +402,7 @@ ZOD-FND-001 (Melos workspace)
                                               Phase 2 (wheel) and Phase 3 (square) can both start
 ```
 
-Nothing in Phase 2 or Phase 3 should start before Gate 1 passes — this mirrors the roadmap's explicit "no screen is started before the core is tested" rule. In practice this means: all of `foundations-architecture/` (Foundations) and `computation-engine/` (Computation engine), plus the dedicated test tasks in `testing-qa/` that cover them (ZOD-TST-001 through ZOD-TST-013, ZOD-TST-017), form the Phase-1 critical path.
+Nothing in Phase 2 or Phase 3 should start before Gate 1 passes — this mirrors the roadmap's explicit "no screen is started before the core is tested" rule. In practice this means: all of `foundations-architecture/` (Foundations) and `computation-engine/` (Computation engine), plus the dedicated test tasks in `testing-qa/` that cover them (ZOD-TST-001 through ZOD-TST-013, ZOD-TST-017), form the Phase-1 critical path. The one exception is ZOD-EPH-007, a deferred post-MVP task that is not part of Gate 1.
 
 ## 5.2 Independent tracks once Gate 1 passes
 
@@ -500,12 +502,12 @@ These don't block a specific task the way the decisions above do, but each has a
 
 ## 7. MVP vs. Future Extensions overview
 
-205 of 217 tasks are **MVP** scope (194 shared and Android, 11 iOS) (required for the first shipping version, phases 1–4). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
+206 of 219 tasks are **MVP** scope (195 shared and Android, 11 iOS) (required for the first shipping version, phases 1–4). One is **deferred post-MVP** (ZOD-EPH-007, kept in `computation-engine/`; owner decision 2026-11-25). 12 are **Optional Extension** scope — every one of them lives in [`optional-extensions/`](optional-extensions/) and none should be started before Phase 4 is complete and Gate 3 (§6.3) has been decided, per the roadmap.
 
 | Folder | MVP tasks | Optional Extension tasks |
 |---|---|---|
 | [`foundations-architecture/`](foundations-architecture/) | 15 | 0 |
-| [`computation-engine/`](computation-engine/) | 14 | 0 |
+| [`computation-engine/`](computation-engine/) | 15 (plus 1 deferred) | 0 |
 | [`shared-ui-design-system/`](shared-ui-design-system/) | 15 | 0 |
 | [`navigation/`](navigation/) | 5 | 0 |
 | [`zodiac-wheel/`](zodiac-wheel/) | 25 | 0 |
@@ -519,7 +521,7 @@ These don't block a specific task the way the decisions above do, but each has a
 | [`release-preparation/`](release-preparation/) | 7 | 0 |
 | [`optional-extensions/`](optional-extensions/) | 0 | 12 |
 | [`ios/tasks/`](ios/tasks/) | 11 | 0 |
-| **Total** | **205** | **12** |
+| **Total** | **206** (plus 1 deferred) | **12** |
 
 No MVP folder contains an Optional Extension task and vice versa — the separation is structural (by folder), not just a per-task label.
 

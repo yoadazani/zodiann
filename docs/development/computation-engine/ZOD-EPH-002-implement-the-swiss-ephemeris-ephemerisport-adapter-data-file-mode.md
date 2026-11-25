@@ -54,6 +54,8 @@ No direct design reference applies — pure computation.
 
 - **iOS split (2026-11-24, owner decision):** ZOD-FND-003 is Done for its Android and shared scope; its iOS half is [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md). This task is no longer blocked by the iOS half: it is built and verified on the host and Android, and its adapter is exercised on iOS by [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md). **Risk accepted by that decision:** if iOS shows the binding or data-file packaging needs a different design, shared adapter code here may need rework. Scope and acceptance criteria are unchanged.
 
+- **Owner decisions 2026-11-25 (planning):** the time conversion is the approved deviation in [`docs/decisions/ZOD-EPH-002-time-scale.md`](../../decisions/ZOD-EPH-002-time-scale.md): leap seconds from 1972, the library's historical ΔT before, a labelled continuous-UTC assumption after the table's validity end. From 1972 it replaces "via ΔT" in the computation-settings bullet. The "ΔT-forecast warning" flag is delivered as two separate outputs, the conversion basis and the ΔT data status; no accuracy warning threshold is set. Native calls use one shared state with a lock; the backup is selected automatically only if the Swiss library does not load. The backup's time conversion is [ZOD-EPH-006](ZOD-EPH-006-align-the-backup-source-time-scale-conversion-with-the-primary.md). The acceptance criteria are unchanged.
+
 ---
 
 *Part of the [Zodiann development task breakdown](../TASKS.md). Source category: "Computation Engine" — see [`../TASKS.md`](../TASKS.md) for the full index, execution order, and open decisions.*

@@ -1,6 +1,6 @@
 # ZOD-EPH-002: time scales, ΔT and updatable Earth-rotation data
 
-**Status: investigation and proposal (2026-11-25). Nothing here is approved or implemented.** The owner asked for an architecture and implementation proposal before any code or dependency change. No code, dependency, specification or task file was changed.
+**Status: investigation and proposal (2026-11-25). The time conversion was approved later the same day, in the form recorded in [`docs/decisions/ZOD-EPH-002-time-scale.md`](../decisions/ZOD-EPH-002-time-scale.md), which takes precedence over this document. Nothing is implemented.** The owner asked for an architecture and implementation proposal before any code or dependency change. No code, dependency, specification or task file was changed.
 
 ## 1. Answer first
 
@@ -31,7 +31,7 @@ Maximum absolute difference in arcseconds, as `current → leap-second TT`:
 | Neptune | 0.198 | 0.056 → 0.056 | 0.091 → 0.079 |
 | Pluto | 0.246 | 0.125 → 0.126 | 0.154 → 0.148 |
 
-**What this does not show:** an Android or iOS device run; instants other than these 53; speeds. **After 2026 it is partly circular:** Horizons also holds TT − UTC constant (about 69.18 s, see `ZOD-EPH-004-delta-t.md` section 2). The agreement shows the two use the same convention; what makes the convention right is the UTC standard (section 3), which a future international decision could change.
+**What this does not show:** an Android or iOS device run; instants other than these 53; speeds. **The difference between the two columns after 2026 is a difference of convention, not of ephemeris accuracy:** Horizons converts UTC with the same leap-second formula, and at an identical TT Swiss Ephemeris and Horizons agree within 0.56″ whichever method produced that TT (decision record section 3). What makes the convention right is the UTC standard (section 3 below), which a future international decision could change.
 
 ## 3. Time scales
 
@@ -106,7 +106,7 @@ transport ─► strict Dart parser ─► validator ─► atomic local store �
 ## 6. Consequences if Stage 1 is approved
 
 * **Specification:** the "Time" row says UTC is converted to TT "using the difference called delta T" and that future ΔT reduces Moon accuracy. Both would be recorded as a deviation in a decision record (as ZOD-FND-011 section 9 did); only the owner edits the specification.
-* **ZOD-EPH-002:** the bullet asking for a ΔT-forecast warning flag becomes the classification above. **ZOD-NFR-017:** its criterion "a far-future date shows the ΔT-forecast banner" needs an owner decision (keep as information, reword or drop).
+* **ZOD-EPH-002:** the bullet asking for a ΔT-forecast warning flag is met by two separate outputs, the time-conversion basis and the classification above; neither is an accuracy warning. **ZOD-NFR-017:** its criterion "a far-future date shows the ΔT-forecast banner" needs an owner decision (keep as information, reword or drop).
 * **Times will differ from tools that use the library's UT entry point.** A tool that treats civil time as UT1 and adds Swiss Ephemeris's ΔT (the library's `swe_calc_ut` route) places every crossing moment, for every body, at a time that differs from Zodiann's by `Swiss ΔT − (TT − UTC)`: from the measured values in `ZOD-EPH-004-delta-t.md` section 3, about −0.4 s in 2026, 1.3 s in 2035, 5.4 s in 2050 and 24 s in 2100. CRS-A5 shows moments to the second, so users comparing tools can see this. Longitudes differ by that time multiplied by the body's speed (Moon about 13″ at 2100). ACC-3 requires a gap above 1″ against Astrolog to be explained; which time conversion Astrolog uses was not checked. ZOD-TST-006 needs this note.
 * **ZOD-TST-001 vs ΔT blocker:** resolved for Swiss Ephemeris on the evidence of section 2 (to be confirmed on a device).
 * **Backup (astronomy-engine):** still uses its own ΔT (up to 78.6″ for the Moon at 2100). `Astronomy_SetDeltaTFunction` (global) can supply the same conversion. A change to completed ZOD-EPH-004 work and its fixtures, so a separate decision (`ZOD-EPH-004-delta-t.md` section 7).

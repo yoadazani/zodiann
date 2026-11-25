@@ -14,7 +14,7 @@ docs/development/
 ├── README.md                              ← you are here
 ├── TASKS.md                               ← master index
 ├── foundations-architecture/              ← 15 tasks
-├── computation-engine/                    ← 14 tasks
+├── computation-engine/                    ← 16 tasks
 ├── shared-ui-design-system/               ← 15 tasks
 ├── navigation/                            ← 5 tasks
 ├── zodiac-wheel/                          ← 25 tasks
@@ -150,7 +150,7 @@ Each task file's **Metadata** block has a `Status` field. When you start, pause,
 2. Update the matching row in `TASKS.md`'s task index table (§4) to the same status, so the master index stays accurate without anyone having to open every file to check progress.
 3. **The individual task file is always the source of truth for the task's details** (description, acceptance criteria, dependencies). `TASKS.md` only mirrors ID / title / priority / status for at-a-glance scanning and linking — if you need to change scope, acceptance criteria, or dependencies, edit the task file, not `TASKS.md`.
 
-All 217 tasks (206 shared and Android, 11 iOS) started at `Not Started`; the current status of each is in `TASKS.md` §4 and `docs/PROGRESS.md`.
+All 219 tasks (208 shared and Android, 11 iOS) started at `Not Started`; the current status of each is in `TASKS.md` §4 and `docs/PROGRESS.md`.
 
 ## Design reference — unchanged, still the source of truth
 
