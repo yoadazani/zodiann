@@ -55,10 +55,11 @@ Give the app its primary position source: accurate, never silently approximate, 
 
 ### 4.4 Data files and startup (`astro_mobile`)
 
-* An installer copies the two packaged files to the application support directory when missing or the size differs, through a temporary file and rename. `path_provider` becomes a runtime dependency; the licensing inventory is updated.
+* An installer copies the two packaged files to the application support directory when a file is missing or its bytes differ (*my call:* stronger than the spike's size-only rule, so a same-size newer file is recopied), through a temporary file and rename. `path_provider` becomes a runtime dependency; the licensing inventory is updated.
 * A failed copy does not stop startup: the Swiss source stays bound and reports data unavailable.
-* `bootstrapOverrides` takes an injectable ephemeris bootstrap, so host tests of `main()` never touch native code.
-* **Source selection**, once at startup: if a probe shows the Swiss library cannot load, bind the astronomy-engine adapter (same wrapper). The active source is exposed by a provider. *My call:* if neither library loads, every request reports data unavailable rather than crashing.
+* The test seam in `bootstrapOverrides` injects the **calculation sources and the load-probe results, never a ready port**, so host tests of `main()` never touch native code and the architecture guards still hold: the binding is **one expression**, `ephemerisPortProvider.overrideWithValue(SupportedRangeEphemeris(<condition> ? <Swiss adapter>(...) : AstronomyEphemeris(...)))`, with both adapters created inside the wrapper.
+* **Source selection**, once at startup: if a probe shows the Swiss library cannot load, the astronomy-engine adapter is chosen. The active source is exposed by a provider. *My call:* if neither library loads, the Swiss adapter is bound over a calculation source that always reports unavailable, so every physical-body request returns `OutOfCoveredRange` instead of crashing. No third port class, so no new guard exemption.
+* **The time basis belongs to the primary source.** The §4.1 function describes the Swiss adapter's conversion. While the backup is active it does not apply; the app-level value combines it with the active source and reports "backup's own ΔT" instead (*my call*).
 
 ## 5. Verification
 
