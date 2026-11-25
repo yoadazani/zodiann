@@ -6,7 +6,7 @@
 - **Category:** [Foundations & Architecture](../README.md#foundations-architecture) (`foundations-architecture/`)
 - **Phase:** Phase 1
 - **Priority:** High
-- **Status:** In Progress (Tasks 1 to 7 implemented; the independent whole-branch review and the final verification are pending; see Completion notes)
+- **Status:** Done (see Completion notes)
 - **Scope:** MVP
 
 ## Description
@@ -47,8 +47,8 @@ No direct design reference applies — this is a data/content decision. The resu
 
 ## Completion notes
 
-- **Interim status 2026-11-25:** the criteria below were met by Tasks 1 to 6, and the owner required the product range to be enforced for every body, the mean node included; that is Task 7 of the plan and it is implemented (commits `9f61270` (the decorator and `OutsideSupportedRange`), `7cb6967` (the no-bypass guard), `6682f66` (the DI guard), `38965bc` (the real-adapter test)). The task stays In Progress until the independent whole-branch review and the final verification are recorded.
-- **Tasks 1 to 6 done 2026-11-25** on branch `task/ZOD-FND-011-ephemeris-data-file-coverage-range`. Plan: [`docs/plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (two plan-review rounds). Decision record: [`docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md).
+- **Done 2026-11-25** (Tasks 1 to 7 of the plan) on branch `task/ZOD-FND-011-ephemeris-data-file-coverage-range`, code head `1264646`. Verified: `melos run lint` and `melos run test` succeed (workspace 466 tests, `astro_core` 96, `shared_ui` 992, `astro_mobile` 257); two independent whole-branch reviews found no Critical or Important issue. Not pushed; CI not yet run.
+- **Plan and record:** branch `task/ZOD-FND-011-ephemeris-data-file-coverage-range`. Plan: [`docs/plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../plans/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (two plan-review rounds). Decision record: [`docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md`](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md).
 - **What was decided:** keep `sepl_18` and `semo_18` (nominally 1800 to 2400, **not device-verified**; ZOD-EPH-002 measures the edges); the supported product range is 1900-01-01 to 2100-12-31 inclusive, judged on the UTC instant. The FND-002 contract amendment (physical `coveredRange`, a sealed `OutsideSupportedRange`, a product-range decorator that also covers the mean node) is **approved and implemented in this task (Task 7)**: `SupportedRangeEphemeris`, `OutsideSupportedRange`, doc-comment edits to `EphemerisPort`, no existing signature changed, no exception introduced, no adapter changed. The raw mean-node API is closed against bypass by two architecture guards (`test/architecture/node_bypass_test.dart`, `port_binding_test.dart`). **ZOD-EPH-002 only wires the production DI binding**, wrapped in `SupportedRangeEphemeris(`, and adds its adapter file to the node-bypass allowlist.
 - **Not changed:** the specification (line 368 deviation recorded in the decision record), the Square anchor scope, the Excel floor, the ΔT warning, and every other task file. The ownership and hand-off map is in the decision record only; a task gets its Notes line when it is planned.
 - **Citation corrected (owner-approved):** the Description cited SQ-10 (square size) for anchors; anchors are SQ-5.
