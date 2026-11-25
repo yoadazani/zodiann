@@ -61,9 +61,11 @@ abstract interface class EphemerisPort {
   /// For **[Body.node]**: returns `EphemerisSuccess(meanAscendingNode(utc))`
   /// for any [utc], except through `SupportedRangeEphemeris`, which returns
   /// `OutsideSupportedRange` outside the supported range for every body, the
-  /// node included. The node is formula-based, so it is not bounded by
-  /// [coveredRange], and its retrograde state is the constant "mean ℞"
-  /// rather than derived from the speed sign (ZOD-EPH-001 / ZOD-EPH-005).
+  /// node included (a bare source is unlimited; the app binds every source
+  /// wrapped, which architecture guards enforce). The node is formula-based,
+  /// so it is not bounded by [coveredRange], and its retrograde state is the
+  /// constant "mean ℞" rather than derived from the speed sign (ZOD-EPH-001 /
+  /// ZOD-EPH-005).
   EphemerisResult position(Body body, DateTime utc);
 
   /// The mean ascending lunar node at the UTC moment [utc].

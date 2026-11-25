@@ -184,6 +184,22 @@ void main() {
         '// SupportedRangeEphemeris(\n'
             'final o = ephemerisPortProvider.overrideWithValue(raw);',
       ),
+      'an adapter used inside a string interpolation hole': (
+        _consumer,
+        r"final s = '${SwissLike()}';",
+      ),
+      'an unwrapped binding inside a string interpolation hole': (
+        _consumer,
+        r"final s = '${ephemerisPortProvider.overrideWithValue(raw)}';",
+      ),
+      'a look-alike class named like the decorator': (
+        _consumer,
+        'class SupportedRangeEphemeris { SupportedRangeEphemeris(Object o); }',
+      ),
+      'a look-alike function named like the decorator': (
+        _consumer,
+        'Object SupportedRangeEphemeris(Object o) => o;',
+      ),
       'a wrapper only in a string next to an unwrapped binding': (
         _overrides,
         "final w = 'SupportedRangeEphemeris(';\n"
@@ -224,6 +240,43 @@ void main() {
       });
 
       expect(names, {'A', 'B', 'C'});
+    });
+
+    test('finds a class that gets the port from a mixin, and an enum', () {
+      final names = discoverAdapterNames({
+        'm.dart': 'mixin PortMix implements EphemerisPort {}',
+        'z.dart': 'class Hidden with PortMix {}',
+        'y.dart': 'final class Other with Unrelated, PortMix {}',
+        'n.dart': 'class Plain with Unrelated {}',
+        'e.dart': 'enum EnumPort implements EphemerisPort { a }',
+      });
+
+      expect(names, {'Hidden', 'Other', 'EnumPort'});
+    });
+
+    test('a hidden adapter is then caught outside a wrapper', () {
+      final found = findBindingProblems({
+        'm.dart': 'mixin PortMix implements EphemerisPort {}',
+        'z.dart': 'class Hidden with PortMix {}',
+        _consumer: 'final p = Hidden();',
+      });
+
+      expect(found, isNotEmpty);
+    });
+  });
+
+  group('the decorator name has one definition', () {
+    test('its home file may declare it', () {
+      expect(
+        findBindingProblems({
+          decoratorDeclarationFile:
+              'final class SupportedRangeEphemeris implements EphemerisPort {\n'
+              '  const SupportedRangeEphemeris(this._s);\n'
+              '  final EphemerisPort _s;\n'
+              '}\n',
+        }),
+        isEmpty,
+      );
     });
   });
 

@@ -8,8 +8,13 @@
 // * R1 every use of `ephemerisPortProvider` is classified (declaration, read,
 //   or a binding that must literally contain `SupportedRangeEphemeris(`);
 // * R2 no second provider of the port exists;
-// * R3 a source adapter (any class implementing `EphemerisPort`) is only ever
-//   used inside a `SupportedRangeEphemeris(` argument list.
+// * R3 a source adapter (a class or enum that implements `EphemerisPort`,
+//   directly or through a mixin that does) is only ever used inside a
+//   `SupportedRangeEphemeris(` argument list;
+// * R4 nothing but the real decorator is named `SupportedRangeEphemeris`
+//   (a look-alike would satisfy the literal wrapper checks).
+//
+// String interpolation holes (`'${...}'`) are scanned like code.
 //
 // ZOD-EPH-002 adds the first production binding, and must write it in one
 // expression: `ephemerisPortProvider.overrideWithValue(
@@ -18,6 +23,7 @@
 import 'dart:io';
 
 import 'dart_source.dart';
+import 'node_bypass.dart' show interpolationBodies;
 import 'production_sources.dart';
 
 export 'production_sources.dart' show productionSources;
@@ -25,6 +31,10 @@ export 'production_sources.dart' show productionSources;
 /// The one file that declares `ephemerisPortProvider`.
 const String bindingDeclarationFile =
     'apps/astro_mobile/lib/src/di/ephemeris_providers.dart';
+
+/// The one file that may declare `SupportedRangeEphemeris`.
+const String decoratorDeclarationFile =
+    'packages/astro_core/lib/src/ephemeris/supported_range_ephemeris.dart';
 
 const String _decorator = 'SupportedRangeEphemeris';
 
@@ -72,23 +82,55 @@ int _closeParen(String code, int open) {
   return -1;
 }
 
-final _adapterClass = RegExp(
-  r'\bclass\s+(\w+)\b[^{;]*?\bimplements\b[^{;]*?\b(?:\w+\s*\.\s*)?EphemerisPort\b',
+const _implementsPort =
+    r'[^{;]*?\bimplements\b[^{;]*?\b(?:\w+\s*\.\s*)?EphemerisPort\b';
+final _classOrEnumImplementing = RegExp(
+  r'\b(?:class|enum)\s+(\w+)\b' + _implementsPort,
 );
+final _mixinImplementing = RegExp(r'\bmixin\s+(\w+)\b' + _implementsPort);
+final _classHeader = RegExp(r'\bclass\s+(\w+)\b([^{;]*)');
 
-/// The names of the source adapters: every class that implements
-/// `EphemerisPort` (the decorator excluded), discovered and not listed so a
-/// future adapter is covered without editing the guard.
-Set<String> discoverAdapterNames(Map<String, String> sources) {
-  final names = <String>{};
-  for (final text in sources.values) {
-    for (final m in _adapterClass.allMatches(_prepare(text))) {
-      final name = m.group(1)!;
-      if (name != _decorator) names.add(name);
+/// Source adapter name to the files that declare it. A source adapter is a
+/// class or enum that implements `EphemerisPort`, directly or by mixing in a
+/// mixin that does (the decorator excluded). Mixins themselves are not
+/// adapters: they cannot be constructed.
+Map<String, Set<String>> _discover(Map<String, String> sources) {
+  final prepared = {for (final e in sources.entries) e.key: _prepare(e.value)};
+  final mixins = <String>{};
+  for (final code in prepared.values) {
+    for (final m in _mixinImplementing.allMatches(code)) {
+      mixins.add(m.group(1)!);
     }
   }
-  return names;
+  final declaredIn = <String, Set<String>>{};
+  void add(String name, String path) {
+    if (name != _decorator) declaredIn.putIfAbsent(name, () => {}).add(path);
+  }
+
+  prepared.forEach((path, code) {
+    for (final m in _classOrEnumImplementing.allMatches(code)) {
+      add(m.group(1)!, path);
+    }
+    for (final m in _classHeader.allMatches(code)) {
+      final header = m.group(2)!;
+      final w = RegExp(r'\bwith\b').firstMatch(header);
+      if (w == null) continue;
+      final clause = header
+          .substring(w.end)
+          .split(RegExp(r'\bimplements\b'))
+          .first;
+      if (mixins.any((mixin) => RegExp('\\b$mixin\\b').hasMatch(clause))) {
+        add(m.group(1)!, path);
+      }
+    }
+  });
+  return declaredIn;
 }
+
+/// The names of the source adapters, discovered and not listed so a future
+/// adapter is covered without editing the guard.
+Set<String> discoverAdapterNames(Map<String, String> sources) =>
+    _discover(sources).keys.toSet();
 
 final _readBefore = RegExp(
   r'\.\s*(?:read|watch|listen|listenManual|exists|invalidate|refresh)\s*(?:<[^;{}()]*>)?\s*\(\s*$',
@@ -106,23 +148,26 @@ final _codegenOfPort = RegExp(
   r'@[Rr]iverpod\b(?:\([^)]*\))?\s*(?:Future<|Stream<)?\s*EphemerisPort\b',
 );
 final _declarationBefore = RegExp(r'ephemerisPortProvider\s*=\s*$');
+final _lookAlike = RegExp(
+  r'\b(?:class|mixin|enum|typedef)\s+SupportedRangeEphemeris\b'
+  r'|\b\w[\w<>?]*\s+SupportedRangeEphemeris\s*\([^()]*\)\s*(?:async\s*)?(?:=>|\{)',
+);
 
 /// Every way the production [sources] (normalised path to text) bind, declare
 /// or use the port outside [_decorator].
 List<BindingProblem> findBindingProblems(Map<String, String> sources) {
   final problems = <BindingProblem>[];
-  final adapters = discoverAdapterNames(sources);
-  final declaredIn = <String, Set<String>>{};
-  sources.forEach((path, text) {
-    for (final m in _adapterClass.allMatches(_prepare(text))) {
-      declaredIn.putIfAbsent(m.group(1)!, () => {}).add(path);
-    }
-  });
+  final declaredIn = _discover(sources);
 
-  sources.forEach((path, text) {
-    final code = _prepare(text);
-    void report(int offset, String message) =>
-        problems.add(BindingProblem(path, _lineOf(code, offset), message));
+  void check(
+    String path,
+    String code, {
+    required int? fixedLine,
+    required bool main,
+  }) {
+    void report(int offset, String message) => problems.add(
+      BindingProblem(path, fixedLine ?? _lineOf(code, offset), message),
+    );
 
     // R1: every use of ephemerisPortProvider.
     for (final m in RegExp(r'\bephemerisPortProvider\b').allMatches(code)) {
@@ -161,7 +206,7 @@ List<BindingProblem> findBindingProblems(Map<String, String> sources) {
         continue;
       }
       if (_assignedAfter.hasMatch(after)) {
-        if (path != bindingDeclarationFile) {
+        if (!main || path != bindingDeclarationFile) {
           report(
             m.start,
             'ephemerisPortProvider is declared outside $bindingDeclarationFile',
@@ -179,6 +224,7 @@ List<BindingProblem> findBindingProblems(Map<String, String> sources) {
     var exemptUsed = false;
     for (final m in _providerOfPort.allMatches(code)) {
       final exempt =
+          main &&
           !exemptUsed &&
           path == bindingDeclarationFile &&
           _declarationBefore.hasMatch(code.substring(0, m.start));
@@ -204,8 +250,8 @@ List<BindingProblem> findBindingProblems(Map<String, String> sources) {
       final close = _closeParen(code, open);
       if (close > open) spans.add((open, close));
     }
-    for (final name in adapters) {
-      if (declaredIn[name]!.contains(path)) continue;
+    declaredIn.forEach((name, files) {
+      if (files.contains(path)) return;
       for (final m in RegExp('\\b$name\\b').allMatches(code)) {
         final inside = spans.any((s) => m.start > s.$1 && m.start < s.$2);
         if (!inside) {
@@ -216,6 +262,25 @@ List<BindingProblem> findBindingProblems(Map<String, String> sources) {
           );
         }
       }
+    });
+
+    // R4: only the real decorator carries its name.
+    if (path != decoratorDeclarationFile) {
+      for (final m in _lookAlike.allMatches(code)) {
+        report(
+          m.start,
+          '$_decorator is declared only in $decoratorDeclarationFile: a '
+          'look-alike would satisfy the wrapper checks without enforcing the '
+          'supported range',
+        );
+      }
+    }
+  }
+
+  sources.forEach((path, text) {
+    check(path, _prepare(text), fixedLine: null, main: true);
+    for (final (line, body) in interpolationBodies(text)) {
+      check(path, _prepare(body), fixedLine: line, main: false);
     }
   });
 

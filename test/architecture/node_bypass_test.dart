@@ -107,6 +107,13 @@ void main() {
       expect(found.single.line, 2);
     });
 
+    test('a } inside a comment in a hole does not end the hole early', () {
+      expect(
+        names("final s = '\${f(/* } */ p.meanAscendingNode(t))}';"),
+        isNotEmpty,
+      );
+    });
+
     test('a // inside a string is not a comment', () {
       expect(
         names("final s = 'http://x'; final p = q.meanAscendingNode(t);"),

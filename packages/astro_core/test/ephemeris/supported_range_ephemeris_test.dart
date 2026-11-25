@@ -34,6 +34,24 @@ final class _RecordingSource implements EphemerisPort {
   }
 }
 
+/// A const source, to prove the decorator can be built in a const context.
+final class _ConstSource implements EphemerisPort {
+  const _ConstSource();
+
+  static final physical = UtcRange(DateTime.utc(1800), DateTime.utc(2400));
+
+  @override
+  UtcRange get coveredRange => physical;
+
+  @override
+  EphemerisResult position(Body body, DateTime utc) =>
+      EphemerisSuccess(EclipticPosition(longitude: 1, speed: 1));
+
+  @override
+  EclipticPosition meanAscendingNode(DateTime utc) =>
+      EclipticPosition(longitude: 1, speed: 1);
+}
+
 void main() {
   const tick = Duration(microseconds: 1);
   final start = SupportedDateRange.start;
@@ -142,10 +160,16 @@ void main() {
       expect(source.nodeCalls, 2);
     });
 
-    test('it can be used as an EphemerisPort and is const-constructible', () {
+    test('it can be used as an EphemerisPort', () {
       final EphemerisPort port = SupportedRangeEphemeris(_RecordingSource());
 
       expect(port.coveredRange, isA<UtcRange>());
+    });
+
+    test('it is const-constructible', () {
+      const port = SupportedRangeEphemeris(_ConstSource());
+
+      expect(port.coveredRange, _ConstSource.physical);
     });
   });
 

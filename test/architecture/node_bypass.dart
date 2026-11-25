@@ -149,7 +149,13 @@ int _holeEnd(String s, int from) {
   var i = from;
   while (i < s.length) {
     final c = s[i];
-    if (c == "'" || c == '"') {
+    if (s.startsWith('//', i)) {
+      final end = s.indexOf('\n', i);
+      i = end < 0 ? s.length : end;
+    } else if (s.startsWith('/*', i)) {
+      final end = s.indexOf('*/', i + 2);
+      i = end < 0 ? s.length : end + 2;
+    } else if (c == "'" || c == '"') {
       final raw = i > 0 && s[i - 1] == 'r';
       i = _readString(s, i, raw, <(int, String)>[], 0);
     } else {
