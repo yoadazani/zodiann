@@ -56,10 +56,18 @@ Give the app its primary position source: accurate, never silently approximate, 
 ### 4.4 Data files and startup (`astro_mobile`)
 
 * An installer copies the two packaged files to the application support directory when a file is missing or its bytes differ (*my call:* stronger than the spike's size-only rule, so a same-size newer file is recopied), through a temporary file and rename. `path_provider` becomes a runtime dependency; the licensing inventory is updated.
-* A failed copy does not stop startup: the Swiss source stays bound and reports data unavailable.
+* A failed copy does not stop startup. *My call:* unless **both** files are installed and match the bundled ones, the Swiss source is bound over the always-unavailable calculation source (below); an older or mixed file set is never used silently.
 * The test seam in `bootstrapOverrides` injects the **calculation sources and the load-probe results, never a ready port**, so host tests of `main()` never touch native code and the architecture guards still hold: the binding is **one expression**, `ephemerisPortProvider.overrideWithValue(SupportedRangeEphemeris(<condition> ? <Swiss adapter>(...) : AstronomyEphemeris(...)))`, with both adapters created inside the wrapper.
 * **Source selection**, once at startup: if a probe shows the Swiss library cannot load, the astronomy-engine adapter is chosen. The active source is exposed by a provider. *My call:* if neither library loads, the Swiss adapter is bound over a calculation source that always reports unavailable, so every physical-body request returns `OutOfCoveredRange` instead of crashing. No third port class, so no new guard exemption.
-* **The time basis belongs to the primary source.** The §4.1 function describes the Swiss adapter's conversion. While the backup is active it does not apply; the app-level value combines it with the active source and reports "backup's own ΔT" instead (*my call*).
+* **The time basis belongs to the primary source.** The §4.1 function describes the Swiss adapter's conversion. *My call* for the app-level values, derived from the probe and install results (never from an adapter type, which the guards forbid):
+
+  | Active source | Time basis | ΔT data status |
+  |---|---|---|
+  | primary | from §4.1 | from §4.1 |
+  | backup | "backup's own ΔT" | absent |
+  | none (neither library loads, or the files are not installed and no switch applies) | absent | absent |
+
+* **Existing code this changes.** The binding depends on startup results, so it moves from the synchronous `appOverrides` list into `bootstrapOverrides` (update its doc comments; the FND-011 record names `appOverrides`, and the guards do not depend on the location). `main()` delegates to a start function with injectable ephemeris dependencies, and the host tests that run startup (`app_shell_test`, `first_launch_test`) inject fakes. The tests asserting that `appOverrides` binds nothing are updated. The ZOD-EPH-004 guard in `astronomy_swap_test.dart` that forbids importing the backup anywhere in the app library is **narrowed to allow only the wiring file** (a test, not the backup's implementation or fixtures). The "never import native bindings from host tests" comments are reworded after confirming host tests still compile and never call native code.
 
 ## 5. Verification
 
