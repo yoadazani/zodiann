@@ -21,9 +21,12 @@ dev_dependencies:
   ffigen: ^23.0.0
   test: ^1.32.0
 
-# ZOD-FND-003 (decision D2): the spike data files are bundled as package
-# assets, because Flutter bundles only assets declared inside a package.
-# ZOD-FND-011 decides the real coverage range.
+# ZOD-FND-003 (decision D2): the data files are bundled as package assets,
+# because Flutter bundles only assets declared inside a package.
+# ZOD-FND-011 (owner decision 2026-11-25): ship only the sepl_18 + semo_18 pair
+# (nominally 1800 to 2400; no neighbouring block, pinned by
+# test/data_files_test.dart). The product range is narrower: 1900 to 2100,
+# SupportedDateRange in astro_core. See docs/decisions/ZOD-FND-011-*.md.
 flutter:
   assets:
     - assets/ephe/

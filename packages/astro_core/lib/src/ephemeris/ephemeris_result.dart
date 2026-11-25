@@ -37,7 +37,8 @@ sealed class EphemerisFailure extends EphemerisResult {
 
 /// The requested moment is outside the range the source's data covers
 /// (spec R-2 and "Computation settings": outside the range a clear message is
-/// shown instead of a wrong result).
+/// shown instead of a wrong result). For an instant inside the supported
+/// range this is a defect (data missing), never hidden.
 final class OutOfCoveredRange extends EphemerisFailure {
   const OutOfCoveredRange({required this.requested, required this.covered});
 
@@ -59,4 +60,37 @@ final class OutOfCoveredRange extends EphemerisFailure {
   @override
   String toString() =>
       'OutOfCoveredRange(requested: $requested, covered: $covered)';
+}
+
+/// The requested moment is outside the product's supported date range
+/// (`SupportedDateRange`, 1900-01-01 through 2100-12-31), whatever the source
+/// could compute (R-2, NFR-R2; ZOD-FND-011).
+///
+/// Distinct from [OutOfCoveredRange]: this means the user asked for a date the
+/// product does not support; [OutOfCoveredRange] inside the supported range
+/// means data is unavailable. Returned for every body, the mean node included.
+final class OutsideSupportedRange extends EphemerisFailure {
+  const OutsideSupportedRange({
+    required this.requested,
+    required this.supported,
+  });
+
+  /// The UTC moment that was requested.
+  final DateTime requested;
+
+  /// The supported range, for the user-facing message.
+  final UtcRange supported;
+
+  @override
+  bool operator ==(Object other) =>
+      other is OutsideSupportedRange &&
+      other.requested == requested &&
+      other.supported == supported;
+
+  @override
+  int get hashCode => Object.hash(requested, supported);
+
+  @override
+  String toString() =>
+      'OutsideSupportedRange(requested: $requested, supported: $supported)';
 }

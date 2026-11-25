@@ -37,9 +37,11 @@ import 'utc_range.dart';
 /// (ARCH-1). Every `DateTime` argument must be UTC; local time is converted to
 /// UTC by the caller before calling.
 abstract interface class EphemerisPort {
-  /// The inclusive UTC range in which this source guarantees its stated
-  /// accuracy for the physical bodies. The app's UI uses it to limit date
-  /// input (R-2). Outside it, [position] returns [OutOfCoveredRange].
+  /// The inclusive UTC range the source's data physically covers. It is not
+  /// the product's supported range: the app limits date input with
+  /// `SupportedDateRange`, enforced in front of every source by
+  /// `SupportedRangeEphemeris` (ZOD-FND-011). Outside this range, [position]
+  /// returns [OutOfCoveredRange].
   UtcRange get coveredRange;
 
   /// The position of [body] at the UTC moment [utc].
@@ -57,9 +59,13 @@ abstract interface class EphemerisPort {
   ///   **never** an approximate position (R-2).
   ///
   /// For **[Body.node]**: returns `EphemerisSuccess(meanAscendingNode(utc))`
-  /// for any [utc]. The node is formula-based, so it is not bounded by
-  /// [coveredRange], and its retrograde state is the constant "mean ℞"
-  /// rather than derived from the speed sign (ZOD-EPH-001 / ZOD-EPH-005).
+  /// for any [utc], except through `SupportedRangeEphemeris`, which returns
+  /// `OutsideSupportedRange` outside the supported range for every body, the
+  /// node included (a bare source is unlimited; the app binds every source
+  /// wrapped, which architecture guards enforce). The node is formula-based,
+  /// so it is not bounded by [coveredRange], and its retrograde state is the
+  /// constant "mean ℞" rather than derived from the speed sign (ZOD-EPH-001 /
+  /// ZOD-EPH-005).
   EphemerisResult position(Body body, DateTime utc);
 
   /// The mean ascending lunar node at the UTC moment [utc].

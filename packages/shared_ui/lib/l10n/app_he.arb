@@ -59,5 +59,7 @@
   "drawerDescSettings": "שפה, ערכת נושא, אורבים",
   "drawerDescAbout": "מקורות החישוב והשיטה",
   "drawerVersion": "גרסה {version}",
-  "drawerOffline": "כל הנתונים נשארים במכשיר"
+  "drawerOffline": "כל הנתונים נשארים במכשיר",
+  "rangeOutsideSupported": "התאריך מחוץ לטווח הנתמך ({start} עד {end}). בחרו תאריך בתוך הטווח.",
+  "rangeDataUnavailable": "נתוני המיקום לתאריך זה אינם זמינים במכשיר."
 }

@@ -461,6 +461,18 @@ abstract class ZodiannLocalizations {
   /// In en, this message translates to:
   /// **'All data stays on this device'**
   String get drawerOffline;
+
+  /// Shown when a requested moment is outside the supported range, 1900 to 2100 (R-2, NFR-R2; ZOD-FND-011). The user chose a date the product does not support. The caller supplies both bounds already formatted for the language and date-order setting. Not copied from kit.js: an owner-approved exception, 2026-11-25.
+  ///
+  /// In en, this message translates to:
+  /// **'This date is outside the supported range ({start} to {end}). Choose a date within it.'**
+  String rangeOutsideSupported(String start, String end);
+
+  /// Shown when the ephemeris data is missing for a date inside the supported range (R-2; ZOD-FND-011): a defect, never hidden and never replaced by a lower-accuracy position. Not for dates outside the supported range (use rangeOutsideSupported). Not copied from kit.js: an owner-approved exception, 2026-11-25.
+  ///
+  /// In en, this message translates to:
+  /// **'Position data for this date is not available on this device.'**
+  String get rangeDataUnavailable;
 }
 
 class _ZodiannLocalizationsDelegate

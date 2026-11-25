@@ -35,6 +35,7 @@ final class _FakePort implements EphemerisPort {
 String describe(EphemerisResult result) => switch (result) {
   EphemerisSuccess(:final position) => 'ok ${position.longitude}',
   OutOfCoveredRange(:final requested) => 'out $requested',
+  OutsideSupportedRange(:final requested) => 'outside $requested',
 };
 
 void main() {

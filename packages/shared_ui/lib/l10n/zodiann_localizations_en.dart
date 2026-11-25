@@ -193,4 +193,13 @@ class ZodiannLocalizationsEn extends ZodiannLocalizations {
 
   @override
   String get drawerOffline => 'All data stays on this device';
+
+  @override
+  String rangeOutsideSupported(String start, String end) {
+    return 'This date is outside the supported range ($start to $end). Choose a date within it.';
+  }
+
+  @override
+  String get rangeDataUnavailable =>
+      'Position data for this date is not available on this device.';
 }
