@@ -32,11 +32,11 @@ export PATH=/c/Users/user/fvm/versions/3.50.0/bin:/c/TDM-GCC-64/bin:$PATH
 export MELOS_SDK_PATH=/c/Users/user/fvm/versions/3.50.0
 export ANDROID_HOME='C:\Users\user\AppData\Local\Android\Sdk'
 ADB=/c/Users/user/AppData/Local/Android/Sdk/platform-tools/adb
-# Emulator (run in the background; device id from `$ADB devices`, usually emulator-5554):
-/c/Users/user/AppData/Local/Android/Sdk/emulator/emulator -avd Pixel_9_Pro_API_35
+# Emulator (x86_64; run in the background; device id from `$ADB devices`, usually emulator-5554):
+/c/Users/user/AppData/Local/Android/Sdk/emulator/emulator -avd Pixel_9_Pro_API_36
 ```
 
-After any `flutter pub get`: `git checkout -- packages/shared_ui/lib/l10n`. Device tests run from `apps/astro_mobile`: `flutter test integration_test/<file> -d emulator-5554`. Host tests: `dart test` in a pure package, `flutter test` in `apps/astro_mobile`, `dart test test/architecture` at the root.
+Record the AVD name, API level and ABI with every device result; earlier ephemeris runs used another AVD, so their numbers are not carried over. After any `flutter pub get`: `git checkout -- packages/shared_ui/lib/l10n`. Device tests run from `apps/astro_mobile`: `flutter test integration_test/<file> -d emulator-5554`; if `flutter test -d` refuses the device, build a debug APK with `-t integration_test/<file>` and read the result from logcat (PROGRESS, Architecture Conventions). Host tests: `dart test` in a pure package, `flutter test` in `apps/astro_mobile`, `dart test test/architecture` at the root.
 
 ## Review Focus
 
