@@ -365,13 +365,13 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 
 ### Task 9: Review, documentation, completion
 
-- [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first. **No code of this task has had an independent review yet.** The reviewer's prompt carries the context below and requires an explicit judgement on each item:
-  * **Context (owner, 2026-11-26):** the round 1 amendments of plan revision 1 (stricter Task 3) were implemented **without a separate owner approval**; the owner accepted the Tasks 0 to 3 implementation afterwards.
-  * the stricter parser rules and their error messages (Task 3);
-  * the additional refusal and acceptance tests, including those beyond the plan (Task 3);
-  * the reconstruction of request URLs against the original pilot requests (what the repository test pins, and what only a scratch script checked);
-  * the 30 mutation checks and whether they cover the parser's failure modes adequately (evidence section below);
-  * the plan revision 2 amendments (the 4A/4B split; round 1 findings I1 to I4 and M1 to M5, and the round 2 corrections), which the owner has not approved separately: `retrogradePrimaries` against `retrogradeDeclarations`, `retrogradeRequestUris` and the URL literals, the inside-repository rule and its cases, the network guard tests, and the Task 5 request handling and mode tests.
+- [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first. **No code of this task has had an independent review yet.** The review is of the implementation and requires an explicit judgement on each item:
+  * parser rules and their error messages;
+  * error handling: refused answers, non-200 answers, timeouts and broken connections;
+  * URL reconstruction: the pilot request URLs (what the repository test pins, and what only a scratch script checked) and the 8 confirmation URLs;
+  * download safety: the network guard, the output-directory rule, saving before parsing, the timeout, and that nothing is retried or resent;
+  * the tests;
+  * mutation coverage (evidence section below), including whether the chosen changes cover the failure modes.
 - [ ] **Step 2:** `superpowers:verification-before-completion`: lint, full tests, `git diff --stat main -- ":(glob)**/lib/**"` empty, `git status --short`; rerun device files touched by review fixes.
 - [ ] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions; the "Carry into ZOD-TST-001" item marked done); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`; a dated update line in `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 5 (what is now validated through 2100-12-31, for the primary only); a dated update on the `TASKS.md` ZOD-EPH-004 bullet that still says an owner decision is needed before ZOD-TST-001. Hand-offs recorded in PROGRESS (other task files are not edited; each becomes a Notes line when that task is planned): ZOD-EPH-002 (its 53-instant UTC-input evidence is superseded by the repointed gate), ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006, ZOD-TST-017 (the T-EPH-1 / ACC-1 gate runs on a device, not in CI).
 - [ ] **Step 4:** Commit `docs(ZOD-TST-001): record verification and completion`. **Stop: push and PR need the owner's approval.**
@@ -398,7 +398,7 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 
 ### Revision 2 (2026-11-26): the 4A/4B split
 
-**Round 1 (`plan-reviewer`, focused, `3b9cf9d..eace7b9`): "Approve after corrections"**; no Critical, 4 Important, 5 Minor, nothing for the owner. All applied. **The Task 4A amendments are to be implemented under the owner's Task 4A approval; the Task 5 amendments wait for Task 5's approval. The owner has not approved either separately** (listed in Task 9 Step 1).
+**Round 1 (`plan-reviewer`, focused, `3b9cf9d..eace7b9`): "Approve after corrections"**; no Critical, 4 Important, 5 Minor, nothing for the owner. All applied.
 
 | ID | Finding | Done |
 |---|---|---|
