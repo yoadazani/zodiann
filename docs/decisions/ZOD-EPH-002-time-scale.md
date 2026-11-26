@@ -100,4 +100,6 @@ The adapter's own TT equals the fixture's within 0.000025″ of Moon longitude.
 
 **What checks the conversion itself (branch review, 2026-11-26).** From 1972 the fixture's TT comes from the app's own conversion, so the matched-TT gate and the TT pin cannot detect an error in it, and the 1″ UTC-input gate resolves only about a second. The host test `packages/ephemeris_swiss/test/reference_tt_fixture_test.dart` therefore requires, for all ten bodies at every reference instant from 1972, that Horizons asked at the app's TT agrees within 0.002″ (a few milliseconds of Moon motion) with the ZOD-EPH-004 reference asked at UTC, where Horizons applies its own leap seconds.
 
+**Update 2026-11-27 (ZOD-TST-001):** that test is replaced by `packages/ephemeris_swiss/test/horizons_reference_time_test.dart`, which reads the shared Horizons dataset (its TT entries against its own UTC cross-check). The device results above are followed by that task's gate over 64 instants.
+
  The far-future ΔT conflict does not arise for this source; the backup keeps it until ZOD-EPH-006.

@@ -383,7 +383,7 @@ The 11 version-2 instants (all `Z`): `1953-11-18T00:00:00`, `1956-09-10T00:00:00
 
 ### Task 8: Device verification and mutation proofs
 
-Run on the owner's arm64 phone (SM-S908E) with `--no-uninstall` after the first file, at the owner's request (2026-11-27); the app installed before the tests was backed up and restored. Planned device: emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configuration unchanged). From `apps/astro_mobile`, one file at a time, with no host suite running: `fvm flutter test integration_test/<file> -d emulator-5554`. Afterwards stop the emulator this task started; leave any process that was already running (for example the adb server).
+Devices (2026-11-27): the emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configuration unchanged) for `swiss_ephemeris_accuracy_test.dart`, and an arm64 phone (SM-S908E) for all four files, with `--no-uninstall`; the app installed on the phone is backed up before and restored after. From `apps/astro_mobile`, one file at a time, with no host suite running: `fvm flutter test integration_test/<file> -d <serial>`. Afterwards stop the emulator this task started; leave any process that was already running (for example the adb server).
 
 - [x] **Step 1:** `swiss_ephemeris_accuracy_test.dart`, `swiss_mean_node_test.dart`; under option A also `astronomy_accuracy_test.dart`, `astronomy_speed_vs_swiss_test.dart`. Expected: all pass. Record every per-body maximum, in particular at the 2100 instants and the retrograde instants. A result over its bound: stop and report. Under option A also stop and report if a backup body exceeds the 17.6″ matched-TT figure documented in `astronomy_ephemeris.dart` (no `lib/` change is allowed here).
 - [x] **Step 2: Mutation proofs** (temporary, each observed failing, then restored with `git status` clean): one copied longitude +2″ → the T-EPH-1 / ACC-1 gate fails; one Moon `jdTt` +1 s in the copy → the TT pin fails; `meanNodeEpochLongitude` +0.02 → the host node test fails; the device node test's flags without 64 → its flag assertion fails.
@@ -391,18 +391,41 @@ Run on the owner's arm64 phone (SM-S908E) with `--no-uninstall` after the first 
 
 ### Task 9: Review, documentation, completion
 
-- [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first. **No code of this task has had an independent review yet.** The review is of the implementation and requires an explicit judgement on each item:
+- [x] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first. **No code of this task has had an independent review yet.** The review is of the implementation and requires an explicit judgement on each item:
   * parser rules and their error messages;
   * error handling: refused answers, non-200 answers, timeouts and broken connections;
   * URL reconstruction: the pilot request URLs (what the repository test pins, and what only a scratch script checked) and the 8 confirmation URLs;
   * download safety: the network guard, the output-directory rule, saving before parsing, the timeout, and that nothing is retried or resent;
   * the tests;
   * mutation coverage (evidence section below), including whether the chosen changes cover the failure modes.
-- [ ] **Step 2:** `superpowers:verification-before-completion`: lint, the full test suite, `git diff --stat main -- ":(glob)**/lib/**"` empty, `git status --short`; rerun device files touched by review fixes.
-- [ ] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions; the "Carry into ZOD-TST-001" item marked done); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`; a dated update line in `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 5 (what is now validated through 2100-12-31, for the primary only); a dated update on the `TASKS.md` ZOD-EPH-004 bullet that still says an owner decision is needed before ZOD-TST-001. Hand-offs recorded in PROGRESS (other task files are not edited; each becomes a Notes line when that task is planned): ZOD-EPH-002 (its 53-instant UTC-input evidence is superseded by the repointed gate), ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006, ZOD-TST-017 (the T-EPH-1 / ACC-1 gate runs on a device, not in CI).
-- [ ] **Step 4:** Commit `docs(ZOD-TST-001): record verification and completion`. **Stop: push and PR need the owner's approval.**
+- [x] **Step 2:** `superpowers:verification-before-completion`: lint, the full test suite, `git diff --stat main -- ":(glob)**/lib/**"` empty, `git status --short`; rerun device files touched by review fixes.
+- [x] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions; the "Carry into ZOD-TST-001" item marked done); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`; a dated update line in `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 5 (what is now validated through 2100-12-31, for the primary only); a dated update on the `TASKS.md` ZOD-EPH-004 bullet that still says an owner decision is needed before ZOD-TST-001. Hand-offs recorded in PROGRESS (other task files are not edited; each becomes a Notes line when that task is planned): ZOD-EPH-002 (its 53-instant UTC-input evidence is superseded by the repointed gate), ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006, ZOD-TST-017 (the T-EPH-1 / ACC-1 gate runs on a device, not in CI).
+- [x] **Step 4:** Commit `docs(ZOD-TST-001): record verification and completion`. **Stop: push and PR need the owner's approval.**
 
-## Evidence kept for the Task 9 review (Tasks 0 to 4A, not independently reviewed)
+## Implementation review (2026-11-27)
+
+One fresh reviewer over `c7df9c6..4ac77b2`: **no Critical and no Important finding, six Minor.** It checked every dataset row against the 30 saved answers, matched all 69 answer hashes, rebuilt every logged request URI from the current code, and added 33 mutations of its own.
+
+| Review item | Judgement |
+|---|---|
+| parser rules, error handling | the primary parser meets design 8.2; the Backup tools' parsing is older and looser (M2) |
+| URL reconstruction | every logged URI equals what the code builds |
+| download safety | timeout, partial body, dropped connection and redirect handled and tested; no retry; saved before parsing |
+| dataset integrity | verified independently; the gates cannot pass vacuously (M4 and M5 are the exceptions found) |
+| tests and mutation coverage | good overall; the surviving mutations are in M2 and M3 |
+
+Findings were graded again by their effect: M4 and three gaps of M3 concern rules the design states, so they were fixed in `084cd11`.
+
+| ID | Finding | Done |
+|---|---|---|
+| M1 | the Backup tools overwrite without the old-row check | deferred to ZOD-TST-005 (design section 12) |
+| M2 | the Backup row-to-instant check is untested and loose | deferred to ZOD-TST-005 |
+| M3 | five mutations of the primary tool survived | fixed: the 1 ms echo limit, saving before decoding, the version bump (each new test failed with its rule broken). Deferred: the cross-check `jdUt` (the committed data is guarded by `horizons_reference_time_test.dart`); the marker-order clause (without it the tool still stops) |
+| M4 | stored times of previous rows not compared | fixed: `datasetProblems` compares `jdTt` and `ttMinusUtSeconds` (three new tests failed first) |
+| M5 | the retrograde gate is skipped for an instant without an entry when `datasetProblems` is called alone | deferred (the tool refuses such a date set first) |
+| M6 | the test harness defaults to the real package root | deferred (every dataset-mode test passes a temporary one) |
+
+## Evidence kept for the Task 9 review (Tasks 0 to 4A)
 
 **URL reconstruction.** The repository test `the query reproduces the two pilot requests` pins pilot requests 1 and 2 (design 8.5). Requests 3 to 11 were compared only by a scratch script (`parse_all.dart`, planning session scratch folder), which on `6531069` parsed all 11 saved answers (17 rows) and rebuilt all 11 logged URLs identically.
 

@@ -1,6 +1,6 @@
 # ZOD-TST-001: the JPL Horizons reference dataset, design
 
-**Status (2026-11-26): Tasks 0 to 4A are done; Tasks 4B to 9 are in progress. The 11 pilot requests are done (section 8).** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
+**Status (2026-11-27): implemented and verified (device results in section 15).** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
 
 Sources of truth: the [task file](../../development/testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md), specification T-EPH-1, ACC-1, ACC-5 and "Computation settings that must be fixed and documented", the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) sections 5 and 6, and the [ZOD-EPH-002 design](2026-11-25-zod-eph-002-swiss-adapter-design.md) section 6 (hand-off).
 
@@ -40,7 +40,7 @@ Give the app one permanent, versioned set of reference longitudes from JPL Horiz
 | `packages/astro_core/test/fixtures/swiss_mean_node.json` | node reference from Swiss Ephemeris (new) | `version` 1; `referenceDatesVersion` as above |
 | `apps/astro_mobile/integration_test/horizons_reference.dart` | generated copy for devices (new) | regenerated offline from the JSON; a host test compares every row |
 
-**Rows are protected.** The fetch tool compares every new `entries` row with the previous file (for the first run, with the old Swiss TT fixture, 530 rows), and every `utcCrossCheck` row with the previous file's, and writes nothing if a longitude of an existing (body, instant) is lost or differs by more than 0.001″. An existing dataset is always compared, whatever baseline is named. The control and evidence rows are re-derived and re-checked on every run. **There is no override:** a legitimate change (a revised Horizons solution, a new leap second, which would move later TT values, or a new library ΔT) stops the tool and needs an owner decision. The tool writes `version` 1 when no dataset exists, otherwise the previous version, plus 1 if any row was added or changed.
+**Rows are protected.** The fetch tool compares every new `entries` row with the previous file (for the first run, with the old Swiss TT fixture, 530 rows), and every `utcCrossCheck` row with the previous file's, and writes nothing if a longitude of an existing (body, instant) is lost or differs by more than 0.001″. An entry the previous dataset holds must also keep its stored `jdTt` and `ttMinusUtSeconds` exactly, so a new leap second or library ΔT stops the tool even where no longitude moves past that tolerance. An existing dataset is always compared, whatever baseline is named. The control and evidence rows are re-derived and re-checked on every run. **There is no override:** a legitimate change (a revised Horizons solution, a new leap second, which would move later TT values, or a new library ΔT) stops the tool and needs an owner decision. The tool writes `version` 1 when no dataset exists, otherwise the previous version, plus 1 if any row was added or changed.
 
 **Dataset content:**
 
@@ -471,7 +471,7 @@ What prompted it: the UTC refetch (EOP file `eop.261125.p270221`) differs from t
 
 ## 11. Blocker closure
 
-**Closed for the Swiss primary source, for this task:** all ten bodies were within 0.56″ at the 53 instants through 2100-01-01T12:00Z on the x86_64 emulator (ZOD-EPH-002). **The extension to 2100-12-31 is not yet verified**; this task's own gate verifies it. ARM devices and iOS remain unverified. **The backup discrepancy stays open.**
+**Closed for the Swiss primary source, for this task:** this task's gate passed on the x86_64 emulator and an arm64 phone, all ten bodies within 0.56″ at the 64 instants from 1899-12-31T12:00Z to 2100-12-31T23:59:59Z, and within 0.48″ at the instants after 2100-01-01T12:00Z (section 15). **iOS remains unverified. The backup discrepancy stays open for ZOD-TST-005.**
 
 ## 12. Limits
 
@@ -480,6 +480,7 @@ What prompted it: the UTC refetch (EOP file `eop.261125.p270221`) differs from t
 * ACC-1's "same settings": geocentric, apparent, tropical of date; Horizons uses the IAU76/80 model for quantity 31, a difference included in the measured error.
 * A future change of the civil time standard would change the post-2027 rows' meaning (decision record section 1).
 * **Future rows do not reproduce exactly.** For instants after the end of Horizons' measured Earth-orientation data, answers changed by up to 0.00072″ between 2026-11-21 and 2026-11-26 (section 10). The primary dataset has the same exposure, and its 0.001″ row protection leaves only about 1.4 times that. Its comparison with the previous TT reference found 0 differences, but both were retrieved on 2026-11-26. A later refetch that exceeds 0.001″ stops the tool and needs an owner decision.
+* **The Backup tools do not enforce the old-row rule of section 10.** It was checked at this refetch by a one-off script; a later run overwrites both fixtures and their copies, with only the git diff to show it. Their row-to-instant check (1.5 s, the longitude read by position) is also looser than the primary parser's and cannot tell apart instants 1 s apart. ZOD-TST-005 closes both before either tool is run again.
 
 ## 13. Owner decisions on the open questions
 
@@ -502,7 +503,7 @@ Function and test names beyond those in the plan; the layout of the fetch tool's
 
 Code at `6b7d3e5` (only this task's documents differed in the working tree). One test file at a time, `flutter test integration_test/<file>`.
 
-**Devices.** (a) Emulator `Pixel_9_Pro_API_36` (API 36, x86_64, 16 KB pages, started with `-memory 3072`): `swiss_ephemeris_accuracy_test.dart` only. (b) The owner's phone, Samsung SM-S908E (Android 16, API 36, **arm64-v8a**, 4 KB pages), at the owner's request, after which the emulator was closed: all four files and the device mutation proofs, with `--no-uninstall`.
+**Devices.** (a) Emulator `Pixel_9_Pro_API_36` (API 36, x86_64, 16 KB pages, started with `-memory 3072`): `swiss_ephemeris_accuracy_test.dart` only. (b) A phone, Samsung SM-S908E (Android 16, API 36, **arm64-v8a**, 4 KB pages): all four files and the device mutation proofs, with `--no-uninstall`. The code changed after these runs is the host fetch tool and its tests only (`084cd11`), so no device file was run again.
 
 | File | Result (phone) | Emulator |
 |---|---|---|

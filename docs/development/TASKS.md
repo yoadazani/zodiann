@@ -293,7 +293,7 @@ The spec's principle is explicit: **every formula requires an automated test tha
 
 | ID | Task | Priority | Status |
 |---|---|---|---|
-| ZOD-TST-001 | [Build the JPL Horizons reference dataset (T-EPH-1 / ACC-1)](testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md) | Critical | Not Started |
+| ZOD-TST-001 | [Build the JPL Horizons reference dataset (T-EPH-1 / ACC-1)](testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md) | Critical | Done |
 | ZOD-TST-002 | [Author the mean-node formula exactness test (T-EPH-2)](testing-qa/ZOD-TST-002-author-the-mean-node-formula-exactness-test-t-eph-2.md) | Critical | Done |
 | ZOD-TST-003 | [Author the retrograde-marking regression test (T-EPH-3)](testing-qa/ZOD-TST-003-author-the-retrograde-marking-regression-test-t-eph-3.md) | High | Not Started |
 | ZOD-TST-004 | [Author the double-precession regression test (T-EPH-1 guard / ACC-5)](testing-qa/ZOD-TST-004-author-the-double-precession-regression-test-t-eph-1-guard-acc-5.md) | Critical | Not Started |
@@ -422,7 +422,7 @@ Settings and persistence (`settings-persistence/`) depend on nearly everything u
 ## 5.3 Tasks that require technical investigation before estimation
 
 - **ZOD-FND-003** (Swiss Ephemeris FFI spike) — R-7's named risk. **Done for Android and shared scope (2026-11-24; the Android half merged 2026-11-20); its iOS half is [ZOD-IOS-001](ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md)**, which no longer blocks ZOD-EPH-002 or the shared critical path (owner decision 2026-11-24; the risk that iOS shows a different binding design is accepted and recorded in ZOD-IOS-001).
-- **ZOD-EPH-004** (astronomy-engine FFI spike) — same category of risk, lower severity since it's a backup. **Done 2026-11-22 (Android and host; iOS not verified):** it found that ZOD-TST-001's 1-arcsecond Moon bound against Horizons cannot be met at far-future UT instants by any adapter because sources assume different future ΔT; recorded in [`docs/spikes/ZOD-EPH-004-delta-t.md`](../spikes/ZOD-EPH-004-delta-t.md) and PROGRESS (Blockers), ZOD-TST-001's criteria unchanged, an owner decision needed before ZOD-TST-001 and ZOD-TST-005 are implemented.
+- **ZOD-EPH-004** (astronomy-engine FFI spike) — same category of risk, lower severity since it's a backup. **Done 2026-11-22 (Android and host; iOS not verified):** it found that ZOD-TST-001's 1-arcsecond Moon bound against Horizons cannot be met at far-future UT instants by any adapter because sources assume different future ΔT; recorded in [`docs/spikes/ZOD-EPH-004-delta-t.md`](../spikes/ZOD-EPH-004-delta-t.md) and PROGRESS (Blockers), ZOD-TST-001's criteria unchanged, an owner decision needed before ZOD-TST-001 and ZOD-TST-005 are implemented. *Update 2026-11-27:* closed for the Swiss primary source (ZOD-TST-001 compares at the same TT and passes through 2100-12-31); still open for the backup in ZOD-TST-005.
 - **ZOD-XLS-001** (OOXML generation spike) — R-8's named risk; blocks all of `excel-export/`.
 - **ZOD-FND-011** (data-file coverage range) — affects app size and every date-range limit in the UI; should resolve early in Phase 1.
 
