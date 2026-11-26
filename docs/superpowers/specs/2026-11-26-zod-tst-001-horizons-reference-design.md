@@ -74,7 +74,7 @@ All 53 version-1 instants stay. Eleven are added, giving **64** (63 inside 1900 
 
 Year boundaries: the version-1 set already holds year starts every five years and several 31 December 23:59:59 instants. All ten bodies are evaluated at every instant.
 
-### 5.1 Retrograde candidates (unconfirmed until the download)
+### 5.1 Retrograde candidates (confirmed from Horizons, section 5.2)
 
 | Body | Primary | Published basis | Backup | Published basis |
 |---|---|---|---|---|
@@ -90,6 +90,43 @@ Year boundaries: the version-1 set already holds year starts every five years an
 **Confirmation rule (Horizons only).** For each declared (body, instant) t, Horizons longitudes at t − 3 days, t and t + 3 days (TT) must strictly decrease, both steps taken as the shortest signed angle. A failing pair is replaced by the body's backup instant, which must pass the same test (Mercury has two declared instants and one backup, so it can replace only one). If no passing replacement exists, work stops and the owner is asked. No date is chosen by our own computation. A substitution changes the instant and row counts; the new counts are reported.
 
 The three samples show backward motion on both sides of t. They do not locate the stations.
+
+### 5.2 Confirmation result (Horizons, 2026-11-26 22:10 UTC)
+
+Eight requests (Mercury to Pluto, TT, quantity 31), 8 of 8 HTTP 200, one attempt each, all accepted by the parser. **All 17 candidates are retrograde: every primary and every backup. No substitution; `retrogradeDeclarations` stays the primaries and every count in the plan stands.**
+
+| Body | Instant (00:00 UTC) | Role | t − 3 d (°) | t (°) | t + 3 d (°) | Steps (°) |
+|---|---|---|---|---|---|---|
+| Mercury | 1953-11-18 | primary | 231.6731315 | 227.9389816 | 225.4173393 | −3.7342, −2.5216 |
+| Mercury | 2016-05-13 | backup | 49.1933078 | 47.4018151 | 45.8669223 | −1.7915, −1.5349 |
+| Mercury | 2049-05-11 | primary | 47.1968723 | 45.3758521 | 43.8165796 | −1.8210, −1.5593 |
+| Venus | 2004-06-14 | backup | 76.2455685 | 74.4712110 | 72.8896318 | −1.7744, −1.5816 |
+| Venus | 2012-06-12 | primary | 73.9062984 | 72.1447999 | 70.5868259 | −1.7615, −1.5580 |
+| Mars | 1956-09-10 | primary | 349.2266378 | 348.3982722 | 347.5727297 | −0.8284, −0.8255 |
+| Mars | 2003-08-28 | backup | 336.0180984 | 335.2208439 | 334.4209791 | −0.7973, −0.7999 |
+| Jupiter | 2023-10-15 | primary | 43.3480764 | 43.0034023 | 42.6419757 | −0.3447, −0.3614 |
+| Jupiter | 2024-10-20 | backup | 81.2380719 | 81.1457628 | 81.0238014 | −0.0923, −0.1220 |
+| Saturn | 2023-08-01 | primary | 335.8958339 | 335.7128216 | 335.5211440 | −0.1830, −0.1917 |
+| Saturn | 2024-08-01 | backup | 348.7404445 | 348.5977086 | 348.4432217 | −0.1427, −0.1545 |
+| Uranus | 2023-10-15 | primary | 52.3191148 | 52.2198113 | 52.1160856 | −0.0993, −0.1037 |
+| Uranus | 2024-10-20 | backup | 56.4488215 | 56.3470187 | 56.2410121 | −0.1018, −0.1060 |
+| Neptune | 2023-08-01 | primary | 357.4792494 | 357.4342864 | 357.3852831 | −0.0450, −0.0490 |
+| Neptune | 2024-08-01 | backup | 359.7456770 | 359.7027412 | 359.6557347 | −0.0429, −0.0470 |
+| Pluto | 2023-08-01 | primary | 298.9636611 | 298.8933332 | 298.8236455 | −0.0703, −0.0697 |
+| Pluto | 2024-08-01 | backup | 300.7341065 | 300.6637671 | 300.5941736 | −0.0703, −0.0696 |
+
+All answers: `API VERSION: 1.2`, EOP file `eop.261125.p270221`, the same source solutions as the pilot. Kept outside the repository (location in `docs/PROGRESS.md`) with the request log `confirm-retrograde.requests.tsv`. SHA-256:
+
+```
+c7c0f475ccd567021e2a3e1474bb456dff3e9216693fddad0de6d6bd50e6c6b1  01_199_TT
+bd088dfd2c27835a1fddca345883e44b10bab2792f3e8948b147bf86e43cbffc  02_299_TT
+4849f5f3b1fc741a7e57463b9f28d04df72a285a5b49f15d3c131ef27407e055  03_499_TT
+89aea1c8666994a5a414e2cec0bf22f9f3192776613d51caeccc0911588b5430  04_599_TT
+303a15de4d2989a5365cb0e5e8618e79ceee690397a95e0b73f17240996e7fde  05_699_TT
+9ef004678acb1dfdaf97d2fc29b89c1cdceb855b2ba2082e520aac715433aab2  06_799_TT
+cea9620dd2a1dee6729a9b0f2ea8ed6fa52595a8747a766be7426053dc912eb7  07_899_TT
+c2b0ff72c619758628de497f3d6790bbee01db99af87ee56c960222a71a42ec3  08_999_TT
+```
 
 ## 6. Time basis: the same instant on both sides
 
@@ -247,6 +284,8 @@ Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do n
 | Control, TT (estimate: UT + library ΔT; the real times come from Horizons) | 22 | 0.994 ms | 0.493 ms |
 
 The two values over 1 ms occur only if Horizons truncates **and** reads the string as its nearest double (read exactly, those two times differ by 0.013 ms and 0.010 ms; the worst TT entry is then 0.997 ms). The Task 4B answers show whether it truncates or rounds: at 2003-08-28, 2004-06-14 and 2012-06-12 a truncating printer shows `.183` and a rounding one `.184` (plan Task 4 Step 4B-echo). The pilot could not tell.
+
+**Observed on the Task 4B answers (2026-11-26): Horizons rounds.** All nine deciding rows print the upper millisecond (`00:01:04.184` for 2003-08-28 and 2004-06-14, `00:01:06.184` for 2012-06-12, each at t and t ± 3). Over all 51 rows the printed time minus the requested one lies between −0.216 and +0.045 ms, the values predicted for rounding. Under rounding every dataset time is predicted within 0.493 ms, so the dataset download proceeds with the tolerance unchanged.
 
 **The canonical TT string** (2026-11-26). For every instant it is `ttJulianDay`: from 1972, `julianDayUt(utc.add(ttMinusUtc)).toStringAsFixed(9)`, the double the adapter passes to the library, printed to nine decimals; before 1972, `julianDayUt(utc) + ΔT/86400` printed the same way. It is **not** an exact-decimal rounding.
 
