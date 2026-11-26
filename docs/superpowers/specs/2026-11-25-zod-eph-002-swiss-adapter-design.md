@@ -1,6 +1,6 @@
 # ZOD-EPH-002: the Swiss Ephemeris adapter (data-file mode), design
 
-**Status: written 2026-11-25, read by a builder reviewer, owner's two questions answered 2026-11-26; awaiting the owner's approval.** Next: implementation plan, plan review, approval, then code.
+**Status: approved by the owner, 2026-11-26** (written 2026-11-25, read by a builder reviewer, the owner's two questions answered 2026-11-26). Implementation plan: [`docs/plans/ZOD-EPH-002-swiss-ephemeris-adapter.md`](../../plans/ZOD-EPH-002-swiss-ephemeris-adapter.md).
 
 Sources of truth: the [task file](../../development/computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md), the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (sections 4, 7a, 11) and the [FFI spike](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md).
 
