@@ -1,6 +1,6 @@
 # ZOD-TST-001: JPL Horizons Reference Dataset Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task, **sequentially in one session** (the tasks share files and interfaces). Steps use checkbox (`- [ ]`) syntax for tracking. **Do not start before the owner approves this plan.**
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task, **sequentially in one session** (the tasks share files and interfaces). Steps use checkbox (`- [ ]`) syntax for tracking. **Approval is by stage (see Global Constraints): stop after Task 3.**
 
 **Goal:** One versioned Horizons reference dataset, compared at matching TT instants, that T-EPH-1 and ACC-1 consume, plus a separate mean-node validation against Swiss Ephemeris.
 
@@ -14,6 +14,8 @@
 
 ## Global Constraints
 
+* **Stages (owner, 2026-11-26):** the 11-request pilot is done, accepted, and **not repeated**. **Tasks 0 to 3 are approved**; they send no Horizons request, download nothing, run no emulator and touch no dataset or backup data. After Task 3: stop and report. Task 4 and every later request wait for a further approval. No push, PR or merge.
+* The pilot's observations do not replace the time-scale control at the 22 pre-1972 instants (design section 6 link 4; Tasks 5 and 6).
 * **No file under any `lib/` changes.** No `EphemerisPort`, adapter, backup implementation, backup range, formula or specification change. `native/*/upstream/` stays byte-identical.
 * Tolerances, never loosened, no body or instant dropped to pass: **1″** for each of the ten bodies against Horizons; node **0.01°**; Horizons TT-against-UT agreement **0.002″**; device TT pin **0.0005″**; echoed time **1 ms**; row protection **0.001″**. A failing gate means stop and report.
 * Every primary comparison is at the same TT (design section 6). Before 1972 nothing of ours is compared with a UT-asked Horizons value (the time-scale control compares Horizons only with itself).
@@ -45,7 +47,7 @@
 |---|---|
 | `packages/ephemeris_swiss/tool/horizons/horizons.dart` | pure: query, parser, angle, retrograde and row checks |
 | `packages/ephemeris_swiss/tool/horizons/swiss_host.dart` | compile and run a host C tool against the vendored Swiss source |
-| `packages/ephemeris_swiss/tool/fetch_horizons_reference.dart` | the only network code: modes `pilot`, `confirm-retrograde`, `dataset` |
+| `packages/ephemeris_swiss/tool/fetch_horizons_reference.dart` | the only network code: modes `confirm-retrograde`, `dataset` (created in Task 4) |
 | `packages/ephemeris_swiss/tool/gen_horizons_copy.dart` | offline: dataset JSON → device const copy |
 | `packages/ephemeris_swiss/tool/node_grid.c`, `gen_swiss_mean_node.dart` | node reference fixture |
 | `packages/astro_core/test/fixtures/{reference_dates,horizons_reference,swiss_mean_node}.json` | shared data |
@@ -79,6 +81,7 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
 - [ ] **Step 1: Write the failing tests**
 
   * `the query is exactly the approved parameters`: `horizonsQuery(command: '301', julianDays: ['2451545.000000000', '2451546.000000000'], timeType: HorizonsTimeType.tt)` equals the map of design section 8 value for value (`TLIST` = `"'2451545.000000000 2451546.000000000'"`, `TIME_DIGITS` `"'FRACSEC'"`, `CAL_FORMAT` `"'BOTH'"`, `APPARENT` `"'AIRLESS'"`, `format` `'text'`); `ut` gives `TIME_TYPE` `"'UT'"`; `quantities: '30,31'` gives `"'30,31'"`.
+  * `the query reproduces the two pilot requests`: for the two requests behind the samples (design 8.5), `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…)).toString()` equals the URL recorded there, written as a literal in the test.
   * `julian days must be ascending with nine decimals`: `ArgumentError` for `['2.000000000', '1.000000000']`, for `['2451545.0']` and for an empty list.
   * `signedDegrees wraps`: `(359.9, 0.1)` ≈ 0.2; `(0.1, 359.9)` ≈ −0.2; `(10, 190)` = −180.
   * `isRetrograde`: `(0.2, 0.0, 359.8)` true; `(359.8, 0.0, 0.2)` false; `(10, 9, 9.5)` false; `(10, 10, 9)` false.
@@ -89,25 +92,18 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
 - [ ] **Step 4:** Rerun the Step 2 command (also the "tool tests" command of Tasks 3 to 5). Expected: all pass.
 - [ ] **Step 5:** Commit `feat(ZOD-TST-001): add the Horizons query and reference checks`.
 
-### Task 2: Pilot requests (first download)
+### Task 2: Pilot answers as parser samples (done)
 
-**Files:** Create `packages/ephemeris_swiss/tool/fetch_horizons_reference.dart`; Create `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt`, `horizons_sample_ut.txt`; Modify `.gitattributes`.
+The 11 pilot requests (design section 8) were sent on 2026-11-26 by a throwaway script outside the repository. The owner accepted those answers as the completed pilot: **they are not repeated, and the repository tool has no pilot mode.** The raw answers stay in the scratch directory; their SHA-256 and the verified format are in design sections 8.1 to 8.5.
 
-**Interfaces:** from `packages/ephemeris_swiss`, `fvm dart run tool/fetch_horizons_reference.dart pilot --out <absolute dir outside the repo>` sends exactly 11 requests with `horizonsQuery`, saves each raw answer in `<dir>`, and does nothing else:
+**Files:** Create `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt`, `horizons_sample_ut.txt`; Modify `.gitattributes`.
 
-| Request | Command | Time type | Quantities | Julian days |
-|---|---|---|---|---|
-| 1 | `301` | TT | `31` | `2415020.000000000`, `2441317.500488241`, `2451545.000000000`, `2488434.500789167` |
-| 2 | `301` | UT | `30,31` | `2415020.000000000`, `2441317.500000000`, `2451545.000000000`, `2488434.500789167` |
-| 3 to 11 | the other nine bodies, one each | TT | `31` | `2488434.500789167` |
+**Interfaces (produces):** the TT sample is pilot request 1 (Moon, TT, quantity 31, four rows); the UT sample is request 2 (Moon, UT, quantities 30 and 31, four rows).
 
-`2441317.5…` is 1972-01-01T00:00:00 (as TT: +42.184 s). `2488434.500789167` is the TT of 2100-12-31T23:59:59Z (+69.184 s), which falls in 2101.
-
-- [ ] **Step 1:** Implement the `pilot` mode (HTTP GET as in the old tool: non-200 throws; 1 s between requests). Any other or missing mode prints usage and exits 64.
-- [ ] **Step 2:** Run it. Expected: 11 files, each containing `$$SOE` and `$$EOE`. **A body with no ephemeris at the last instant: stop and ask the owner** (no substitute target or date on our own).
-- [ ] **Step 3: Inspect and record** in the design section 8: the exact time-scale header text for TT and UT, the Julian-day and fraction-of-second precision, the `ObsEcLon` and quantity 30 column labels, the API version line, the target `{source: …}` line, the centre line. Also record the decimal places of `ObsEcLon` and of quantity 30. **Stop and ask the owner** if the answer does not declare TT, if neither the printed Julian day nor the calendar time resolves 1 ms, if quantity 30 is printed to fewer than 3 decimals of a second, or if `ObsEcLon` is printed to fewer than 7 decimals of a degree.
-- [ ] **Step 4: The 1972 boundary:** the Moon longitude of row 2 of request 1 (TT) and of row 2 of request 2 (UT) agree within 0.002″. If not, **stop and ask** (options: leave that instant out of the UT cross-check, or choose another boundary instant).
-- [ ] **Step 5:** Add `packages/ephemeris_swiss/test/fixtures/horizons_sample_*.txt -text` to `.gitattributes`, copy answers 1 and 2 unchanged to the sample files, and commit `test(ZOD-TST-001): capture the Horizons output format`.
+- [x] **Step 1:** All 11 raw answers match the SHA-256 of design 8.5.
+- [x] **Step 2:** Every pilot stop condition passed (design 8.4), including data for all ten bodies at the last instant and the 1972 boundary.
+- [x] **Step 3:** Answers 1 and 2 copied unchanged to the sample files, with `packages/ephemeris_swiss/test/fixtures/horizons_sample_*.txt -text` in `.gitattributes`; commit `a0210c9`; the committed blobs match the two hashes.
+- [x] **Step 4:** Format, headers, column-name requirements and precision recorded in design section 8.
 
 ### Task 3: Answer parser
 
@@ -125,19 +121,38 @@ HorizonsAnswer parseHorizonsAnswer(String text, {required String command,
     bool expectTdbMinusUt = false});
 ```
 
-Checks: both markers; a CSV header row, columns located **by name** (never by fixed index); the declared time scale equals `timeType`; the target line names `command`; the centre is the geocentre (500, body 399); as many rows as requested; each row's echoed time within 1 ms of its requested Julian day, in order; longitude in [0, 360); quantity 30 present when expected.
+`apiVersion` is the number after `API VERSION:` (any value); `targetLine` is the whole `Target body name:` line, trimmed.
 
-- [ ] **Step 1: Write the failing tests** against the samples: `parses the TT sample` (four rows, longitudes equal the literals read from the file, `apiVersion` and `targetLine` non-empty); `parses the UT sample with TDB-UT` (four non-null values); `a CRLF variant and an LF variant parse to the same rows`; then one test per failure, each editing the sample text in memory and expecting `FormatException`: `a TT answer is refused for a UT request` and the reverse; `a missing row`; `two rows swapped`; `an echoed time 2 ms off`; `no ObsEcLon column`; `no $$EOE`; `another target` (parse with `command: '10'`); `a non-geocentric centre`; `longitude 360`; `quantity 30 expected but absent`.
+Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `FormatException` whose message **starts with** the quoted word, so a test can tell which check refused:
+
+1. `markers`: one `$$SOE` line, then one `$$EOE` line.
+2. `API version`: the line is present.
+3. `time scale`: the `Start time` and `Stop  time` lines, trailing spaces removed, both end in ` TT` or ` UT` equal to `timeType`.
+4. `target`: the target line contains `(<command>)`.
+5. `centre`: the centre body line contains `Earth (399)` and the centre site is `GEOCENTRIC`.
+6. `column`: the header is the last line before `$$SOE` containing `Date__(`; split at commas and trimmed; it holds, **by name** (never by index), the two date columns of the requested scale, `ObsEcLon`, and `TDB-UT` when `expectTdbMinusUt`.
+7. `rows`: as many rows as requested.
+8. For each row, in order: `fields` (as many as the header); `number` (the Julian day, longitude and, when expected, quantity 30 parse as numbers; the calendar time matches `yyyy-Mon-dd HH:mm:ss.fff`); `time` (**both** the printed Julian day and the calendar time are within 1 ms of the requested Julian day); `precision` (longitude at least 7 decimals, quantity 30 at least 3); `longitude` (in [0, 360)).
+
+`tdbMinusUtSeconds` is null unless expected.
+
+- [ ] **Step 1: Write the failing tests** against the samples.
+  * `parses the TT sample`: four rows; `julianDay` equals the four requested strings; longitudes `265.2972999`, `101.6302965`, `223.3148557`, `293.9451964`; every `tdbMinusUtSeconds` null; `apiVersion` `'1.2'`; `targetLine` contains `Moon (301)` and `DE441`.
+  * `parses the UT sample with TDB-UT`: longitudes `265.2969812`, `101.6302965`, `223.3237860`, `293.9567420`; `tdbMinusUtSeconds` `-1.946024`, `42.183919`, `64.183903`, `69.183904`.
+  * `a CRLF variant parses to the same rows` (the samples are LF).
+  * One test per refusal, each editing the sample text in memory (assert the edit changed the text) and expecting a `FormatException` whose message starts with the check's word: `a TT answer is refused for a UT request` and the reverse, and `a stop time naming another scale` (`time scale`); `a column header naming another scale`, `no ObsEcLon column`, `quantity 30 expected but absent` (`column`); `a missing row` (`rows`); `a row missing a field` (`fields`); `two rows swapped`, `an echoed Julian day 2 ms off`, `an echoed calendar time 2 ms off` (`time`); `a value that is not a number` (`n.a.`, `number`); `longitude printed to six decimals`, `quantity 30 printed to two decimals` (`precision`); `longitude 360` (`360.0000000`, `longitude`); `no $$SOE`, `no $$EOE` (`markers`); `no API version line` (`API version`); `another target` (`command: '10'`, `target`); `a non-geocentric centre body` and `a non-geocentric site` (`centre`).
 - [ ] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
 - [ ] **Step 3:** Implement from the recorded format.
 - [ ] **Step 4:** Run. Expected: all pass.
-- [ ] **Step 5:** Commit `feat(ZOD-TST-001): parse Horizons answers and refuse mismatches`.
+- [ ] **Step 5:** Commit `feat(ZOD-TST-001): parse Horizons answers and refuse mismatches`. **Stop here: report, and wait for the owner's approval of Task 4.**
 
 ### Task 4: Confirm the retrograde dates with Horizons
 
-**Files:** Create `tool/horizons/swiss_host.dart`; Modify `tool/fetch_horizons_reference.dart`; Modify `test/horizons_tool_test.dart`.
+**Waits for the owner's approval.** **Files:** Create `tool/horizons/swiss_host.dart`, `tool/fetch_horizons_reference.dart`; Modify `tool/horizons/horizons.dart`, `test/horizons_tool_test.dart`.
 
 **Interfaces:**
+
+`tool/fetch_horizons_reference.dart`, the only network code of the new tool, run from the package root as `fvm dart run tool/fetch_horizons_reference.dart <mode> … --out <dir outside the repository>`: HTTP GET of `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…))`; a non-200 answer throws; requests sequential, at least 1 s apart; every raw answer saved in `<dir>`; every answer read through `parseHorizonsAnswer`. A missing or unknown mode, or a missing `--out`, prints usage and exits 64 before any request.
 
 ```dart
 // swiss_host.dart: copied from the old tool (deleted in Task 6), same gcc flags and library sources.
@@ -189,7 +204,7 @@ Dataset JSON keys: `version` (from `nextDatasetVersion`; 1 for this task), `refe
 
 Generated copy declares: `horizonsDatasetVersion`, `horizonsToleranceArcseconds`, `typedef HorizonsReference = ({String body, String utc, String jdTt, double ttMinusUtSeconds, double longitudeDegrees})`, `typedef HorizonsUtReference = ({String body, String utc, double longitudeDegrees})`, `const horizonsReference`, `const horizonsUtCrossCheck`, with a generated-file header. The tolerance is `const double horizonsToleranceArcseconds`; the version is `const int horizonsDatasetVersion`.
 
-**Mode `dataset --baseline <json> --out <dir>`** (both required, else exit 64; requests of design 8.1). Fixed repository paths resolve against the package root (`Platform.script.resolve('../')`); `--baseline` and `--out` are relative to the current directory, or absolute.
+**Mode `dataset --baseline <json> --out <dir>`** (both required, else exit 64; requests of design 8.6). Fixed repository paths resolve against the package root (`Platform.script.resolve('../')`); `--baseline` and `--out` are relative to the current directory, or absolute.
 
 * reads and validates, **before the first request**, `reference_dates.json` (instants and `referenceDatesVersion`) and the baseline: the old Swiss TT fixture or a previous `horizons_reference.json` (both have `entries` with `body`, `utc`, `longitudeDegrees`; the latter also has `utcCrossCheck`, passed as `crossCheckBaseline`);
 * if `packages/astro_core/test/fixtures/horizons_reference.json` exists, reads and validates it before the first request as `previous`: it feeds `nextDatasetVersion`, and its `entries` and `utcCrossCheck` are **always** compared by `changedRows`, in addition to `--baseline`. No argument skips this;
@@ -311,4 +326,8 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 | I4 | the pilot did not gate printed precision | applied |
 | M1 to M5 | command form; missing-row gates; "changed" defined; wording of the pre-1972 constraint; tolerance type | applied |
 
-**Open for the owner:** design section 13, D1 to D6.
+D1 to D6 (design section 13) were open after round 2; **the owner approved the recommended answers on 2026-11-26.**
+
+### Revision 1 (2026-11-26): the pilot workflow (owner decision, Option A)
+
+The pilot was run by a throwaway script outside the repository and accepted as the completed pilot. Amendments: Task 2 is now "answers as parser samples" (no `pilot` mode, no repeat); Task 3 pins its checks, their order and their messages to the verified format (centre check corrected: the answers never print `500`; both echoed times; precision gates now enforced by the parser); Task 1 gains a test that the repository's query reproduces the two sample requests; Task 4 now creates the fetch tool (its HTTP behaviour moved from Task 2); stage boundaries added to Global Constraints; design section 8 records the format and results (old 8.1 is now 8.6).

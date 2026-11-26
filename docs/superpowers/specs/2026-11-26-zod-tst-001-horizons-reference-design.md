@@ -1,6 +1,6 @@
 # ZOD-TST-001: the JPL Horizons reference dataset, design
 
-**Status: written 2026-11-26, awaiting the owner's approval. Nothing is implemented and no Horizons data has been downloaded for it.** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
+**Status (2026-11-26): approved by the owner, one stage at a time. The 11 pilot requests are done and accepted as the pilot (section 8); Tasks 0 to 3 of the plan are approved; every later request and stage waits for a further approval.** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
 
 Sources of truth: the [task file](../../development/testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md), specification T-EPH-1, ACC-1, ACC-5 and "Computation settings that must be fixed and documented", the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) sections 5 and 6, and the [ZOD-EPH-002 design](2026-11-25-zod-eph-002-swiss-adapter-design.md) section 6 (hand-off).
 
@@ -135,11 +135,11 @@ Before 1972 the instant string is only the app's input label, read as UT. No UTC
 | control: mean node, J2000 | 1.409° |
 | control: true node | 1.980° |
 
-**Conclusion.** The definitions are compatible with `SEFLG_NONUT`; **0.01° is verified on this evidence and becomes final when the owner confirms D6** (about 4.6 times the observed maximum, consistent with the specification's "less than 0.01°"). The UTC time argument contributes at most about 0.00004°.
+**Conclusion.** The definitions are compatible with `SEFLG_NONUT`; **0.01° is verified on this evidence and final: the owner confirmed D6 on 2026-11-26** (about 4.6 times the observed maximum, consistent with the specification's "less than 0.01°"). The UTC time argument contributes at most about 0.00004°.
 
 **What 0.01° alone cannot catch:** the default-flags variant also passes it. The tests therefore require the reference to carry `NONUT` (and not J2000 or sidereal), and require the J2000 and true-node controls to exceed 0.01°.
 
-**For the owner to confirm (D6):** the matching setting is `NONUT` because the formula's definition is on the mean equinox. Choosing the app's planet frame (true equinox) instead would still pass 0.01°, with a margin of about 1.4 instead of 4.6.
+**Confirmed by the owner (D6):** the matching setting is `NONUT` because the formula's definition is on the mean equinox. Choosing the app's planet frame (true equinox) instead would still pass 0.01°, with a margin of about 1.4 instead of 4.6.
 
 **Observation (no change proposed here):** planet longitudes are on the true equinox of date and the formula node on the mean equinox, so they differ in frame by nutation: at most 0.00527° (19.0″) over the same daily sweep, 1900 to 2100. This follows from the specification's formula.
 
@@ -165,11 +165,9 @@ Endpoint `https://ssd.jpl.nasa.gov/api/horizons.api` (GET). [API documentation](
 
 **Output conventions (documented):** quantity 31 is the "Observer-centered IAU76/80 ecliptic-of-date longitude and latitude of the target centers' apparent position with light-time, gravitational deflection of light, stellar aberration, and optional atmospheric refraction correction", in degrees (the manual's text; it does not name the equinox or nutation there; the repository measured at most 0.56″ against Swiss true-equinox-of-date positions). Quantity 30 is TDB − UT in seconds; UT means UT1 before 1962 and UTC after; unknown future leap seconds are held; ΔT predictions are held constant beyond about 73 days.
 
-**Not documented, checked by the pilot:** the header text for TT output, the printed Julian-day precision, the quantity 30 column label, and the printed decimal places. The pilot answers are inspected before the parser is written. Work stops if the output cannot confirm the time to 1 ms, prints quantity 30 to fewer than 3 decimals of a second, or prints the longitude to fewer than 7 decimals of a degree.
+**Not documented, so checked by the pilot:** the header text for TT output, the printed Julian-day precision, the quantity 30 column label, the printed decimal places, and the satellite-solution coverage of 499 to 999 at the last instant, which as TT is 2101-01-01T00:01:08. The stop conditions were: no ephemeris for a body there; a time that cannot be confirmed to 1 ms; quantity 30 under 3 decimals of a second; longitude under 7 decimals of a degree; TT and UT disagreeing by more than 0.002″ at the 1972 boundary. All passed (results below).
 
-**Coverage not verified:** the satellite-solution spans behind 499 to 999 at the last instant, which as TT is 2101-01-01T00:01:08 (the time-spans page did not render). Existing queries succeeded to 2100-01-01. The pilot probes all ten bodies there first; a body with no ephemeris is a stop for an owner decision, with no substitute target or date chosen on our own.
-
-**Pilot (11 requests):**
+**Pilot (11 requests, sent 2026-11-26; not repeated):**
 
 | Requests | Command | Time type, quantities | Julian days |
 |---|---|---|---|
@@ -177,13 +175,98 @@ Endpoint `https://ssd.jpl.nasa.gov/api/horizons.api` (GET). [API documentation](
 | 1 | Moon | UT, 30 and 31 | 2415020.000000000, 2441317.500000000, 2451545.000000000, 2488434.500789167 |
 | 9 | each other body | TT, 31 | 2488434.500789167 |
 
-The second Julian day is 1972-01-01T00:00:00, exactly where the time convention changes. TT and UT answers must agree there within 0.002″; whether Horizons applies the leap-second offset at that exact instant is not established, and a disagreement is a stop (leave the instant out of the cross-check, or choose another boundary instant). The control's TT times are derived from Horizons' own TDB − UT as in section 6.
+The second Julian day is 1972-01-01T00:00:00, exactly where the time convention changes (the TT request asks it 42.184 s later). The control's TT times are derived from Horizons' own TDB − UT as in section 6.
 
-### 8.1 Requests
+The requests were sent by a throwaway script outside the repository, with exactly the parameters above, between 18:41:32 and 18:41:50 UTC; all returned HTTP 200. The owner accepted these answers as the completed pilot (2026-11-26): **they are not repeated, and the repository tool has no pilot mode.**
+
+### 8.1 Verified output format
+
+Answers are plain text with LF line endings. In order:
+
+| Line (as printed, trailing spaces omitted) | Note |
+|---|---|
+| `API VERSION: 1.2` | the documentation read at planning was 1.3; recorded, not asserted |
+| `API SOURCE: NASA/JPL Horizons API` | |
+| `Target body name: Moon (301)                      {source: DE441}` | the number in parentheses is the `COMMAND` |
+| `Center body name: Earth (399)                     {source: DE441}` | |
+| `Center-site name: GEOCENTRIC` | the answers never print `500` |
+| `Start time      : A.D. 1899-Dec-31 12:00:00.0000 TT` | ends in the time scale, ` TT` or ` UT` |
+| `Stop  time      : A.D. 2101-Jan-01 00:01:08.1840 TT` | two spaces after `Stop`; ends in the scale |
+| `Atmos refraction: NO (AIRLESS)`, `Time format     : BOTH`, `Calendar mode   : Mixed Julian/Gregorian`, `EOP file        : eop.261125.p270221` | other header lines, between asterisk rules |
+| the table header, then a rule of asterisks, then `$$SOE`, the rows, `$$EOE` | |
+
+Table header with quantity 31 in TT, and with quantities 30 and 31 in UT:
+
+```
+ Date__(TT)__HR:MN:SC.fff, Date_________JDTT, , ,    ObsEcLon,   ObsEcLat,
+ Date__(UT)__HR:MN:SC.fff, Date_________JDUT, , ,       TDB-UT,     ObsEcLon,   ObsEcLat,
+```
+
+A row of each (leading space, trailing comma):
+
+```
+ 1899-Dec-31 12:00:00.000, 2415020.000000000, , , 265.2972999,  0.4615158,
+ 1899-Dec-31 12:00:00.000, 2415020.000000000, , ,    -1.946024,  265.2969812,  0.4614866,
+```
+
+The text after `$$EOE` explains the columns ("Terrestrial Time ("TT") output was requested"; for UT, "Times PRIOR to 1962 are UT1 … Times AFTER 1962 are in UTC", and the last known leap second is held for future instants). No answer carried a warning.
+
+### 8.2 Parsing requirements
+
+* **Columns are located by name** in the header line (the last line before `$$SOE` that contains `Date__(`), split at commas and trimmed: `Date__(TT)__HR:MN:SC.fff` or `Date__(UT)__HR:MN:SC.fff`, `Date_________JDTT` or `Date_________JDUT`, `ObsEcLon`, `TDB-UT`. **Never by position:** longitude is field 5 in a quantity-31 answer and field 6 with quantity 30. Two columns after the Julian day have empty names. Every row has as many fields as the header.
+* The time scale is taken from the `Start time` and `Stop  time` lines and from the two date column names; all must name the requested scale.
+* The target is `(<COMMAND>)` on the target line; the centre is `Earth (399)` and `GEOCENTRIC`.
+* Both echoed times, the Julian day and the calendar time, must match the requested Julian day within 1 ms, row by row in request order.
+* Fewer printed decimals than the pilot gates (longitude 7, quantity 30 three) is refused for every later answer.
+
+### 8.3 Precision
+
+| Value | Printed | Resolution |
+|---|---|---|
+| Julian day | 9 decimals | 86.4 µs |
+| Calendar time | 3 decimals of a second | 1 ms |
+| `ObsEcLon` | 7 decimals of a degree | 0.00036″, below the 0.001″ row protection |
+| `TDB-UT` | 6 decimals of a second | 1 µs |
+
+### 8.4 Pilot results
+
+* All ten bodies have a row at TT 2101-01-01T00:01:08.184. Sources: Sun, Moon, Mercury and Venus DE441; Mars `mar099`; Jupiter `jup365_merged`; Saturn `sat441l`; Uranus `ura184_merged`; Neptune `nep098_merged`; Pluto `plu060_merged`.
+* All 17 rows echo the requested times, in order.
+* 1972 boundary: the Moon is 101.6302965° in both the TT and the UT answer; `TDB-UT` there is 42.183919 s, so Horizons applies the offset at that exact instant.
+* `TDB-UT` at the other three pilot times: −1.946024 s (1899-12-31T12), 64.183903 s (2000-01-01T12), 69.183904 s (2101).
+* Observation, not a gate: where the same Julian day was asked as TT and as UT, UT minus TT is −1.147″, +32.149″ and +41.564″, that is 0.50 to 0.60″ per second of `TDB-UT`, consistent with the Moon's motion. **It does not replace link 4 of section 6: the 22-instant time-scale control is still run with the dataset.**
+* No accuracy statement follows from the pilot: its values were not compared with the app's.
+
+### 8.5 Pilot answers
+
+The two Moon answers are committed unchanged as parser samples, `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt` (request 1) and `horizons_sample_ut.txt` (request 2). All 11 raw answers and the request log stay in the planning session's scratch directory (`pilot-raw`), outside the repository; a reboot or cleanup can remove them. SHA-256:
+
+```
+789e1d04b1d22563d7a8dafe8a706921e214f8f5c54efec802bbb59b2147fc24  01_301_TT
+4e77b549aa88286be8ee469f5adbdd9a9e35fa67804a1ff237672db8869f24fa  02_301_UT
+4ce393a3b4d9ec31ed26bf1f8c903233ca56b5fc75084177fc555b2e10e9509f  03_10_TT
+5a15a8b99756f629733ff9e2e6644f9a3123da42fb7cf602a3da9f3050b1daa6  04_199_TT
+6074c503690a41ca860b103e049917e6d63094a884ae96a48d726ed6c89c09f6  05_299_TT
+33102b8130a4e314faff96fa918917ef5e8712715b31113f14e859dcb869b809  06_499_TT
+752c3d6f274f2a4d5ef94bf6e77f1092df3e36f96e9a90a085d9b94f46d51436  07_599_TT
+8b55f55fce038032a3f3d2c2de901024c2b61f236c3367c8952bc374aa4eca03  08_699_TT
+37513e3ff3737b016103fbe1c307ec8af8008c814b6d337f338f0f089f031bae  09_799_TT
+5d3a7326d8d94b826f1f88c705900eeb9e41f9d5197075197175df83407720c6  10_899_TT
+1d8205e37bbf028e7fcac1a2d8b4e2645514ca57e07b5a9fca1e9faa69f4d4ac  11_999_TT
+```
+
+The two requests behind the samples, as sent (the repository's query function must reproduce them):
+
+```
+https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST_TYPE=%27JD%27&TLIST=%272415020.000000000+2441317.500488241+2451545.000000000+2488434.500789167%27&TIME_TYPE=%27TT%27&TIME_DIGITS=%27FRACSEC%27&CAL_FORMAT=%27BOTH%27&QUANTITIES=%2731%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27&APPARENT=%27AIRLESS%27
+https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA=%27NO%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&TLIST_TYPE=%27JD%27&TLIST=%272415020.000000000+2441317.500000000+2451545.000000000+2488434.500789167%27&TIME_TYPE=%27UT%27&TIME_DIGITS=%27FRACSEC%27&CAL_FORMAT=%27BOTH%27&QUANTITIES=%2730%2C31%27&ANG_FORMAT=%27DEG%27&EXTRA_PREC=%27YES%27&CSV_FORMAT=%27YES%27&APPARENT=%27AIRLESS%27
+```
+
+### 8.6 Requests
 
 | Phase | Requests | Times per request |
 |---|---|---|
-| Pilot (format, 1972 boundary, last-instant coverage) | 11 | 1 to 4 |
+| Pilot (format, 1972 boundary, last-instant coverage): **done 2026-11-26** | 11 | 1 to 4 |
 | Retrograde confirmation, primaries and backups (TT) | 8 (Mercury to Pluto) | 6 to 9 |
 | Dataset: TT entries | 10 | 64 |
 | Dataset: UT cross-check from 1972 | 10 | 42 |
@@ -191,6 +274,8 @@ The second Julian day is 1972-01-01T00:00:00, exactly where the time convention 
 | Dataset: retrograde evidence (t ± 3 days) | 8 | 2 to 4 |
 | Backup fixtures (only under option A, section 10) | 20 | 61 |
 | **Total** | **49, or 69 with option A** | |
+
+**Remaining after the pilot: 38 requests, or 58 with option A (chosen).** Each later phase waits for the owner's approval.
 
 Sequential, 1 second apart. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. Re-running a failed request with the same parameters is within the approval; a new date or parameter is not.
 
@@ -213,7 +298,7 @@ Sequential, 1 second apart. The documentation states no API rate limit. A reques
 
 New: dataset integrity and coverage test (`astro_core`), node host test (`astro_core`), node device test (`astro_mobile`), unit tests of the fetch tool's parser and checks (`ephemeris_swiss`).
 
-## 10. The backup (decisions needed)
+## 10. The backup (option A chosen)
 
 Your range restriction covers the three instants after 2100-01-01T12:00Z. It does **not** cover the eight new instants **inside** the backup's range, because its tests require every shared instant to have backup reference rows.
 
@@ -239,9 +324,11 @@ Neither changes the backup's implementation, range, tolerance or boundary tests.
 * ACC-1's "same settings": geocentric, apparent, tropical of date; Horizons uses the IAU76/80 model for quantity 31, a difference included in the measured error.
 * A future change of the civil time standard would change the post-2027 rows' meaning (decision record section 1).
 
-## 13. Decisions needed from the owner
+## 13. Owner decisions on the open questions
 
-| ID | Question | Recommendation |
+**Answered 2026-11-26: the owner approved the recommended answer in every row.** D1: option A. D2: keep the 53. D3: leave. D4: accept. D5: the download is approved in principle and **authorised one stage at a time** (so far the pilot only). D6: confirmed.
+
+| ID | Question | Recommendation (approved) |
 |---|---|---|
 | D1 | Backup coverage of the new in-range instants: A (including edits to the backup's test data, fetch tools and device tests) or B (section 10) | **A** |
 | D2 | Under A, the speed test's sample | keep the 53 |
