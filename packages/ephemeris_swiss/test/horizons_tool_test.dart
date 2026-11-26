@@ -1,5 +1,8 @@
-// ZOD-TST-001: the pure query and check functions of the Horizons reference
-// tool (tool/horizons/horizons.dart). Offline: nothing here sends a request.
+// ZOD-TST-001: the pure query, check and parse functions of the Horizons
+// reference tool (tool/horizons/horizons.dart). Offline: nothing here sends a
+// request; the parser is tested on two answers of the pilot of 2026-11-26.
+import 'dart:io';
+
 import 'package:test/test.dart';
 
 import '../tool/horizons/horizons.dart';
@@ -197,6 +200,301 @@ void main() {
         changedRows(baseline, next, toleranceArcseconds: 0.0001),
         hasLength(1),
       );
+    });
+  });
+
+  parserTests();
+}
+
+const _ttDays = [
+  '2415020.000000000',
+  '2441317.500488241',
+  '2451545.000000000',
+  '2488434.500789167',
+];
+
+const _utDays = [
+  '2415020.000000000',
+  '2441317.500000000',
+  '2451545.000000000',
+  '2488434.500789167',
+];
+
+const _firstRowTime = '1899-Dec-31 12:00:00.000,';
+
+String _sample(String scale) =>
+    File('test/fixtures/horizons_sample_$scale.txt').readAsStringSync();
+
+/// [text] with the first [from] replaced; fails if there is nothing to replace.
+String _edit(String text, String from, String to) {
+  expect(text, contains(from));
+  final edited = text.replaceFirst(from, to);
+  expect(edited, isNot(text));
+  return edited;
+}
+
+/// The row line of [text] that starts with the calendar time [time].
+String _line(String text, String time) =>
+    text.split('\n').singleWhere((line) => line.startsWith(' $time'));
+
+HorizonsAnswer _parseTt(
+  String text, {
+  String command = '301',
+  HorizonsTimeType timeType = HorizonsTimeType.tt,
+  List<String> julianDays = _ttDays,
+  bool expectTdbMinusUt = false,
+}) => parseHorizonsAnswer(
+  text,
+  command: command,
+  timeType: timeType,
+  julianDays: julianDays,
+  expectTdbMinusUt: expectTdbMinusUt,
+);
+
+HorizonsAnswer _parseUt(
+  String text, {
+  HorizonsTimeType timeType = HorizonsTimeType.ut,
+  bool expectTdbMinusUt = true,
+}) => parseHorizonsAnswer(
+  text,
+  command: '301',
+  timeType: timeType,
+  julianDays: _utDays,
+  expectTdbMinusUt: expectTdbMinusUt,
+);
+
+/// A refusal by the check named [check].
+Matcher _refusedBy(String check) => throwsA(
+  isA<FormatException>().having(
+    (e) => e.message,
+    'message',
+    startsWith('$check:'),
+  ),
+);
+
+void parserTests() {
+  group('parseHorizonsAnswer', () {
+    late String tt;
+    late String ut;
+    setUpAll(() {
+      tt = _sample('tt');
+      ut = _sample('ut');
+    });
+
+    test('parses the TT sample', () {
+      final answer = _parseTt(tt);
+      expect([for (final r in answer.rows) r.julianDay], _ttDays);
+      expect(
+        [for (final r in answer.rows) r.longitudeDegrees],
+        [265.2972999, 101.6302965, 223.3148557, 293.9451964],
+      );
+      expect([
+        for (final r in answer.rows) r.tdbMinusUtSeconds,
+      ], everyElement(isNull));
+      expect(answer.apiVersion, '1.2');
+      expect(answer.targetLine, contains('Moon (301)'));
+      expect(answer.targetLine, contains('DE441'));
+    });
+
+    test('parses the UT sample with TDB-UT', () {
+      final answer = _parseUt(ut);
+      expect([for (final r in answer.rows) r.julianDay], _utDays);
+      expect(
+        [for (final r in answer.rows) r.longitudeDegrees],
+        [265.2969812, 101.6302965, 223.3237860, 293.9567420],
+      );
+      expect(
+        [for (final r in answer.rows) r.tdbMinusUtSeconds],
+        [-1.946024, 42.183919, 64.183903, 69.183904],
+      );
+    });
+
+    test('a CRLF variant parses to the same rows', () {
+      expect(tt, isNot(contains('\r')));
+      final lf = _parseTt(tt);
+      final crlf = _parseTt(tt.replaceAll('\n', '\r\n'));
+      expect(crlf.rows, lf.rows);
+      expect(crlf.apiVersion, lf.apiVersion);
+      expect(crlf.targetLine, lf.targetLine);
+    });
+
+    test('the UT sample read without TDB-UT gives the same longitudes', () {
+      final answer = _parseUt(ut, expectTdbMinusUt: false);
+      expect(
+        [for (final r in answer.rows) r.longitudeDegrees],
+        [265.2969812, 101.6302965, 223.3237860, 293.9567420],
+      );
+      expect([
+        for (final r in answer.rows) r.tdbMinusUtSeconds,
+      ], everyElement(isNull));
+    });
+
+    test('a requested time about 0.5 ms (0.518 ms) from the echo passes and '
+        'the row carries the requested string', () {
+      final answer = _parseTt(
+        tt,
+        julianDays: ['2415020.000000006', ..._ttDays.skip(1)],
+      );
+      expect(answer.rows.first.julianDay, '2415020.000000006');
+    });
+
+    group('refuses', () {
+      test('a TT answer for a UT request', () {
+        expect(
+          () => _parseTt(tt, timeType: HorizonsTimeType.ut),
+          _refusedBy('time scale'),
+        );
+      });
+
+      test('a UT answer for a TT request', () {
+        expect(
+          () => _parseUt(
+            ut,
+            timeType: HorizonsTimeType.tt,
+            expectTdbMinusUt: false,
+          ),
+          _refusedBy('time scale'),
+        );
+      });
+
+      test('a stop time naming another scale', () {
+        final text = _edit(tt, '00:01:08.1840 TT', '00:01:08.1840 UT');
+        expect(() => _parseTt(text), _refusedBy('time scale'));
+      });
+
+      test('a start time naming another scale', () {
+        final text = _edit(tt, '12:00:00.0000 TT', '12:00:00.0000 UT');
+        expect(() => _parseTt(text), _refusedBy('time scale'));
+      });
+
+      test('a column header naming another scale', () {
+        for (final (from, to) in [
+          ('Date__(TT)__HR:MN:SC.fff', 'Date__(UT)__HR:MN:SC.fff'),
+          ('Date_________JDTT', 'Date_________JDUT'),
+        ]) {
+          final text = _edit(tt, from, to);
+          expect(() => _parseTt(text), _refusedBy('column'), reason: from);
+        }
+      });
+
+      test('no ObsEcLon column', () {
+        final text = _edit(tt, 'ObsEcLon,', 'ObsEcLng,');
+        expect(() => _parseTt(text), _refusedBy('column'));
+      });
+
+      test('quantity 30 expected but absent', () {
+        expect(
+          () => _parseTt(tt, expectTdbMinusUt: true),
+          _refusedBy('column'),
+        );
+      });
+
+      test('a missing row', () {
+        final row = _line(tt, '2000-Jan-01');
+        final text = _edit(tt, '$row\n', '');
+        expect(() => _parseTt(text), _refusedBy('rows'));
+      });
+
+      test('an extra row', () {
+        final row = _line(tt, '2101-Jan-01');
+        final text = _edit(tt, '$row\n', '$row\n$row\n');
+        expect(() => _parseTt(text), _refusedBy('rows'));
+      });
+
+      test('a row missing a field', () {
+        final text = _edit(
+          tt,
+          '2415020.000000000, , ,',
+          '2415020.000000000, ,',
+        );
+        expect(() => _parseTt(text), _refusedBy('fields'));
+      });
+
+      test('two rows swapped', () {
+        final first = _line(tt, '1972-Jan-01');
+        final second = _line(tt, '2000-Jan-01');
+        final text = _edit(tt, '$first\n$second\n', '$second\n$first\n');
+        expect(() => _parseTt(text), _refusedBy('time'));
+      });
+
+      test('an echoed Julian day 2 ms off', () {
+        final text = _edit(tt, '2415020.000000000,', '2415020.000000023,');
+        expect(() => _parseTt(text), _refusedBy('time'));
+      });
+
+      test('an echoed calendar time 2 ms off', () {
+        final text = _edit(tt, _firstRowTime, '1899-Dec-31 12:00:00.002,');
+        expect(() => _parseTt(text), _refusedBy('time'));
+      });
+
+      test('a value that is not a number', () {
+        for (final value in ['n.a.', 'NaN', 'Infinity']) {
+          final text = _edit(tt, '265.2972999', value);
+          expect(() => _parseTt(text), _refusedBy('number'), reason: value);
+        }
+      });
+
+      test('a calendar time in another form', () {
+        final text = _edit(tt, _firstRowTime, '1899-Xyz-31 12:00:00.000,');
+        expect(() => _parseTt(text), _refusedBy('number'));
+      });
+
+      test('longitude printed to six decimals', () {
+        final text = _edit(tt, '265.2972999', '265.297300');
+        expect(() => _parseTt(text), _refusedBy('precision'));
+      });
+
+      test('quantity 30 printed to two decimals', () {
+        final text = _edit(ut, '-1.946024', '-1.95');
+        expect(() => _parseUt(text), _refusedBy('precision'));
+      });
+
+      test('longitude 360', () {
+        final text = _edit(tt, '265.2972999', '360.0000000');
+        expect(() => _parseTt(text), _refusedBy('longitude'));
+      });
+
+      test('a negative longitude', () {
+        final text = _edit(tt, '265.2972999', '-0.0000001');
+        expect(() => _parseTt(text), _refusedBy('longitude'));
+      });
+
+      test(r'no $$SOE', () {
+        final text = _edit(tt, r'$$SOE', 'SOE');
+        expect(() => _parseTt(text), _refusedBy('markers'));
+      });
+
+      test(r'no $$EOE', () {
+        final text = _edit(tt, r'$$EOE', 'EOE');
+        expect(() => _parseTt(text), _refusedBy('markers'));
+      });
+
+      test('no API version line', () {
+        final text = _edit(tt, 'API VERSION: 1.2', 'API: 1.2');
+        expect(() => _parseTt(text), _refusedBy('API version'));
+      });
+
+      test('another target', () {
+        expect(() => _parseTt(tt, command: '10'), _refusedBy('target'));
+      });
+
+      test('a non-geocentric centre body', () {
+        final text = _edit(
+          tt,
+          'Center body name: Earth (399)',
+          'Center body name: Mars (499)',
+        );
+        expect(() => _parseTt(text), _refusedBy('centre'));
+      });
+
+      test('a non-geocentric site', () {
+        final text = _edit(
+          tt,
+          'Center-site name: GEOCENTRIC',
+          'Center-site name: NOT GEOCENTRIC',
+        );
+        expect(() => _parseTt(text), _refusedBy('centre'));
+      });
     });
   });
 }
