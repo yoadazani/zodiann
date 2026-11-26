@@ -1,6 +1,6 @@
 # ZOD-TST-001: JPL Horizons Reference Dataset Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task, **sequentially in one session** (the tasks share files and interfaces). Steps use checkbox (`- [ ]`) syntax for tracking. **Approval is by stage (see Global Constraints): stop after Task 3.**
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task, **sequentially in one session** (the tasks share files and interfaces). Steps use checkbox (`- [ ]`) syntax for tracking. **Approval is by stage (see Global Constraints): stop after Task 4A.**
 
 **Goal:** One versioned Horizons reference dataset, compared at matching TT instants, that T-EPH-1 and ACC-1 consume, plus a separate mean-node validation against Swiss Ephemeris.
 
@@ -14,7 +14,7 @@
 
 ## Global Constraints
 
-* **Stages (owner, 2026-11-26):** the 11-request pilot is done, accepted, and **not repeated**. **Tasks 0 to 3 are approved**; they send no Horizons request, download nothing, run no emulator and touch no dataset or backup data. After Task 3: stop and report. Tasks 4 to 9, and every Horizons request, download and emulator run, wait for a further approval. No push, PR or merge.
+* **Stages (owner, 2026-11-26):** the 11-request pilot is done, accepted, and **not repeated**. **Tasks 0 to 3 are done and accepted. Task 4A (offline code only) is approved**: it sends no network request, downloads nothing, runs no emulator and touches no dataset or backup data; after it, stop and report. Task 4B (the 8 retrograde requests), Tasks 5 to 9, and every Horizons request, download and emulator run wait for a further explicit approval. No push, PR or merge. Existing scratch data and local work notes are not deleted.
 * The pilot's observations do not replace the time-scale control at the 22 pre-1972 instants (design section 6 link 4; Tasks 5 and 6).
 * **No file under any `lib/` changes.** No `EphemerisPort`, adapter, backup implementation, backup range, formula or specification change. `native/*/upstream/` stays byte-identical.
 * Tolerances, never loosened, no body or instant dropped to pass: **1″** for each of the ten bodies against Horizons; node **0.01°**; Horizons TT-against-UT agreement **0.002″**; device TT pin **0.0005″**; echoed time **1 ms**; row protection **0.001″**. A failing gate means stop and report.
@@ -150,29 +150,89 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
 
 ### Task 4: Confirm the retrograde dates with Horizons
 
-**Waits for the owner's approval.** **Files:** Create `tool/horizons/swiss_host.dart`, `tool/fetch_horizons_reference.dart`; Modify `tool/horizons/horizons.dart`, `test/horizons_tool_test.dart`.
+**Split by owner decision (2026-11-26): 4A is offline code (Steps 1 to 3C), then a stop; 4B (Steps 4 to 6) sends the 8 requests and waits for a separate explicit approval.**
+
+**Files:** Create `tool/horizons/swiss_host.dart`, `tool/fetch_horizons_reference.dart`, `test/horizons_fetch_test.dart`; Modify `tool/horizons/horizons.dart`, `test/horizons_tool_test.dart`. The old tool and `tt_grid.c` are not touched (Task 6).
 
 **Interfaces:**
 
-`tool/fetch_horizons_reference.dart`, the only network code of the new tool, run from the package root as `fvm dart run tool/fetch_horizons_reference.dart <mode> … --out <dir outside the repository>`: HTTP GET of `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…))`; a non-200 answer throws; requests sequential, at least 1 s apart; every raw answer saved in `<dir>` **before** it is read through `parseHorizonsAnswer`. A missing or unknown mode, or a missing `--out`, prints usage and exits 64 before any request.
-
 ```dart
-// swiss_host.dart: copied from the old tool (deleted in Task 6), same gcc flags and library sources.
-List<String> runSwissHostTool(Uri packageRoot, String cFileName, List<String> arguments); // stdout lines; non-zero exit throws
-// horizons.dart
+// horizons.dart (still pure: no network, no file access)
 typedef Declaration = ({String body, String utc});
 const List<Declaration> retrogradeDeclarations; // design 5.1 primaries, 9 pairs
 const Map<String, String> retrogradeBackups;     // body -> backup utc, 8 entries
-/// The Julian day string sent as TT for [utc] (design section 6).
+/// The Julian day string sent as TT for [utc] (design section 6). The 1972
+/// boundary is ephemerisTimeFor's. Exactly the old tool's arithmetic:
+/// from 1972 julianDayUt(utc.add(ttMinusUtc)), before it julianDayUt(utc) +
+/// deltaT / 86400; nine decimals. ArgumentError before 1972 without a finite
+/// delta T.
 String ttJulianDay(DateTime utc, {double? historicalDeltaTSeconds});
+/// Whole days only, on the string: the fraction digits are unchanged.
+String shiftJulianDay(String julianDay, int days);
+/// One instant under test with its three Julian days: t - 3, t, t + 3.
+typedef RetrogradeCandidate = ({String body, String utc, bool isBackup, List<String> julianDays});
+/// The candidate instants before the leap-second table, ascending.
+List<String> retrogradeHistoricalInstants();
+/// One list per request, Mercury to Pluto; within a request ascending by instant.
+/// [historicalDeltaTSeconds] is keyed by those instants; ArgumentError if one is missing.
+List<List<RetrogradeCandidate>> retrogradeRequests(Map<String, double> historicalDeltaTSeconds);
+typedef RetrogradeResult = ({String body, String utc, bool isBackup, double before, double at, double after});
+/// Three rows per candidate, in request order; ArgumentError if the counts differ.
+List<RetrogradeResult> retrogradeResults(List<RetrogradeCandidate> candidates, List<HorizonsRow> rows);
+/// body, instant, primary or backup, the three longitudes, both signed steps, PASS or FAIL.
+String retrogradeResultLine(RetrogradeResult result);
+/// Bodies with more failing declared instants than passing backups.
+List<String> retrogradeUnresolved(Iterable<RetrogradeResult> results);
+
+// swiss_host.dart: the old tool's gcc flags and library sources, unchanged.
+typedef ProcessRunner = ProcessResult Function(String executable, List<String> arguments);
+/// Compiles tool/[cFileName] against the vendored source and runs it; the
+/// non-empty stdout lines. StateError if compiling or running exits non-zero.
+List<String> runSwissHostTool(Uri packageRoot, String cFileName, List<String> arguments, {ProcessRunner run = Process.runSync});
+/// tt_grid.c with the packaged data directory (assets/ephe) as first argument
+/// and julianDayUt of each instant; StateError unless one line per instant.
+List<double> libraryDeltaTSeconds(Uri packageRoot, List<DateTime> instants, {ProcessRunner run = Process.runSync});
+
+// fetch_horizons_reference.dart, the only network code of the new tool.
+typedef HorizonsResponse = ({int statusCode, List<int> bytes});
+/// The exit code. Only main connects a real HTTP GET, gcc and a real delay.
+Future<int> runHorizonsTool(List<String> arguments, {
+    required Uri packageRoot,
+    required Future<HorizonsResponse> Function(Uri uri) get,
+    required List<double> Function(List<DateTime> instants) deltaT,
+    required Future<void> Function(Duration duration) pause,
+    required StringSink out, required StringSink err});
 ```
+
+**Tool behaviour**, run from the package root as `fvm dart run tool/fetch_horizons_reference.dart confirm-retrograde --out <dir>`:
+
+* Exactly those three arguments; otherwise, or if `<dir>` is inside the repository, or exists and is not empty, print usage with the reason to `err` and return 64, **before** any delta T computation or request. A `<dir>` that does not exist is created.
+* The delta T and all 8 queries (`horizonsQuery`, TT, quantity 31) are built before the first request.
+* One request at a time, a pause of 1 s between requests. URI: `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', query)`.
+* Each answer's bytes are saved unchanged in `<dir>` **before** anything reads them: `NN_<command>_TT.txt` (`NN` = 01 to 08), or for a non-200 status `NN_<command>_TT.http<status>.txt`, followed by an `HttpException`. A parser refusal propagates. Either way no further request is sent.
+* Prints one `retrogradeResultLine` per candidate. After the 8th answer: return 1, naming the bodies, if `retrogradeUnresolved` is not empty; else 0.
 
 `retrogradeDeclarations`: mercury 1953-11-18 and 2049-05-11; venus 2012-06-12; mars 1956-09-10; jupiter 2023-10-15; saturn 2023-08-01; uranus 2023-10-15; neptune 2023-08-01; pluto 2023-08-01 (all `T00:00:00Z`). Backups: mercury 2016-05-13; venus 2004-06-14; mars 2003-08-28; jupiter and uranus 2024-10-20; saturn, neptune and pluto 2024-08-01.
 
-- [ ] **Step 1: Failing tests:** `ttJulianDay from 1972 uses leap seconds` (`2012-06-12T00:00:00Z` → `julianDayUt + 66.184/86400` (TAI − UTC was 34 s until 2012-07-01), nine decimals; `2023-08-01` → +69.184); `before 1972 it adds the given delta T` (`1953-11-18`, 30.0 → +30/86400); `before 1972 without delta T throws ArgumentError`; `1971-12-31T23:59:59Z uses the given delta T`; `1972-01-01T00:00:00Z is +42.184 s even when a delta T is given`; `declarations cover mercury to pluto and never sun or moon`; `every declared body has a backup`.
+**No test or step of 4A opens a connection, and no test compiles or runs a C tool** (CI runs this package's tests; the host helper is tested through its `ProcessRunner`). Never run the command-line tool with valid arguments in 4A. Fetch-tool tests run inside `HttpOverrides.runZoned` with a client factory that throws.
+
+- [ ] **Step 1: Failing tests, pure functions** (`horizons_tool_test.dart`):
+  * `ttJulianDay from 1972 uses leap seconds` (`2012-06-12T00:00:00Z` → `julianDayUt + 66.184/86400` (TAI − UTC was 34 s until 2012-07-01), nine decimals; `2023-08-01` → +69.184); `before 1972 it adds the given delta T` (`1953-11-18`, 30.0 → +30/86400); `before 1972 without a finite delta T throws ArgumentError` (null, NaN); `1971-12-31T23:59:59Z uses the given delta T`; `1972-01-01T00:00:00Z is +42.184 s even when a delta T is given` (equals `'2441317.500488241'`, the pilot's string); `2100-12-31T23:59:59Z is the pilot's last instant` (`'2488434.500789167'`).
+  * `shiftJulianDay moves whole days and keeps the fraction` (`('2441317.500488241', -3)` → `'2441314.500488241'`; `+3` → `'2441320.500488241'`).
+  * `declarations cover mercury to pluto and never sun or moon` and `every declared body has a backup`, both against the design 5.1 pairs written as literals; `the historical instants are 1953-11-18 and 1956-09-10`.
+  * `eight requests, mercury to pluto, 51 times` (Mercury 9, each other body 6; strictly ascending; TT Julian days of the instants from 1972 written as literals; each candidate's three days are t−3, t, t+3; a missing delta T throws).
+  * `results pair three rows with each candidate`; a row count that differs throws; `the line shows both steps and the verdict`.
+  * `unresolved`: all pass → none; a primary failing with its backup passing → none; primary and backup failing → that body; both Mercury primaries failing with the backup passing → `mercury`; only a backup failing → none.
 - [ ] **Step 2:** Run. Expected: compile failure.
-- [ ] **Step 3:** Implement, and the mode `confirm-retrograde --out <dir>`: for each body Mercury to Pluto, one TT request holding JD(t) − 3, JD(t), JD(t) + 3 for each of its primary and backup instants (ascending), where JD(t) = `ttJulianDay`; delta T from `runSwissHostTool(…, 'tt_grid.c', …)`. Print one line per pair: body, instant, three longitudes, both signed steps, `PASS` or `FAIL`. Exit 1 if any body has a declared instant failing and its backup failing.
-- [ ] **Step 4:** Run tests (pass), then the mode (8 requests). Expected: exit 0.
+- [ ] **Step 3:** Implement them; run (pass). Commit `feat(ZOD-TST-001): add the retrograde candidates and their checks`.
+- [ ] **Step 3A: Failing tests, host helper and tool** (`horizons_fetch_test.dart`):
+  * host helper, with a recording `ProcessRunner`: the gcc arguments are the old tool's (`-O1 -std=gnu99 -I <upstream> -o <exe> <tool/tt_grid.c> <the nine library sources> -lm`); a non-zero compile or run exit throws `StateError`; `libraryDeltaTSeconds` passes `assets/ephe` first, then one Julian day per instant, parses the lines, and throws if the count differs.
+  * usage, with a `get` and `deltaT` that fail the test if called: no arguments; `dataset`, `pilot` or an unknown mode; `--out` missing or without a value; an extra argument; `--out` inside the repository; a non-empty `--out` → 64.
+  * a recording fake `get` answering from a text built on the TT sample (target `(<command>)`, rows echoing the requested days, chosen longitudes): exactly the 8 expected URLs in order, written as literals; 7 pauses of 1 s, each between two requests; 8 raw files with the answer bytes; exit 0 when every pair is retrograde, 1 naming the body when unresolved.
+  * a refused answer: the raw file is on disk, the error propagates, one request only; a non-200 answer: saved as `.http503.txt`, `HttpException`, one request only.
+- [ ] **Step 3B:** Run (compile failure), implement `swiss_host.dart` and the tool, run (pass), format, analyze. Commit `feat(ZOD-TST-001): add the retrograde confirmation tool (not run)`.
+- [ ] **Step 3C: Offline checks, no request.** (a) Once, by a scratch script, the real helper: `libraryDeltaTSeconds` for a pre-1972 instant of the old TT fixture equals its `ttMinusUtSeconds` within 1e-9. (b) From a scratch script, print the 8 URLs built with the real delta T, calling no HTTP function. (c) **Timestamp margin:** for all 51 times, the printed calendar time predicted if Horizons rounds and if it truncates, taking the Julian-day string both exactly and as its nearest double; record the largest predicted difference and any time predicted to exceed 1 ms in design 8.3. The tolerance is not changed. (d) `fvm dart run melos run lint` and `… test` exit 0. **Stop and report; 4B waits for approval.**
+- [ ] **Step 4 (4B):** Run the mode (8 requests). Expected: exit 0.
 - [ ] **Step 5: Apply the rule** of design 5.1 and record all results in the design. If a declared pair failed and its backup passed: replace the pair in `retrogradeDeclarations`. Mercury has two declared instants and one backup, so the backup replaces only one; if both Mercury instants fail, stop and ask (the tool's exit code 1 covers this too). In `_v2Instants` and `_addedInDateSetVersion2` (Task 6), drop a failed instant only if no other declared pair uses it, and add the backup instant. Then recompute and **write into this plan before Task 6**: N instants; rows 10N; instants and rows from 1972; instants before 1972 (also the control rows); backup instants and rows; and every literal in Tasks 6 and 7 that depends on them. Report the substitution to the owner.
 - [ ] **Step 6:** Commit `feat(ZOD-TST-001): confirm the retrograde instants with Horizons`.
 
@@ -296,10 +356,31 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 
 ### Task 9: Review, documentation, completion
 
-- [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first.
+- [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first. **No code of this task has had an independent review yet.** The reviewer's prompt carries the context below and requires an explicit judgement on each item:
+  * **Context (owner, 2026-11-26):** the round 1 amendments of plan revision 1 (stricter Task 3) were implemented **without a separate owner approval**; the owner accepted the Tasks 0 to 3 implementation afterwards.
+  * the stricter parser rules and their error messages (Task 3);
+  * the additional refusal and acceptance tests, including those beyond the plan (Task 3);
+  * the reconstruction of request URLs against the original pilot requests (what the repository test pins, and what only a scratch script checked);
+  * the 30 mutation checks and whether they cover the parser's failure modes adequately (evidence section below).
 - [ ] **Step 2:** `superpowers:verification-before-completion`: lint, full tests, `git diff --stat main -- ":(glob)**/lib/**"` empty, `git status --short`; rerun device files touched by review fixes.
 - [ ] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions; the "Carry into ZOD-TST-001" item marked done); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`; a dated update line in `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 5 (what is now validated through 2100-12-31, for the primary only); a dated update on the `TASKS.md` ZOD-EPH-004 bullet that still says an owner decision is needed before ZOD-TST-001. Hand-offs recorded in PROGRESS (other task files are not edited; each becomes a Notes line when that task is planned): ZOD-EPH-002 (its 53-instant UTC-input evidence is superseded by the repointed gate), ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006, ZOD-TST-017 (the T-EPH-1 / ACC-1 gate runs on a device, not in CI).
 - [ ] **Step 4:** Commit `docs(ZOD-TST-001): record verification and completion`. **Stop: push and PR need the owner's approval.**
+
+## Evidence kept for the Task 9 review (Tasks 0 to 3, not independently reviewed)
+
+**URL reconstruction.** The repository test `the query reproduces the two pilot requests` pins pilot requests 1 and 2 (design 8.5). Requests 3 to 11 were compared only by a scratch script (`parse_all.dart`, planning session scratch folder), which on `6531069` parsed all 11 saved answers (17 rows) and rebuilt all 11 logged URLs identically.
+
+**Mutation checks** (scratch script `mutate.dart`, on `6531069`): each change below was applied alone to `tool/horizons/horizons.dart`, `test/horizons_tool_test.dart` was run, and the file was restored; 30 of 30 made at least one test fail. They were chosen by the author of the code, so their coverage is itself a review item.
+
+| Area | Changes |
+|---|---|
+| markers, version, scale | marker refusal disabled; API version refusal disabled; scale-suffix refusal disabled; only the `Start time` line read; only the `Stop  time` line read |
+| target, centre | target refusal disabled; centre-body clause removed; site refusal disabled; site compared by `contains` |
+| columns | calendar, Julian-day, longitude and quantity 30 columns each replaced by a fixed index |
+| rows, fields, numbers | `!=` rows → `<`; `!=` fields → `>`; number pattern refusal disabled |
+| time | only the calendar echo checked; only the Julian-day echo checked; tolerance × 5; tolerance ÷ 4 |
+| values | longitude precision clause removed; quantity 30 decimals 3 → 2; negative longitude allowed; 360 allowed; printed Julian day returned instead of the requested one |
+| other functions | `APPARENT` removed from the query; ordering check disabled; retrograde `&&` → `\|\|`; row tolerance 0.001 → 0.002; missing row not reported |
 
 ## Plan review
 
