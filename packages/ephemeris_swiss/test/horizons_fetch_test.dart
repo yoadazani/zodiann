@@ -1015,23 +1015,60 @@ void main() {
       expect(Directory(out).existsSync(), isFalse);
     });
 
-    for (final (name, prepare) in <(String, void Function())>[
+    // Without a previous dataset, only the baseline can object.
+    for (final list in ['entries', 'utcCrossCheck']) {
+      _offlineTest('a changed baseline row of $list writes nothing', () async {
+        final julianDay = list == 'entries'
+            ? ttOf(sorted[3])
+            : julianDayUt(DateTime.parse(sorted[3])).toStringAsFixed(9);
+        final row = {
+          'body': 'sun',
+          'utc': sorted[3],
+          // 3.6 arcseconds from what the fake answers.
+          'longitudeDegrees':
+              double.parse(_datasetLongitude('10', julianDay)) + 0.001,
+        };
+        File(baseline).writeAsStringSync(
+          jsonEncode({
+            'entries': <Object>[],
+            list: [row],
+          }),
+        );
+        final harness = harnessFor();
+
+        expect(await harness.run(run(inScratch('raw'))), 1);
+        expect('${harness.err}', contains('changed by'));
+        expect(dataset.existsSync(), isFalse);
+      });
+    }
+
+    for (final (name, prepare, error) in <(String, void Function(), Matcher)>[
       (
         'a declared instant missing from the dates',
         () => writeDates([...before1972, ...from1972.take(4)]),
+        isA<StateError>().having(
+          (e) => e.message,
+          'message',
+          contains('2049-05-11T00:00:00Z'),
+        ),
       ),
-      ('a missing baseline', () => File(baseline).deleteSync()),
-      ('a broken existing dataset', () => dataset.writeAsStringSync('{')),
+      (
+        'a missing baseline',
+        () => File(baseline).deleteSync(),
+        isA<FileSystemException>(),
+      ),
+      (
+        'a broken existing dataset',
+        () => dataset.writeAsStringSync('{'),
+        isA<FormatException>(),
+      ),
     ]) {
       _offlineTest('$name stops before any request', () async {
         prepare();
         final harness = harnessFor(
           answer: (uri) => fail('a request was sent: $uri'),
         );
-        await expectLater(
-          harness.run(run(inScratch('raw'))),
-          throwsA(anything),
-        );
+        await expectLater(harness.run(run(inScratch('raw'))), throwsA(error));
         expect(harness.requested, isEmpty);
         expect(Directory(inScratch('raw')).existsSync(), isFalse);
       });
