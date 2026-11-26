@@ -40,7 +40,7 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 
 - `_fe_analyzer_shared` 111.0.0 (tool) — Copyright 2019, the Dart project authors.
 - `analyzer` 14.7.0 (tool) — Copyright 2013, the Dart project authors.
-- `args` 2.7.0 (tool) — Copyright 2013, the Dart project authors.
+- `args` 2.7.0 (runtime) — Copyright 2013, the Dart project authors.
 - `async` 2.13.1 (runtime) — Copyright 2015, the Dart project authors.
 - `boolean_selector` 2.1.2 (runtime) — Copyright 2016, the Dart project authors.
 - `characters` 1.4.1 (runtime) — Copyright 2019, the Dart project authors.
@@ -49,17 +49,17 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 - `cli_config` 0.2.0 (tool) — Copyright 2023, the Dart project authors.
 - `cli_util` 0.6.0 (tool) — Copyright 2015, the Dart project authors.
 - `collection` 1.19.1 (runtime) — Copyright 2015, the Dart project authors.
-- `convert` 3.1.2 (tool) — Copyright 2015, the Dart project authors.
+- `convert` 3.1.2 (runtime) — Copyright 2015, the Dart project authors.
 - `coverage` 1.16.0 (tool) — Copyright 2014, the Dart project authors.
 - `crypto` 3.0.8 (runtime) — Copyright 2015, the Dart project authors.
 - `cupertino_ui` 1.1.6 (runtime) — Copyright 2013 The Flutter Authors
-- `ffi` 2.2.0 (tool) — Copyright 2019, the Dart project authors.
-- `file` 7.0.1 (tool) — Copyright 2017, the Dart project authors. All rights reserved.
+- `ffi` 2.2.0 (runtime) — Copyright 2019, the Dart project authors.
+- `file` 7.0.1 (runtime) — Copyright 2017, the Dart project authors. All rights reserved.
 - `fixnum` 1.1.1 (runtime) — Copyright 2014, the Dart project authors.
 - `flutter_lints` 6.0.0 (tool) — Copyright 2013 The Flutter Authors. All rights reserved.
 - `flutter` 0.0.0 (runtime) — Copyright 2014 The Flutter Authors
 - `frontend_server_client` 4.2.0 (tool) — Copyright 2012, the Dart project authors.
-- `glob` 2.2.0 (tool) — Copyright 2014, the Dart project authors.
+- `glob` 2.2.0 (runtime) — Copyright 2014, the Dart project authors.
 - `go_router` 18.1.4 (runtime) — Copyright 2013 The Flutter Authors
 - `graphs` 2.3.2 (tool) — Copyright 2017, the Dart project authors.
 - `http_multi_server` 3.2.3 (tool) — Copyright 2014, the Dart project authors.
@@ -67,6 +67,9 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 - `http` 1.6.0 (tool) — Copyright 2014, the Dart project authors.
 - `intl` 0.20.3 (runtime) — Copyright 2013, the Dart project authors.
 - `io` 1.1.0 (tool) — Copyright 2017, the Dart project authors.
+- `jni` 1.2.1 (runtime) — Copyright 2022, the Dart project authors.
+- `jni_flutter` 1.1.0 (runtime) — Copyright 2026, the Dart project authors.
+- `jni_util` 1.0.0 (runtime) — Copyright 2026, the Dart project authors.
 - `json_annotation` 4.12.0 (tool) — Copyright 2017, the Dart project authors. All rights reserved.
 - `leak_tracker_flutter_testing` 3.0.10 (runtime) — Copyright 2022, the Dart project authors.
 - `leak_tracker_testing` 3.0.2 (runtime) — Copyright 2022, the Dart project authors.
@@ -78,12 +81,20 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 - `material_ui` 1.11.0 (runtime) — Copyright 2013 The Flutter Authors
 - `meta` 1.19.0 (runtime) — Copyright 2016, the Dart project authors.
 - `mime` 2.1.0 (tool) — Copyright 2015, the Dart project authors.
-- `package_config` 3.0.0 (tool) — Copyright 2019, the Dart project authors.
+- `objective_c` 9.6.4 (runtime) — Copyright 2024, the Dart project authors.
+- `package_config` 3.0.0 (runtime) — Copyright 2019, the Dart project authors.
 - `path` 1.9.1 (runtime) — Copyright 2014, the Dart project authors.
-- `platform` 3.1.6 (tool) — Copyright 2017, the Dart project authors. All rights reserved.
+- `path_provider` 2.1.6 (runtime) — Copyright 2013 The Flutter Authors
+- `path_provider_android` 2.3.1 (runtime) — Copyright 2013 The Flutter Authors
+- `path_provider_foundation` 2.6.0 (runtime) — Copyright 2013 The Flutter Authors
+- `path_provider_linux` 2.2.2 (runtime) — Copyright 2013 The Flutter Authors
+- `path_provider_platform_interface` 2.1.3 (runtime) — Copyright 2013 The Flutter Authors
+- `path_provider_windows` 2.3.0 (runtime) — Copyright 2013 The Flutter Authors. All rights reserved.
+- `platform` 3.1.6 (runtime) — Copyright 2017, the Dart project authors. All rights reserved.
+- `plugin_platform_interface` 2.1.8 (runtime) — Copyright 2013 The Flutter Authors. All rights reserved.
 - `pool` 1.5.3 (tool) — Copyright 2014, the Dart project authors.
-- `process` 5.0.6 (tool) — Copyright 2013, the Dart project authors.
-- `pub_semver` 2.2.1 (tool) — Copyright 2014, the Dart project authors.
+- `process` 5.0.6 (runtime) — Copyright 2013, the Dart project authors.
+- `pub_semver` 2.2.1 (runtime) — Copyright 2014, the Dart project authors.
 - `pubspec_parse` 1.7.0 (tool) — Copyright 2018, the Dart project authors.
 - `shelf_packages_handler` 3.0.2 (tool) — Copyright 2016, the Dart project authors.
 - `shelf_static` 1.2.0 (tool) — Copyright 2015, the Dart project authors.
@@ -100,14 +111,15 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 - `test_api` 0.7.14 (runtime) — Copyright 2018, the Dart project authors.
 - `test_core` 0.6.20 (tool) — Copyright 2018, the Dart project authors.
 - `test` 1.32.0 (tool) — Copyright 2014, the Dart project authors.
-- `typed_data` 1.4.0 (tool) — Copyright 2015, the Dart project authors.
+- `typed_data` 1.4.0 (runtime) — Copyright 2015, the Dart project authors.
 - `vector_math` 2.4.4 (runtime) — Copyright 2013 The Flutter Authors
 - `vm_service` 15.4.0 (runtime) — Copyright 2015, the Dart project authors.
 - `watcher` 1.2.1 (tool) — Copyright 2014, the Dart project authors.
 - `web_socket_channel` 3.0.3 (tool) — Copyright 2016, the Dart project authors.
 - `web_socket` 1.0.1 (tool) — Copyright 2024, the Dart project authors.
-- `web` 1.1.2 (tool) — Copyright 2023, the Dart project authors.
+- `web` 1.1.2 (runtime) — Copyright 2023, the Dart project authors.
 - `webkit_inspection_protocol` 1.2.1 (tool) — Copyright 2013, Google Inc.
+- `xdg_directories` 1.1.0 (runtime) — Copyright 2013 The Flutter Authors. All rights reserved.
 - `yaml_edit` 2.2.4 (tool) — Copyright 2020, the Dart project authors.
 
 ### MIT
@@ -124,7 +136,7 @@ Not read, so no license is stated here: the Flutter engine's individual third-pa
 - `state_notifier` 1.0.0 (runtime) — Copyright (c) 2020 Remi Rousselet
 - `uuid` 4.6.0 (runtime) — Copyright (c) 2021 Yulian Kuncheff
 - `xml` 7.1.0 (tool) — Copyright (c) 2006-2026 Lukas Renggli.
-- `yaml` 3.1.4 (tool) — Copyright (c) 2014, the Dart project authors; Copyright (c) 2006, Kirill Simonov.
+- `yaml` 3.1.4 (runtime) — Copyright (c) 2014, the Dart project authors; Copyright (c) 2006, Kirill Simonov.
 
 ### Apache-2.0
 

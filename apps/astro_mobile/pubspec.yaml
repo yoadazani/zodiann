@@ -34,6 +34,9 @@ dependencies:
   go_router: ^18.1.4
   intl: ^0.20.3
   material_ui: ^1.11.0
+  # ZOD-EPH-002: the application support directory the Swiss Ephemeris data
+  # files are installed into at startup.
+  path_provider: ^2.1.6
   # ZOD-L10-002: main() builds the settings store over the async preferences
   # API (SharedPreferencesAsync), which shared_storage does not re-export.
   shared_preferences: ^2.5.6
@@ -53,7 +56,5 @@ dev_dependencies:
     path: ../../packages/gann_core
   integration_test:
     sdk: flutter
-  # ZOD-FND-003: copies the bundled data files to a real directory.
-  path_provider: ^2.1.6
   # ZOD-L10-002: the in-memory preferences platform the tests install.
   shared_preferences_platform_interface: ^2.4.2
