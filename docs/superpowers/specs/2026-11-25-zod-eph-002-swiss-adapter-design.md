@@ -1,6 +1,6 @@
 # ZOD-EPH-002: the Swiss Ephemeris adapter (data-file mode), design
 
-**Status: written 2026-11-25, awaiting the owner's approval.** Next: implementation plan, plan review, approval, then code.
+**Status: written 2026-11-25, read by a builder reviewer, owner's two questions answered 2026-11-26; awaiting the owner's approval.** Next: implementation plan, plan review, approval, then code.
 
 Sources of truth: the [task file](../../development/computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md), the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (sections 4, 7a, 11) and the [FFI spike](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md).
 
@@ -71,13 +71,15 @@ Give the app its primary position source: accurate, never silently approximate, 
 
 ## 5. Verification
 
+**Owner decisions (2026-11-26):** the **x86_64 Android emulator** is the required device; ARM devices stay unverified and are recorded as a gap for a later release check. **All ten bodies must be within 1″** of Horizons, both by UTC input and at matched TT (matching ACC-1's per-body bound; the task fails if any body misses).
+
 | Check | Where |
 |---|---|
 | Time scale at every table step, 1972, validity end, one microsecond either side; status boundaries; table equals the published list | host |
 | Adapter: mapping of all bodies, flags, fallback and error cases, node, range, non-UTC | host, fake source |
 | Wiring: wrapper, fallback selection, installer, startup with failures | host, plus the architecture guards |
-| T-EPH-1: Sun and Moon within 1″ of Horizons by UTC input on 10+ dates (the existing 53 UT instants, all bodies recorded) | device |
-| Ephemeris accuracy at matched TT; no extra precession | device |
+| T-EPH-1 and the owner's wider gate: **all ten bodies** within 1″ of Horizons by UTC input at the existing 53 UT instants | device |
+| All ten bodies within 1″ at matched TT (a new Horizons fixture queried with TT); no extra precession | device |
 | Range edges for all bodies; measured file edges; negative control | device |
 | Concurrent calls from several isolates equal sequential results, including an isolate that never set the path | device |
 | Release APK contains `libswisseph` for all three ABIs; size recorded | build |
