@@ -602,6 +602,22 @@ void main() {
       expect(harness.requested, hasLength(1));
     });
 
+    _offlineTest(
+      'an answer that is not UTF-8 is saved before it is read',
+      () async {
+        final bytes = [0xff, 0xfe, 0x41];
+        final harness = _Harness(
+          answer: (_) async => (statusCode: 200, bytes: bytes),
+        );
+        await expectLater(
+          harness.confirm(inScratch('raw')),
+          throwsFormatException,
+        );
+        expect(File(inScratch('raw/01_199_TT.txt')).readAsBytesSync(), bytes);
+        expect(harness.requested, hasLength(1));
+      },
+    );
+
     _offlineTest('a non-200 answer is saved and stops the run', () async {
       final bytes = 'busy\n'.codeUnits;
       final harness = _Harness(
@@ -992,6 +1008,46 @@ void main() {
             as Map<String, Object?>)['version'],
         1,
       );
+    });
+
+    // 1 ms of delta T moves the stored TT by 12e-9 days and no printed
+    // longitude, so only the stored times can show it.
+    _offlineTest('a changed delta T writes nothing', () async {
+      expect(await harnessFor().run(run(inScratch('first'))), 0);
+      final written = dataset.readAsBytesSync();
+
+      final changed = _Harness(
+        packageRoot: packageRoot,
+        deltaT: (_) => [deltaT[0] + 0.001, deltaT[1], deltaT[2]],
+        answer: (uri) async => (statusCode: 200, bytes: _datasetAnswer(uri)),
+      );
+
+      expect(await changed.run(run(inScratch('second'), emptyBaseline)), 1);
+      expect(
+        '${changed.err}',
+        allOf(
+          contains('previous dataset: sun ${sorted[0]}: jdTt changed'),
+          contains('ttMinusUtSeconds changed'),
+          isNot(contains('changed by')),
+        ),
+      );
+      expect(dataset.readAsBytesSync(), written);
+    });
+
+    _offlineTest('an added instant raises the version', () async {
+      // The first run lacks one instant that no retrograde pair needs.
+      writeDates([...before1972, ...from1972.skip(1)]);
+      expect(await harnessFor().run(run(inScratch('first'), emptyBaseline)), 0);
+      writeDates([...before1972, ...from1972]);
+
+      expect(
+        await harnessFor().run(run(inScratch('second'), emptyBaseline)),
+        0,
+      );
+      final json =
+          jsonDecode(dataset.readAsStringSync()) as Map<String, Object?>;
+      expect(json['version'], 2);
+      expect(json['entries'], hasLength(80));
     });
 
     _offlineTest('without --baseline or --out nothing starts', () async {

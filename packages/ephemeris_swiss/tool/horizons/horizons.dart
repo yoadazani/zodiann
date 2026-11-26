@@ -632,13 +632,33 @@ const _timeScaleToleranceArcseconds = 0.002;
 /// than this.
 const _discriminatingSeconds = 10;
 
+/// One line for every stored time of a [previous] entry that the entry of the
+/// same body and instant in [next] holds differently. A new leap second or
+/// library delta T can move these without moving a longitude past the row
+/// tolerance. Missing entries are [changedRows]' to report.
+List<String> _changedTimes(
+  List<Map<String, Object?>> previous,
+  List<Map<String, Object?>> next,
+) {
+  final entries = {for (final row in next) (row['body'], row['utc']): row};
+  return [
+    for (final before in previous)
+      if (entries[(before['body'], before['utc'])] case final after?)
+        for (final field in ['jdTt', 'ttMinusUtSeconds'])
+          if (after[field] != before[field])
+            '${before['body']} ${before['utc']}: $field changed from '
+                '${before[field]} to ${after[field]}',
+  ];
+}
+
 /// What is wrong with [dataset]; empty only when every gate passes.
 ///
 /// Every body has an entry at each of [instants]; no row of [baseline],
-/// [crossCheckBaseline] or [previous] is missing or changed; before 1972 each
-/// instant has a time-scale control row and from 1972 each body has a UT
-/// cross-check row, both within 0.002 arcseconds; the control can tell the
-/// scales apart; and Horizons shows every declared pair retrograde.
+/// [crossCheckBaseline] or [previous] is missing or has another longitude; no
+/// entry of [previous] has another stored time; before 1972 each instant has a
+/// time-scale control row and from 1972 each body has a UT cross-check row,
+/// both within 0.002 arcseconds; the control can tell the scales apart; and
+/// Horizons shows every declared pair retrograde.
 List<String> datasetProblems(
   Map<String, Object?> dataset, {
   required List<String> instants,
@@ -679,6 +699,11 @@ List<String> datasetProblems(
         crossCheck,
       ))
         'previous cross-check: $change',
+      for (final change in _changedTimes(
+        _datasetRows(previous, 'entries'),
+        _datasetRows(dataset, 'entries'),
+      ))
+        'previous dataset: $change',
     ],
   ];
 

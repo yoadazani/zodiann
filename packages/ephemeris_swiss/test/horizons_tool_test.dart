@@ -832,6 +832,13 @@ void parserTests() {
         expect(() => _parseTt(text), _refusedBy('time'));
       });
 
+      // Just over the 1 ms limit (14e-9 days is 1.2 ms), so the limit cannot
+      // widen unseen.
+      test('an echoed Julian day 1.2 ms off', () {
+        final text = _edit(tt, '2415020.000000000,', '2415020.000000014,');
+        expect(() => _parseTt(text), _refusedBy('time'));
+      });
+
       test('a value that is not a number', () {
         for (final value in ['n.a.', 'NaN', 'Infinity']) {
           final text = _edit(tt, '265.2972999', value);
@@ -1185,6 +1192,24 @@ void datasetTests() {
         isNotEmpty,
       );
     });
+
+    for (final (field, value) in <(String, Object)>[
+      ('jdTt', '2400000.000000012'),
+      ('ttMinusUtSeconds', 30.501),
+    ]) {
+      test('a $field that differs from the previous dataset', () {
+        final previous = altered(
+          'entries',
+          (rows) => rows.first[field] = value,
+        );
+        expect(problems(_cleanDataset(), baseline: [], previous: previous), [
+          allOf(
+            startsWith('previous dataset: sun ${_datasetInstants.first}: '),
+            contains('$field changed from $value'),
+          ),
+        ]);
+      });
+    }
 
     test('a missing control row', () {
       final dataset = altered('timeScaleControl', (rows) => rows.removeLast());
