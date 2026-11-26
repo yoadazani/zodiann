@@ -1,12 +1,28 @@
 // ZOD-TST-001: the pure query, check and parse functions of the Horizons
 // reference tool (tool/horizons/horizons.dart). Offline: nothing here sends a
 // request; the parser is tested on two answers of the pilot of 2026-11-26.
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:astro_core/astro_core.dart';
 import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 import 'package:test/test.dart';
 
 import '../tool/horizons/horizons.dart';
+
+/// Records the TT Julian days the adapter asks for; calculates nothing.
+final class _RecordingSource implements SwissCalculationSource {
+  final terrestrialDays = <double>[];
+
+  @override
+  SwissCalcResult? calcUt(DateTime utc, int body, {required int flags}) => null;
+
+  @override
+  SwissCalcResult? calcTt(double tjdTt, int body, {required int flags}) {
+    terrestrialDays.add(tjdTt);
+    return null;
+  }
+}
 
 /// The two requests that produced test/fixtures/horizons_sample_{tt,ut}.txt,
 /// exactly as sent on 2026-11-26 (design section 8.5).
@@ -320,6 +336,46 @@ void retrogradeTests() {
 
     test("2100-12-31T23:59:59Z is the pilot's last instant", () {
       expect(ttJulianDay(at('2100-12-31T23:59:59Z')), '2488434.500789167');
+    });
+
+    test('prints the app TT, not an exact-decimal rounding of it', () {
+      // At these three instants exact arithmetic rounds one unit higher. The
+      // first two strings are also those stored by ZOD-EPH-002's TT reference.
+      expect(ttJulianDay(at('2010-01-01T00:00:00Z')), '2455197.500766018');
+      expect(ttJulianDay(at('2015-01-01T00:00:00Z')), '2457023.500777592');
+      expect(ttJulianDay(at('2012-06-12T00:00:00Z')), '2456090.500766018');
+    });
+
+    test('from 1972 it is the Julian day the adapter asks the library for', () {
+      final shared =
+          (jsonDecode(
+                File('../astro_core/test/fixtures/reference_dates.json')
+                    .readAsStringSync(),
+              ) as Map<String, Object?>)['dates']!
+              as List<Object?>;
+      final instants = {
+        ...shared.cast<String>(),
+        for (final p in retrogradePrimaries) p.utc,
+        ...retrogradeBackups.values,
+        // The other instants the date set gains from 1972 (design section 5).
+        '1972-01-01T00:00:00Z',
+        '2100-07-01T00:00:00Z',
+        '2100-12-31T00:00:00Z',
+        '2100-12-31T23:59:59Z',
+      }.map(at).where((utc) => !utc.isBefore(DateTime.utc(1972))).toList();
+      final source = _RecordingSource();
+      final adapter = SwissEphemeris(source: source);
+
+      for (final utc in instants) {
+        adapter.position(Body.moon, utc);
+        expect(
+          source.terrestrialDays.last.toStringAsFixed(9),
+          ttJulianDay(utc),
+          reason: '$utc',
+        );
+      }
+      expect(source.terrestrialDays, hasLength(instants.length));
+      expect(instants.length, greaterThan(40));
     });
   });
 
