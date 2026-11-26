@@ -1,6 +1,6 @@
 # ZOD-TST-001: the JPL Horizons reference dataset, design
 
-**Status (2026-11-26): approved by the owner, one stage at a time. The 11 pilot requests are done and accepted as the pilot (section 8); Tasks 0 to 3 of the plan are approved; every later request and stage waits for a further approval.** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
+**Status (2026-11-26): approved by the owner, one stage at a time. The 11 pilot requests are done and accepted as the pilot (section 8); Tasks 0 to 3 of the plan are done and accepted and Task 4A (offline code) is approved; every later request and stage waits for a further approval.** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
 
 Sources of truth: the [task file](../../development/testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md), specification T-EPH-1, ACC-1, ACC-5 and "Computation settings that must be fixed and documented", the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) sections 5 and 6, and the [ZOD-EPH-002 design](2026-11-25-zod-eph-002-swiss-adapter-design.md) section 6 (hand-off).
 
