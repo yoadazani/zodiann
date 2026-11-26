@@ -497,3 +497,48 @@ What prompted it: the UTC refetch (EOP file `eop.261125.p270221`) differs from t
 ## 14. Left to the builder
 
 Function and test names beyond those in the plan; the layout of the fetch tool's internals; message wording of its failures.
+
+## 15. Device verification (2026-11-27 local)
+
+Code at `6b7d3e5` (only this task's documents differed in the working tree). One test file at a time, `flutter test integration_test/<file>`.
+
+**Devices.** (a) Emulator `Pixel_9_Pro_API_36` (API 36, x86_64, 16 KB pages, started with `-memory 3072`): `swiss_ephemeris_accuracy_test.dart` only. (b) The owner's phone, Samsung SM-S908E (Android 16, API 36, **arm64-v8a**, 4 KB pages), at the owner's request, after which the emulator was closed: all four files and the device mutation proofs, with `--no-uninstall`.
+
+| File | Result (phone) | Emulator |
+|---|---|---|
+| `swiss_ephemeris_accuracy_test.dart` | 9 of 9 passed | 9 of 9 passed, the same per-body maxima |
+| `swiss_mean_node_test.dart` | 2 of 2 passed | not run |
+| `astronomy_accuracy_test.dart` | 10 of 10 passed | not run |
+| `astronomy_speed_vs_swiss_test.dart` | 3 of 3 passed | not run |
+
+**T-EPH-1 / ACC-1 (primary, limit 1″), largest error per body, arcseconds.** Adapter at the instant and matched TT give the same figures (64 instants each); the cross-check asks the adapter at UTC against Horizons at UTC (42 instants from 1972).
+
+| Body | Adapter and matched TT | at | UTC cross-check | at |
+|---|---|---|---|---|
+| Sun | 0.2426 | 1900-01-01 | 0.1824 | 2100-07-01 |
+| Moon | 0.2430 | 1899-12-31 | 0.1851 | 2100-07-01 |
+| Mercury | 0.2431 | 1900-01-01 | 0.1827 | 2100-12-31 |
+| Venus | 0.2423 | 1899-12-31 | 0.1824 | 2100-12-31 |
+| Mars | 0.2426 | 1900-01-01 | 0.1831 | 2100-07-01 |
+| Jupiter | 0.2276 | 1915-01-01 | 0.2035 | 2100-12-31 |
+| Saturn | 0.2520 | 1900-01-01 | 0.2218 | 2100-07-01 |
+| Uranus | 0.5598 | 1900-01-01 | 0.4773 | 2100-12-31 |
+| Neptune | 0.1980 | 1899-12-31 | 0.0817 | 2100-12-31T23:59:59 |
+| Pluto | 0.2459 | 1915-01-01 | 0.1667 | 2100-07-01 |
+
+At the instants worth recording (largest over the ten bodies, adapter): 1953-11-18 0.2614; 1956-09-10 0.2087; 2012-06-12 0.1244; 2023-08-01 0.0946; 2023-10-15 0.0858; 2049-05-11 0.3197; **2100-07-01 0.4731; 2100-12-31 0.4773; 2100-12-31T23:59:59 0.4765** (Uranus except the 2012 and 2023 instants). TT pin: at most 0.0000252″ over 64 Moon instants (limit 0.0005″).
+
+**Mean node (limit 0.01°).** 64 shared instants: 0.0021604° at 1899-12-31T12; 2,412 months from 1900 to 2100: 0.0021603° at 1900-01-01. Controls: J2000 up to 1.409°, true node up to 1.959°. Host: 0.0021604°.
+
+**Backup (ACC-2, limit 60″), matched TT, 61 instants, largest error:** Sun 1.985″, Moon 3.399″, Mercury 10.883″, Venus 11.616″, Mars 10.015″, Jupiter 6.488″, Saturn 11.493″, Uranus 11.029″, **Neptune 17.590″** (2090-01-01; inside the 17.6″ the adapter documents), Pluto 8.169″. UTC input, informational only: Moon up to 78.599″ (2099-12-31). Speed against Swiss at the same TT, 53 version-1 instants plus its dense sets: every frozen bound held (largest Moon 0.000573°/day against 0.0007; Mercury 0.000784 against 0.0012), no sign mismatch.
+
+**Mutation proofs** (temporary, each observed failing, then restored byte for byte):
+
+| Change | Where run | Failure observed |
+|---|---|---|
+| one copied longitude +2″ | phone | T-EPH-1 / ACC-1: Sun at 1899-12-31, 1.758″ over the limit of 1″ |
+| one Moon `jdTt` +1 s in the copy | phone | TT pin: 0.498″, limit 0.0005″ |
+| `meanNodeEpochLongitude` +0.02° | host | node test: 0.0178°, limit 0.01° |
+| node reference flags without `SEFLG_NONUT` | phone | flag assertion |
+
+**Not verified on a device:** iOS; the node, Backup accuracy and Backup speed files on x86_64 (the phone replaced the emulator for them).
