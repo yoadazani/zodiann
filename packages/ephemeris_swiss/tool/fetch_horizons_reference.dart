@@ -8,11 +8,14 @@
 // in all), asking in TT at each candidate instant and 3 days either side, and
 // reports which candidates Horizons shows retrograde. Every answer is saved
 // unchanged before it is read. The requests hold dates and body numbers only.
+// Each request has 60 seconds in all; a timeout or any other failure stops the
+// run, and nothing is retried or sent again.
 //
 // The only network code of the tool; a one-off host tool, never part of the app
 // (the app never touches the network: test/architecture/no_network_test.dart).
 // Design: docs/superpowers/specs/
 // 2026-11-26-zod-tst-001-horizons-reference-design.md, sections 5 and 8.
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -83,8 +86,9 @@ String? _outputRefusal(Uri packageRoot, String path) {
 ///
 /// Nothing is requested and [deltaT] is not called for exit code 64. A non-200
 /// answer throws [HttpException] and an answer the parser refuses throws
-/// [FormatException]; either way the answer is already saved and no further
-/// request is sent.
+/// [FormatException]; either way the answer is already saved. An error of [get]
+/// (a timeout, a broken connection) propagates and nothing is saved for that
+/// request. After any of these no further request is sent.
 Future<int> runHorizonsTool(
   List<String> arguments, {
   required Uri packageRoot,
@@ -161,16 +165,39 @@ Future<int> runHorizonsTool(
   return 1;
 }
 
-Future<HorizonsResponse> _httpGet(Uri uri) async {
+/// The longest one request may take, from connecting to the last byte.
+const horizonsRequestTimeout = Duration(seconds: 60);
+
+/// Sends one GET of [uri] and returns the status and the whole body. The request
+/// is sent once: it is never retried, and a redirect is not followed.
+///
+/// Throws [TimeoutException] if the whole answer has not arrived within
+/// [timeout], and [HttpException] if the connection ends before the answer is
+/// complete. Either way the connection is closed and nothing of the incomplete
+/// answer is returned.
+Future<HorizonsResponse> horizonsHttpGet(
+  Uri uri, {
+  Duration timeout = horizonsRequestTimeout,
+}) async {
   final client = HttpClient();
-  try {
+  Future<HorizonsResponse> get() async {
     final request = await client.getUrl(uri);
+    request.followRedirects = false;
     final response = await request.close();
     final bytes = <int>[];
     await response.forEach(bytes.addAll);
     return (statusCode: response.statusCode, bytes: bytes);
+  }
+
+  try {
+    return await get().timeout(
+      timeout,
+      onTimeout: () =>
+          throw TimeoutException('no complete answer from $uri', timeout),
+    );
   } finally {
-    client.close();
+    // Forced, so an abandoned request does not stay open.
+    client.close(force: true);
   }
 }
 
@@ -179,7 +206,7 @@ Future<void> main(List<String> arguments) async {
   exitCode = await runHorizonsTool(
     arguments,
     packageRoot: packageRoot,
-    get: _httpGet,
+    get: horizonsHttpGet,
     deltaT: (instants) => libraryDeltaTSeconds(packageRoot, instants),
     pause: (duration) => Future<void>.delayed(duration),
     out: stdout,

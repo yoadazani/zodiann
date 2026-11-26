@@ -1,7 +1,9 @@
-// ZOD-TST-001: the Horizons download tool and the Swiss host helper. Offline:
-// the HTTP GET, the delta T source and the process runner are fakes, and every
-// test body runs where opening a real connection fails. Nothing here compiles or
-// runs a C tool.
+// ZOD-TST-001: the Horizons download tool and the Swiss host helper. Nothing
+// here reaches the network. The tool's HTTP GET, delta T source and process
+// runner are fakes, in tests where opening a connection fails; only the tests of
+// the real GET connect, and only to a server they start on this machine. Nothing
+// here compiles or runs a C tool.
+import 'dart:async';
 import 'dart:io';
 
 import 'package:ephemeris_swiss/ephemeris_swiss.dart';
@@ -153,6 +155,99 @@ _Harness _mustNotStart() => _Harness(
   answer: (uri) => fail('a request was sent: $uri'),
   deltaT: (_) => fail('the delta T was computed'),
 );
+
+/// A server on this machine for one test. Once a connection's request has
+/// arrived it sends [reply] (nothing if empty), then closes the connection if
+/// [closeAfterReply], else leaves it open.
+class _LoopbackServer {
+  _LoopbackServer(this._server) {
+    _server.listen(_accept);
+  }
+
+  final ServerSocket _server;
+  final _clients = <Socket>[];
+  final _firstClosedByClient = Completer<void>();
+
+  String reply = '';
+  bool closeAfterReply = false;
+  int connections = 0;
+
+  /// The head of each request received.
+  final requests = <String>[];
+
+  Uri get uri => Uri.parse('http://127.0.0.1:${_server.port}/api');
+
+  Future<void> get firstClosedByClient => _firstClosedByClient.future;
+
+  void _accept(Socket client) {
+    connections++;
+    _clients.add(client);
+    // A write to a connection the client has dropped is expected.
+    unawaited(client.done.then<void>((_) {}, onError: (_) {}));
+    final head = StringBuffer();
+    var answered = false;
+    void closed() {
+      if (!_firstClosedByClient.isCompleted) _firstClosedByClient.complete();
+    }
+
+    client.listen(
+      (data) async {
+        head.write(String.fromCharCodes(data));
+        if (answered || !'$head'.contains('\r\n\r\n')) return;
+        answered = true;
+        requests.add('$head');
+        if (reply.isNotEmpty) {
+          client.write(reply);
+          await client.flush();
+        }
+        if (closeAfterReply) await client.close();
+      },
+      onDone: closed,
+      onError: (_) => closed(),
+    );
+  }
+
+  Future<void> stop() async {
+    for (final client in _clients) {
+      client.destroy();
+    }
+    await _server.close();
+  }
+}
+
+/// Lets a client connect to this machine only, without any proxy.
+class _LoopbackOnly extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) =>
+      super.createHttpClient(context)
+        ..findProxy = ((_) => 'DIRECT')
+        ..connectionFactory = (uri, proxyHost, proxyPort) {
+          if (uri.host != InternetAddress.loopbackIPv4.address) {
+            throw StateError('a test tried to reach ${uri.host}');
+          }
+          return Socket.startConnect(uri.host, uri.port);
+        };
+}
+
+/// A test during which only a server started for it can be reached.
+void _loopbackTest(
+  String name,
+  Future<void> Function(_LoopbackServer server) body,
+) {
+  test(name, () async {
+    final server = _LoopbackServer(
+      await ServerSocket.bind(InternetAddress.loopbackIPv4, 0),
+    );
+    try {
+      await HttpOverrides.runWithHttpOverrides(
+        () => body(server),
+        _LoopbackOnly(),
+      );
+    } finally {
+      await server.stop();
+    }
+  });
+}
 
 /// A test during which opening a real connection fails.
 void _offlineTest(String name, Future<void> Function() body) {
@@ -476,6 +571,172 @@ void main() {
       );
       expect(File(inScratch('raw/01_199_TT.txt')).existsSync(), isFalse);
       expect(harness.requested, hasLength(1));
+    });
+
+    _offlineTest('a timed-out first request saves nothing and stops', () async {
+      final harness = _Harness(
+        answer: (_) async => throw TimeoutException('no complete answer'),
+      );
+      await expectLater(
+        harness.confirm(inScratch('raw')),
+        throwsA(isA<TimeoutException>()),
+      );
+      expect(Directory(inScratch('raw')).listSync(), isEmpty);
+      expect(harness.requested, hasLength(1));
+      expect(harness.events, ['get']);
+      expect('${harness.out}', isEmpty);
+    });
+
+    _offlineTest(
+      'a timed-out third request keeps two answers and stops',
+      () async {
+        var sent = 0;
+        final harness = _Harness(
+          answer: (uri) async {
+            if (++sent == 3) throw TimeoutException('no complete answer');
+            return (statusCode: 200, bytes: _answerTo(uri));
+          },
+        );
+        await expectLater(
+          harness.confirm(inScratch('raw')),
+          throwsA(isA<TimeoutException>()),
+        );
+        final names = [
+          for (final file in Directory(inScratch('raw')).listSync())
+            file.uri.pathSegments.last,
+        ]..sort();
+        expect(names, ['01_199_TT.txt', '02_299_TT.txt']);
+        expect(
+          File(inScratch('raw/02_299_TT.txt')).readAsBytesSync(),
+          _answerTo(harness.requested[1]),
+        );
+        expect(harness.events, [
+          'get',
+          'pause 1000',
+          'get',
+          'pause 1000',
+          'get',
+        ]);
+      },
+    );
+  });
+
+  // The real GET, against a server these tests start on this machine. The client
+  // refuses every other host.
+  group('horizonsHttpGet', () {
+    const short = Duration(seconds: 1);
+    // For answers that are expected: a slow machine must not time out.
+    const generous = Duration(seconds: 10);
+    // Long enough that a request sent again would have arrived.
+    const settle = Duration(milliseconds: 300);
+
+    test('the limit is 60 seconds', () {
+      expect(horizonsRequestTimeout, const Duration(seconds: 60));
+    });
+
+    _loopbackTest('the client refuses another host', (server) async {
+      await expectLater(
+        horizonsHttpGet(
+          Uri.parse('http://horizons.invalid/'),
+          timeout: generous,
+        ),
+        throwsStateError,
+      );
+      expect(server.requests, isEmpty);
+    });
+
+    _loopbackTest('returns a complete answer', (server) async {
+      server.reply = 'HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\ncomplete';
+      final response = await horizonsHttpGet(server.uri, timeout: generous);
+
+      expect(response.statusCode, 200);
+      expect(response.bytes, 'complete'.codeUnits);
+      expect(server.requests, hasLength(1));
+    });
+
+    for (final (name, reply) in [
+      ('no answer at all', ''),
+      (
+        'part of an answer',
+        'HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\npartial',
+      ),
+    ]) {
+      _loopbackTest('times out on $name, and sends nothing again', (
+        server,
+      ) async {
+        server.reply = reply;
+        final clock = Stopwatch()..start();
+        await expectLater(
+          horizonsHttpGet(server.uri, timeout: short),
+          throwsA(
+            isA<TimeoutException>()
+                .having((e) => e.duration, 'duration', short)
+                .having(
+                  (e) => e.message,
+                  'message',
+                  contains('no complete answer'),
+                ),
+          ),
+        );
+        expect(clock.elapsed, greaterThanOrEqualTo(short));
+        expect(clock.elapsed, lessThan(const Duration(seconds: 10)));
+        // The abandoned connection is closed, not left running.
+        await server.firstClosedByClient.timeout(const Duration(seconds: 5));
+        await Future<void>.delayed(settle);
+        expect(server.connections, 1);
+        expect(server.requests, hasLength(1));
+      });
+    }
+
+    for (final (name, reply) in [
+      ('before any answer', ''),
+      (
+        'part way through an answer',
+        'HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\npartial',
+      ),
+    ]) {
+      _loopbackTest('a connection closed $name is an error, not an answer', (
+        server,
+      ) async {
+        server
+          ..reply = reply
+          ..closeAfterReply = true;
+        await expectLater(
+          horizonsHttpGet(server.uri, timeout: const Duration(seconds: 5)),
+          throwsA(isA<HttpException>()),
+        );
+        await Future<void>.delayed(settle);
+        expect(server.requests, hasLength(1));
+      });
+    }
+
+    _loopbackTest('a redirect is not followed', (server) async {
+      server.reply =
+          'HTTP/1.1 302 Found\r\nLocation: /elsewhere\r\n'
+          'Content-Length: 0\r\n\r\n';
+      final response = await horizonsHttpGet(server.uri, timeout: generous);
+
+      expect(response.statusCode, 302);
+      await Future<void>.delayed(settle);
+      expect(server.requests, hasLength(1));
+    });
+
+    _loopbackTest('a stalled answer stops the tool: nothing saved or resent', (
+      server,
+    ) async {
+      server.reply = 'HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\npartial';
+      final scratchOut = inScratch('raw');
+      final harness = _Harness(
+        answer: (_) => horizonsHttpGet(server.uri, timeout: short),
+      );
+      await expectLater(
+        harness.confirm(scratchOut),
+        throwsA(isA<TimeoutException>()),
+      );
+      await Future<void>.delayed(settle);
+      expect(Directory(scratchOut).listSync(), isEmpty);
+      expect(harness.events, ['get']);
+      expect(server.requests, hasLength(1));
     });
   });
 }
