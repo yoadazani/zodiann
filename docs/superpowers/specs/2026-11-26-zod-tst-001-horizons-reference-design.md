@@ -243,10 +243,10 @@ Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do n
 | TT entries | 64 | **1.013 ms**, `2447892.500661852` (1990-01-01), nearest double | 0.493 ms |
 | UT cross-check | 42 | 0.971 ms | 0.029 ms |
 | Control, UT | 22 | **1.010 ms**, `2440423.345138889` (1969-07-20T20:17), nearest double | 0.010 ms |
-| Retrograde evidence | 12 | 0.955 ms | 0.216 ms |
+| Retrograde evidence | 12 distinct (18 sent) | 0.955 ms | 0.216 ms |
 | Control, TT (estimate: UT + library ΔT; the real times come from Horizons) | 22 | 0.994 ms | 0.493 ms |
 
-The two values over 1 ms occur only if Horizons truncates **and** reads the string as its nearest double (reading it exactly gives 0.997 ms and 0.010 ms). The Task 4B answers show whether it truncates or rounds: at 2003-08-28, 2004-06-14 and 2012-06-12 a truncating printer shows `.183` and a rounding one `.184` (plan Task 4 Step 4B-echo). The pilot could not tell.
+The two values over 1 ms occur only if Horizons truncates **and** reads the string as its nearest double (read exactly, those two times differ by 0.013 ms and 0.010 ms; the worst TT entry is then 0.997 ms). The Task 4B answers show whether it truncates or rounds: at 2003-08-28, 2004-06-14 and 2012-06-12 a truncating printer shows `.183` and a rounding one `.184` (plan Task 4 Step 4B-echo). The pilot could not tell.
 
 **The canonical TT string** (2026-11-26). For every instant it is `ttJulianDay`: from 1972, `julianDayUt(utc.add(ttMinusUtc)).toStringAsFixed(9)`, the double the adapter passes to the library, printed to nine decimals; before 1972, `julianDayUt(utc) + ΔT/86400` printed the same way. It is **not** an exact-decimal rounding.
 
@@ -265,7 +265,7 @@ The two values over 1 ms occur only if Horizons truncates **and** reads the stri
 
 ### 8.5 Pilot answers
 
-The two Moon answers are committed unchanged as parser samples, `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt` (request 1) and `horizons_sample_ut.txt` (request 2). All 11 raw answers and the request log stay in the planning session's scratch directory (`pilot-raw`), outside the repository; a reboot or cleanup can remove them. SHA-256:
+The two Moon answers are committed unchanged as parser samples, `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt` (request 1) and `horizons_sample_ut.txt` (request 2). All 11 raw answers and the request log are kept in a durable directory outside the repository (location in `docs/PROGRESS.md`). SHA-256:
 
 ```
 789e1d04b1d22563d7a8dafe8a706921e214f8f5c54efec802bbb59b2147fc24  01_301_TT
