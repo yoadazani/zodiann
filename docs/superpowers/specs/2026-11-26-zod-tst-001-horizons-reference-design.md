@@ -344,6 +344,93 @@ https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA
 
 Sequential, 1 second apart, each limited to 60 s in all, never retried, redirected or sent again without the owner's approval. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. A failed or refused request is not run again without the owner's approval; a new date or parameter needs it too.
 
+### 8.7 Download results
+
+All answers are kept unchanged outside the repository, in `C:/Users/user/zodiann-horizons-answers/ZOD-TST-001`, one directory per phase, with a request log (`*.requests.tsv`: file, time saved, status, bytes, SHA-256, URI) and the tool's output (`*.run.log`). Every request was sent once.
+
+| Phase | Requests | Saved (UTC) | Result |
+|---|---|---|---|
+| Pilot | 11 | 2026-11-26 18:41 | 11 HTTP 200 (section 8.4) |
+| Retrograde confirmation | 8 | 2026-11-26 22:10 | 8 HTTP 200 (section 5.2) |
+| Dataset | 30 | 2026-11-26T22:31:06Z to 22:31:55Z | 30 HTTP 200; written |
+| Backup, UTC | 10 | 2026-11-26T22:37:47Z to 22:38:02Z | 10 HTTP 200; 610 rows |
+| Backup, TT | 10 | 2026-11-26T22:49:21Z to 22:49:36Z | 10 HTTP 200; 610 rows |
+
+**Dataset** (tool at commit `65e2b33`; `API VERSION: 1.2`; `horizons_reference.json` version 1, 188763 bytes, SHA-256 `b1ddcacebd42e12310379e2dc70795e44a4145a8c4a2f7f19297a78c79ec8752`):
+
+* 640 entries (64 instants, ten bodies), 420 UT cross-check rows, 22 time-scale control rows, 9 retrograde evidence rows; every parser check passed and `datasetProblems` was empty.
+* All 530 rows of the previous Swiss TT reference are unchanged (largest difference 0″).
+* UT cross-check against TT entries: largest disagreement 0.00036″ (Moon, 2090-01-01), limit 0.002″. Time-scale control: largest 0.00072″ (1956-09-10), limit 0.002″; TDB − UT from −1.946024 to 42.076161 s.
+* Offline comparison with the retrograde answers: 27 times asked twice, largest difference 0″.
+* Echoed times: printed minus requested between −0.492 and +0.493 ms over 1,122 rows (rounding, as predicted).
+
+**Backup** (old-row rule of section 10; for each fixture 530 old rows present, 350 identical, 180 changed, all from 2030-01-01 on, largest 0.00072″; no violation; 80 new rows for the 8 new instants). The UTC requests ran before the rule was decided; their answers were kept and used, not sent again.
+
+SHA-256, dataset:
+
+```
+4a74de068fa3fa892613f3e889a70ce413e283195c273627cd06b501d21eb6a7  01_10_TT
+70a42730efcf208d9a4ce0bbb42b35ae3bb2c5269a57f52cfbb6844e9c55269f  02_301_TT
+eb2a1f450ea6138dfcb912a5a271761446e24e1cdd6df9e59d0c67385dc05ab8  03_199_TT
+5178d4568afbe2354de04e04e398b6bcaa85b4dbc150880e24f211ecd13e1611  04_299_TT
+15c9bc32bc592a8b9bbdc7fbf9a4e413e66efcef15818501c184f50fb97a0e1a  05_499_TT
+3ddcb4c2f948e5165c8a335a3062276372fa81599c8abcc147cf8ddac3b4bd4f  06_599_TT
+98c6d0c674093123b09eb516cc84e14c454fb24640570fa8dfac41fffa6e447c  07_699_TT
+bdacee3c6d96352657f5d70adbc407225f55fee44e869e3c9eea6fec26122e0b  08_799_TT
+cde0ef45841ba7c87d61da68edba1beba785af496b2f204d26259cc9d992eea0  09_899_TT
+bc5c997f136810fad932bf219e959f3ea4f0fbf2664e85b0341657fd2b0b5bf7  10_999_TT
+f8c6b84db98c1b843a58c784a01fb9bcfa9596e5896e7087c4c1a99a1de2441e  11_10_UT
+6bad41f294b54a325eea597cb515310abf81edbcf59bfc80276b1462790c77e8  12_301_UT
+306e797a6af3e653b0ac51b2e2147740eedf366c003a8371218cad63b1d2e37a  13_199_UT
+8e80cc871220ce8344b6ba02f3205fbce2d0edd32ce2e45844754270b6c4aea7  14_299_UT
+6ed262b227bf216725b8d4be20444346bbce47b077d28182fc172a5880dd802f  15_499_UT
+b5d7d2a6a5f6d9bf1969555e63a6235d8c61bfb727ff47810b3b595732339f3c  16_599_UT
+4478f94f4b73e26287a2b68f1247eb30af52fa172ebf88ef253d23f54b0a4799  17_699_UT
+262f24877839ea6224216531115ee54c329a43a0852c4a443e1e66db1a4b915d  18_799_UT
+c2c4a2990ac98bf77382ab89056392f81468d8a02471d45289ee62b3692a76cd  19_899_UT
+487c0b637a44b3c22082b723bde8c15746ef158855b883ff29420feecf917e80  20_999_UT
+ed66ddae3a9de630a1ebfda3ad5743709b3f660a8ef0fd62b083da68bbd3da2a  21_301_UT
+8739c519db0da747c2cb352298c8f536cddf5376af3902925bac9640c230d918  22_301_TT
+28a4a87b8e86dd8ba51a70ee7aa9853e671d243aaba2aa123659a97828b803a4  23_199_TT
+8fd476b3a0baddf367732004613108d608b6ec44be998d55231f15dfcd10fe2c  24_299_TT
+58f998bff2e8fe9559bb4e8bc2176d3628d9e99b9dd4d24b64eee58bc7be8bfb  25_499_TT
+716a3715ba27f746d45947ed41477f63091d96dd0197a7ebc584fc70be96ae73  26_599_TT
+e019c8f6a8b26d20a5067b3ad84dafadd48434c015a2de115579b310c35d16e8  27_699_TT
+fafe152102334b8ed32cd14188847e1df6b7d89eef6e8a289b5252b6529d8434  28_799_TT
+4345c6a9ec8d38265c6135b503d937e3056b3cc9fea32939cb9341d9b24d46fa  29_899_TT
+27a7478e64c693ab4069e3970dc638b43b955af22624847821c4f1e42f0bf0c2  30_999_TT
+```
+
+SHA-256, Backup UTC:
+
+```
+8a801aa82df326208a6075b5f593efdceb6af8566f93c66c3bf20bafed66241c  01_10_UT
+68e5018b087401039120e086869226671ba4c4d36ee4347f0e6d7a630f258951  02_301_UT
+04e3a168ef8cfd3393b6cca5a500f446619e2c34722ae487195e0f3cdba2201e  03_199_UT
+a7db581c22e38dabd8e51a89873abdea0f5b9573d8c3ab545007f8c1b5626c35  04_299_UT
+4c2ca47ffbbfe242e382db40d1f12f9cc9c491a513a5f3061b8c51f87a382154  05_499_UT
+8b033dbc853bd3aa4589d1f97cd1cbbfe73de49d4cfd9167edc42be087d71319  06_599_UT
+4a054aa7503a6932df857f156290873f5dc1a1834675dbcb8ec2b074ffc0cb5a  07_699_UT
+36e87d8b3a9d2fdc51d87d07be00f45d858a8e2d6d2081a80c13d68ac119db69  08_799_UT
+a28db277500612305967175cfee7815ef3e483edda51c877f9ee713ee229be71  09_899_UT
+ea3a1aa0672169443a6e259bb50074a76009f951f0ba15343e20851ed02885ad  10_999_UT
+```
+
+SHA-256, Backup TT:
+
+```
+63f18d171e91f6ed883d6c23e0b9e62db4a12b2f890f48d86887630b2c3f823d  01_10_TT
+df4b28130f0a5cedee774ba45db835161fa48831607e8170cdacae1d9ca10f0b  02_301_TT
+85d6a8ab8607be8e11606fd19932fe03e8d4441e7a86b7a5686f28bbe7581c19  03_199_TT
+616a42ffcf9033e1b113e07fb49ec9eff3bb7c0d761ad955b9983be597914834  04_299_TT
+726aeffaf2db77dc535106281026bc99973f217312ac65906afe87d448e64c5b  05_499_TT
+56dbabc26441a0e683bb7932c4f52bf0923d608ae02fa9f9abcdcdbc33e09a10  06_599_TT
+52df1d5dce7ea93f5105870a9b5d86bdd1d35a49b737cd2196efde86cf17d5d4  07_699_TT
+012b73f12a7d81e1398c51d802ffae34032df28182b50cf083bd522ef43348db  08_799_TT
+d021fff2b38ba041abdb7c9bc214e00b4c7c5731b5c097e7d878952db94a68fb  09_899_TT
+b2f03472be9a764a3693b8e3b78ebfbd5200c480b2c6794440c33ecf33778b96  10_999_TT
+```
+
 ## 9. Tests: what is repointed, changed or left alone
 
 | Existing test or tool | Action |
@@ -369,10 +456,14 @@ Your range restriction covers the three instants after 2100-01-01T12:00Z. It doe
 
 | Option | What happens | Cost |
 |---|---|---|
-| **A (recommended)** | The restriction is by range only. The two backup fixtures are refetched for the 61 in-range instants (every existing row must be **identical**, otherwise stop and ask), its two fetch tools filter to the range, the device counts go from 53 to 61 instants, and the existing 60″ gate also runs on the eight new instants. **This edits backup test data, tools and device tests, which is more than "update the tests": approving A approves that** | 20 more requests; one more device run; backup test data and ACC-2 evidence grow |
+| **A (recommended)** | The restriction is by range only. The two backup fixtures are refetched for the 61 in-range instants (every existing row is kept under the old-row rule below, otherwise stop and ask), its two fetch tools filter to the range, the device counts go from 53 to 61 instants, and the existing 60″ gate also runs on the eight new instants. **This edits backup test data, tools and device tests, which is more than "update the tests": approving A approves that** | 20 more requests; one more device run; backup test data and ACC-2 evidence grow |
 | B | The backup tests assert only the 53 version-1 instants; new instants are left to ZOD-TST-005 | none now, but this **goes further than your wording**: the "every shared instant in range" requirement is narrowed |
 
 Neither changes the backup's implementation, range, tolerance or boundary tests.
+
+**Old-row rule for the refetch (owner decision, 2026-11-27, replacing "identical").** For both backup fixtures: every old (body, instant) row is present; its other stored values (`utDays`, `ttDays`, `deltaTSeconds`, `jdTt`) are identical; its longitude may differ only for an instant after **2026-11-25** (the end of the Earth-orientation data in the Horizons answers) and by at most **0.001″**, and then the new value is taken. Anything else stops and goes to the owner.
+
+What prompted it: the UTC refetch (EOP file `eop.261125.p270221`) differs from the fixture retrieved 2026-11-21 in 180 of 530 rows, all from 2030-01-01 on, by 0.00036″ to 0.00072″ (1 or 2 units of the seventh decimal), while all 350 earlier rows are identical and all 390 rows shared with the primary dataset's UT cross-check equal it. The shift does not grow with a body's speed, so it is not a time-basis change; an update of Horizons' Earth-orientation predictions is the likely cause, **inferred, not proven** (the 2026-11-21 answers were not saved).
 
 **Speed test (only under A):** its frozen speed bounds were set on the 53 instants and a dense Moon set. Recommended: it keeps sampling exactly the 53 (the eight are excluded by name and the count is asserted). Alternative: let it sample 61 and stop if a frozen bound is exceeded.
 
@@ -388,6 +479,7 @@ Neither changes the backup's implementation, range, tolerance or boundary tests.
 * Positions only. No speed reference.
 * ACC-1's "same settings": geocentric, apparent, tropical of date; Horizons uses the IAU76/80 model for quantity 31, a difference included in the measured error.
 * A future change of the civil time standard would change the post-2027 rows' meaning (decision record section 1).
+* **Future rows do not reproduce exactly.** For instants after the end of Horizons' measured Earth-orientation data, answers changed by up to 0.00072″ between 2026-11-21 and 2026-11-26 (section 10). The primary dataset has the same exposure, and its 0.001″ row protection leaves only about 1.4 times that. Its comparison with the previous TT reference found 0 differences, but both were retrieved on 2026-11-26. A later refetch that exceeds 0.001″ stops the tool and needs an owner decision.
 
 ## 13. Owner decisions on the open questions
 

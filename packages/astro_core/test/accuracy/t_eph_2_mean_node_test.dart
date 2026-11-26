@@ -156,6 +156,21 @@ void main() {
       expect(max, closeTo(0.00213, 1e-5), reason: 'max $max° at day $atDay');
     });
 
+    // Moved here from the date-set shape test (ZOD-TST-001): which reference
+    // instants lie outside the specification's stated ±100 years. The bound
+    // below is still asserted on every one of them.
+    test('only the three 2100 instants lie outside T = ±1', () {
+      final first = DateTime.utc(1899, 12, 31, 12);
+      final last = DateTime.utc(2100, 1, 1, 12);
+
+      expect(dates.where((t) => t.isBefore(first)), isEmpty);
+      expect(dates.where((t) => t.isAfter(last)), [
+        DateTime.utc(2100, 7, 1),
+        DateTime.utc(2100, 12, 31),
+        DateTime.utc(2100, 12, 31, 23, 59, 59),
+      ]);
+    });
+
     test('is within the bound on every reference date', () {
       for (final t in dates) {
         expect(deviation(t), lessThan(0.01), reason: '$t');

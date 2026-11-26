@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "description": "Shared reference date set for T-EPH-2 (ZOD-TST-002, owner) and T-EPH-1 / ACC-1 (ZOD-TST-001). UTC instants across 1900-2100 (ACC-1 shape): start of every 5th year, year-end boundaries, the J2000 epoch, the ±100-year ends (T = -1 and +1) and mid-year instants. Add-only: ZOD-TST-001 may add instants in this file and must then increment `version`; it must never drop or change an existing instant.",
+  "version": 2,
+  "description": "Shared reference date set for T-EPH-2 (ZOD-TST-002, owner) and T-EPH-1 / ACC-1 (ZOD-TST-001). UTC instants across 1900-2100 (ACC-1 shape): start of every 5th year, year-end boundaries, the J2000 epoch, the ±100-year ends (T = -1 and +1) and mid-year instants. Add-only: ZOD-TST-001 may add instants in this file and must then increment `version`; it must never drop or change an existing instant. Version 2 (ZOD-TST-001): retrograde instants, the 1972 boundary and 2100 through 31 December.",
   "dates": [
     "1899-12-31T12:00:00Z",
     "1900-01-01T00:00:00Z",
@@ -16,11 +16,15 @@
     "1945-01-01T00:00:00Z",
     "1950-01-01T00:00:00Z",
     "1950-12-31T23:59:59Z",
+    "1953-11-18T00:00:00Z",
     "1955-01-01T00:00:00Z",
+    "1956-09-10T00:00:00Z",
     "1960-01-01T00:00:00Z",
     "1965-01-01T00:00:00Z",
     "1969-07-20T20:17:00Z",
     "1970-01-01T00:00:00Z",
+    "1971-12-31T23:59:59Z",
+    "1972-01-01T00:00:00Z",
     "1975-01-01T00:00:00Z",
     "1980-01-01T00:00:00Z",
     "1985-01-01T00:00:00Z",
@@ -32,8 +36,11 @@
     "2000-12-31T23:59:59Z",
     "2005-01-01T00:00:00Z",
     "2010-01-01T00:00:00Z",
+    "2012-06-12T00:00:00Z",
     "2015-01-01T00:00:00Z",
     "2020-01-01T00:00:00Z",
+    "2023-08-01T00:00:00Z",
+    "2023-10-15T00:00:00Z",
     "2024-12-31T23:59:59Z",
     "2025-01-01T00:00:00Z",
     "2026-11-12T00:00:00Z",
@@ -41,6 +48,7 @@
     "2035-01-01T00:00:00Z",
     "2040-01-01T00:00:00Z",
     "2045-01-01T00:00:00Z",
+    "2049-05-11T00:00:00Z",
     "2050-01-01T00:00:00Z",
     "2055-01-01T00:00:00Z",
     "2060-01-01T00:00:00Z",
@@ -54,6 +62,9 @@
     "2095-01-01T00:00:00Z",
     "2099-12-31T23:59:59Z",
     "2100-01-01T00:00:00Z",
-    "2100-01-01T12:00:00Z"
+    "2100-01-01T12:00:00Z",
+    "2100-07-01T00:00:00Z",
+    "2100-12-31T00:00:00Z",
+    "2100-12-31T23:59:59Z"
   ]
 }

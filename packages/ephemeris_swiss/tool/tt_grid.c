@@ -3,7 +3,7 @@
  * delta T in seconds that the vendored Swiss Ephemeris applies to it with the
  * packaged data files (the same call swe_calc_ut makes), one per line with 12
  * decimals. The first argument is the data directory. Host tool only, never
- * part of the app; tool/fetch_horizons_tt_reference.dart compiles it against
+ * part of the app; tool/horizons/swiss_host.dart compiles it against
  * the unmodified upstream sources and runs it. It exits non-zero on any
  * library warning.
  */

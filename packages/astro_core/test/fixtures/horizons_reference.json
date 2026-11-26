@@ -1,9 +1,25 @@
 {
+  "version": 1,
+  "referenceDatesVersion": 2,
   "source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api)",
   "retrievedOn": "2026-11-26",
-  "quantity": "31 (Observer ecliptic longitude): per the Horizons manual, IAU76/80 ecliptic-of-date longitude of the apparent position with light-time, gravitational deflection and stellar aberration; ZOD-FND-003 found it agrees with the true equinox of date",
-  "timeScale": "Each entry is asked at the TT the app gives its UTC instant: from 1972 UTC + (TAI - UTC) + 32.184 s (astro_core ephemerisTimeFor); before 1972 UT + the delta T of the vendored Swiss Ephemeris (tool/tt_grid.c). ttMinusUtSeconds is that difference.",
+  "apiVersion": "1.2",
+  "targetSources": {
+    "sun": "Target body name: Sun (10)                        {source: DE441}",
+    "moon": "Target body name: Moon (301)                      {source: DE441}",
+    "mercury": "Target body name: Mercury (199)                   {source: DE441}",
+    "venus": "Target body name: Venus (299)                     {source: DE441}",
+    "mars": "Target body name: Mars (499)                      {source: mar099}",
+    "jupiter": "Target body name: Jupiter (599)                   {source: jup365_merged}",
+    "saturn": "Target body name: Saturn (699)                    {source: sat441l}",
+    "uranus": "Target body name: Uranus (799)                    {source: ura184_merged}",
+    "neptune": "Target body name: Neptune (899)                   {source: nep098_merged}",
+    "pluto": "Target body name: Pluto (999)                     {source: plu060_merged}"
+  },
+  "quantity": "31 (Observer ecliptic longitude): per the Horizons manual, IAU76/80 ecliptic-of-date longitude of the apparent position with light-time, gravitational deflection and stellar aberration",
+  "timeScale": "Each entry is asked in TT at the TT the app gives its instant, jdTt: from 1972 UTC + (TAI - UTC) + 32.184 s (astro_core ephemerisTimeFor); before 1972 the instant read as UT plus the delta T of the vendored Swiss Ephemeris (tool/tt_grid.c). ttMinusUtSeconds is that difference. utcCrossCheck asks Horizons at the UTC instant from 1972; timeScaleControl compares Horizons with itself before 1972.",
   "queryParameters": {
+    "format": "text",
     "COMMAND": {
       "sun": "10",
       "moon": "301",
@@ -16,18 +32,48 @@
       "neptune": "899",
       "pluto": "999"
     },
-    "CENTER": "500@399",
+    "OBJ_DATA": "NO",
+    "MAKE_EPHEM": "YES",
     "EPHEM_TYPE": "OBSERVER",
-    "QUANTITIES": "31",
+    "CENTER": "500@399",
     "TLIST_TYPE": "JD",
     "TIME_TYPE": "TT",
-    "TIME_DIGITS": "SECONDS",
+    "TIME_DIGITS": "FRACSEC",
+    "CAL_FORMAT": "BOTH",
+    "QUANTITIES": "31",
     "ANG_FORMAT": "DEG",
     "EXTRA_PREC": "YES",
     "CSV_FORMAT": "YES",
-    "OBJ_DATA": "NO"
+    "APPARENT": "AIRLESS"
   },
-  "instants": "every instant of packages/astro_core/test/fixtures/reference_dates.json (53 at the time of the fetch)",
+  "utcCrossCheckQueryParameters": {
+    "format": "text",
+    "COMMAND": {
+      "sun": "10",
+      "moon": "301",
+      "mercury": "199",
+      "venus": "299",
+      "mars": "499",
+      "jupiter": "599",
+      "saturn": "699",
+      "uranus": "799",
+      "neptune": "899",
+      "pluto": "999"
+    },
+    "OBJ_DATA": "NO",
+    "MAKE_EPHEM": "YES",
+    "EPHEM_TYPE": "OBSERVER",
+    "CENTER": "500@399",
+    "TLIST_TYPE": "JD",
+    "TIME_TYPE": "UT",
+    "TIME_DIGITS": "FRACSEC",
+    "CAL_FORMAT": "BOTH",
+    "QUANTITIES": "31",
+    "ANG_FORMAT": "DEG",
+    "EXTRA_PREC": "YES",
+    "CSV_FORMAT": "YES",
+    "APPARENT": "AIRLESS"
+  },
   "toleranceArcseconds": 1,
   "entries": [
     {
@@ -130,10 +176,24 @@
     },
     {
       "body": "sun",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 235.3582744
+    },
+    {
+      "body": "sun",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 279.7937601
+    },
+    {
+      "body": "sun",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 167.25498
     },
     {
       "body": "sun",
@@ -162,6 +222,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 280.156271
+    },
+    {
+      "body": "sun",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 279.6626867
+    },
+    {
+      "body": "sun",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 279.662698
     },
     {
       "body": "sun",
@@ -242,6 +316,13 @@
     },
     {
       "body": "sun",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 81.4373112
+    },
+    {
+      "body": "sun",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -253,6 +334,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 280.009492
+    },
+    {
+      "body": "sun",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 128.5252773
+    },
+    {
+      "body": "sun",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 201.3771188
     },
     {
       "body": "sun",
@@ -302,6 +397,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 280.9649283
+    },
+    {
+      "body": "sun",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 50.7582115
     },
     {
       "body": "sun",
@@ -400,6 +502,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 281.1136517
+    },
+    {
+      "body": "sun",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 99.316414
+    },
+    {
+      "body": "sun",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 279.3443271
+    },
+    {
+      "body": "sun",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 280.3638289
     },
     {
       "body": "moon",
@@ -501,10 +624,24 @@
     },
     {
       "body": "moon",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 14.3617645
+    },
+    {
+      "body": "moon",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 358.8978692
+    },
+    {
+      "body": "moon",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 234.3349664
     },
     {
       "body": "moon",
@@ -533,6 +670,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 190.6990368
+    },
+    {
+      "body": "moon",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 101.6301436
+    },
+    {
+      "body": "moon",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 101.6302965
     },
     {
       "body": "moon",
@@ -613,6 +764,13 @@
     },
     {
       "body": "moon",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 357.7741181
+    },
+    {
+      "body": "moon",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -624,6 +782,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 346.1383767
+    },
+    {
+      "body": "moon",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 297.4889909
+    },
+    {
+      "body": "moon",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 204.2614513
     },
     {
       "body": "moon",
@@ -673,6 +845,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 66.761235
+    },
+    {
+      "body": "moon",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 150.9895531
     },
     {
       "body": "moon",
@@ -771,6 +950,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 164.4237531
+    },
+    {
+      "body": "moon",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 25.7260246
+    },
+    {
+      "body": "moon",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 279.3576049
+    },
+    {
+      "body": "moon",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 293.9451964
     },
     {
       "body": "mercury",
@@ -872,10 +1072,24 @@
     },
     {
       "body": "mercury",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 227.9389816
+    },
+    {
+      "body": "mercury",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 283.6070419
+    },
+    {
+      "body": "mercury",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 191.551409
     },
     {
       "body": "mercury",
@@ -904,6 +1118,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 299.0214552
+    },
+    {
+      "body": "mercury",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 257.1255886
+    },
+    {
+      "body": "mercury",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 257.1255993
     },
     {
       "body": "mercury",
@@ -984,6 +1212,13 @@
     },
     {
       "body": "mercury",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 98.618702
+    },
+    {
+      "body": "mercury",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -995,6 +1230,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 274.3833145
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 154.22902
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 197.6188686
     },
     {
       "body": "mercury",
@@ -1044,6 +1293,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 262.0048483
+    },
+    {
+      "body": "mercury",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 45.3758521
     },
     {
       "body": "mercury",
@@ -1142,6 +1398,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 288.8176386
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 78.2840252
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 296.8757439
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 298.2941694
     },
     {
       "body": "venus",
@@ -1243,10 +1520,24 @@
     },
     {
       "body": "venus",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 217.8104833
+    },
+    {
+      "body": "venus",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 235.8366307
+    },
+    {
+      "body": "venus",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 121.6397553
     },
     {
       "body": "venus",
@@ -1275,6 +1566,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 274.4532541
+    },
+    {
+      "body": "venus",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 310.7907468
+    },
+    {
+      "body": "venus",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 310.7907605
     },
     {
       "body": "venus",
@@ -1355,6 +1660,13 @@
     },
     {
       "body": "venus",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 72.1447999
+    },
+    {
+      "body": "venus",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -1366,6 +1678,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 314.4094923
+    },
+    {
+      "body": "venus",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 147.0243634
+    },
+    {
+      "body": "venus",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 155.2754705
     },
     {
       "body": "venus",
@@ -1415,6 +1741,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 262.4020084
+    },
+    {
+      "body": "venus",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 5.6387626
     },
     {
       "body": "venus",
@@ -1513,6 +1846,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 320.6717014
+    },
+    {
+      "body": "venus",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 55.6804293
+    },
+    {
+      "body": "venus",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 264.5611679
+    },
+    {
+      "body": "venus",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 265.8174304
     },
     {
       "body": "mars",
@@ -1614,10 +1968,24 @@
     },
     {
       "body": "mars",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 190.1591747
+    },
+    {
+      "body": "mars",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 349.8112206
+    },
+    {
+      "body": "mars",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 348.3982722
     },
     {
       "body": "mars",
@@ -1646,6 +2014,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 342.236237
+    },
+    {
+      "body": "mars",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 3.3802933
+    },
+    {
+      "body": "mars",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 3.3803004
     },
     {
       "body": "mars",
@@ -1726,6 +2108,13 @@
     },
     {
       "body": "mars",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 169.4386232
+    },
+    {
+      "body": "mars",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -1737,6 +2126,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 238.3846079
+    },
+    {
+      "body": "mars",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 163.234706
+    },
+    {
+      "body": "mars",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 211.9157894
     },
     {
       "body": "mars",
@@ -1786,6 +2189,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 308.5305761
+    },
+    {
+      "body": "mars",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 76.7204393
     },
     {
       "body": "mars",
@@ -1884,6 +2294,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 29.7293429
+    },
+    {
+      "body": "mars",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 132.9855449
+    },
+    {
+      "body": "mars",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 253.2957042
+    },
+    {
+      "body": "mars",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 254.0066286
     },
     {
       "body": "jupiter",
@@ -1985,10 +2416,24 @@
     },
     {
       "body": "jupiter",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 84.6214067
+    },
+    {
+      "body": "jupiter",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 116.8504909
+    },
+    {
+      "body": "jupiter",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 163.2405348
     },
     {
       "body": "jupiter",
@@ -2017,6 +2462,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 212.3250046
+    },
+    {
+      "body": "jupiter",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 262.349743
+    },
+    {
+      "body": "jupiter",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 262.3497454
     },
     {
       "body": "jupiter",
@@ -2097,6 +2556,13 @@
     },
     {
       "body": "jupiter",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 60.0629328
+    },
+    {
+      "body": "jupiter",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -2108,6 +2574,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 276.6703386
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 43.6823046
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 43.0034023
     },
     {
       "body": "jupiter",
@@ -2157,6 +2637,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 310.4542297
+    },
+    {
+      "body": "jupiter",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 91.0271264
     },
     {
       "body": "jupiter",
@@ -2255,6 +2742,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 201.2591621
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 193.9690117
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 226.83732
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 227.0073354
     },
     {
       "body": "saturn",
@@ -2356,10 +2864,24 @@
     },
     {
       "body": "saturn",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 213.1441281
+    },
+    {
+      "body": "saturn",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 228.3408181
+    },
+    {
+      "body": "saturn",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 237.5079448
     },
     {
       "body": "saturn",
@@ -2388,6 +2910,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 32.0622903
+    },
+    {
+      "body": "saturn",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 60.4242255
+    },
+    {
+      "body": "saturn",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 60.4242249
     },
     {
       "body": "saturn",
@@ -2468,6 +3004,13 @@
     },
     {
       "body": "saturn",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 202.9102531
+    },
+    {
+      "body": "saturn",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -2479,6 +3022,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 291.3949664
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 335.7128216
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 330.8616469
     },
     {
       "body": "saturn",
@@ -2528,6 +3085,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 247.1008803
+    },
+    {
+      "body": "saturn",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 297.3896596
     },
     {
       "body": "saturn",
@@ -2626,6 +3190,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 205.6604692
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 199.9657943
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 216.8800087
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 216.955333
     },
     {
       "body": "uranus",
@@ -2727,10 +3312,24 @@
     },
     {
       "body": "uranus",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 112.9363974
+    },
+    {
+      "body": "uranus",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 116.3291472
+    },
+    {
+      "body": "uranus",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 125.2864232
     },
     {
       "body": "uranus",
@@ -2759,6 +3358,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 188.7206104
+    },
+    {
+      "body": "uranus",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 198.0903792
+    },
+    {
+      "body": "uranus",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 198.0903794
     },
     {
       "body": "uranus",
@@ -2839,6 +3452,13 @@
     },
     {
       "body": "uranus",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 8.147002
+    },
+    {
+      "body": "uranus",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -2850,6 +3470,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 32.6940395
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 52.7487948
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 52.2198113
     },
     {
       "body": "uranus",
@@ -2899,6 +3533,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 146.4804755
+    },
+    {
+      "body": "uranus",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 161.8375183
     },
     {
       "body": "uranus",
@@ -2997,6 +3638,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 17.7436853
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 25.3097215
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 21.7311973
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 21.7317202
     },
     {
       "body": "neptune",
@@ -3098,10 +3760,24 @@
     },
     {
       "body": "neptune",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 204.7622957
+    },
+    {
+      "body": "neptune",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 208.0044013
+    },
+    {
+      "body": "neptune",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 208.64206
     },
     {
       "body": "neptune",
@@ -3130,6 +3806,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 239.8858503
+    },
+    {
+      "body": "neptune",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 244.0990972
+    },
+    {
+      "body": "neptune",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 244.0990975
     },
     {
       "body": "neptune",
@@ -3210,6 +3900,13 @@
     },
     {
       "body": "neptune",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 333.1375446
+    },
+    {
+      "body": "neptune",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -3221,6 +3918,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 346.2645207
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 357.4342864
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 355.5952324
     },
     {
       "body": "neptune",
@@ -3270,6 +3981,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 42.1679055
+    },
+    {
+      "body": "neptune",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 53.4479272
     },
     {
       "body": "neptune",
@@ -3368,6 +4086,27 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 167.2868565
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 164.8992767
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 169.5085076
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 169.5029737
     },
     {
       "body": "pluto",
@@ -3469,10 +4208,24 @@
     },
     {
       "body": "pluto",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "ttMinusUtSeconds": 30.572200534016,
+      "longitudeDegrees": 145.0001651
+    },
+    {
+      "body": "pluto",
       "utc": "1955-01-01T00:00:00Z",
       "jdTt": "2435108.500359609",
       "ttMinusUtSeconds": 31.070207031816,
       "longitudeDegrees": 146.5390811
+    },
+    {
+      "body": "pluto",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "ttMinusUtSeconds": 31.563208632313,
+      "longitudeDegrees": 148.9246276
     },
     {
       "body": "pluto",
@@ -3501,6 +4254,20 @@
       "jdTt": "2440587.500465062",
       "ttMinusUtSeconds": 40.181338701613,
       "longitudeDegrees": 177.3921739
+    },
+    {
+      "body": "pluto",
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "ttMinusUtSeconds": 42.229999964977,
+      "longitudeDegrees": 182.0490356
+    },
+    {
+      "body": "pluto",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "ttMinusUtSeconds": 42.184,
+      "longitudeDegrees": 182.0490356
     },
     {
       "body": "pluto",
@@ -3581,6 +4348,13 @@
     },
     {
       "body": "pluto",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "ttMinusUtSeconds": 66.184,
+      "longitudeDegrees": 278.7008307
+    },
+    {
+      "body": "pluto",
       "utc": "2015-01-01T00:00:00Z",
       "jdTt": "2457023.500777592",
       "ttMinusUtSeconds": 67.184,
@@ -3592,6 +4366,20 @@
       "jdTt": "2458849.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 292.3855818
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 298.8933332
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 297.8956326
     },
     {
       "body": "pluto",
@@ -3641,6 +4429,13 @@
       "jdTt": "2467981.500800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 330.9533189
+    },
+    {
+      "body": "pluto",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 339.2277156
     },
     {
       "body": "pluto",
@@ -3739,6 +4534,2801 @@
       "jdTt": "2488070.000800741",
       "ttMinusUtSeconds": 69.184,
       "longitudeDegrees": 32.4003518
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 35.1123374
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 33.3846656
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "ttMinusUtSeconds": 69.184,
+      "longitudeDegrees": 33.3787025
+    }
+  ],
+  "utcCrossCheck": [
+    {
+      "body": "sun",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 279.662698
+    },
+    {
+      "body": "sun",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 279.9345415
+    },
+    {
+      "body": "sun",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 279.7149645
+    },
+    {
+      "body": "sun",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 280.5164197
+    },
+    {
+      "body": "sun",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 280.3045062
+    },
+    {
+      "body": "sun",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 280.0898992
+    },
+    {
+      "body": "sun",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 279.8591931
+    },
+    {
+      "body": "sun",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 279.8592049
+    },
+    {
+      "body": "sun",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 280.3689092
+    },
+    {
+      "body": "sun",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 280.633381
+    },
+    {
+      "body": "sun",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 280.6662111
+    },
+    {
+      "body": "sun",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 280.4511513
+    },
+    {
+      "body": "sun",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 81.4373112
+    },
+    {
+      "body": "sun",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 280.2304304
+    },
+    {
+      "body": "sun",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 280.009492
+    },
+    {
+      "body": "sun",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 128.5252773
+    },
+    {
+      "body": "sun",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 201.3771188
+    },
+    {
+      "body": "sun",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 280.8135882
+    },
+    {
+      "body": "sun",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 280.8136
+    },
+    {
+      "body": "sun",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 229.6109539
+    },
+    {
+      "body": "sun",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 280.6023364
+    },
+    {
+      "body": "sun",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 280.3735306
+    },
+    {
+      "body": "sun",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 280.1573008
+    },
+    {
+      "body": "sun",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 280.9649283
+    },
+    {
+      "body": "sun",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 50.7582115
+    },
+    {
+      "body": "sun",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 280.7483826
+    },
+    {
+      "body": "sun",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 280.5237823
+    },
+    {
+      "body": "sun",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 280.3023801
+    },
+    {
+      "body": "sun",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 126.2151511
+    },
+    {
+      "body": "sun",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 281.1130773
+    },
+    {
+      "body": "sun",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 280.8897246
+    },
+    {
+      "body": "sun",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 280.6706908
+    },
+    {
+      "body": "sun",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 280.4561726
+    },
+    {
+      "body": "sun",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 281.2646119
+    },
+    {
+      "body": "sun",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 281.0422037
+    },
+    {
+      "body": "sun",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 280.8111796
+    },
+    {
+      "body": "sun",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 280.6041809
+    },
+    {
+      "body": "sun",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 280.6041927
+    },
+    {
+      "body": "sun",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 281.1136517
+    },
+    {
+      "body": "sun",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 99.316414
+    },
+    {
+      "body": "sun",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 279.3443271
+    },
+    {
+      "body": "sun",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 280.3638289
+    },
+    {
+      "body": "moon",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 101.6302965
+    },
+    {
+      "body": "moon",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 139.1884502
+    },
+    {
+      "body": "moon",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 83.1579033
+    },
+    {
+      "body": "moon",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 29.7009775
+    },
+    {
+      "body": "moon",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 326.557372
+    },
+    {
+      "body": "moon",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 273.7649851
+    },
+    {
+      "body": "moon",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 217.2931809
+    },
+    {
+      "body": "moon",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 217.2933209
+    },
+    {
+      "body": "moon",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 223.323786
+    },
+    {
+      "body": "moon",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 348.705584
+    },
+    {
+      "body": "moon",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 159.2942272
+    },
+    {
+      "body": "moon",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 103.2443922
+    },
+    {
+      "body": "moon",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 357.7741182
+    },
+    {
+      "body": "moon",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 50.6170294
+    },
+    {
+      "body": "moon",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 346.1383767
+    },
+    {
+      "body": "moon",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 297.4889909
+    },
+    {
+      "body": "moon",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 204.2614513
+    },
+    {
+      "body": "moon",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 293.9134402
+    },
+    {
+      "body": "moon",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 293.9135958
+    },
+    {
+      "body": "moon",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 259.8448224
+    },
+    {
+      "body": "moon",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 238.4215595
+    },
+    {
+      "body": "moon",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 185.6287116
+    },
+    {
+      "body": "moon",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 116.1518599
+    },
+    {
+      "body": "moon",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 66.761235
+    },
+    {
+      "body": "moon",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 150.9895531
+    },
+    {
+      "body": "moon",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 18.6755973
+    },
+    {
+      "body": "moon",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 314.6028159
+    },
+    {
+      "body": "moon",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 247.2330574
+    },
+    {
+      "body": "moon",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 264.7174168
+    },
+    {
+      "body": "moon",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 204.371255
+    },
+    {
+      "body": "moon",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 152.7336219
+    },
+    {
+      "body": "moon",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 85.397125
+    },
+    {
+      "body": "moon",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 18.2629978
+    },
+    {
+      "body": "moon",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 345.204975
+    },
+    {
+      "body": "moon",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 282.9361169
+    },
+    {
+      "body": "moon",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 214.6234238
+    },
+    {
+      "body": "moon",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 157.4114454
+    },
+    {
+      "body": "moon",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 157.4116076
+    },
+    {
+      "body": "moon",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 164.4237531
+    },
+    {
+      "body": "moon",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 25.7260246
+    },
+    {
+      "body": "moon",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 279.3576049
+    },
+    {
+      "body": "moon",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 293.9451964
+    },
+    {
+      "body": "mercury",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 257.1255993
+    },
+    {
+      "body": "mercury",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 287.043471
+    },
+    {
+      "body": "mercury",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 267.9562621
+    },
+    {
+      "body": "mercury",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 257.9738387
+    },
+    {
+      "body": "mercury",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 295.7954362
+    },
+    {
+      "body": "mercury",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 290.4297091
+    },
+    {
+      "body": "mercury",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 271.1117814
+    },
+    {
+      "body": "mercury",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 271.1117994
+    },
+    {
+      "body": "mercury",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 271.8892699
+    },
+    {
+      "body": "mercury",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 284.2714679
+    },
+    {
+      "body": "mercury",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 258.4014327
+    },
+    {
+      "body": "mercury",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 288.9958744
+    },
+    {
+      "body": "mercury",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 98.618702
+    },
+    {
+      "body": "mercury",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 293.6560816
+    },
+    {
+      "body": "mercury",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 274.3833145
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 154.22902
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 197.6188686
+    },
+    {
+      "body": "mercury",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 259.8699528
+    },
+    {
+      "body": "mercury",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 259.8699677
+    },
+    {
+      "body": "mercury",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 215.29665
+    },
+    {
+      "body": "mercury",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 279.4569432
+    },
+    {
+      "body": "mercury",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 296.5727259
+    },
+    {
+      "body": "mercury",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 277.7345752
+    },
+    {
+      "body": "mercury",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 262.0048483
+    },
+    {
+      "body": "mercury",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 45.3758521
+    },
+    {
+      "body": "mercury",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 270.0594888
+    },
+    {
+      "body": "mercury",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 298.9117657
+    },
+    {
+      "body": "mercury",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 281.1394639
+    },
+    {
+      "body": "mercury",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 131.5658868
+    },
+    {
+      "body": "mercury",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 264.5702858
+    },
+    {
+      "body": "mercury",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 263.3689124
+    },
+    {
+      "body": "mercury",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 300.1950685
+    },
+    {
+      "body": "mercury",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 284.5789882
+    },
+    {
+      "body": "mercury",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 267.4265718
+    },
+    {
+      "body": "mercury",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 259.842413
+    },
+    {
+      "body": "mercury",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 299.6602958
+    },
+    {
+      "body": "mercury",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 288.0057534
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 288.0057722
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 288.8176386
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 78.2840252
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 296.8757439
+    },
+    {
+      "body": "mercury",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 298.2941694
+    },
+    {
+      "body": "venus",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 310.7907605
+    },
+    {
+      "body": "venus",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 293.3809132
+    },
+    {
+      "body": "venus",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 311.3974299
+    },
+    {
+      "body": "venus",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 326.3544043
+    },
+    {
+      "body": "venus",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 306.2818333
+    },
+    {
+      "body": "venus",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 233.8570672
+    },
+    {
+      "body": "venus",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 240.9613877
+    },
+    {
+      "body": "venus",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 240.9614017
+    },
+    {
+      "body": "venus",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 241.5657794
+    },
+    {
+      "body": "venus",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 326.9667269
+    },
+    {
+      "body": "venus",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 259.1001546
+    },
+    {
+      "body": "venus",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 277.8499553
+    },
+    {
+      "body": "venus",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 72.1447999
+    },
+    {
+      "body": "venus",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 296.7219753
+    },
+    {
+      "body": "venus",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 314.4094923
+    },
+    {
+      "body": "venus",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 147.0243634
+    },
+    {
+      "body": "venus",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 155.2754705
+    },
+    {
+      "body": "venus",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 327.7120862
+    },
+    {
+      "body": "venus",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 327.7120986
+    },
+    {
+      "body": "venus",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 202.9462034
+    },
+    {
+      "body": "venus",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 289.5470699
+    },
+    {
+      "body": "venus",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 233.5183772
+    },
+    {
+      "body": "venus",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 243.7427554
+    },
+    {
+      "body": "venus",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 262.4020084
+    },
+    {
+      "body": "venus",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 5.6387626
+    },
+    {
+      "body": "venus",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 281.2480383
+    },
+    {
+      "body": "venus",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 300.0341917
+    },
+    {
+      "body": "venus",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 317.3076304
+    },
+    {
+      "body": "venus",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 161.0139016
+    },
+    {
+      "body": "venus",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 328.3326832
+    },
+    {
+      "body": "venus",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 269.8751183
+    },
+    {
+      "body": "venus",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 234.254797
+    },
+    {
+      "body": "venus",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 246.6693287
+    },
+    {
+      "body": "venus",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 265.7349202
+    },
+    {
+      "body": "venus",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 284.6419837
+    },
+    {
+      "body": "venus",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 303.3093683
+    },
+    {
+      "body": "venus",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 320.0704714
+    },
+    {
+      "body": "venus",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 320.0704853
+    },
+    {
+      "body": "venus",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 320.6717014
+    },
+    {
+      "body": "venus",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 55.6804293
+    },
+    {
+      "body": "venus",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 264.5611679
+    },
+    {
+      "body": "venus",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 265.8174304
+    },
+    {
+      "body": "mars",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 3.3803004
+    },
+    {
+      "body": "mars",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 254.9592652
+    },
+    {
+      "body": "mars",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 163.9713069
+    },
+    {
+      "body": "mars",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 335.1394595
+    },
+    {
+      "body": "mars",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 249.6482639
+    },
+    {
+      "body": "mars",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 152.6460188
+    },
+    {
+      "body": "mars",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 327.5754502
+    },
+    {
+      "body": "mars",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 327.5754592
+    },
+    {
+      "body": "mars",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 327.9632921
+    },
+    {
+      "body": "mars",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 214.9377973
+    },
+    {
+      "body": "mars",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 244.3496385
+    },
+    {
+      "body": "mars",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 138.8174871
+    },
+    {
+      "body": "mars",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 169.4386232
+    },
+    {
+      "body": "mars",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 321.0509001
+    },
+    {
+      "body": "mars",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 238.3846079
+    },
+    {
+      "body": "mars",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 163.234706
+    },
+    {
+      "body": "mars",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 211.9157894
+    },
+    {
+      "body": "mars",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 121.9179132
+    },
+    {
+      "body": "mars",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 121.9179094
+    },
+    {
+      "body": "mars",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 143.9493521
+    },
+    {
+      "body": "mars",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 314.7013239
+    },
+    {
+      "body": "mars",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 233.0836793
+    },
+    {
+      "body": "mars",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 102.4864207
+    },
+    {
+      "body": "mars",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 308.5305761
+    },
+    {
+      "body": "mars",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 76.7204393
+    },
+    {
+      "body": "mars",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 227.714694
+    },
+    {
+      "body": "mars",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 81.2164288
+    },
+    {
+      "body": "mars",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 301.7063679
+    },
+    {
+      "body": "mars",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 208.6806403
+    },
+    {
+      "body": "mars",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 222.2705859
+    },
+    {
+      "body": "mars",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 61.195177
+    },
+    {
+      "body": "mars",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 295.7781541
+    },
+    {
+      "body": "mars",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 216.0819825
+    },
+    {
+      "body": "mars",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 44.0405085
+    },
+    {
+      "body": "mars",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 289.9945465
+    },
+    {
+      "body": "mars",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 210.3218426
+    },
+    {
+      "body": "mars",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 29.5253549
+    },
+    {
+      "body": "mars",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 29.5253596
+    },
+    {
+      "body": "mars",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 29.7293429
+    },
+    {
+      "body": "mars",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 132.9855449
+    },
+    {
+      "body": "mars",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 253.2957042
+    },
+    {
+      "body": "mars",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 254.0066286
+    },
+    {
+      "body": "jupiter",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 262.3497454
+    },
+    {
+      "body": "jupiter",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 343.3148465
+    },
+    {
+      "body": "jupiter",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 160.1980397
+    },
+    {
+      "body": "jupiter",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 291.4572732
+    },
+    {
+      "body": "jupiter",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 95.2160871
+    },
+    {
+      "body": "jupiter",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 244.7318447
+    },
+    {
+      "body": "jupiter",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 25.2331082
+    },
+    {
+      "body": "jupiter",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 25.2331086
+    },
+    {
+      "body": "jupiter",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 25.2530685
+    },
+    {
+      "body": "jupiter",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 62.1901497
+    },
+    {
+      "body": "jupiter",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 197.2877455
+    },
+    {
+      "body": "jupiter",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 326.3588373
+    },
+    {
+      "body": "jupiter",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 60.0629328
+    },
+    {
+      "body": "jupiter",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 141.7588084
+    },
+    {
+      "body": "jupiter",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 276.6703386
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 43.6823046
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 43.0034023
+    },
+    {
+      "body": "jupiter",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 73.2154477
+    },
+    {
+      "body": "jupiter",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 73.2154465
+    },
+    {
+      "body": "jupiter",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 145.5124556
+    },
+    {
+      "body": "jupiter",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 230.5745049
+    },
+    {
+      "body": "jupiter",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 5.8320199
+    },
+    {
+      "body": "jupiter",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 181.4555795
+    },
+    {
+      "body": "jupiter",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 310.4542297
+    },
+    {
+      "body": "jupiter",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 91.0271264
+    },
+    {
+      "body": "jupiter",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 121.6915486
+    },
+    {
+      "body": "jupiter",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 262.48746
+    },
+    {
+      "body": "jupiter",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 51.165595
+    },
+    {
+      "body": "jupiter",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 112.0291887
+    },
+    {
+      "body": "jupiter",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 216.1339985
+    },
+    {
+      "body": "jupiter",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 347.5119644
+    },
+    {
+      "body": "jupiter",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 164.5934665
+    },
+    {
+      "body": "jupiter",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 295.0626171
+    },
+    {
+      "body": "jupiter",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 100.4761826
+    },
+    {
+      "body": "jupiter",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 248.4176572
+    },
+    {
+      "body": "jupiter",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 30.2192517
+    },
+    {
+      "body": "jupiter",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 201.206316
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 201.2063173
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 201.2591621
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 193.9690117
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 226.83732
+    },
+    {
+      "body": "jupiter",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 227.0073354
+    },
+    {
+      "body": "saturn",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 60.4242249
+    },
+    {
+      "body": "saturn",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 105.8744363
+    },
+    {
+      "body": "saturn",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 176.9869979
+    },
+    {
+      "body": "saturn",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 234.7303737
+    },
+    {
+      "body": "saturn",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 285.5983638
+    },
+    {
+      "body": "saturn",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 337.9906823
+    },
+    {
+      "body": "saturn",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 40.4058376
+    },
+    {
+      "body": "saturn",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 40.4058374
+    },
+    {
+      "body": "saturn",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 40.3956366
+    },
+    {
+      "body": "saturn",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 54.5910304
+    },
+    {
+      "body": "saturn",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 114.9304938
+    },
+    {
+      "body": "saturn",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 184.5065709
+    },
+    {
+      "body": "saturn",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 202.9102531
+    },
+    {
+      "body": "saturn",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 240.8662688
+    },
+    {
+      "body": "saturn",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 291.3949664
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 335.7128216
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 330.8616469
+    },
+    {
+      "body": "saturn",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 344.5240516
+    },
+    {
+      "body": "saturn",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 344.5240525
+    },
+    {
+      "body": "saturn",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 8.6674666
+    },
+    {
+      "body": "saturn",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 48.3977689
+    },
+    {
+      "body": "saturn",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 123.5818238
+    },
+    {
+      "body": "saturn",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 191.6545614
+    },
+    {
+      "body": "saturn",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 247.1008803
+    },
+    {
+      "body": "saturn",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 297.3896596
+    },
+    {
+      "body": "saturn",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 297.5742805
+    },
+    {
+      "body": "saturn",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 351.4992135
+    },
+    {
+      "body": "saturn",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 57.1547974
+    },
+    {
+      "body": "saturn",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 86.7975749
+    },
+    {
+      "body": "saturn",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 132.4892179
+    },
+    {
+      "body": "saturn",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 198.8626372
+    },
+    {
+      "body": "saturn",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 253.1028167
+    },
+    {
+      "body": "saturn",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 303.4591954
+    },
+    {
+      "body": "saturn",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 358.3078062
+    },
+    {
+      "body": "saturn",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 65.4114407
+    },
+    {
+      "body": "saturn",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 140.791015
+    },
+    {
+      "body": "saturn",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 205.6316619
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 205.6316626
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 205.6604692
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 199.9657943
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 216.8800087
+    },
+    {
+      "body": "saturn",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 216.955333
+    },
+    {
+      "body": "uranus",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 198.0903794
+    },
+    {
+      "body": "uranus",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 211.8777955
+    },
+    {
+      "body": "uranus",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 234.0475814
+    },
+    {
+      "body": "uranus",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 255.3654395
+    },
+    {
+      "body": "uranus",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 275.7554118
+    },
+    {
+      "body": "uranus",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 295.4724679
+    },
+    {
+      "body": "uranus",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 314.7840513
+    },
+    {
+      "body": "uranus",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 314.7840519
+    },
+    {
+      "body": "uranus",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 314.809168
+    },
+    {
+      "body": "uranus",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 318.6500066
+    },
+    {
+      "body": "uranus",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 333.9116335
+    },
+    {
+      "body": "uranus",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 353.0900719
+    },
+    {
+      "body": "uranus",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 8.147002
+    },
+    {
+      "body": "uranus",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 12.6133443
+    },
+    {
+      "body": "uranus",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 32.6940395
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 52.7487948
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 52.2198113
+    },
+    {
+      "body": "uranus",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 53.6358248
+    },
+    {
+      "body": "uranus",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 53.6358245
+    },
+    {
+      "body": "uranus",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 64.2528811
+    },
+    {
+      "body": "uranus",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 75.5576365
+    },
+    {
+      "body": "uranus",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 98.4545423
+    },
+    {
+      "body": "uranus",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 122.2532499
+    },
+    {
+      "body": "uranus",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 146.4804755
+    },
+    {
+      "body": "uranus",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 161.8375183
+    },
+    {
+      "body": "uranus",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 170.7326106
+    },
+    {
+      "body": "uranus",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 194.5339712
+    },
+    {
+      "body": "uranus",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 217.4771786
+    },
+    {
+      "body": "uranus",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 218.8689558
+    },
+    {
+      "body": "uranus",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 239.5331356
+    },
+    {
+      "body": "uranus",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 260.620288
+    },
+    {
+      "body": "uranus",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 280.8373828
+    },
+    {
+      "body": "uranus",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 300.4795095
+    },
+    {
+      "body": "uranus",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 319.7884178
+    },
+    {
+      "body": "uranus",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 338.8659195
+    },
+    {
+      "body": "uranus",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 358.1165696
+    },
+    {
+      "body": "uranus",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 17.7413059
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 17.741306
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 17.7436853
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 25.3097215
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 21.7311973
+    },
+    {
+      "body": "uranus",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 21.7317202
+    },
+    {
+      "body": "neptune",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 244.0990975
+    },
+    {
+      "body": "neptune",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 250.4333961
+    },
+    {
+      "body": "neptune",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 260.9227809
+    },
+    {
+      "body": "neptune",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 271.4850436
+    },
+    {
+      "body": "neptune",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 282.0191365
+    },
+    {
+      "body": "neptune",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 292.5679395
+    },
+    {
+      "body": "neptune",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 303.1752428
+    },
+    {
+      "body": "neptune",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 303.1752432
+    },
+    {
+      "body": "neptune",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 303.1930007
+    },
+    {
+      "body": "neptune",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 305.3272203
+    },
+    {
+      "body": "neptune",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 313.8466349
+    },
+    {
+      "body": "neptune",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 324.5820819
+    },
+    {
+      "body": "neptune",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 333.1375446
+    },
+    {
+      "body": "neptune",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 335.3845348
+    },
+    {
+      "body": "neptune",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 346.2645207
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 357.4342864
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 355.5952324
+    },
+    {
+      "body": "neptune",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 357.2978078
+    },
+    {
+      "body": "neptune",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 357.297808
+    },
+    {
+      "body": "neptune",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 1.8772802
+    },
+    {
+      "body": "neptune",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 8.37814
+    },
+    {
+      "body": "neptune",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 19.5622323
+    },
+    {
+      "body": "neptune",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 30.8374797
+    },
+    {
+      "body": "neptune",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 42.1679055
+    },
+    {
+      "body": "neptune",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 53.4479272
+    },
+    {
+      "body": "neptune",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 53.6034215
+    },
+    {
+      "body": "neptune",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 65.054618
+    },
+    {
+      "body": "neptune",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 76.5583491
+    },
+    {
+      "body": "neptune",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 82.1849379
+    },
+    {
+      "body": "neptune",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 88.0646724
+    },
+    {
+      "body": "neptune",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 99.5449531
+    },
+    {
+      "body": "neptune",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 111.0175895
+    },
+    {
+      "body": "neptune",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 122.424038
+    },
+    {
+      "body": "neptune",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 133.7438386
+    },
+    {
+      "body": "neptune",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 145.0232593
+    },
+    {
+      "body": "neptune",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 156.1831191
+    },
+    {
+      "body": "neptune",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 167.2905217
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 167.2905217
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 167.2868565
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 164.8992767
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 169.5085076
+    },
+    {
+      "body": "neptune",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 169.5029737
+    },
+    {
+      "body": "pluto",
+      "utc": "1972-01-01T00:00:00Z",
+      "jdUt": "2441317.500000000",
+      "longitudeDegrees": 182.0490356
+    },
+    {
+      "body": "pluto",
+      "utc": "1975-01-01T00:00:00Z",
+      "jdUt": "2442413.500000000",
+      "longitudeDegrees": 189.2226847
+    },
+    {
+      "body": "pluto",
+      "utc": "1980-01-01T00:00:00Z",
+      "jdUt": "2444239.500000000",
+      "longitudeDegrees": 201.6073363
+    },
+    {
+      "body": "pluto",
+      "utc": "1985-01-01T00:00:00Z",
+      "jdUt": "2446066.500000000",
+      "longitudeDegrees": 214.3607716
+    },
+    {
+      "body": "pluto",
+      "utc": "1990-01-01T00:00:00Z",
+      "jdUt": "2447892.500000000",
+      "longitudeDegrees": 227.0793833
+    },
+    {
+      "body": "pluto",
+      "utc": "1995-01-01T00:00:00Z",
+      "jdUt": "2449718.500000000",
+      "longitudeDegrees": 239.5229201
+    },
+    {
+      "body": "pluto",
+      "utc": "1999-12-31T23:59:59Z",
+      "jdUt": "2451544.499988426",
+      "longitudeDegrees": 251.4371496
+    },
+    {
+      "body": "pluto",
+      "utc": "2000-01-01T00:00:00Z",
+      "jdUt": "2451544.500000000",
+      "longitudeDegrees": 251.43715
+    },
+    {
+      "body": "pluto",
+      "utc": "2000-01-01T12:00:00Z",
+      "jdUt": "2451545.000000000",
+      "longitudeDegrees": 251.4547644
+    },
+    {
+      "body": "pluto",
+      "utc": "2000-12-31T23:59:59Z",
+      "jdUt": "2451910.499988426",
+      "longitudeDegrees": 253.7681356
+    },
+    {
+      "body": "pluto",
+      "utc": "2005-01-01T00:00:00Z",
+      "jdUt": "2453371.500000000",
+      "longitudeDegrees": 262.7239699
+    },
+    {
+      "body": "pluto",
+      "utc": "2010-01-01T00:00:00Z",
+      "jdUt": "2455197.500000000",
+      "longitudeDegrees": 273.3087995
+    },
+    {
+      "body": "pluto",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdUt": "2456090.500000000",
+      "longitudeDegrees": 278.7008307
+    },
+    {
+      "body": "pluto",
+      "utc": "2015-01-01T00:00:00Z",
+      "jdUt": "2457023.500000000",
+      "longitudeDegrees": 283.1648881
+    },
+    {
+      "body": "pluto",
+      "utc": "2020-01-01T00:00:00Z",
+      "jdUt": "2458849.500000000",
+      "longitudeDegrees": 292.3855818
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdUt": "2460157.500000000",
+      "longitudeDegrees": 298.8933332
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdUt": "2460232.500000000",
+      "longitudeDegrees": 297.8956326
+    },
+    {
+      "body": "pluto",
+      "utc": "2024-12-31T23:59:59Z",
+      "jdUt": "2460676.499988426",
+      "longitudeDegrees": 301.064776
+    },
+    {
+      "body": "pluto",
+      "utc": "2025-01-01T00:00:00Z",
+      "jdUt": "2460676.500000000",
+      "longitudeDegrees": 301.0647764
+    },
+    {
+      "body": "pluto",
+      "utc": "2026-11-12T00:00:00Z",
+      "jdUt": "2461356.500000000",
+      "longitudeDegrees": 303.2398186
+    },
+    {
+      "body": "pluto",
+      "utc": "2030-01-01T00:00:00Z",
+      "jdUt": "2462502.500000000",
+      "longitudeDegrees": 309.1648402
+    },
+    {
+      "body": "pluto",
+      "utc": "2035-01-01T00:00:00Z",
+      "jdUt": "2464328.500000000",
+      "longitudeDegrees": 316.8169168
+    },
+    {
+      "body": "pluto",
+      "utc": "2040-01-01T00:00:00Z",
+      "jdUt": "2466154.500000000",
+      "longitudeDegrees": 324.0416277
+    },
+    {
+      "body": "pluto",
+      "utc": "2045-01-01T00:00:00Z",
+      "jdUt": "2467981.500000000",
+      "longitudeDegrees": 330.9533189
+    },
+    {
+      "body": "pluto",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdUt": "2469572.500000000",
+      "longitudeDegrees": 339.2277156
+    },
+    {
+      "body": "pluto",
+      "utc": "2050-01-01T00:00:00Z",
+      "jdUt": "2469807.500000000",
+      "longitudeDegrees": 337.5330679
+    },
+    {
+      "body": "pluto",
+      "utc": "2055-01-01T00:00:00Z",
+      "jdUt": "2471633.500000000",
+      "longitudeDegrees": 343.8122859
+    },
+    {
+      "body": "pluto",
+      "utc": "2060-01-01T00:00:00Z",
+      "jdUt": "2473459.500000000",
+      "longitudeDegrees": 349.8787075
+    },
+    {
+      "body": "pluto",
+      "utc": "2061-07-28T18:30:00Z",
+      "jdUt": "2474034.270833333",
+      "longitudeDegrees": 354.0226732
+    },
+    {
+      "body": "pluto",
+      "utc": "2065-01-01T00:00:00Z",
+      "jdUt": "2475286.500000000",
+      "longitudeDegrees": 355.7214358
+    },
+    {
+      "body": "pluto",
+      "utc": "2070-01-01T00:00:00Z",
+      "jdUt": "2477112.500000000",
+      "longitudeDegrees": 1.3656936
+    },
+    {
+      "body": "pluto",
+      "utc": "2075-01-01T00:00:00Z",
+      "jdUt": "2478938.500000000",
+      "longitudeDegrees": 6.8389276
+    },
+    {
+      "body": "pluto",
+      "utc": "2080-01-01T00:00:00Z",
+      "jdUt": "2480764.500000000",
+      "longitudeDegrees": 12.1652204
+    },
+    {
+      "body": "pluto",
+      "utc": "2085-01-01T00:00:00Z",
+      "jdUt": "2482591.500000000",
+      "longitudeDegrees": 17.3918745
+    },
+    {
+      "body": "pluto",
+      "utc": "2090-01-01T00:00:00Z",
+      "jdUt": "2484417.500000000",
+      "longitudeDegrees": 22.4741119
+    },
+    {
+      "body": "pluto",
+      "utc": "2095-01-01T00:00:00Z",
+      "jdUt": "2486243.500000000",
+      "longitudeDegrees": 27.4756687
+    },
+    {
+      "body": "pluto",
+      "utc": "2099-12-31T23:59:59Z",
+      "jdUt": "2488069.499988426",
+      "longitudeDegrees": 32.4030241
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-01-01T00:00:00Z",
+      "jdUt": "2488069.500000000",
+      "longitudeDegrees": 32.4030241
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-01-01T12:00:00Z",
+      "jdUt": "2488070.000000000",
+      "longitudeDegrees": 32.4003518
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-07-01T00:00:00Z",
+      "jdUt": "2488250.500000000",
+      "longitudeDegrees": 35.1123374
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-12-31T00:00:00Z",
+      "jdUt": "2488433.500000000",
+      "longitudeDegrees": 33.3846656
+    },
+    {
+      "body": "pluto",
+      "utc": "2100-12-31T23:59:59Z",
+      "jdUt": "2488434.499988426",
+      "longitudeDegrees": 33.3787025
+    }
+  ],
+  "timeScaleControl": [
+    {
+      "utc": "1899-12-31T12:00:00Z",
+      "jdUt": "2415020.000000000",
+      "tdbMinusUtSeconds": -1.946024,
+      "jdTtDerived": "2415019.999977476",
+      "longitudeAtUt": 265.2969812,
+      "longitudeAtTt": 265.2969812
+    },
+    {
+      "utc": "1900-01-01T00:00:00Z",
+      "jdUt": "2415020.500000000",
+      "tdbMinusUtSeconds": -1.944461,
+      "jdTtDerived": "2415020.499977495",
+      "longitudeAtUt": 272.4162663,
+      "longitudeAtTt": 272.4162663
+    },
+    {
+      "utc": "1905-01-01T00:00:00Z",
+      "jdUt": "2416846.500000000",
+      "tdbMinusUtSeconds": 4.949941,
+      "jdTtDerived": "2416846.500057291",
+      "longitudeAtUt": 220.3362504,
+      "longitudeAtTt": 220.3362504
+    },
+    {
+      "utc": "1910-01-01T00:00:00Z",
+      "jdUt": "2418672.500000000",
+      "tdbMinusUtSeconds": 11.163871,
+      "jdTtDerived": "2418672.500129212",
+      "longitudeAtUt": 161.4934018,
+      "longitudeAtTt": 161.4934018
+    },
+    {
+      "utc": "1912-06-30T06:00:00Z",
+      "jdUt": "2419583.750000000",
+      "tdbMinusUtSeconds": 14.424893,
+      "jdTtDerived": "2419583.750166955",
+      "longitudeAtUt": 285.6160669,
+      "longitudeAtTt": 285.6160669
+    },
+    {
+      "utc": "1915-01-01T00:00:00Z",
+      "jdUt": "2420498.500000000",
+      "tdbMinusUtSeconds": 17.496329,
+      "jdTtDerived": "2420498.500202504",
+      "longitudeAtUt": 93.6052119,
+      "longitudeAtTt": 93.6052119
+    },
+    {
+      "utc": "1920-01-01T00:00:00Z",
+      "jdUt": "2422324.500000000",
+      "tdbMinusUtSeconds": 21.630315,
+      "jdTtDerived": "2422324.500250351",
+      "longitudeAtUt": 32.0814874,
+      "longitudeAtTt": 32.0814874
+    },
+    {
+      "utc": "1925-01-01T00:00:00Z",
+      "jdUt": "2424151.500000000",
+      "tdbMinusUtSeconds": 23.798827,
+      "jdTtDerived": "2424151.500275449",
+      "longitudeAtUt": 358.3813501,
+      "longitudeAtTt": 358.3813501
+    },
+    {
+      "utc": "1930-01-01T00:00:00Z",
+      "jdUt": "2425977.500000000",
+      "tdbMinusUtSeconds": 24.424869,
+      "jdTtDerived": "2425977.500282695",
+      "longitudeAtUt": 290.8622612,
+      "longitudeAtTt": 290.8622612
+    },
+    {
+      "utc": "1935-01-01T00:00:00Z",
+      "jdUt": "2427803.500000000",
+      "tdbMinusUtSeconds": 24.16844,
+      "jdTtDerived": "2427803.500279727",
+      "longitudeAtUt": 223.8477748,
+      "longitudeAtTt": 223.8477748
+    },
+    {
+      "utc": "1940-01-01T00:00:00Z",
+      "jdUt": "2429629.500000000",
+      "tdbMinusUtSeconds": 24.428539,
+      "jdTtDerived": "2429629.500282738",
+      "longitudeAtUt": 173.6697443,
+      "longitudeAtTt": 173.6697443
+    },
+    {
+      "utc": "1945-01-01T00:00:00Z",
+      "jdUt": "2431456.500000000",
+      "tdbMinusUtSeconds": 27.051165,
+      "jdTtDerived": "2431456.500313092",
+      "longitudeAtUt": 128.8648543,
+      "longitudeAtTt": 128.8648543
+    },
+    {
+      "utc": "1950-01-01T00:00:00Z",
+      "jdUt": "2433282.500000000",
+      "tdbMinusUtSeconds": 28.93232,
+      "jdTtDerived": "2433282.500334865",
+      "longitudeAtUt": 61.4154091,
+      "longitudeAtTt": 61.4154091
+    },
+    {
+      "utc": "1950-12-31T23:59:59Z",
+      "jdUt": "2433647.499988426",
+      "tdbMinusUtSeconds": 29.321707,
+      "jdTtDerived": "2433647.500327798",
+      "longitudeAtUt": 187.0562425,
+      "longitudeAtTt": 187.0562425
+    },
+    {
+      "utc": "1953-11-18T00:00:00Z",
+      "jdUt": "2434699.500000000",
+      "tdbMinusUtSeconds": 30.181555,
+      "jdTtDerived": "2434699.500349324",
+      "longitudeAtUt": 14.3616977,
+      "longitudeAtTt": 14.3616976
+    },
+    {
+      "utc": "1955-01-01T00:00:00Z",
+      "jdUt": "2435108.500000000",
+      "tdbMinusUtSeconds": 30.409188,
+      "jdTtDerived": "2435108.500351958",
+      "longitudeAtUt": 358.8977646,
+      "longitudeAtTt": 358.8977646
+    },
+    {
+      "utc": "1956-09-10T00:00:00Z",
+      "jdUt": "2435726.500000000",
+      "tdbMinusUtSeconds": 31.143738,
+      "jdTtDerived": "2435726.500360460",
+      "longitudeAtUt": 234.3349049,
+      "longitudeAtTt": 234.3349047
+    },
+    {
+      "utc": "1960-01-01T00:00:00Z",
+      "jdUt": "2436934.500000000",
+      "tdbMinusUtSeconds": 33.072251,
+      "jdTtDerived": "2436934.500382781",
+      "longitudeAtUt": 310.2649128,
+      "longitudeAtTt": 310.2649128
+    },
+    {
+      "utc": "1965-01-01T00:00:00Z",
+      "jdUt": "2438761.500000000",
+      "tdbMinusUtSeconds": 35.72406,
+      "jdTtDerived": "2438761.500413473",
+      "longitudeAtUt": 260.1151054,
+      "longitudeAtTt": 260.1151054
+    },
+    {
+      "utc": "1969-07-20T20:17:00Z",
+      "jdUt": "2440423.345138889",
+      "tdbMinusUtSeconds": 39.758124,
+      "jdTtDerived": "2440423.345599052",
+      "longitudeAtUt": 187.8737519,
+      "longitudeAtTt": 187.8737518
+    },
+    {
+      "utc": "1970-01-01T00:00:00Z",
+      "jdUt": "2440587.500000000",
+      "tdbMinusUtSeconds": 40.184032,
+      "jdTtDerived": "2440587.500465093",
+      "longitudeAtUt": 190.6990372,
+      "longitudeAtTt": 190.6990372
+    },
+    {
+      "utc": "1971-12-31T23:59:59Z",
+      "jdUt": "2441317.499988426",
+      "tdbMinusUtSeconds": 42.076161,
+      "jdTtDerived": "2441317.500475419",
+      "longitudeAtUt": 101.630119,
+      "longitudeAtTt": 101.630119
+    }
+  ],
+  "retrogradeEvidence": [
+    {
+      "body": "mercury",
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTtBefore": "2434696.500353845",
+      "longitudeBefore": 231.6731315,
+      "jdTtAfter": "2434702.500353845",
+      "longitudeAfter": 225.4173393
+    },
+    {
+      "body": "mercury",
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTtBefore": "2469569.500800741",
+      "longitudeBefore": 47.1968723,
+      "jdTtAfter": "2469575.500800741",
+      "longitudeAfter": 43.8165796
+    },
+    {
+      "body": "venus",
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTtBefore": "2456087.500766018",
+      "longitudeBefore": 73.9062984,
+      "jdTtAfter": "2456093.500766018",
+      "longitudeAfter": 70.5868259
+    },
+    {
+      "body": "mars",
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTtBefore": "2435723.500365315",
+      "longitudeBefore": 349.2266378,
+      "jdTtAfter": "2435729.500365315",
+      "longitudeAfter": 347.5727297
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTtBefore": "2460229.500800741",
+      "longitudeBefore": 43.3480764,
+      "jdTtAfter": "2460235.500800741",
+      "longitudeAfter": 42.6419757
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTtBefore": "2460154.500800741",
+      "longitudeBefore": 335.8958339,
+      "jdTtAfter": "2460160.500800741",
+      "longitudeAfter": 335.521144
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTtBefore": "2460229.500800741",
+      "longitudeBefore": 52.3191148,
+      "jdTtAfter": "2460235.500800741",
+      "longitudeAfter": 52.1160856
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTtBefore": "2460154.500800741",
+      "longitudeBefore": 357.4792494,
+      "jdTtAfter": "2460160.500800741",
+      "longitudeAfter": 357.3852831
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTtBefore": "2460154.500800741",
+      "longitudeBefore": 298.9636611,
+      "jdTtAfter": "2460160.500800741",
+      "longitudeAfter": 298.8236455
     }
   ]
 }

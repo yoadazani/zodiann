@@ -21,22 +21,23 @@
 // request has 60 seconds in all; a timeout or any other failure stops the run,
 // and nothing is retried or sent again.
 //
-// The only network code of the tool; a one-off host tool, never part of the app
-// (the app never touches the network: test/architecture/no_network_test.dart).
+// The requests are made by horizons/download.dart. A one-off host tool, never
+// part of the app (the app never touches the network:
+// test/architecture/no_network_test.dart).
 // Design: docs/superpowers/specs/
 // 2026-11-26-zod-tst-001-horizons-reference-design.md, sections 4 to 8.
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:astro_core/astro_core.dart';
 import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 
+import 'horizons/download.dart';
 import 'horizons/horizons.dart';
 import 'horizons/swiss_host.dart';
 
-/// An HTTP answer, its body as received.
-typedef HorizonsResponse = ({int statusCode, List<int> bytes});
+export 'horizons/download.dart'
+    show HorizonsResponse, horizonsHttpGet, horizonsRequestTimeout;
 
 const _usage =
     'usage: dart run tool/fetch_horizons_reference.dart\n'
@@ -209,32 +210,6 @@ List<Uri> datasetRequestUris({
   ];
 }
 
-/// The path segments of a file URI, normalised, and in one case on Windows.
-List<String> _segments(Uri uri) => [
-  for (final segment in uri.normalizePath().pathSegments)
-    if (segment.isNotEmpty)
-      Platform.isWindows ? segment.toLowerCase() : segment,
-];
-
-/// Why [path] cannot receive the answers, or null if it can: it must lie outside
-/// the repository of [packageRoot], and not exist or be an empty directory, so
-/// no earlier answer is ever overwritten.
-String? _outputRefusal(Uri packageRoot, String path) {
-  final root = _segments(packageRoot.resolve('../../'));
-  final target = _segments(Directory(path).absolute.uri);
-  var inside = target.length >= root.length;
-  for (var i = 0; inside && i < root.length; i++) {
-    inside = target[i] == root[i];
-  }
-  if (inside) return '$path is inside the repository';
-  return switch (FileSystemEntity.typeSync(path)) {
-    FileSystemEntityType.notFound => null,
-    FileSystemEntityType.directory when Directory(path).listSync().isEmpty =>
-      null,
-    _ => '$path exists and is not an empty directory',
-  };
-}
-
 /// Sends [request] once, saves the answer unchanged as [name] in [directory]
 /// and then reads it. With [saveUri] the URI is saved before it is sent.
 Future<HorizonsAnswer> _ask(
@@ -244,26 +219,14 @@ Future<HorizonsAnswer> _ask(
   required Future<HorizonsResponse> Function(Uri uri) get,
   bool saveUri = false,
 }) async {
-  File fileNamed(String fileName) =>
-      File.fromUri(directory.absolute.uri.resolve(fileName));
   final uri = _uriOf(request);
   if (saveUri) {
-    fileNamed('$name.uri.txt').writeAsStringSync('$uri', flush: true);
+    File.fromUri(directory.absolute.uri.resolve('$name.uri.txt'))
+        .writeAsStringSync('$uri', flush: true);
   }
-  final response = await get(uri);
-  final suffix = response.statusCode == 200
-      ? ''
-      : '.http${response.statusCode}';
-  final file = fileNamed('$name$suffix.txt')
-    ..writeAsBytesSync(response.bytes, flush: true);
-  if (response.statusCode != 200) {
-    throw HttpException(
-      'HTTP ${response.statusCode}; the answer is in ${file.path}',
-      uri: uri,
-    );
-  }
+  final text = await downloadHorizonsAnswer(directory, name, uri, get);
   return parseHorizonsAnswer(
-    utf8.decode(response.bytes),
+    text,
     command: request.command,
     timeType: request.timeType,
     julianDays: request.julianDays,
@@ -309,7 +272,7 @@ Future<int> runHorizonsTool(
     default:
       return refuse('unrecognised arguments: ${arguments.join(' ')}');
   }
-  final refusal = _outputRefusal(packageRoot, path);
+  final refusal = horizonsOutputRefusal(packageRoot.resolve('../../'), path);
   if (refusal != null) return refuse(refusal);
 
   /// The library delta T of each of [instants], keyed by it.
@@ -545,42 +508,6 @@ Future<int> runHorizonsTool(
     ..writeln('${(dataset['entries']! as List<Object?>).length} entries')
     ..writeln('${baselineRows.length} baseline rows unchanged');
   return 0;
-}
-
-/// The longest one request may take, from connecting to the last byte.
-const horizonsRequestTimeout = Duration(seconds: 60);
-
-/// Sends one GET of [uri] and returns the status and the whole body. The request
-/// is sent once: it is never retried, and a redirect is not followed.
-///
-/// Throws [TimeoutException] if the whole answer has not arrived within
-/// [timeout], and [HttpException] if the connection ends before the answer is
-/// complete. Either way the connection is closed and nothing of the incomplete
-/// answer is returned.
-Future<HorizonsResponse> horizonsHttpGet(
-  Uri uri, {
-  Duration timeout = horizonsRequestTimeout,
-}) async {
-  final client = HttpClient();
-  Future<HorizonsResponse> get() async {
-    final request = await client.getUrl(uri);
-    request.followRedirects = false;
-    final response = await request.close();
-    final bytes = <int>[];
-    await response.forEach(bytes.addAll);
-    return (statusCode: response.statusCode, bytes: bytes);
-  }
-
-  try {
-    return await get().timeout(
-      timeout,
-      onTimeout: () =>
-          throw TimeoutException('no complete answer from $uri', timeout),
-    );
-  } finally {
-    // Forced, so an abandoned request does not stay open.
-    client.close(force: true);
-  }
 }
 
 Future<void> main(List<String> arguments) async {

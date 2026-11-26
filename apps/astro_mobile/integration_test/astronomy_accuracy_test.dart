@@ -1,7 +1,9 @@
 // ZOD-EPH-004 Task 5 (D12): ACC-2 on a device. The astronomy-engine adapter,
 // running the real C library through FFI, against JPL Horizons for all ten
 // physical bodies at every instant of packages/astro_core/test/fixtures/
-// reference_dates.json, within one arcminute, **at equivalent TT instants**.
+// reference_dates.json within the Backup's covered range, 1899-12-31T12:00Z to
+// 2100-01-01T12:00Z (61 instants), within one arcminute, **at equivalent TT
+// instants**.
 // Run on an Android device or emulator:
 //   flutter test integration_test/astronomy_accuracy_test.dart -d <device>
 //
@@ -107,12 +109,12 @@ void main() {
             reason: 'delta T at ${reference.utc}',
           );
         }
-        expect(seen, hasLength(53));
+        expect(seen, hasLength(61));
       },
     );
   });
 
-  test('ACC-2 gate: all ten bodies, 53 instants, within 60 arcseconds of '
+  test('ACC-2 gate: all ten bodies, 61 instants, within 60 arcseconds of '
       'Horizons at the equivalent TT instants', () {
     // What this comparison is: the adapter is called with each reference UTC
     // instant through the production path; Horizons was asked at the TT the

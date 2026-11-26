@@ -3,7 +3,7 @@
 // packages/ephemeris_astronomy/test/fixtures/reference_longitudes_tt.json
 // (JPL Horizons, quantity 31, geocentric, apparent, asked at the
 // TT the adapter assigns to each UTC instant, retrieved
-// 2026-11-22). `test/astronomy_reference_longitudes_tt_match_test.dart`
+// 2026-11-26). `test/astronomy_reference_longitudes_tt_match_test.dart`
 // keeps this copy equal to the fixture. `utc` is an ISO-8601 string
 // because DateTime is not const.
 
@@ -134,11 +134,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'sun',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 235.3582746,
+  ),
+  (
+    body: 'sun',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 279.7937597,
+  ),
+  (
+    body: 'sun',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 167.2549816,
   ),
   (
     body: 'sun',
@@ -171,6 +187,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 280.1562707,
+  ),
+  (
+    body: 'sun',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 279.6626865,
+  ),
+  (
+    body: 'sun',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 279.6626983,
   ),
   (
     body: 'sun',
@@ -262,6 +294,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'sun',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 81.4373289,
+  ),
+  (
+    body: 'sun',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -275,6 +315,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 280.0095202,
+  ),
+  (
+    body: 'sun',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 128.5253261,
+  ),
+  (
+    body: 'sun',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 201.3771709,
   ),
   (
     body: 'sun',
@@ -306,7 +362,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 280.6024354,
+    longitudeDegrees: 280.6024356,
   ),
   (
     body: 'sun',
@@ -314,7 +370,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 280.37367,
+    longitudeDegrees: 280.3736701,
   ),
   (
     body: 'sun',
@@ -322,7 +378,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 280.1574838,
+    longitudeDegrees: 280.157484,
   ),
   (
     body: 'sun',
@@ -330,7 +386,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 280.9651584,
+    longitudeDegrees: 280.9651586,
+  ),
+  (
+    body: 'sun',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 50.7584712,
   ),
   (
     body: 'sun',
@@ -338,7 +402,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 280.748663,
+    longitudeDegrees: 280.7486631,
   ),
   (
     body: 'sun',
@@ -346,7 +410,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 280.5241833,
+    longitudeDegrees: 280.5241834,
   ),
   (
     body: 'sun',
@@ -354,7 +418,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 280.3029039,
+    longitudeDegrees: 280.3029041,
   ),
   (
     body: 'sun',
@@ -362,7 +426,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 126.2156786,
+    longitudeDegrees: 126.2156788,
   ),
   (
     body: 'sun',
@@ -370,7 +434,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 281.1137258,
+    longitudeDegrees: 281.113726,
   ),
   (
     body: 'sun',
@@ -378,7 +442,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 280.8904993,
+    longitudeDegrees: 280.8904995,
   ),
   (
     body: 'sun',
@@ -386,7 +450,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 280.6715939,
+    longitudeDegrees: 280.6715941,
   ),
   (
     body: 'sun',
@@ -394,7 +458,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 280.4572064,
+    longitudeDegrees: 280.4572066,
   ),
   (
     body: 'sun',
@@ -402,7 +466,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 281.2657782,
+    longitudeDegrees: 281.2657784,
   ),
   (
     body: 'sun',
@@ -410,7 +474,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 281.0435044,
+    longitudeDegrees: 281.0435046,
   ),
   (
     body: 'sun',
@@ -418,7 +482,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 280.812616,
+    longitudeDegrees: 280.8126162,
   ),
   (
     body: 'sun',
@@ -426,7 +490,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 280.6057547,
+    longitudeDegrees: 280.6057549,
   ),
   (
     body: 'sun',
@@ -434,7 +498,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 280.6057665,
+    longitudeDegrees: 280.6057667,
   ),
   (
     body: 'sun',
@@ -442,7 +506,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 281.1152256,
+    longitudeDegrees: 281.1152258,
   ),
   (
     body: 'moon',
@@ -558,11 +622,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'moon',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 14.3617679,
+  ),
+  (
+    body: 'moon',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 358.897863,
+  ),
+  (
+    body: 'moon',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 234.334987,
   ),
   (
     body: 'moon',
@@ -595,6 +675,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 190.6990328,
+  ),
+  (
+    body: 'moon',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 101.6301403,
+  ),
+  (
+    body: 'moon',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 101.6303006,
   ),
   (
     body: 'moon',
@@ -686,6 +782,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'moon',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 357.774345,
+  ),
+  (
+    body: 'moon',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -699,6 +803,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 346.1387066,
+  ),
+  (
+    body: 'moon',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 297.4897675,
+  ),
+  (
+    body: 'moon',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 204.2621026,
   ),
   (
     body: 'moon',
@@ -730,7 +850,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 238.4229802,
+    longitudeDegrees: 238.4229804,
   ),
   (
     body: 'moon',
@@ -738,7 +858,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 185.6304165,
+    longitudeDegrees: 185.6304167,
   ),
   (
     body: 'moon',
@@ -746,7 +866,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 116.1540045,
+    longitudeDegrees: 116.1540047,
   ),
   (
     body: 'moon',
@@ -754,7 +874,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 66.7645587,
+    longitudeDegrees: 66.7645589,
+  ),
+  (
+    body: 'moon',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 150.9928343,
   ),
   (
     body: 'moon',
@@ -762,7 +890,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 18.6793118,
+    longitudeDegrees: 18.679312,
   ),
   (
     body: 'moon',
@@ -770,7 +898,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 314.6075518,
+    longitudeDegrees: 314.607552,
   ),
   (
     body: 'moon',
@@ -778,7 +906,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 247.2396422,
+    longitudeDegrees: 247.2396424,
   ),
   (
     body: 'moon',
@@ -786,7 +914,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 264.7240409,
+    longitudeDegrees: 264.7240411,
   ),
   (
     body: 'moon',
@@ -794,7 +922,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 204.380328,
+    longitudeDegrees: 204.3803282,
   ),
   (
     body: 'moon',
@@ -802,7 +930,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 152.7436851,
+    longitudeDegrees: 152.7436853,
   ),
   (
     body: 'moon',
@@ -810,7 +938,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 85.4076386,
+    longitudeDegrees: 85.4076388,
   ),
   (
     body: 'moon',
@@ -818,7 +946,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 18.2764323,
+    longitudeDegrees: 18.2764325,
   ),
   (
     body: 'moon',
@@ -826,7 +954,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 345.2212661,
+    longitudeDegrees: 345.2212663,
   ),
   (
     body: 'moon',
@@ -834,7 +962,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 282.9518038,
+    longitudeDegrees: 282.951804,
   ),
   (
     body: 'moon',
@@ -842,7 +970,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 214.6408277,
+    longitudeDegrees: 214.6408279,
   ),
   (
     body: 'moon',
@@ -850,7 +978,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 157.4330904,
+    longitudeDegrees: 157.4330905,
   ),
   (
     body: 'moon',
@@ -858,7 +986,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 157.4332525,
+    longitudeDegrees: 157.4332527,
   ),
   (
     body: 'moon',
@@ -866,7 +994,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 164.4454353,
+    longitudeDegrees: 164.4454355,
   ),
   (
     body: 'mercury',
@@ -982,11 +1110,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'mercury',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 227.9389814,
+  ),
+  (
+    body: 'mercury',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 283.6070412,
+  ),
+  (
+    body: 'mercury',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 191.5514096,
   ),
   (
     body: 'mercury',
@@ -1019,6 +1163,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 299.021455,
+  ),
+  (
+    body: 'mercury',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 257.1255884,
+  ),
+  (
+    body: 'mercury',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 257.1255996,
   ),
   (
     body: 'mercury',
@@ -1110,6 +1270,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'mercury',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 98.6187354,
+  ),
+  (
+    body: 'mercury',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -1123,6 +1291,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 274.3833581,
+  ),
+  (
+    body: 'mercury',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 154.229087,
+  ),
+  (
+    body: 'mercury',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 197.6189598,
   ),
   (
     body: 'mercury',
@@ -1154,7 +1338,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 279.4568104,
+    longitudeDegrees: 279.4568106,
   ),
   (
     body: 'mercury',
@@ -1162,7 +1346,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 296.5729324,
+    longitudeDegrees: 296.5729326,
   ),
   (
     body: 'mercury',
@@ -1170,7 +1354,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 277.7348614,
+    longitudeDegrees: 277.7348616,
   ),
   (
     body: 'mercury',
@@ -1178,7 +1362,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 262.0051624,
+    longitudeDegrees: 262.0051626,
+  ),
+  (
+    body: 'mercury',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 45.3756969,
   ),
   (
     body: 'mercury',
@@ -1186,7 +1378,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 270.0592251,
+    longitudeDegrees: 270.0592253,
   ),
   (
     body: 'mercury',
@@ -1194,7 +1386,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 298.912297,
+    longitudeDegrees: 298.9122972,
   ),
   (
     body: 'mercury',
@@ -1202,7 +1394,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 281.1402902,
+    longitudeDegrees: 281.1402904,
   ),
   (
     body: 'mercury',
@@ -1210,7 +1402,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 131.5670082,
+    longitudeDegrees: 131.5670084,
   ),
   (
     body: 'mercury',
@@ -1218,7 +1410,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 264.5712137,
+    longitudeDegrees: 264.5712139,
   ),
   (
     body: 'mercury',
@@ -1226,7 +1418,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 263.3687487,
+    longitudeDegrees: 263.3687488,
   ),
   (
     body: 'mercury',
@@ -1234,7 +1426,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 300.1960004,
+    longitudeDegrees: 300.1960006,
   ),
   (
     body: 'mercury',
@@ -1242,7 +1434,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 284.5806306,
+    longitudeDegrees: 284.5806308,
   ),
   (
     body: 'mercury',
@@ -1250,7 +1442,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 267.4282917,
+    longitudeDegrees: 267.4282919,
   ),
   (
     body: 'mercury',
@@ -1258,7 +1450,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 259.842957,
+    longitudeDegrees: 259.8429572,
   ),
   (
     body: 'mercury',
@@ -1266,7 +1458,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 299.6610503,
+    longitudeDegrees: 299.6610505,
   ),
   (
     body: 'mercury',
@@ -1274,7 +1466,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 288.0082602,
+    longitudeDegrees: 288.0082603,
   ),
   (
     body: 'mercury',
@@ -1282,7 +1474,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 288.0082789,
+    longitudeDegrees: 288.0082791,
   ),
   (
     body: 'mercury',
@@ -1290,7 +1482,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 288.8201481,
+    longitudeDegrees: 288.8201482,
   ),
   (
     body: 'venus',
@@ -1406,11 +1598,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'venus',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 217.8104835,
+  ),
+  (
+    body: 'venus',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 235.8366304,
+  ),
+  (
+    body: 'venus',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 121.6397569,
   ),
   (
     body: 'venus',
@@ -1443,6 +1651,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 274.4532537,
+  ),
+  (
+    body: 'venus',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 310.7907465,
+  ),
+  (
+    body: 'venus',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 310.7907608,
   ),
   (
     body: 'venus',
@@ -1534,6 +1758,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'venus',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 72.1447896,
+  ),
+  (
+    body: 'venus',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -1547,6 +1779,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 314.4095263,
+  ),
+  (
+    body: 'venus',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 147.0243455,
+  ),
+  (
+    body: 'venus',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 155.2755188,
   ),
   (
     body: 'venus',
@@ -1578,7 +1826,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 289.5470162,
+    longitudeDegrees: 289.5470164,
   ),
   (
     body: 'venus',
@@ -1586,7 +1834,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 233.5185163,
+    longitudeDegrees: 233.5185165,
   ),
   (
     body: 'venus',
@@ -1594,7 +1842,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 243.7429747,
+    longitudeDegrees: 243.7429749,
   ),
   (
     body: 'venus',
@@ -1602,7 +1850,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 262.4022915,
+    longitudeDegrees: 262.4022917,
+  ),
+  (
+    body: 'venus',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 5.6389883,
   ),
   (
     body: 'venus',
@@ -1610,7 +1866,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 281.2483845,
+    longitudeDegrees: 281.2483847,
   ),
   (
     body: 'venus',
@@ -1618,7 +1874,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 300.0346837,
+    longitudeDegrees: 300.0346839,
   ),
   (
     body: 'venus',
@@ -1626,7 +1882,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 317.3082551,
+    longitudeDegrees: 317.3082553,
   ),
   (
     body: 'venus',
@@ -1634,7 +1890,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 161.0145564,
+    longitudeDegrees: 161.0145566,
   ),
   (
     body: 'venus',
@@ -1642,7 +1898,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 328.33332,
+    longitudeDegrees: 328.3333201,
   ),
   (
     body: 'venus',
@@ -1650,7 +1906,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 269.8747286,
+    longitudeDegrees: 269.8747287,
   ),
   (
     body: 'venus',
@@ -1658,7 +1914,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 234.2557585,
+    longitudeDegrees: 234.2557587,
   ),
   (
     body: 'venus',
@@ -1666,7 +1922,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 246.6705762,
+    longitudeDegrees: 246.6705763,
   ),
   (
     body: 'venus',
@@ -1674,7 +1930,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 265.7363568,
+    longitudeDegrees: 265.736357,
   ),
   (
     body: 'venus',
@@ -1682,7 +1938,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 284.643589,
+    longitudeDegrees: 284.6435891,
   ),
   (
     body: 'venus',
@@ -1690,7 +1946,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 303.311127,
+    longitudeDegrees: 303.3111272,
   ),
   (
     body: 'venus',
@@ -1698,7 +1954,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 320.0723291,
+    longitudeDegrees: 320.0723293,
   ),
   (
     body: 'venus',
@@ -1706,7 +1962,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 320.0723431,
+    longitudeDegrees: 320.0723432,
   ),
   (
     body: 'venus',
@@ -1714,7 +1970,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 320.6735583,
+    longitudeDegrees: 320.6735585,
   ),
   (
     body: 'mars',
@@ -1830,11 +2086,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'mars',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 190.1591749,
+  ),
+  (
+    body: 'mars',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 349.8112203,
+  ),
+  (
+    body: 'mars',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 348.3982718,
   ),
   (
     body: 'mars',
@@ -1867,6 +2139,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 342.2362367,
+  ),
+  (
+    body: 'mars',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 3.3802931,
+  ),
+  (
+    body: 'mars',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 3.3803006,
   ),
   (
     body: 'mars',
@@ -1958,6 +2246,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'mars',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 169.4386315,
+  ),
+  (
+    body: 'mars',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -1971,6 +2267,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 238.3846265,
+  ),
+  (
+    body: 'mars',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 163.2347378,
+  ),
+  (
+    body: 'mars',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 211.915825,
   ),
   (
     body: 'mars',
@@ -2002,7 +2314,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 314.7014002,
+    longitudeDegrees: 314.7014004,
   ),
   (
     body: 'mars',
@@ -2010,7 +2322,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 233.0837689,
+    longitudeDegrees: 233.083769,
   ),
   (
     body: 'mars',
@@ -2018,7 +2330,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 102.4863489,
+    longitudeDegrees: 102.4863491,
   ),
   (
     body: 'mars',
@@ -2026,7 +2338,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 308.5307536,
+    longitudeDegrees: 308.5307538,
+  ),
+  (
+    body: 'mars',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 76.7206202,
   ),
   (
     body: 'mars',
@@ -2034,7 +2354,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 227.7148687,
+    longitudeDegrees: 227.7148689,
   ),
   (
     body: 'mars',
@@ -2042,7 +2362,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 81.2163133,
+    longitudeDegrees: 81.2163135,
   ),
   (
     body: 'mars',
@@ -2050,7 +2370,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 301.7067707,
+    longitudeDegrees: 301.7067709,
   ),
   (
     body: 'mars',
@@ -2058,7 +2378,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 208.6809419,
+    longitudeDegrees: 208.6809421,
   ),
   (
     body: 'mars',
@@ -2066,7 +2386,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 222.2709763,
+    longitudeDegrees: 222.2709765,
   ),
   (
     body: 'mars',
@@ -2074,7 +2394,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 61.1951434,
+    longitudeDegrees: 61.1951435,
   ),
   (
     body: 'mars',
@@ -2082,7 +2402,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 295.7788454,
+    longitudeDegrees: 295.7788456,
   ),
   (
     body: 'mars',
@@ -2090,7 +2410,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 216.0825798,
+    longitudeDegrees: 216.08258,
   ),
   (
     body: 'mars',
@@ -2098,7 +2418,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 44.0407546,
+    longitudeDegrees: 44.0407548,
   ),
   (
     body: 'mars',
@@ -2106,7 +2426,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 289.9955342,
+    longitudeDegrees: 289.9955344,
   ),
   (
     body: 'mars',
@@ -2114,7 +2434,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 210.3226319,
+    longitudeDegrees: 210.322632,
   ),
   (
     body: 'mars',
@@ -2122,7 +2442,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 29.5259828,
+    longitudeDegrees: 29.525983,
   ),
   (
     body: 'mars',
@@ -2130,7 +2450,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 29.5259876,
+    longitudeDegrees: 29.5259877,
   ),
   (
     body: 'mars',
@@ -2138,7 +2458,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 29.729975,
+    longitudeDegrees: 29.7299752,
   ),
   (
     body: 'jupiter',
@@ -2254,11 +2574,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'jupiter',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 84.6214067,
+  ),
+  (
+    body: 'jupiter',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 116.850491,
+  ),
+  (
+    body: 'jupiter',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 163.2405352,
   ),
   (
     body: 'jupiter',
@@ -2291,6 +2627,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 212.3250045,
+  ),
+  (
+    body: 'jupiter',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 262.3497429,
+  ),
+  (
+    body: 'jupiter',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 262.3497455,
   ),
   (
     body: 'jupiter',
@@ -2382,6 +2734,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'jupiter',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 60.062937,
+  ),
+  (
+    body: 'jupiter',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -2395,6 +2755,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 276.670345,
+  ),
+  (
+    body: 'jupiter',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 43.68231,
+  ),
+  (
+    body: 'jupiter',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 43.0033961,
   ),
   (
     body: 'jupiter',
@@ -2426,7 +2802,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 230.5745219,
+    longitudeDegrees: 230.574522,
   ),
   (
     body: 'jupiter',
@@ -2434,7 +2810,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 5.8320343,
+    longitudeDegrees: 5.8320345,
   ),
   (
     body: 'jupiter',
@@ -2442,7 +2818,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 181.4555881,
+    longitudeDegrees: 181.4555883,
   ),
   (
     body: 'jupiter',
@@ -2450,7 +2826,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 310.4542798,
+    longitudeDegrees: 310.4542799,
+  ),
+  (
+    body: 'jupiter',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 91.0271798,
   ),
   (
     body: 'jupiter',
@@ -2458,7 +2842,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 121.6915158,
+    longitudeDegrees: 121.691516,
   ),
   (
     body: 'jupiter',
@@ -2466,7 +2850,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 262.4875467,
+    longitudeDegrees: 262.4875469,
   ),
   (
     body: 'jupiter',
@@ -2474,7 +2858,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 51.1655698,
+    longitudeDegrees: 51.16557,
   ),
   (
     body: 'jupiter',
@@ -2482,7 +2866,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 112.0293109,
+    longitudeDegrees: 112.029311,
   ),
   (
     body: 'jupiter',
@@ -2490,7 +2874,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 216.1340897,
+    longitudeDegrees: 216.1340898,
   ),
   (
     body: 'jupiter',
@@ -2498,7 +2882,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 347.5120859,
+    longitudeDegrees: 347.512086,
   ),
   (
     body: 'jupiter',
@@ -2506,7 +2890,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 164.5934605,
+    longitudeDegrees: 164.5934607,
   ),
   (
     body: 'jupiter',
@@ -2514,7 +2898,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 295.0628515,
+    longitudeDegrees: 295.0628516,
   ),
   (
     body: 'jupiter',
@@ -2522,7 +2906,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 100.4760272,
+    longitudeDegrees: 100.4760274,
   ),
   (
     body: 'jupiter',
@@ -2530,7 +2914,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 248.4179182,
+    longitudeDegrees: 248.4179184,
   ),
   (
     body: 'jupiter',
@@ -2538,7 +2922,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 30.2192864,
+    longitudeDegrees: 30.2192866,
   ),
   (
     body: 'jupiter',
@@ -2546,7 +2930,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 201.2064801,
+    longitudeDegrees: 201.2064802,
   ),
   (
     body: 'jupiter',
@@ -2554,7 +2938,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 201.2064813,
+    longitudeDegrees: 201.2064815,
   ),
   (
     body: 'jupiter',
@@ -2562,7 +2946,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 201.2593243,
+    longitudeDegrees: 201.2593245,
   ),
   (
     body: 'saturn',
@@ -2678,11 +3062,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'saturn',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 213.1441282,
+  ),
+  (
+    body: 'saturn',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 228.3408181,
+  ),
+  (
+    body: 'saturn',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 237.5079449,
   ),
   (
     body: 'saturn',
@@ -2715,6 +3115,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 32.0622903,
+  ),
+  (
+    body: 'saturn',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 60.4242255,
+  ),
+  (
+    body: 'saturn',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 60.4242248,
   ),
   (
     body: 'saturn',
@@ -2806,6 +3222,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'saturn',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 202.9102527,
+  ),
+  (
+    body: 'saturn',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -2819,6 +3243,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 291.3949697,
+  ),
+  (
+    body: 'saturn',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 335.7128184,
+  ),
+  (
+    body: 'saturn',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 330.8616452,
   ),
   (
     body: 'saturn',
@@ -2850,7 +3290,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 48.3977655,
+    longitudeDegrees: 48.3977657,
   ),
   (
     body: 'saturn',
@@ -2858,7 +3298,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 123.5818138,
+    longitudeDegrees: 123.581814,
   ),
   (
     body: 'saturn',
@@ -2866,7 +3306,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 191.6545677,
+    longitudeDegrees: 191.6545679,
   ),
   (
     body: 'saturn',
@@ -2874,7 +3314,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 247.100904,
+    longitudeDegrees: 247.1009041,
+  ),
+  (
+    body: 'saturn',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 297.3896575,
   ),
   (
     body: 'saturn',
@@ -2882,7 +3330,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 297.5743121,
+    longitudeDegrees: 297.5743123,
   ),
   (
     body: 'saturn',
@@ -2890,7 +3338,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 351.4992391,
+    longitudeDegrees: 351.4992393,
   ),
   (
     body: 'saturn',
@@ -2898,7 +3346,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 57.1547727,
+    longitudeDegrees: 57.1547729,
   ),
   (
     body: 'saturn',
@@ -2906,7 +3354,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 86.7976357,
+    longitudeDegrees: 86.7976359,
   ),
   (
     body: 'saturn',
@@ -2914,7 +3362,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 132.4891775,
+    longitudeDegrees: 132.4891777,
   ),
   (
     body: 'saturn',
@@ -2922,7 +3370,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 198.8626725,
+    longitudeDegrees: 198.8626727,
   ),
   (
     body: 'saturn',
@@ -2930,7 +3378,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 253.1029137,
+    longitudeDegrees: 253.1029139,
   ),
   (
     body: 'saturn',
@@ -2938,7 +3386,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 303.4593097,
+    longitudeDegrees: 303.4593098,
   ),
   (
     body: 'saturn',
@@ -2946,7 +3394,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 358.3078702,
+    longitudeDegrees: 358.3078704,
   ),
   (
     body: 'saturn',
@@ -2954,7 +3402,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 65.4113661,
+    longitudeDegrees: 65.4113663,
   ),
   (
     body: 'saturn',
@@ -2962,7 +3410,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 140.7909412,
+    longitudeDegrees: 140.7909414,
   ),
   (
     body: 'saturn',
@@ -2970,7 +3418,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 205.6317513,
+    longitudeDegrees: 205.6317515,
   ),
   (
     body: 'saturn',
@@ -2978,7 +3426,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 205.631752,
+    longitudeDegrees: 205.6317522,
   ),
   (
     body: 'saturn',
@@ -2986,7 +3434,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 205.6605574,
+    longitudeDegrees: 205.6605576,
   ),
   (
     body: 'uranus',
@@ -3102,11 +3550,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'uranus',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 112.9363974,
+  ),
+  (
+    body: 'uranus',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 116.3291472,
+  ),
+  (
+    body: 'uranus',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 125.2864233,
   ),
   (
     body: 'uranus',
@@ -3139,6 +3603,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 188.7206104,
+  ),
+  (
+    body: 'uranus',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 198.0903791,
+  ),
+  (
+    body: 'uranus',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 198.0903794,
   ),
   (
     body: 'uranus',
@@ -3230,6 +3710,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'uranus',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 8.1470025,
+  ),
+  (
+    body: 'uranus',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -3243,6 +3731,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 32.6940392,
+  ),
+  (
+    body: 'uranus',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 52.7487959,
+  ),
+  (
+    body: 'uranus',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 52.2198096,
   ),
   (
     body: 'uranus',
@@ -3274,7 +3778,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 75.5576327,
+    longitudeDegrees: 75.5576329,
   ),
   (
     body: 'uranus',
@@ -3282,7 +3786,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 98.4545362,
+    longitudeDegrees: 98.4545364,
   ),
   (
     body: 'uranus',
@@ -3290,7 +3794,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 122.2532426,
+    longitudeDegrees: 122.2532428,
   ),
   (
     body: 'uranus',
@@ -3298,7 +3802,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 146.4804694,
+    longitudeDegrees: 146.4804696,
+  ),
+  (
+    body: 'uranus',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 161.8375164,
   ),
   (
     body: 'uranus',
@@ -3306,7 +3818,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 170.7326087,
+    longitudeDegrees: 170.7326089,
   ),
   (
     body: 'uranus',
@@ -3314,7 +3826,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 194.5339776,
+    longitudeDegrees: 194.5339778,
   ),
   (
     body: 'uranus',
@@ -3322,7 +3834,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 217.4771972,
+    longitudeDegrees: 217.4771974,
   ),
   (
     body: 'uranus',
@@ -3330,7 +3842,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 218.8689614,
+    longitudeDegrees: 218.8689615,
   ),
   (
     body: 'uranus',
@@ -3338,7 +3850,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 239.5331674,
+    longitudeDegrees: 239.5331676,
   ),
   (
     body: 'uranus',
@@ -3346,7 +3858,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 260.6203322,
+    longitudeDegrees: 260.6203323,
   ),
   (
     body: 'uranus',
@@ -3354,7 +3866,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 280.8374353,
+    longitudeDegrees: 280.8374355,
   ),
   (
     body: 'uranus',
@@ -3362,7 +3874,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 300.4795663,
+    longitudeDegrees: 300.4795665,
   ),
   (
     body: 'uranus',
@@ -3370,7 +3882,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 319.7884729,
+    longitudeDegrees: 319.7884731,
   ),
   (
     body: 'uranus',
@@ -3378,7 +3890,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 338.8659658,
+    longitudeDegrees: 338.8659659,
   ),
   (
     body: 'uranus',
@@ -3386,7 +3898,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 358.1165997,
+    longitudeDegrees: 358.1165998,
   ),
   (
     body: 'uranus',
@@ -3394,7 +3906,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 17.7413128,
+    longitudeDegrees: 17.7413129,
   ),
   (
     body: 'uranus',
@@ -3402,7 +3914,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 17.7413128,
+    longitudeDegrees: 17.741313,
   ),
   (
     body: 'uranus',
@@ -3410,7 +3922,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 17.7436928,
+    longitudeDegrees: 17.7436929,
   ),
   (
     body: 'neptune',
@@ -3526,11 +4038,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'neptune',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 204.7622957,
+  ),
+  (
+    body: 'neptune',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 208.0044013,
+  ),
+  (
+    body: 'neptune',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 208.64206,
   ),
   (
     body: 'neptune',
@@ -3563,6 +4091,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 239.8858503,
+  ),
+  (
+    body: 'neptune',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 244.0990971,
+  ),
+  (
+    body: 'neptune',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 244.0990975,
   ),
   (
     body: 'neptune',
@@ -3654,6 +4198,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'neptune',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 333.1375445,
+  ),
+  (
+    body: 'neptune',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -3667,6 +4219,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 346.2645213,
+  ),
+  (
+    body: 'neptune',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 357.4342856,
+  ),
+  (
+    body: 'neptune',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 355.5952311,
   ),
   (
     body: 'neptune',
@@ -3698,7 +4266,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 8.3781405,
+    longitudeDegrees: 8.3781407,
   ),
   (
     body: 'neptune',
@@ -3706,7 +4274,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 19.5622322,
+    longitudeDegrees: 19.5622324,
   ),
   (
     body: 'neptune',
@@ -3714,7 +4282,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 30.8374785,
+    longitudeDegrees: 30.8374787,
   ),
   (
     body: 'neptune',
@@ -3722,7 +4290,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 42.1679027,
+    longitudeDegrees: 42.1679029,
+  ),
+  (
+    body: 'neptune',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 53.4479373,
   ),
   (
     body: 'neptune',
@@ -3730,7 +4306,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 53.6034166,
+    longitudeDegrees: 53.6034168,
   ),
   (
     body: 'neptune',
@@ -3738,7 +4314,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 65.0546092,
+    longitudeDegrees: 65.0546094,
   ),
   (
     body: 'neptune',
@@ -3746,7 +4322,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 76.5583359,
+    longitudeDegrees: 76.5583361,
   ),
   (
     body: 'neptune',
@@ -3754,7 +4330,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 82.1849536,
+    longitudeDegrees: 82.1849538,
   ),
   (
     body: 'neptune',
@@ -3762,7 +4338,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 88.0646547,
+    longitudeDegrees: 88.0646549,
   ),
   (
     body: 'neptune',
@@ -3770,7 +4346,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 99.5449314,
+    longitudeDegrees: 99.5449316,
   ),
   (
     body: 'neptune',
@@ -3778,7 +4354,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 111.0175648,
+    longitudeDegrees: 111.017565,
   ),
   (
     body: 'neptune',
@@ -3786,7 +4362,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 122.4240117,
+    longitudeDegrees: 122.4240119,
   ),
   (
     body: 'neptune',
@@ -3794,7 +4370,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 133.7438124,
+    longitudeDegrees: 133.7438126,
   ),
   (
     body: 'neptune',
@@ -3802,7 +4378,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 145.0232357,
+    longitudeDegrees: 145.0232359,
   ),
   (
     body: 'neptune',
@@ -3810,7 +4386,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 156.1831005,
+    longitudeDegrees: 156.1831007,
   ),
   (
     body: 'neptune',
@@ -3818,7 +4394,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 167.2905104,
+    longitudeDegrees: 167.2905106,
   ),
   (
     body: 'neptune',
@@ -3826,7 +4402,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 167.2905104,
+    longitudeDegrees: 167.2905105,
   ),
   (
     body: 'neptune',
@@ -3834,7 +4410,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 167.2868448,
+    longitudeDegrees: 167.286845,
   ),
   (
     body: 'pluto',
@@ -3950,11 +4526,27 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'pluto',
+    utc: '1953-11-18T00:00:00Z',
+    utDays: -16845.5,
+    ttDays: -16845.49964592697,
+    deltaTSeconds: 30.591909668873996,
+    longitudeDegrees: 145.0001651,
+  ),
+  (
+    body: 'pluto',
     utc: '1955-01-01T00:00:00Z',
     utDays: -16436.5,
     ttDays: -16436.499640844322,
     deltaTSeconds: 31.031050567980856,
     longitudeDegrees: 146.5390811,
+  ),
+  (
+    body: 'pluto',
+    utc: '1956-09-10T00:00:00Z',
+    utDays: -15818.5,
+    ttDays: -15818.499633066685,
+    deltaTSeconds: 31.70303837978281,
+    longitudeDegrees: 148.9246277,
   ),
   (
     body: 'pluto',
@@ -3987,6 +4579,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: -10957.499535255165,
     deltaTSeconds: 40.15395374153741,
     longitudeDegrees: 177.3921739,
+  ),
+  (
+    body: 'pluto',
+    utc: '1971-12-31T23:59:59Z',
+    utDays: -10227.500011574075,
+    ttDays: -10227.49952303717,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 182.0490356,
+  ),
+  (
+    body: 'pluto',
+    utc: '1972-01-01T00:00:00Z',
+    utDays: -10227.5,
+    ttDays: -10227.499511463095,
+    deltaTSeconds: 42.20958861988038,
+    longitudeDegrees: 182.0490356,
   ),
   (
     body: 'pluto',
@@ -4078,6 +4686,14 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
   ),
   (
     body: 'pluto',
+    utc: '2012-06-12T00:00:00Z',
+    utDays: 4545.5,
+    ttDays: 4545.500784460916,
+    deltaTSeconds: 67.77742316771764,
+    longitudeDegrees: 278.7008302,
+  ),
+  (
+    body: 'pluto',
     utc: '2015-01-01T00:00:00Z',
     utDays: 5478.5,
     ttDays: 5478.500798508445,
@@ -4091,6 +4707,22 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     ttDays: 7304.500828444182,
     deltaTSeconds: 71.5775773191126,
     longitudeDegrees: 292.3855827,
+  ),
+  (
+    body: 'pluto',
+    utc: '2023-08-01T00:00:00Z',
+    utDays: 8612.5,
+    ttDays: 8612.50085187551,
+    deltaTSeconds: 73.60204401193187,
+    longitudeDegrees: 298.893332,
+  ),
+  (
+    body: 'pluto',
+    utc: '2023-10-15T00:00:00Z',
+    utDays: 8687.5,
+    ttDays: 8687.500853269346,
+    deltaTSeconds: 73.7224715296179,
+    longitudeDegrees: 297.8956327,
   ),
   (
     body: 'pluto',
@@ -4122,7 +4754,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 10957.5,
     ttDays: 10957.50089803736,
     deltaTSeconds: 77.59042794350535,
-    longitudeDegrees: 309.1648428,
+    longitudeDegrees: 309.1648429,
   ),
   (
     body: 'pluto',
@@ -4130,7 +4762,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 12783.5,
     ttDays: 12783.500937675752,
     deltaTSeconds: 81.01518494077027,
-    longitudeDegrees: 316.81692,
+    longitudeDegrees: 316.8169202,
   ),
   (
     body: 'pluto',
@@ -4138,7 +4770,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 14609.5,
     ttDays: 14609.500980547773,
     deltaTSeconds: 84.71932758693583,
-    longitudeDegrees: 324.0416315,
+    longitudeDegrees: 324.0416317,
   ),
   (
     body: 'pluto',
@@ -4146,7 +4778,15 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 16436.5,
     ttDays: 16436.501026679554,
     deltaTSeconds: 88.7051134952344,
-    longitudeDegrees: 330.9533231,
+    longitudeDegrees: 330.9533233,
+  ),
+  (
+    body: 'pluto',
+    utc: '2049-05-11T00:00:00Z',
+    utDays: 18027.5,
+    ttDays: 18027.501069489277,
+    deltaTSeconds: 92.40387354511768,
+    longitudeDegrees: 339.2277187,
   ),
   (
     body: 'pluto',
@@ -4154,7 +4794,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 18262.5,
     ttDays: 18262.501076020602,
     deltaTSeconds: 92.96818004222587,
-    longitudeDegrees: 337.5330724,
+    longitudeDegrees: 337.5330726,
   ),
   (
     body: 'pluto',
@@ -4162,7 +4802,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 20088.5,
     ttDays: 20088.501194164408,
     deltaTSeconds: 103.17580484552309,
-    longitudeDegrees: 343.8122913,
+    longitudeDegrees: 343.8122914,
   ),
   (
     body: 'pluto',
@@ -4170,7 +4810,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 21914.5,
     ttDays: 21914.50131466878,
     deltaTSeconds: 113.58738272683695,
-    longitudeDegrees: 349.8787132,
+    longitudeDegrees: 349.8787134,
   ),
   (
     body: 'pluto',
@@ -4178,7 +4818,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 22489.270833333332,
     ttDays: 22489.272186316433,
     deltaTSeconds: 116.89773994730785,
-    longitudeDegrees: 354.0226662,
+    longitudeDegrees: 354.0226664,
   ),
   (
     body: 'pluto',
@@ -4186,7 +4826,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 23741.5,
     ttDays: 23741.50143709209,
     deltaTSeconds: 124.16475664358586,
-    longitudeDegrees: 355.7214414,
+    longitudeDegrees: 355.7214416,
   ),
   (
     body: 'pluto',
@@ -4194,7 +4834,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 25567.5,
     ttDays: 25567.501561300327,
     deltaTSeconds: 134.89634825382382,
-    longitudeDegrees: 1.3656985,
+    longitudeDegrees: 1.3656987,
   ),
   (
     body: 'pluto',
@@ -4202,7 +4842,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 27393.5,
     ttDays: 27393.501687359985,
     deltaTSeconds: 145.78790272353217,
-    longitudeDegrees: 6.8389314,
+    longitudeDegrees: 6.8389316,
   ),
   (
     body: 'pluto',
@@ -4210,7 +4850,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 29219.5,
     ttDays: 29219.50181527107,
     deltaTSeconds: 156.8394203670323,
-    longitudeDegrees: 12.1652224,
+    longitudeDegrees: 12.1652226,
   ),
   (
     body: 'pluto',
@@ -4218,7 +4858,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 31046.5,
     ttDays: 31046.50194510515,
     deltaTSeconds: 168.0570848286152,
-    longitudeDegrees: 17.3918747,
+    longitudeDegrees: 17.3918749,
   ),
   (
     body: 'pluto',
@@ -4226,7 +4866,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 32872.5,
     ttDays: 32872.50207672009,
     deltaTSeconds: 179.42861588671803,
-    longitudeDegrees: 22.4741096,
+    longitudeDegrees: 22.4741098,
   ),
   (
     body: 'pluto',
@@ -4234,7 +4874,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 34698.5,
     ttDays: 34698.50221018647,
     deltaTSeconds: 190.96011074725538,
-    longitudeDegrees: 27.4756634,
+    longitudeDegrees: 27.4756636,
   ),
   (
     body: 'pluto',
@@ -4242,7 +4882,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.49998842592,
     ttDays: 36524.50233393018,
     deltaTSeconds: 202.65156752429903,
-    longitudeDegrees: 32.4030156,
+    longitudeDegrees: 32.4030158,
   ),
   (
     body: 'pluto',
@@ -4250,7 +4890,7 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36524.5,
     ttDays: 36524.50234550426,
     deltaTSeconds: 202.65156815294176,
-    longitudeDegrees: 32.4030155,
+    longitudeDegrees: 32.4030157,
   ),
   (
     body: 'pluto',
@@ -4258,6 +4898,6 @@ const astronomyTtReferenceLongitudes = <AstronomyTtReference>[
     utDays: 36525.0,
     ttDays: 36525.002345541565,
     deltaTSeconds: 202.6547912042588,
-    longitudeDegrees: 32.4003435,
+    longitudeDegrees: 32.4003437,
   ),
 ];

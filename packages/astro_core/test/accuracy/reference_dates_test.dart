@@ -7,6 +7,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:astro_core/astro_core.dart' show SupportedDateRange;
 import 'package:test/test.dart';
 
 /// The 53 version-1 instants (chronological). Must stay in the fixture.
@@ -66,6 +67,22 @@ const _v1Instants = [
   '2100-01-01T12:00:00Z',
 ];
 
+/// The instants version 2 added (ZOD-TST-001): retrograde instants, the 1972
+/// boundary and 2100 through 31 December.
+const _v2Instants = [
+  '1953-11-18T00:00:00Z',
+  '1956-09-10T00:00:00Z',
+  '1971-12-31T23:59:59Z',
+  '1972-01-01T00:00:00Z',
+  '2012-06-12T00:00:00Z',
+  '2023-08-01T00:00:00Z',
+  '2023-10-15T00:00:00Z',
+  '2049-05-11T00:00:00Z',
+  '2100-07-01T00:00:00Z',
+  '2100-12-31T00:00:00Z',
+  '2100-12-31T23:59:59Z',
+];
+
 final _canonical = RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$');
 
 String _two(int n) => n.toString().padLeft(2, '0');
@@ -98,6 +115,14 @@ void main() {
       expect(dates.toSet().containsAll(_v1Instants), isTrue);
     });
 
+    test('version 2 holds every version-2 instant', () {
+      expect(json['version'], 2);
+      expect(_v2Instants, hasLength(11));
+      expect(_v1Instants.length + _v2Instants.length, dates.length);
+      expect(dates, hasLength(64));
+      expect(dates.toSet().containsAll(_v2Instants), isTrue);
+    });
+
     test('has at least 50 unique instants', () {
       expect(dates.length, greaterThanOrEqualTo(50));
       expect(dates.toSet(), hasLength(dates.length));
@@ -112,9 +137,9 @@ void main() {
       }
     });
 
-    test('stays within the T = ±1 window', () {
+    test('stays between T = −1 and the end of the supported range', () {
       final start = DateTime.utc(1899, 12, 31, 12);
-      final end = DateTime.utc(2100, 1, 1, 12);
+      final end = SupportedDateRange.end;
       for (final s in dates) {
         final t = DateTime.parse(s);
         expect(t.isBefore(start) || t.isAfter(end), isFalse, reason: s);

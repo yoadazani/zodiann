@@ -31,6 +31,20 @@ import 'package:path_provider/path_provider.dart';
 
 import 'astronomy_reference_longitudes_tt.dart';
 
+/// The eight instants ZOD-TST-001 added to the shared date set inside the
+/// Backup's range. The speed bounds were frozen on the 53 earlier ones, so this
+/// test keeps sampling exactly those (owner decision D2).
+const _addedInDateSetVersion2 = {
+  '1953-11-18T00:00:00Z',
+  '1956-09-10T00:00:00Z',
+  '1971-12-31T23:59:59Z',
+  '1972-01-01T00:00:00Z',
+  '2012-06-12T00:00:00Z',
+  '2023-08-01T00:00:00Z',
+  '2023-10-15T00:00:00Z',
+  '2049-05-11T00:00:00Z',
+};
+
 /// D7 (a): the largest allowed `|astronomy speed - Swiss speed|`, degrees per
 /// day, owner-approved 2026-11-21.
 const Map<Body, double> speedBoundDegPerDay = {
@@ -270,8 +284,10 @@ void main() {
 
     // The 53 reference instants, every body.
     final referenceInstants = {
-      for (final r in astronomyTtReferenceLongitudes) DateTime.parse(r.utc),
+      for (final r in astronomyTtReferenceLongitudes)
+        if (!_addedInDateSetVersion2.contains(r.utc)) DateTime.parse(r.utc),
     }.toList()..sort();
+    expect(referenceInstants, hasLength(53));
     for (final body in _swissIds.keys) {
       for (final utc in referenceInstants) {
         sample(body, utc, reference: true);

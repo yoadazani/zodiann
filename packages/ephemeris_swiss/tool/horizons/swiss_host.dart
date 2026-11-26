@@ -1,7 +1,7 @@
 // ZOD-TST-001: compiles a host C tool of this package against the unmodified
 // vendored Swiss Ephemeris source and runs it. Needs `gcc` on the PATH. Host
-// tooling only, never part of the app. The flags and sources are those of
-// tool/fetch_horizons_tt_reference.dart (ZOD-EPH-002).
+// tooling only, never part of the app. The flags and sources are those the
+// ZOD-EPH-002 accuracy reference was built with.
 import 'dart:io';
 
 import 'package:ephemeris_swiss/ephemeris_swiss.dart';
