@@ -57,7 +57,7 @@
 
 ### Task 0: Baseline
 
-- [ ] **Step 1:** Run `fvm dart run melos run lint`, then `fvm dart run melos run test`. Expected: both exit 0. Record counts. If either fails, stop and report.
+- [x] **Step 1:** Run `fvm dart run melos run lint`, then `fvm dart run melos run test`. Expected: both exit 0. Record counts. If either fails, stop and report.
 
 ### Task 1: Pure query and check functions
 
@@ -78,7 +78,7 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
     Iterable<LongitudeRow> next, {double toleranceArcseconds = 0.001});
 ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
   * `the query is exactly the approved parameters`: `horizonsQuery(command: '301', julianDays: ['2451545.000000000', '2451546.000000000'], timeType: HorizonsTimeType.tt)` equals the map of design section 8 value for value (`TLIST` = `"'2451545.000000000 2451546.000000000'"`, `TIME_DIGITS` `"'FRACSEC'"`, `CAL_FORMAT` `"'BOTH'"`, `APPARENT` `"'AIRLESS'"`, `format` `'text'`); `ut` gives `TIME_TYPE` `"'UT'"`; `quantities: '30,31'` gives `"'30,31'"`.
   * `the query reproduces the two pilot requests`: for the two requests behind the samples (design 8.5), `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…)).toString()` equals the URL recorded there, written as a literal in the test.
@@ -87,10 +87,10 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
   * `isRetrograde`: `(0.2, 0.0, 359.8)` true; `(359.8, 0.0, 0.2)` false; `(10, 9, 9.5)` false; `(10, 10, 9)` false.
   * `changedRows`: equal rows → empty; a difference of 0.0009″ → empty; 0.0011″ → one line naming body and utc; a baseline row missing from `next` → one line containing `missing`; an extra row in `next` → empty; `359.9999999` against `0.0000001` (0.00072″ apart across 0°) → empty at the default tolerance, one line at `toleranceArcseconds: 0.0001`.
 
-- [ ] **Step 2:** `Push-Location packages/ephemeris_swiss; fvm dart test test/horizons_tool_test.dart; Pop-Location`. Expected: compile failure, `horizons.dart` not found.
-- [ ] **Step 3:** Implement. `horizonsCommands` as in the existing tools.
-- [ ] **Step 4:** Rerun the Step 2 command (also the "tool tests" command of Tasks 3 to 5). Expected: all pass.
-- [ ] **Step 5:** Commit `feat(ZOD-TST-001): add the Horizons query and reference checks`.
+- [x] **Step 2:** `Push-Location packages/ephemeris_swiss; fvm dart test test/horizons_tool_test.dart; Pop-Location`. Expected: compile failure, `horizons.dart` not found.
+- [x] **Step 3:** Implement. `horizonsCommands` as in the existing tools.
+- [x] **Step 4:** Rerun the Step 2 command (also the "tool tests" command of Tasks 3 to 5). Expected: all pass.
+- [x] **Step 5:** Commit `feat(ZOD-TST-001): add the Horizons query and reference checks`.
 
 ### Task 2: Pilot answers as parser samples (done)
 
@@ -136,17 +136,17 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
 
 `tdbMinusUtSeconds` is null unless expected.
 
-- [ ] **Step 1: Write the failing tests** against the samples.
+- [x] **Step 1: Write the failing tests** against the samples.
   * `parses the TT sample`: four rows; `julianDay` equals the four requested strings; longitudes `265.2972999`, `101.6302965`, `223.3148557`, `293.9451964`; every `tdbMinusUtSeconds` null; `apiVersion` `'1.2'`; `targetLine` contains `Moon (301)` and `DE441`.
   * `parses the UT sample with TDB-UT`: longitudes `265.2969812`, `101.6302965`, `223.3237860`, `293.9567420`; `tdbMinusUtSeconds` `-1.946024`, `42.183919`, `64.183903`, `69.183904`.
   * `a CRLF variant parses to the same rows` (the samples are LF).
   * `the UT sample read without TDB-UT gives the same longitudes` (`expectTdbMinusUt: false`; every `tdbMinusUtSeconds` null).
   * `a requested time about 0.5 ms (0.518 ms) from the echo passes and the row carries the requested string` (TT sample, first requested day `'2415020.000000006'`; `rows.first.julianDay` equals it).
   * One test per refusal, each editing the sample text in memory (assert the edit changed the text) or, where only arguments are named, changing the arguments. Row edits target the row text, for example `1899-Dec-31 12:00:00.000,`, because the header lines contain the same times. Each expects a `FormatException` whose message starts with the check's word and a colon (`startsWith('<word>:')`): `a TT answer is refused for a UT request` and the reverse, `a stop time naming another scale` (`00:01:08.1840 TT` to `UT`) and `a start time naming another scale` (`12:00:00.0000 TT` to `UT`) (`time scale`); `a column header naming another scale`, `no ObsEcLon column`, `quantity 30 expected but absent` (`column`); `a missing row`, `an extra row` (`rows`); `a row missing a field` (`fields`); `two rows swapped`, `an echoed Julian day 2 ms off`, `an echoed calendar time 2 ms off` (`time`); `a value that is not a number` (`n.a.`, `number`); `longitude printed to six decimals`, `quantity 30 printed to two decimals` (`precision`); `longitude 360` (`360.0000000`), `a negative longitude` (`-0.0000001`) (`longitude`); `no $$SOE`, `no $$EOE` (`markers`); `no API version line` (`API version`); `another target` (`command: '10'`, `target`); `a non-geocentric centre body` and `a non-geocentric site` (`centre`).
-- [ ] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
-- [ ] **Step 3:** Implement from the recorded format.
-- [ ] **Step 4:** Run. Expected: all pass.
-- [ ] **Step 5:** Commit `feat(ZOD-TST-001): parse Horizons answers and refuse mismatches`. **Stop here: report, and wait for the owner's approval of Task 4.**
+- [x] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
+- [x] **Step 3:** Implement from the recorded format.
+- [x] **Step 4:** Run. Expected: all pass.
+- [x] **Step 5:** Commit `feat(ZOD-TST-001): parse Horizons answers and refuse mismatches`. **Stop here: report, and wait for the owner's approval of Task 4.**
 
 ### Task 4: Confirm the retrograde dates with Horizons
 
