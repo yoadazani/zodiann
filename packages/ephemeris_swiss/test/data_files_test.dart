@@ -1,8 +1,8 @@
 // ZOD-FND-011 (owner decision 2026-11-25): the app ships exactly the Swiss
 // Ephemeris pair sepl_18 + semo_18 and no neighbouring 600-year block. The
-// files nominally cover 1800 to 2400 (named after the upstream blocks; NOT
-// device-verified until ZOD-EPH-002 measures the edges), while the product
-// range is narrower (1900 to 2100, `SupportedDateRange` in astro_core).
+// files nominally cover 1800 to 2400 (named after the upstream blocks; the
+// measured edges are `SwissEphemeris.fileCoverage`, ZOD-EPH-002), while the
+// product range is narrower (1900 to 2100, `SupportedDateRange` in astro_core).
 import 'dart:io';
 
 import 'package:astro_core/astro_core.dart';

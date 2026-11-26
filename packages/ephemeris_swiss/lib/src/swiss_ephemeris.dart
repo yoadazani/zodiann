@@ -43,10 +43,14 @@ final class SwissEphemeris
   final LeapSecondTable? _leapSeconds;
 
   /// The instants the packaged files (`sepl_18`, `semo_18`) cover for all ten
-  /// bodies.
+  /// bodies, measured on the device by
+  /// apps/astro_mobile/integration_test/swiss_file_edges_test.dart
+  /// (Pixel_9_Pro_API_36 emulator, API 36, x86_64, 2026-11-26): the packaged
+  /// data fails for some body up to 1800-01-01T05:44Z and from
+  /// 2400-01-07T04:58Z; whole days with a margin of at least 24 h are taken.
   static final UtcRange fileCoverage = UtcRange(
-    DateTime.utc(1800, 1, 2),
-    DateTime.utc(2399, 12, 31),
+    DateTime.utc(1800, 1, 3),
+    DateTime.utc(2400, 1, 6),
   );
 
   @override
