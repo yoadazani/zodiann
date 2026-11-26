@@ -1,6 +1,6 @@
 # ZOD-TST-001: the JPL Horizons reference dataset, design
 
-**Status (2026-11-26): approved by the owner, one stage at a time. The 11 pilot requests are done and accepted as the pilot (section 8); Tasks 0 to 3 of the plan are done and accepted and Task 4A (offline code) is done; Task 4B and every later request and stage wait for a further approval.** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
+**Status (2026-11-26): Tasks 0 to 4A are done; Tasks 4B to 9 are in progress. The 11 pilot requests are done (section 8).** Plan: [`docs/plans/ZOD-TST-001-horizons-reference-dataset.md`](../../plans/ZOD-TST-001-horizons-reference-dataset.md).
 
 Sources of truth: the [task file](../../development/testing-qa/ZOD-TST-001-build-the-jpl-horizons-reference-dataset-t-eph-1-acc-1.md), specification T-EPH-1, ACC-1, ACC-5 and "Computation settings that must be fixed and documented", the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) sections 5 and 6, and the [ZOD-EPH-002 design](2026-11-25-zod-eph-002-swiss-adapter-design.md) section 6 (hand-off).
 
@@ -289,7 +289,7 @@ https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA
 | Backup fixtures (only under option A, section 10) | 20 | 61 |
 | **Total** | **49, or 69 with option A** | |
 
-**Remaining after the pilot: 38 requests, or 58 with option A (chosen).** Each later phase waits for the owner's approval.
+**Remaining after the pilot: 38 requests, or 58 with option A (chosen).**
 
 Sequential, 1 second apart, each limited to 60 s in all, never retried, redirected or sent again without the owner's approval. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. Re-running a failed request with the same parameters is within the approval; a new date or parameter is not.
 
