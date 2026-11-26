@@ -135,7 +135,7 @@ Before 1972 the instant string is only the app's input label, read as UT. No UTC
 | control: mean node, J2000 | 1.409° |
 | control: true node | 1.980° |
 
-**Conclusion.** The definitions are compatible with `SEFLG_NONUT`; **0.01° is finalized on this evidence** (about 4.6 times the observed maximum, consistent with the specification's "less than 0.01°"). The UTC time argument contributes at most about 0.00004°.
+**Conclusion.** The definitions are compatible with `SEFLG_NONUT`; **0.01° is verified on this evidence and becomes final when the owner confirms D6** (about 4.6 times the observed maximum, consistent with the specification's "less than 0.01°"). The UTC time argument contributes at most about 0.00004°.
 
 **What 0.01° alone cannot catch:** the default-flags variant also passes it. The tests therefore require the reference to carry `NONUT` (and not J2000 or sidereal), and require the J2000 and true-node controls to exceed 0.01°.
 
