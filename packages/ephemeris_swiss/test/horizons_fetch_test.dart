@@ -738,5 +738,41 @@ void main() {
       expect(harness.events, ['get']);
       expect(server.requests, hasLength(1));
     });
+
+    // Without a declared length, a body cut short by the server closing the
+    // connection looks complete to the HTTP client: the parser must refuse it.
+    _loopbackTest('a cut-off answer of unknown length is refused and kept', (
+      server,
+    ) async {
+      final sample = File('test/fixtures/horizons_sample_tt.txt')
+          .readAsStringSync();
+      final cutOff = sample.substring(0, sample.indexOf(r'$$EOE'));
+      server
+        ..reply = 'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n$cutOff'
+        ..closeAfterReply = true;
+      final scratchOut = inScratch('raw');
+      final harness = _Harness(
+        answer: (_) => horizonsHttpGet(server.uri, timeout: generous),
+      );
+
+      await expectLater(
+        harness.confirm(scratchOut),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            startsWith('markers:'),
+          ),
+        ),
+      );
+      await Future<void>.delayed(settle);
+      expect(
+        File(inScratch('raw/01_199_TT.txt')).readAsBytesSync(),
+        cutOff.codeUnits,
+      );
+      expect(Directory(scratchOut).listSync(), hasLength(1));
+      expect(harness.events, ['get']);
+      expect(server.requests, hasLength(1));
+    });
   });
 }
