@@ -132,7 +132,7 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
 5. `centre`: the `Center body name:` line contains `Earth (399)`, and the text after `Center-site name:`, trimmed, equals `GEOCENTRIC`.
 6. `column`: the header is the last line before `$$SOE` containing `Date__(`; split at commas and trimmed; it holds, **by name** (never by index), the two date columns of the requested scale, `ObsEcLon`, and `TDB-UT` when `expectTdbMinusUt`.
 7. `rows`: as many rows as requested.
-8. For each row, in order: `fields` (as many as the header); `number` (the Julian day, longitude and, when expected, quantity 30 match `^-?d+.d+$`; the calendar time matches `yyyy-Mon-dd HH:mm:ss.fff`); `time` (**both** the printed Julian day and the calendar time are within 1 ms of the requested Julian day; instants are derived from Julian day strings in integer microseconds, whole and fraction parsed separately); `precision` (longitude at least 7 decimals, quantity 30 at least 3); `longitude` (in [0, 360)).
+8. For each row, in order: `fields` (as many as the header); `number` (the Julian day, longitude and, when expected, quantity 30 match `^-?\d+\.\d+$`; the calendar time matches `yyyy-Mon-dd HH:mm:ss.fff`); `time` (**both** the printed Julian day and the calendar time are within 1 ms of the requested Julian day; instants are derived from Julian day strings in integer microseconds, whole and fraction parsed separately); `precision` (longitude at least 7 decimals, quantity 30 at least 3); `longitude` (in [0, 360)).
 
 `tdbMinusUtSeconds` is null unless expected.
 
