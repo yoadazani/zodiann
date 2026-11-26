@@ -20,26 +20,24 @@ class _FakePort implements EphemerisPort {
 }
 
 void main() {
-  test(
-    'unbound ephemerisPortProvider throws a StateError naming appOverrides',
-    () {
-      final container = ProviderContainer.test();
-      expect(
-        () => container.read(ephemerisPortProvider),
-        throwsA(
-          isA<ProviderException>().having(
-            (e) => e.exception,
-            'exception',
-            isA<StateError>().having(
-              (e) => e.message,
-              'message',
-              contains('appOverrides'),
-            ),
+  test('unbound ephemerisPortProvider throws a StateError naming '
+      'bootstrapOverrides', () {
+    final container = ProviderContainer.test();
+    expect(
+      () => container.read(ephemerisPortProvider),
+      throwsA(
+        isA<ProviderException>().having(
+          (e) => e.exception,
+          'exception',
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('bootstrapOverrides'),
           ),
         ),
-      );
-    },
-  );
+      ),
+    );
+  });
 
   test('one override binds the port', () {
     final fake = _FakePort();
@@ -49,9 +47,17 @@ void main() {
     expect(container.read(ephemerisPortProvider), same(fake));
   });
 
-  test('appOverrides binds nothing yet', () {
-    // Pins today's state: the task that first ships a real adapter into the
-    // app adds its binding to appOverrides and updates this test.
+  test('unbound ephemerisStatusProvider throws too', () {
+    final container = ProviderContainer.test();
+    expect(
+      () => container.read(ephemerisStatusProvider),
+      throwsA(isA<ProviderException>()),
+    );
+  });
+
+  test('the port is bound at bootstrap, not in appOverrides', () {
+    // The source depends on startup results (ZOD-EPH-002), so
+    // bootstrapOverrides binds it; see ephemeris_wiring_test.dart.
     expect(appOverrides, isEmpty);
   });
 }

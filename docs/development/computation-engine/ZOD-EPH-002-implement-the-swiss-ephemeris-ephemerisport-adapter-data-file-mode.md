@@ -6,7 +6,7 @@
 - **Category:** [Computation Engine](../README.md#computation-engine) (`computation-engine/`)
 - **Phase:** Phase 1
 - **Priority:** Critical
-- **Status:** Not Started
+- **Status:** Done
 - **Scope:** MVP
 
 ## Description
@@ -27,10 +27,10 @@ No direct design reference applies — pure computation.
 
 ## Acceptance Criteria
 
-- [ ] T-EPH-1 passes: Sun and Moon longitude within 1 arcsecond of JPL Horizons/Swiss Ephemeris reference data on 10+ dates.
-- [ ] Requesting a date outside the packaged range returns the typed "out of range" error, not a silently wrong value.
-- [ ] No code path applies an additional precession correction on top of the library's tropical-of-date output (guarded by the regression test T-EPH-1/ACC-5).
-- [ ] Longitude speed is read from the ephemeris, never finite-differenced.
+- [x] T-EPH-1 passes: Sun and Moon longitude within 1 arcsecond of JPL Horizons/Swiss Ephemeris reference data on 10+ dates. *(x86_64 emulator, API 36, head `37bbcac`: all ten bodies at 53 instants within 0.56 arcseconds of Horizons, by UTC input and at matched TT (owner gate: 1 arcsecond); `integration_test/swiss_ephemeris_accuracy_test.dart`.)*
+- [x] Requesting a date outside the packaged range returns the typed "out of range" error, not a silently wrong value. *(`OutOfCoveredRange` outside the measured coverage, 1800-01-03 to 2400-01-06, and for any Moshier fallback, warning or error; `OutsideSupportedRange` outside 1900 to 2100 through the bound port. Adapter and wiring host tests; edge tests on the emulator.)*
+- [x] No code path applies an additional precession correction on top of the library's tropical-of-date output (guarded by the regression test T-EPH-1/ACC-5). *(The flag word is exactly `SEFLG_SWIEPH | SEFLG_SPEED` (258), pinned by a host test; the accuracy gates would fail by far more than their bound otherwise.)*
+- [x] Longitude speed is read from the ephemeris, never finite-differenced. *(One library call per position, speed from `xx[3]`; host test, and the emulator test equating it with the library value.)*
 
 ## Dependencies
 
@@ -53,6 +53,10 @@ No direct design reference applies — pure computation.
 - **From ZOD-EPH-004 (owner decision of 2026-11-21, D5): this task owns the automatic source selection.** The astronomy-engine task text said to wire its adapter as the automatic fallback when the Swiss Ephemeris FFI binding is unavailable. That cannot be done there (this adapter did not exist), so it is deferred here: this task defines the primary adapter and its availability, and so decides when and how the astronomy-engine backup (`AstronomyEphemeris`, `packages/ephemeris_astronomy`, DI-swappable by one `ephemerisPortProvider` override) is selected. Nothing was wired in production by ZOD-EPH-004, and no `FallbackEphemerisPort` was added to `astro_core`. Facts for that decision: the backup's covered range is 1899-12-31 to 2100-01-01 (the Swiss adapter's will differ); its longitude is within 17.6 arcseconds of Horizons at equivalent TT instants, but at UTC instants the Moon is up to 78.6 arcseconds off late in the range because of the library's ΔT (`docs/spikes/ZOD-EPH-004-delta-t.md`), so the two sources disagree for the far-future Moon by design; release builds drop an unreferenced native library, so the backup's native asset enters a build only when app code references it; the vendored library keeps unsynchronised global state (the Pluto segment cache), so calls into it must be serialized like Swiss's; and the backup applies no gravitational light deflection for any body (documented in the adapter and the findings), so it does not match Swiss near solar conjunction.
 
 - **iOS split (2026-11-24, owner decision):** ZOD-FND-003 is Done for its Android and shared scope; its iOS half is [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md). This task is no longer blocked by the iOS half: it is built and verified on the host and Android, and its adapter is exercised on iOS by [ZOD-IOS-001](../ios/tasks/ZOD-IOS-001-verify-the-swiss-ephemeris-and-astronomy-engine-ffi-bindings-on-ios.md). **Risk accepted by that decision:** if iOS shows the binding or data-file packaging needs a different design, shared adapter code here may need rework. Scope and acceptance criteria are unchanged.
+
+- **Owner decisions 2026-11-25 (planning):** the time conversion is the approved deviation in [`docs/decisions/ZOD-EPH-002-time-scale.md`](../../decisions/ZOD-EPH-002-time-scale.md): leap seconds from 1972, the library's historical ΔT before, a labelled continuous-UTC assumption after the table's validity end. From 1972 it replaces "via ΔT" in the computation-settings bullet. The "ΔT-forecast warning" flag is delivered as two separate outputs, the conversion basis and the ΔT data status; no accuracy warning threshold is set. Native calls use one shared state with a lock; the backup is selected automatically only if the Swiss library does not load. The backup's time conversion is [ZOD-EPH-006](ZOD-EPH-006-align-the-backup-source-time-scale-conversion-with-the-primary.md). The acceptance criteria are unchanged.
+
+- **Done 2026-11-26** (branch `task/ZOD-EPH-002-swiss-ephemeris-adapter`, plan [`docs/plans/ZOD-EPH-002-swiss-ephemeris-adapter.md`](../../plans/ZOD-EPH-002-swiss-ephemeris-adapter.md)). Verified on the host and an x86_64 Android emulator only: **ARM devices and iOS are unverified** (iOS is ZOD-IOS-001). The specification deviation of the time conversion is recorded; the specification text is the owner's to change. Hand-offs: design document section 6.
 
 ---
 

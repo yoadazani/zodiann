@@ -13,17 +13,17 @@ dependencies:
   # ZOD-FND-003 (owner decision D5, 2026-11-20): a regular dependency, because
   # Flutter bundles a package's assets (the Swiss Ephemeris data files) only
   # for regular dependencies; the build hook then also builds libswisseph for
-  # Android. A release APK therefore contains the spike data subset (1800 to
-  # 2400, +1.66 MB per ABI) until ZOD-FND-011 decides the final range; it
-  # contains libswisseph only once app code reaches the bindings (measured:
-  # the release build drops unreferenced native assets). The app is not
-  # distributed.
+  # Android. A release APK contains the sepl_18 + semo_18 pair chosen by
+  # ZOD-FND-011 (+1.66 MB per ABI) and, since the app binds the source
+  # (ZOD-EPH-002), libswisseph: the release build drops a native asset that
+  # no app code references. The app is not distributed.
   ephemeris_swiss:
     path: ../../packages/ephemeris_swiss
   # ZOD-EPH-004: a regular dependency for the same reason as ephemeris_swiss: the
   # build hook then also builds libastronomy for Android. The release build drops
-  # a native asset that no app code references (ZOD-FND-003 gotcha 8), so the
-  # library reaches a release APK only once app code uses the bindings.
+  # a native asset that no app code references (ZOD-FND-003 gotcha 8); the
+  # library is in release APKs because the startup wiring uses its bindings
+  # (ZOD-EPH-002).
   ephemeris_astronomy:
     path: ../../packages/ephemeris_astronomy
   flutter:
@@ -34,6 +34,9 @@ dependencies:
   go_router: ^18.1.4
   intl: ^0.20.3
   material_ui: ^1.11.0
+  # ZOD-EPH-002: the application support directory the Swiss Ephemeris data
+  # files are installed into at startup.
+  path_provider: ^2.1.6
   # ZOD-L10-002: main() builds the settings store over the async preferences
   # API (SharedPreferencesAsync), which shared_storage does not re-export.
   shared_preferences: ^2.5.6
@@ -53,7 +56,5 @@ dev_dependencies:
     path: ../../packages/gann_core
   integration_test:
     sdk: flutter
-  # ZOD-FND-003: copies the bundled data files to a real directory.
-  path_provider: ^2.1.6
   # ZOD-L10-002: the in-memory preferences platform the tests install.
   shared_preferences_platform_interface: ^2.4.2

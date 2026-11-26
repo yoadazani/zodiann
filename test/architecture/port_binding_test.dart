@@ -2,8 +2,8 @@
 // its source in `SupportedRangeEphemeris`, so the supported date range is
 // enforced in front of every source (Q1). The guard fails closed: a binding,
 // a second provider of the port, or a direct use of a source adapter that is
-// not literally wrapped fails the build. No production binding exists yet
-// (ZOD-EPH-002 adds the first), so the real-repository scan is clean today.
+// not literally wrapped fails the build. The production binding is in
+// apps/astro_mobile/lib/src/di/ephemeris_wiring.dart (ZOD-EPH-002).
 // Runs from the workspace root on every `melos run test`.
 import 'dart:io';
 

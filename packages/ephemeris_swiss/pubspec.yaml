@@ -7,6 +7,9 @@ environment:
   sdk: ^3.14.0
 
 dependencies:
+  # ZOD-EPH-002: the port the adapter implements and the time conversion.
+  astro_core:
+    path: ../astro_core
   # ZOD-FND-003: the Android build hook (hook/build.dart) compiles the vendored
   # Swiss Ephemeris source with native assets; ffi marshals the calls.
   code_assets: ^2.0.0
@@ -17,7 +20,7 @@ dependencies:
 
 dev_dependencies:
   # ZOD-FND-003: generates lib/src/ffi/swisseph_bindings.g.dart
-  # (`dart run ffigen --config ffigen.yaml`; needs libclang).
+  # (`dart run tool/ffigen.dart`; needs libclang).
   ffigen: ^23.0.0
   test: ^1.32.0
 

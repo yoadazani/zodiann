@@ -27,6 +27,7 @@ Two ranges are kept apart everywhere:
 - **Size impact (existing measured evidence, [`docs/spikes/ZOD-FND-003-swiss-ephemeris-ffi.md`](../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md) section 4):** the release APK grows by **+1,663,124 B per ABI** with the regular dependency: arm64-v8a 18,537,162 to 20,200,286 B; armeabi-v7a 16,157,122 to 17,820,246 B; x86_64 19,788,968 to 21,452,092 B. Option 2 adds no bytes beyond the spike's pair. **Measured on Android builds only**; the iOS size is added by ZOD-IOS-009; ZOD-REL-002 re-checks the final size.
 - **The regular `ephemeris_swiss` dependency in `apps/astro_mobile/pubspec.yaml` stays** (the release app carries the files; the spike left this confirmation to FND-011).
 - **Nominal, not verified.** "1800 to 2400" comes from the upstream block names. Until ZOD-EPH-002 measures the edges on a device they must not be quoted as measured facts. The spike observed one thing only: at 1799-12-31 with only `sepl_18` present, the library fell back to its built-in ephemeris (flags 260, a `sepl_12.se1 not found` warning). The approved range sits 100 and about 299 years inside the nominal edges, so the exact edge instants cannot affect a supported date.
+- **Measured by ZOD-EPH-002 (2026-11-26, x86_64 emulator, API 36):** with the packaged pair some body fails up to 1800-01-01T05:44Z and from 2400-01-07T04:58Z. The adapter covers 1800-01-03 to 2400-01-06 (`SwissEphemeris.fileCoverage`, pinned by `apps/astro_mobile/integration_test/swiss_file_edges_test.dart`).
 
 ## 4. Boundary behavior
 

@@ -13,8 +13,8 @@ import 'dart:ffi' as ffi;
     ffi.Pointer<ffi.Char>,
   )
 >()
-external int swe_calc(
-  double tjd,
+external int zodiann_swiss_calc_tt(
+  double tjd_tt,
   int ipl,
   int iflag,
   ffi.Pointer<ffi.Double> xx,
@@ -30,7 +30,7 @@ external int swe_calc(
     ffi.Pointer<ffi.Char>,
   )
 >()
-external int swe_calc_ut(
+external int zodiann_swiss_calc_ut(
   double tjd_ut,
   int ipl,
   int iflag,
@@ -39,11 +39,10 @@ external int swe_calc_ut(
 );
 
 @ffi.Native<ffi.Void Function()>()
-external void swe_close();
+external void zodiann_swiss_close();
 
 @ffi.Native<ffi.Void Function(ffi.Pointer<ffi.Char>)>()
-external void swe_set_ephe_path(ffi.Pointer<ffi.Char> path);
+external void zodiann_swiss_set_ephe_path(ffi.Pointer<ffi.Char> path);
 
-/// exports from sweph.c
-@ffi.Native<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>()
-external ffi.Pointer<ffi.Char> swe_version(ffi.Pointer<ffi.Char> arg0);
+@ffi.Native<ffi.Void Function(ffi.Pointer<ffi.Char>)>()
+external void zodiann_swiss_version(ffi.Pointer<ffi.Char> out);

@@ -5,15 +5,17 @@ import 'package:ffi/ffi.dart';
 import 'ffi/swisseph_bindings.g.dart' as native;
 import 'swiss_calc.dart';
 
-/// A thin wrapper over the native Swiss Ephemeris library (ZOD-FND-003 spike).
+/// A thin wrapper over the native Swiss Ephemeris library (ZOD-FND-003). It is
+/// **not** the `EphemerisPort` adapter.
 ///
-/// It exists to prove the binding. It is **not** the `EphemerisPort` adapter
-/// (ZOD-EPH-002). The library keeps global state (the ephemeris path and open
-/// file handles), so calls from several isolates or threads must not
-/// interleave; this wrapper does nothing to serialize them.
+/// Every call goes through the project's locked functions
+/// (native/swisseph/zodiann_swiss_lock.c) over **one library state shared by
+/// every thread** (ZOD-EPH-002): calls from several isolates are serialized,
+/// [setEphePath] is called once and applies to every isolate, and [close]
+/// likewise affects every isolate.
 ///
-/// Importing this file loads `libswisseph`, which the build hook produces for
-/// Android only, so import it from device code and never from host tests.
+/// The first call loads `libswisseph`, which the build hook produces for
+/// Android only, so a call fails on the host.
 final class SwissEphemerisBinding {
   SwissEphemerisBinding();
 
@@ -21,7 +23,7 @@ final class SwissEphemerisBinding {
   String version() {
     final buffer = calloc<Char>(256);
     try {
-      native.swe_version(buffer);
+      native.zodiann_swiss_version(buffer);
       return buffer.cast<Utf8>().toDartString();
     } finally {
       calloc.free(buffer);
@@ -33,7 +35,7 @@ final class SwissEphemerisBinding {
   void setEphePath(String directory) {
     final path = directory.toNativeUtf8(allocator: calloc);
     try {
-      native.swe_set_ephe_path(path.cast<Char>());
+      native.zodiann_swiss_set_ephe_path(path.cast<Char>());
     } finally {
       calloc.free(path);
     }
@@ -57,7 +59,13 @@ final class SwissEphemerisBinding {
     final xx = calloc<Double>(6);
     final serr = calloc<Char>(256);
     try {
-      final returned = native.swe_calc_ut(julianDay, body, flags, xx, serr);
+      final returned = native.zodiann_swiss_calc_ut(
+        julianDay,
+        body,
+        flags,
+        xx,
+        serr,
+      );
       final error = serr.cast<Utf8>().toDartString();
       if (returned < 0) {
         throw StateError('swe_calc_ut failed: $error');
@@ -91,7 +99,13 @@ final class SwissEphemerisBinding {
     final xx = calloc<Double>(6);
     final serr = calloc<Char>(256);
     try {
-      final returned = native.swe_calc(tjdTt, body, flags, xx, serr);
+      final returned = native.zodiann_swiss_calc_tt(
+        tjdTt,
+        body,
+        flags,
+        xx,
+        serr,
+      );
       final error = serr.cast<Utf8>().toDartString();
       if (returned < 0) {
         throw StateError('swe_calc failed: $error');
@@ -108,6 +122,6 @@ final class SwissEphemerisBinding {
     }
   }
 
-  /// Closes the library's open files (`swe_close`).
-  void close() => native.swe_close();
+  /// Closes the library's open files (`swe_close`), for every isolate.
+  void close() => native.zodiann_swiss_close();
 }

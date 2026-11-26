@@ -25,9 +25,9 @@ class NodeBypass {
 }
 
 /// The only files that may name the raw API, each with the reason. Any other
-/// production file fails the guard. **ZOD-EPH-002 must add its Swiss adapter
-/// file here with a justification** (every class implementing `EphemerisPort`
-/// declares `meanAscendingNode`); so must any later source or wrapper.
+/// production file fails the guard. Every class implementing `EphemerisPort`
+/// declares `meanAscendingNode`, so **any later source or wrapper must add its
+/// file here with a justification**.
 const Map<String, String> nodeBypassAllowlist = {
   'packages/astro_core/lib/src/ephemeris/mean_node.dart':
       'Defines the formula, meanAscendingNodeAt and the '
@@ -40,6 +40,9 @@ const Map<String, String> nodeBypassAllowlist = {
   'packages/ephemeris_astronomy/lib/src/astronomy_ephemeris.dart':
       'A source adapter: its own position() node branch uses the shared '
       'formula (ZOD-EPH-004).',
+  'packages/ephemeris_swiss/lib/src/swiss_ephemeris.dart':
+      'A source adapter: its own position() node branch uses the shared '
+      'formula (ZOD-EPH-002).',
 };
 
 /// The raw API: the two names and the mixin that exposes the method. Whole

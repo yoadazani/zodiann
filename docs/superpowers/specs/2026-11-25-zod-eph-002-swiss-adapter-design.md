@@ -1,0 +1,126 @@
+# ZOD-EPH-002: the Swiss Ephemeris adapter (data-file mode), design
+
+**Status: approved by the owner, 2026-11-26** (written 2026-11-25, read by a builder reviewer, the owner's two questions answered 2026-11-26). Implementation plan: [`docs/plans/ZOD-EPH-002-swiss-ephemeris-adapter.md`](../../plans/ZOD-EPH-002-swiss-ephemeris-adapter.md).
+
+Sources of truth: the [task file](../../development/computation-engine/ZOD-EPH-002-implement-the-swiss-ephemeris-ephemerisport-adapter-data-file-mode.md), the [time-conversion decision](../../decisions/ZOD-EPH-002-time-scale.md), the [ZOD-FND-011 record](../../decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md) (sections 4, 7a, 11) and the [FFI spike](../../spikes/ZOD-FND-003-swiss-ephemeris-ffi.md).
+
+## 1. Intent
+
+Give the app its primary position source: accurate, never silently approximate, and safe to call from the crossing solver's background isolate.
+
+**Goals:** the ten physical bodies through `EphemerisPort` with speed from the library; the approved time conversion; serialized native calls; data files installed on the device; production wiring with the automatic backup; Android verification.
+
+**Non-goals:** built-in Moshier mode (EPH-003); the backup's time conversion (EPH-006); updatable data (EPH-007); banners and settings screens (NFR-017, SET-006); the crossing solver; iOS verification (IOS-001); any network access; any `EphemerisPort` contract change.
+
+**Failure even if it "works":** a Moshier or otherwise approximate longitude returned as success; a valid date failing on a background isolate; a production binding without the supported-range wrapper.
+
+## 2. Constraints
+
+* Vendored `native/swisseph/upstream` stays byte-identical (guarded).
+* Settings: geocentric, apparent, true ecliptic of date; flags `SEFLG_SWIEPH | SEFLG_SPEED` only, so no extra precession, sidereal or J2000 flag.
+* Host tests never load native code (the hook builds Android only).
+* Architecture guards: the binding is `ephemerisPortProvider.overrideWithValue(SupportedRangeEphemeris(<adapter>(...)))` with the adapter created inside; the adapter file joins `nodeBypassAllowlist` with a justification.
+
+## 3. Approaches (chosen by the owner)
+
+| Question | Chosen | Considered, and why not |
+|---|---|---|
+| Serialization | One shared library state (`TLSOFF`) and a lock in project C code. Same behaviour on every platform; costs native code and brief waiting | Per-thread state plus lock: two behaviours, iOS untestable. Dart retry: leaves shared iOS state unprotected |
+| Time | Leap seconds from 1972, historical ΔT before, labelled assumption after the table | `swe_calc_ut` everywhere: reads UTC as UT1, so a ΔT forecast moves future positions |
+| Backup | Automatic only if the Swiss library does not load | Never automatic: no positions until a settings screen exists |
+| Earth-rotation updates | Separate deferred task | In this task: needs no-network rules changed, changes no position |
+
+## 4. Design
+
+### 4.1 Time scale (`astro_core`, pure Dart)
+
+* `LeapSecondTable`: the 27 steps plus the 1972 base, with source, bulletin and validity end (2027-06-28T00:00:00Z).
+* A pure function of a UTC instant returning a sealed result: **Universal Time** (before 1972) or **Terrestrial Time** with the offset in seconds and the basis `publishedLeapSeconds` or `assumedContinuousUtc`. Non-UTC input throws `ArgumentError`.
+* A separate pure function for the **ΔT data status** (observed / estimated / forecast) over a dataset description (bundled: observed through the end of 2023, estimated through the end of 2028). A guard ties the estimated end to the vendored `TABEND`.
+* Both are callable by any consumer, so no port or result type changes.
+
+### 4.2 Native layer (`ephemeris_swiss`)
+
+* A project-authored C file beside (not inside) `upstream/`: one mutex around set-path, close, `swe_calc` and `swe_calc_ut`. The hook compiles it with the library and defines `TLSOFF`.
+* `SwissEphemerisBinding` keeps its public methods and calls through the locked functions, so existing device tests are unchanged. A guard forbids any other Dart code from using the unlocked symbols.
+* The data path is set once at startup; with shared state it applies to every isolate.
+
+### 4.3 Adapter
+
+* A pure-Dart `EphemerisPort` over a small injected calculation interface (host-testable with a fake); the native implementation is exported only from the native library entry point.
+* `position`: node from `MeanAscendingNodeFormula`; non-UTC throws; outside `coveredRange`, `OutOfCoveredRange`; otherwise convert time, one library call, check `usedSwissEphemerisFiles`, normalize the longitude, take the speed from the same call.
+* Moshier fallback, a missing file, a warning **or a negative library return** gives `OutOfCoveredRange` (data unavailable). *My call:* a damaged file must not crash the app.
+* `coveredRange` comes from edges **measured on the device**, taken inward so every body succeeds throughout. Measured 2026-11-26: **1800-01-03 to 2400-01-06**.
+* *My call:* speed is reported as the library gives it (degrees per TT day); the difference from per-UTC-day exists only inside a leap second or the 1972 step.
+
+### 4.4 Data files and startup (`astro_mobile`)
+
+* An installer copies the two packaged files to the application support directory when a file is missing or its bytes differ (*my call:* stronger than the spike's size-only rule, so a same-size newer file is recopied), through a temporary file and rename. `path_provider` becomes a runtime dependency; the licensing inventory is updated.
+* A failed copy does not stop startup. *My call:* unless **both** files are installed and match the bundled ones, the Swiss source is bound over the always-unavailable calculation source (below); an older or mixed file set is never used silently.
+* The test seam in `bootstrapOverrides` injects the **calculation sources and the load-probe results, never a ready port**, so host tests of `main()` never touch native code and the architecture guards still hold: the binding is **one expression**, `ephemerisPortProvider.overrideWithValue(SupportedRangeEphemeris(<condition> ? <Swiss adapter>(...) : AstronomyEphemeris(...)))`, with both adapters created inside the wrapper.
+* **Source selection**, once at startup: if a probe shows the Swiss library cannot load, the astronomy-engine adapter is chosen. The active source is exposed by a provider. *My call:* if neither library loads, the Swiss adapter is bound over a calculation source that always reports unavailable, so every physical-body request returns `OutOfCoveredRange` instead of crashing. No third port class, so no new guard exemption.
+* **The time basis belongs to the primary source.** The §4.1 function describes the Swiss adapter's conversion. *My call* for the app-level values, derived from the probe and install results (never from an adapter type, which the guards forbid):
+
+  | Active source | Time basis | ΔT data status |
+  |---|---|---|
+  | primary | from §4.1 | from §4.1 |
+  | backup | "backup's own ΔT" | absent |
+  | none (neither library loads, or the files are not installed and no switch applies) | absent | absent |
+
+* **Existing code this changes.** The binding depends on startup results, so it moves from the synchronous `appOverrides` list into `bootstrapOverrides` (update its doc comments; the FND-011 record names `appOverrides`, and the guards do not depend on the location). `main()` delegates to a start function with injectable ephemeris dependencies, and the host tests that run startup (`app_shell_test`, `first_launch_test`) inject fakes. The tests asserting that `appOverrides` binds nothing are updated. The ZOD-EPH-004 guard in `astronomy_swap_test.dart` that forbids importing the backup anywhere in the app library is **narrowed to allow only the wiring file** (a test, not the backup's implementation or fixtures). The "never import native bindings from host tests" comments are reworded after confirming host tests still compile and never call native code.
+
+## 5. Verification
+
+**Owner decisions (2026-11-26):** the **x86_64 Android emulator** is the required device; ARM devices stay unverified and are recorded as a gap for a later release check. **All ten bodies must be within 1″** of Horizons, both by UTC input and at matched TT (matching ACC-1's per-body bound; the task fails if any body misses).
+
+| Check | Where |
+|---|---|
+| Time scale at every table step, 1972, validity end, one microsecond either side; status boundaries; table equals the published list | host |
+| Adapter: mapping of all bodies, flags, fallback and error cases, node, range, non-UTC | host, fake source |
+| Wiring: wrapper, fallback selection, installer, startup with failures | host, plus the architecture guards |
+| T-EPH-1 and the owner's wider gate: **all ten bodies** within 1″ of Horizons by UTC input at the existing 53 UT instants | device |
+| All ten bodies within 1″ at matched TT (a new Horizons fixture queried with TT); no extra precession | device |
+| Range edges for all bodies; measured file edges; negative control | device |
+| Concurrent calls from several isolates equal sequential results, including an isolate that never set the path | device |
+| Release APK contains `libswisseph` for all three ABIs; size recorded | build |
+
+## 6. Known limits and hand-offs
+
+* **Until EPH-006, the fallback changes time handling:** the backup uses its own ΔT (Moon up to 78.6″ at 2100).
+* The backup library keeps unsynchronised state; this task does not serialize it. A consumer running it on two isolates at once could get a wrong Pluto. Recommended addition to EPH-006 or the crossing tasks.
+* TT as a function of UTC has steps (decision record section 4): hand-off to CRS-001/002.
+* Swiss speed has small glitches near solar conjunction ([note](../../spikes/ZOD-EPH-004-swiss-speed-reference.md)): hand-off to CRS-001 and EPH-005.
+* iOS is unverified (accepted risk, IOS-001). ARM devices are unverified.
+
+Hand-offs recorded at implementation (each becomes a note when its task is planned):
+
+* **ZOD-TST-001:** T-EPH-1 here uses the ZOD-EPH-004 UT reference copy and the new Swiss TT fixture; adding instants means refetching both and updating the 53 and 530 counts; TST-001 repoints T-EPH-1 to its fixture.
+* **ZOD-EPH-006 or the crossing tasks:** the backup's unsynchronised library state is not serialized (recommended addition). `packages/ephemeris_astronomy` comments still say host code never imports its native library; the app wiring now does.
+* **ZOD-CRS-001, ZOD-CRS-002:** the TT steps (decision record section 4).
+* **ZOD-CRS-001, ZOD-EPH-005:** Swiss speed glitches near solar conjunction.
+* **ZOD-IOS-001:** the iOS hook must compile `zodiann_swiss_lock.c` with `-DTLSOFF`; the concurrency and startup tests need an iOS run.
+* **ZOD-NFR-017:** the time basis and the ΔT data status come from `ephemerisStatusProvider` (app layer).
+
+Added by the branch review (2026-11-26):
+
+* **ZOD-EPH-007:** `EphemerisStatus` reads the bundled leap table while the adapter accepts an injected one; new data must reach both from one instance, or the reported basis can disagree with the conversion used.
+* **ZOD-IOS-001:** until the iOS hook builds Swiss Ephemeris, the Swiss probe fails there and startup selects the backup. `libswisseph` also still exports the unlocked upstream `swe_*` symbols (only Dart is guarded); hiding them belongs with the next hook change.
+* **ZOD-REL-002:** repeat the release check on every release build (both libraries and both `.se1` files in each APK, and the startup line `zodiann ephemeris source: primary`); no automated test does it.
+
+## 7. Left to the builder
+
+Names and file layout; the calculation interface's shape; the C function signatures; how the probe is made; how device fixtures are shared.
+
+## 8. Release build results (2026-11-26)
+
+`flutter build apk --release --split-per-abi`. Every APK holds `libswisseph.so`, `libastronomy.so`, `libdartjni.so` and both `.se1` files. All `LOAD` segments of `libswisseph.so` are aligned to `0x4000` on the three ABIs, and each exports the five locked functions. Sizes in bytes:
+
+| ABI | APK | `libswisseph` | `libastronomy` | `libdartjni` |
+|---|---|---|---|---|
+| armeabi-v7a | 21,129,866 | 571,676 | 206,636 | 82,048 |
+| arm64-v8a | 23,566,896 | 551,120 | 197,240 | 131,944 |
+| x86_64 | 24,849,443 | 637,656 | 249,232 | 117,256 |
+
+Against the ZOD-FND-003 measurement with the data files and without the library (2026-11-20: 17,820,246; 20,200,286; 21,452,092) the APKs are 3.3 to 3.4 MB larger. Much other app work landed in between, so the difference is not all this task's.
+
+A clean install of the x86_64 release APK on the API 36 emulator logged `zodiann ephemeris source: primary`, with no fatal exception or native crash and a running process.

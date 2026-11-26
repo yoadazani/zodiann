@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/misc.dart' show Override;
 
-/// The DI wiring: the single place that binds sources for the running app
-/// (ARCH-4). `main()` passes it to the root `ProviderScope`.
+/// The DI bindings that need no startup work (ARCH-4). `bootstrapOverrides`
+/// includes them in the root `ProviderScope`.
 ///
-/// The task that first ships a real adapter into the app adds its binding
-/// here, e.g. `ephemerisPortProvider.overrideWithValue(...)`.
+/// A binding that depends on something resolved at startup is made there
+/// instead: the position source is chosen and bound by `ephemerisOverrides`
+/// (`ephemeris_wiring.dart`, ZOD-EPH-002).
 ///
 /// Deliberately not a `const` literal: `ProviderScope`'s default `overrides`
 /// is `const <Override>[]`, and a const list here would be the same canonical

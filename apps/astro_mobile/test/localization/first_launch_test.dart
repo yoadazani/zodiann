@@ -17,6 +17,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 import 'package:shared_storage/shared_storage.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import '../di/support/fake_ephemeris_dependencies.dart';
 import 'support/memory_settings_store.dart';
 
 /// One launch: a new store over the same in-memory platform, as a restart
@@ -29,7 +30,11 @@ Future<BuildContext> _launch(
   List<Locale> device,
 ) async {
   final overrides = await tester.runAsync(
-    () => bootstrapOverrides(store: store, deviceLocales: device),
+    () => bootstrapOverrides(
+      store: store,
+      deviceLocales: device,
+      ephemeris: FakeEphemerisDependencies().dependencies,
+    ),
   );
   await tester.pumpWidget(
     ProviderScope(overrides: overrides!, child: const ZodiannApp()),
@@ -122,5 +127,10 @@ void main() {
     expect(main, contains('ensureInitialized'));
     expect(main, contains('await bootstrapOverrides('));
     expect(main, contains('overrides:'));
+    // The running app starts with the real position-source dependencies.
+    expect(
+      main,
+      contains('startZodiann(ephemeris: productionEphemerisDependencies())'),
+    );
   });
 }
