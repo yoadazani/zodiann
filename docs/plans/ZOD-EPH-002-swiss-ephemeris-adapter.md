@@ -22,6 +22,7 @@
 * No `EphemerisPort` contract change. No network use in app code.
 * The production binding is one expression, `ephemerisPortProvider.overrideWithValue(SupportedRangeEphemeris(...))`, with both adapters created inside it.
 * Host tests never run native code or the real file installer.
+* Before **every** commit, from the root: `dart run melos run lint` and `dart run melos run test` exit 0, one process at a time (`dart` is the pinned SDK on `PATH`, equivalent to `fvm dart`).
 * Acceptance gate (owner, 2026-11-26): on the **x86_64 Android emulator**, **all ten bodies within 1″** of JPL Horizons by UTC input at the 53 reference instants **and** at matched TT. A miss fails the task: stop and report; never widen a tolerance or drop an instant.
 
 ### Environment (every task)
@@ -46,6 +47,7 @@ Most likely to bite a person first. Each has a test in the owning task.
 3. An app update ships new data of the same size: it is recopied (Task 6).
 4. A damaged data file or a nonsense library result: unavailable, not a crash (Tasks 3, 5).
 5. The first and last supported instants (1900-01-01T00:00Z, 2100-12-31T23:59:59.999999Z) succeed for all ten bodies (Task 5).
+6. A release build ends with source `none`, or lacks the backup library, with no visible error (Task 8).
 
 ## Plan decisions (builder's calls)
 
@@ -156,12 +158,12 @@ int zodiann_swiss_calc_tt(double tjd_tt, int ipl, int iflag, double *xx, char *s
 - [ ] **Step 2: Run** it on the emulator against the unchanged library. Expected: the first test FAILS (per-thread state: the worker falls back to Moshier). If it passes, stop and find out why before continuing.
 - [ ] **Step 3: Write the guard test** (host, text scan):
   * the generated bindings declare exactly the five `zodiann_swiss_*` externals and no `swe_*` one;
-  * no `.dart` file under `apps/` or `packages/` (this guard excluded, build output excluded) has an `external` declaration named `swe_*` or a quoted symbol starting `swe_`;
+  * no `.dart` file under `apps/` or `packages/` (this guard excluded, build output excluded) has an `external` declaration named `swe_\w+`, or a string literal that is entirely a symbol (`['"]swe_\w+['"]`; error messages that merely mention a function do not count);
   * the C file: each of the five function bodies contains, in this order, one `pthread_mutex_lock(&zodiann_swiss_mutex)`, one upstream `swe_` call, one `pthread_mutex_unlock(&zodiann_swiss_mutex)`, and **no call to another `zodiann_swiss_` function** (the mutex is not recursive);
   * the C file has `#error` under `#ifndef TLSOFF`;
   * the hook lists `zodiann_swiss_lock.c` and defines `TLSOFF`.
   Run it: FAIL.
-- [ ] **Step 4: Implement.** C: `static pthread_mutex_t zodiann_swiss_mutex = PTHREAD_MUTEX_INITIALIZER;`, include `swephexp.h`, store the return value, unlock, return it. SPDX `AGPL-3.0-only` header. State in a comment that `swe_set_ephe_path` calls upstream `swe_calc` internally, which is safe only because that inner call is the unlocked upstream symbol. Hook: add the source, `native/swisseph` to `includes`, `defines: {'TLSOFF': null}`, and the `.c` and `.h` to `output.dependencies`. ffigen: entry point is the project header, the five names, drop the NDK sysroot options (no system header), keep the output path and asset id; run `dart run tool/ffigen.dart` from the package. Binding: call the new functions; replace the "does nothing to serialize" doc comment with the shared-state rule (path set once, applies to every isolate).
+- [ ] **Step 4: Implement.** C: `static pthread_mutex_t zodiann_swiss_mutex = PTHREAD_MUTEX_INITIALIZER;`, include `swephexp.h`, store the return value, unlock, return it. SPDX `AGPL-3.0-only` header. State in a comment that `swe_set_ephe_path` calls upstream `swe_calc` internally, which is safe only because that inner call is the unlocked upstream symbol. Hook: add the source, `'../../native/swisseph'` to `includes`, `defines: {'TLSOFF': null}`, and the `.c` and `.h` to `output.dependencies`; correct the stale `ffigen.yaml` comments in `hook/build.dart` and the package `pubspec.yaml`. ffigen: entry point is the project header, the five names, drop the NDK sysroot options (no system header), keep the output path and asset id; run `dart run tool/ffigen.dart` from the package. Binding: call the new functions; replace the "does nothing to serialize" doc comment with the shared-state rule (path set once, applies to every isolate; `close()` likewise affects every isolate).
 - [ ] **Step 5: Run** the guard (PASS), then on the emulator `swiss_ephemeris_concurrency_test.dart`, `swiss_ephemeris_spike_test.dart` and `astronomy_speed_vs_swiss_test.dart`. Expected: all PASS.
 - [ ] **Step 6: Mutation check (not committed):** comment out the lock and unlock lines, run the concurrency test three times, record the result, restore, and confirm `git diff` is clean for the C file. A pass without the lock is recorded as "race not reproduced", not as proof.
 - [ ] **Step 7: Commit** `feat(ZOD-EPH-002): serialize one shared Swiss Ephemeris state`.
@@ -197,7 +199,7 @@ final class NativeSwissCalculationSource implements SwissCalculationSource {
 }
 ```
 
-The constructor does no native call. The two sources neither implement `EphemerisPort` nor mix in the node formula.
+The constructor does no native call. `coveredRange` returns `fileCoverage`. `calculateSwissBody` lives in `swiss_calculation_source.dart` and throws `ArgumentError` for `Body.node`. The two sources neither implement `EphemerisPort` nor mix in the node formula. The adapter's doc states that before 1972 the UTC input is treated as Universal Time (it may differ from UT1 by the DUT1 of the day).
 
 - [ ] **Step 1: Write the failing tests** with a recording fake source:
   * `swissBodyIds` is exactly the ten physical bodies with the values above.
@@ -205,7 +207,8 @@ The constructor does no native call. The two sources neither implement `Ephemeri
   * At `utc(1972)` and `utc(2026, 11, 26)`: one `calcTt` with `julianDayUt(utc.add(Duration(microseconds: 32184000 + n * 1000000)))` (n = 10 and 37), flags `258`; no `calcUt`.
   * A custom leap table changes the TT passed.
   * Success: longitude normalized (`-1e-15` gives `0.0`, `370` gives `10`), speed equal to the result's speed, one call only.
-  * Each of: `null`; Moshier flag; warning text; negative flags; NaN or infinite longitude; NaN speed → `OutOfCoveredRange(requested: utc, covered: port.coveredRange)`.
+  * Each of: `null`; Moshier flag; warning text; return flags `-5` with an empty error (the Swiss bit set and the Moshier bit clear, so only the sign check rejects it); NaN or infinite longitude; NaN speed → `OutOfCoveredRange(requested: utc, covered: port.coveredRange)`.
+  * `calculateSwissBody` with `Body.node` throws `ArgumentError`.
   * Over `UnavailableSwissCalculationSource`: all ten bodies give `OutOfCoveredRange`; the node still succeeds.
   * One microsecond before `coveredRange.start` and after `.end`: `OutOfCoveredRange`, no source call; both ends themselves call the source.
   * Node: `EphemerisSuccess(meanAscendingNodeAt(utc))` also outside coverage, no source call.
@@ -249,7 +252,7 @@ The constructor does no native call. The two sources neither implement `Ephemeri
   * `'speed is the library speed'`: adapter speed equals `xx[3]` from the matching direct call for all ten bodies at `2026-11-26` and `1950-01-01`;
   * `'supported and covered edges'`: all ten bodies succeed at `SupportedDateRange.start`, `.end`, `fileCoverage.start`, `.end`; one microsecond outside coverage gives `OutOfCoveredRange`;
   * `'empty directory'`: path set to an empty temporary directory, all ten give `OutOfCoveredRange`;
-  * `'damaged files'`: both files truncated to half in a temporary directory, then in a second one both overwritten with 4,096 zero bytes: at `2000-01-01T12:00Z` all ten give `OutOfCoveredRange` and the process survives. A truncated file may still serve some blocks: if a body succeeds there, its longitude must be within 1″ of the intact result. A crash or a wrong success is a stop-and-report finding.
+  * `'damaged files'`, at `2000-01-01T12:00Z`, in two temporary directories, the process surviving both: both files overwritten with 4,096 zero bytes → all ten `OutOfCoveredRange`; both truncated to half → each body is either `OutOfCoveredRange` or within 1″ of the intact result. A crash or a wrong success is a stop-and-report finding.
   Restore the good path after the control tests.
 - [ ] **Step 5: Run** on the emulator and keep the printed maxima for the docs. Expected: PASS. A longitude miss: stop and report.
 - [ ] **Step 6: Mutation check (not committed):** add `1.0 / 24` to the adapter's TT Julian day; the UTC gate must fail. Restore.
@@ -260,7 +263,7 @@ The constructor does no native call. The two sources neither implement `Ephemeri
 **Files:**
 - Create: `apps/astro_mobile/lib/src/ephemeris/swiss_data_installer.dart`
 - Test: `apps/astro_mobile/test/ephemeris/swiss_data_installer_test.dart`
-- Modify: `apps/astro_mobile/pubspec.yaml`, `pubspec.lock` if it changes, `docs/licensing/third-party-inventory.md`, `THIRD_PARTY_NOTICES.md` if it lists runtime packages
+- Modify: `apps/astro_mobile/pubspec.yaml`, `pubspec.lock` if it changes, `docs/licensing/third-party-inventory.md`, `THIRD_PARTY_NOTICES.md`
 
 **Interfaces — Produces:**
 
@@ -278,14 +281,15 @@ Future<bool> installSwissData({
   * the names equal the files in `../../packages/ephemeris_swiss/assets/ephe`;
   * fresh install creates the directory, writes both, returns true, leaves no `.tmp`;
   * a second run leaves an old `lastModified` (set in the test) unchanged;
-  * same-size different bytes are replaced; a shorter target is replaced; a stale `<name>.tmp` with junk is gone afterwards and the target is right;
+  * same-size different bytes are replaced; a shorter target is replaced;
+  * a stale `<name>.tmp` with junk beside an **already correct** target is gone afterwards;
   * the directory path occupied by a file → false, no throw;
   * a directory where `sepl_18.se1` should be → false, and `semo_18.se1` is still installed;
   * `loadBundled` throwing for one name → false, the other installed, and an existing older copy of the failed name still reports false.
 - [ ] **Step 2: Run** `flutter test test/ephemeris/swiss_data_installer_test.dart`: FAIL.
-- [ ] **Step 3: Implement:** per file, in its own `try`: load; if the target's bytes differ or it is missing, write `<name>.tmp` with `flush: true`, rename over the target; success is a read-back equal to the bundled bytes.
+- [ ] **Step 3: Implement:** per file, in its own `try`: delete any existing `<name>.tmp`; load; if the target's bytes differ or it is missing, write `<name>.tmp` with `flush: true`, rename over the target; success is a read-back equal to the bundled bytes.
 - [ ] **Step 4: Run:** PASS.
-- [ ] **Step 5: Promote `path_provider`.** Save `dart pub deps --json` to the scratchpad; move `path_provider: ^2.1.6` to `dependencies` with a comment; `flutter pub get`; save the output again. Compute `astro_mobile`'s regular-dependency closure from both (the walk in `test/architecture/dependency_closure.dart`). For **every** package that newly enters it, change its inventory row from `dev/test/tool only` to the runtime wording the inventory uses, and update section 4's native-plugins row (expected: the `path_provider*` family, `jni`, `jni_flutter`, `jni_util`, `objective_c`; the command output is the authority). Re-read each moved package's LICENSE in the pub cache; record that `jni`'s native code now ships and remains unread. Any license other than those already recorded: stop and ask.
+- [ ] **Step 5: Promote `path_provider`.** Save `dart pub deps --json` to the scratchpad; move `path_provider: ^2.1.6` to `dependencies` with a comment; `flutter pub get`; save the output again. Compute `astro_mobile`'s regular-dependency closure from both (the walk in `test/architecture/dependency_closure.dart`). Check **every** inventory row against the full after-closure, not only the difference. Expected to enter newly: `jni_flutter`, `path_provider`, `path_provider_android`, `path_provider_foundation`. Expected to be in the closure already since ZOD-L10-002 yet labelled `dev/test/tool only` (correct them and say it is a correction): `args`, `convert`, `jni`, `jni_util`, `objective_c`, `package_config`, `path_provider_linux`, `path_provider_platform_interface`, `path_provider_windows`, `plugin_platform_interface`, `typed_data`, `web`, `xdg_directories`. The command output is the authority. Change those rows to the inventory's runtime wording, rewrite section 4's native-plugins row (`jni`'s native code already ships, `jni_flutter` newly ships, both unread), and change the matching `(tool)` labels in `THIRD_PARTY_NOTICES.md` to `(runtime)`. Re-read each of these packages' LICENSE in the pub cache. Any license other than those already recorded: stop and ask.
 - [ ] **Step 6: Run** `dart test test/architecture`. Expected: PASS.
 - [ ] **Step 7: Commit** `feat(ZOD-EPH-002): install the Swiss data files on the device`.
 
@@ -337,7 +341,7 @@ Non-UTC input to either status method throws `ArgumentError` for every source.
 | no or probe throws | not prepared | no, or probe or open throws | none | Swiss over unavailable |
 
 - [ ] **Step 1: Write the failing status test:** primary at `utc(1971, 12, 31)` → `historicalDeltaT`/`observed`; `utc(2000)` → `publishedLeapSeconds`/`observed`; `utc(2027, 6, 28)` → `assumedContinuousUtc`/`estimated`; `utc(2030)` → `assumedContinuousUtc`/`forecast`; backup → `backupOwnDeltaT`/`null`; none → `null`/`null`; non-UTC throws.
-- [ ] **Step 2: Write the failing wiring test** with fake dependencies that count calls (never a port). Per table row (including every "throws" variant): the status source; the bound port `isA<SupportedRangeEphemeris>()`; Sun at `utc(2000)` (success from the fake for primary and backup, with distinguishable longitudes; `OutOfCoveredRange` for none); the call counts ("not probed", "not prepared", `openSwissSource` once with the prepared directory). `utc(1899, 6, 1)` → `OutsideSupportedRange` for every row. The default fake factory has both probes false. Production on the host: `ephemerisOverrides(productionEphemerisDependencies())` completes with source `none` and `prepareSwissData` is never reached (no native library is built for the host, so both probes fail to resolve). Startup: `bootstrapOverrides` with dependencies that all throw still returns the saved language override.
+- [ ] **Step 2: Write the failing wiring test** with fake dependencies that count calls (never a port). Per table row (including every "throws" variant): the status source; the bound port `isA<SupportedRangeEphemeris>()`; Sun at `utc(2000)` (success from the fake for primary and backup, with distinguishable longitudes; `OutOfCoveredRange` for none); the call counts ("not probed", "not prepared", `openSwissSource` once with the prepared directory). `utc(1899, 6, 1)` → `OutsideSupportedRange` for every row. The "throws" fakes throw an `Error` (`ArgumentError`), as a failed native resolution does. The default fake factory has both probes false. Production on the host (no native library is built for it): take `p = productionEphemerisDependencies()`; `expect(p.swissLoads, throwsA(anything))` and the same for `p.backupLoads`; then `ephemerisOverrides` over `p`'s four other members and a counting `prepareSwissData` gives status `none` with count 0. Startup: `bootstrapOverrides` with dependencies that all throw still returns the saved language override.
 - [ ] **Step 3: Run:** FAIL.
 - [ ] **Step 4: Implement.** The binding, computed sources first, then:
 
@@ -351,7 +355,7 @@ ephemerisPortProvider.overrideWithValue(
 )
 ```
 
-Production dependencies: `swissLoads` calls `SwissEphemerisBinding().version()` and returns true; `backupLoads` computes the Sun at `utc(2000)` through `const NativeBodyStateSource()`; `prepareSwissData` uses `getApplicationSupportDirectory()` + `/ephe`, `rootBundle.load`, `installSwissData`, returning the path or null; `openSwissSource` builds one binding, `setEphePath(directory)`, `NativeSwissCalculationSource`. `bootstrapOverrides` returns `[...appOverrides, ...await ephemerisOverrides(ephemeris), appLocaleProvider.overrideWithValue(locale)]`. The unbound port's error message and doc comment name `bootstrapOverrides`.
+After selection, `ephemerisOverrides` writes one line with `debugPrint`: `zodiann ephemeris source: <primary|backup|none>`. Production dependencies: `swissLoads` calls `SwissEphemerisBinding().version()` and returns true; `backupLoads` computes the Sun at `utc(2000)` through `const NativeBodyStateSource()`; `prepareSwissData` uses `getApplicationSupportDirectory()` + `/ephe`, `rootBundle.load`, `installSwissData`, returning the path or null; `openSwissSource` builds one binding, `setEphePath(directory)`, `NativeSwissCalculationSource`. `bootstrapOverrides` returns `[...appOverrides, ...await ephemerisOverrides(ephemeris), appLocaleProvider.overrideWithValue(locale)]`. The unbound port's error message and doc comment name `bootstrapOverrides`.
 - [ ] **Step 5: Update existing tests, keeping each one's intent:**
   * `app_shell_test`: run `startZodiann(ephemeris: fake)` instead of `app.main`; expect `appOverrides.length + 3` overrides; assert the mounted container's port is a `SupportedRangeEphemeris`.
   * `first_launch_test`: pass the fake to `bootstrapOverrides`; the text check also requires `startZodiann(ephemeris: productionEphemerisDependencies())`.
@@ -359,19 +363,19 @@ Production dependencies: `swissLoads` calls `SwissEphemerisBinding().version()` 
   * `astronomy_swap_test`: the import scan exempts exactly `lib/src/di/ephemeris_wiring.dart` (assert it exists and does import the package); rename the "not wired" test and its header comment.
   * Reword the "never import native bindings from host tests" comments: host code may compile these imports (the wiring does) but must not rely on a native call succeeding.
 - [ ] **Step 6: Run** `flutter test` in `apps/astro_mobile` and `dart test test/architecture`. Expected: PASS, including `port_binding_test` and `node_bypass_test` unchanged in rules. If a guard rejects the code, change the code, not the guard.
-- [ ] **Step 7: Write and run the device startup test:** `bootstrapOverrides` with `productionEphemerisDependencies()` → status `primary`; the bound port gives success for all ten bodies and the node at `2026-11-26T00:00Z`; a second bootstrap leaves the installed files' modification times unchanged.
+- [ ] **Step 7: Write and run the device startup test.** First test: delete `<support>/ephe`; `bootstrapOverrides` with `productionEphemerisDependencies()` → status `primary`; the bound port gives success for all ten bodies and the node at `2026-11-26T00:00Z`; a second bootstrap leaves the installed files' modification times unchanged. Second test: the production dependencies with only `swissLoads: () => false` and a counting `prepareSwissData` → status `backup`, count 0, success for all ten bodies at the same instant.
 - [ ] **Step 8: Commit** `feat(ZOD-EPH-002): bind the ephemeris source at startup with the backup fallback`.
 
 ### Task 8: Release build, full verification and records
 
 **Files:**
-- Modify: `native/swisseph/README.md`, `native/swisseph/VENDORED.md` (the project files beside `upstream/`, `TLSOFF`), `docs/decisions/ZOD-EPH-002-time-scale.md` (status: implemented; device results), the design doc (measured coverage), `apps/astro_mobile/pubspec.yaml` (stale comments on APK contents and the spike subset)
+- Modify, correcting every statement this task makes stale: `native/swisseph/README.md` (the project files beside `upstream/`, `TLSOFF`, "spike subset"), `native/swisseph/VENDORED.md`, `THIRD_PARTY_NOTICES.md` (what the generated bindings derive from), `docs/licensing/third-party-inventory.md` section 4 (when each native library is in a release APK), `docs/decisions/ZOD-EPH-002-time-scale.md` (status: implemented; device results), `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 3 (measured edges), the design doc (measured coverage), `apps/astro_mobile/pubspec.yaml` (comments on APK contents and the spike subset), `docs/PROGRESS.md` (hand-offs of Step 5)
 
-- [ ] **Step 1: Release APKs:** from `apps/astro_mobile`, `flutter build apk --release --split-per-abi`; for `armeabi-v7a`, `arm64-v8a`, `x86_64`: `unzip -l build/app/outputs/flutter-apk/app-<abi>-release.apk | grep -E "libswisseph|libastronomy|libdartjni|\.se1"`. Required: `libswisseph.so` in all three. Record APK sizes and each library's size against the FND-003 baseline (section 4).
-- [ ] **Step 2: Release smoke test:** `$ADB install -r` the x86_64 APK, `$ADB logcat -c`, launch with `$ADB shell monkey -p com.zodiann.app -c android.intent.category.LAUNCHER 1`, then `$ADB logcat -d` shows no fatal exception or native crash and `$ADB shell pidof com.zodiann.app` returns a pid.
-- [ ] **Step 3: All device tests,** one file at a time (every `integration_test/*_test.dart`). Expected: PASS; record each result.
-- [ ] **Step 4: Full host verification** from the root: `dart run melos run lint`, `dart run melos run test`, `git status --short`. Expected: PASS; only `grep.exe.stackdump` untracked.
-- [ ] **Step 5: Records** listed under Files, with ARM devices and iOS stated as unverified. Task status, `TASKS.md` and `PROGRESS.md` are updated only after the independent whole-branch review and its fixes (zodiann-development workflow).
+- [ ] **Step 1: Release APKs:** from `apps/astro_mobile`, `flutter build apk --release --split-per-abi`; for `armeabi-v7a`, `arm64-v8a`, `x86_64`: `unzip -l build/app/outputs/flutter-apk/app-<abi>-release.apk | grep -E "libswisseph|libastronomy|libdartjni|\.se1"`. Required in all three: `libswisseph.so`, `libastronomy.so` and both `.se1` assets. Record APK sizes and each library's size against the FND-003 baseline (section 4), and check with NDK 28.2 `llvm-readelf -lW` that the rebuilt `libswisseph.so` keeps `0x4000` `LOAD` alignment on all three.
+- [ ] **Step 2: Release smoke test:** `$ADB uninstall com.zodiann.app` (a fresh data-file install), `$ADB install` the x86_64 APK, `$ADB logcat -c`, launch with `$ADB shell monkey -p com.zodiann.app -c android.intent.category.LAUNCHER 1`. Required: `$ADB logcat -d -s flutter` contains `zodiann ephemeris source: primary`; `$ADB logcat -d` shows no fatal exception or native crash; `$ADB shell pidof com.zodiann.app` returns a pid.
+- [ ] **Step 3: All device tests.** First `$ADB uninstall com.zodiann.app` (the split release APK has a higher version code). Run every `integration_test/*_test.dart` one file at a time. For `offline_fonts_test.dart` run `$ADB shell cmd connectivity airplane-mode enable` before and `... disable` after. For `storage_persistence_test.dart` use the two-launch procedure in its header, or record that only phase 1 (`STORAGE_PHASE_1_WRITTEN`) ran. Expected: PASS; record each result.
+- [ ] **Step 4: Full host verification** from the root: `dart run melos run lint`, `dart run melos run test`, `git status --short`. Expected: PASS; only `grep.exe.stackdump` untracked besides this task's edits.
+- [ ] **Step 5: Records** listed under Files, with ARM devices and iOS stated as unverified. Record these hand-offs in `PROGRESS.md` (other task files are not edited): (a) ZOD-TST-001: T-EPH-1 here uses the EPH-004 UT copy and the new Swiss TT fixture; adding instants means refetching both and updating the 53 and 530 counts; TST-001 repoints T-EPH-1 to its fixture. (b) ZOD-EPH-006 or the crossing tasks: the backup's unsynchronised state is not serialized (recommended addition). (c) ZOD-CRS-001/002: the TT steps. (d) ZOD-CRS-001 and ZOD-EPH-005: Swiss speed glitches near solar conjunction. (e) ZOD-IOS-001: the iOS hook must compile `zodiann_swiss_lock.c` with `-DTLSOFF`, and the concurrency and startup tests need an iOS run. (f) ZOD-NFR-017: the time basis and ΔT status come from `ephemerisStatusProvider` (app layer). The task status, `TASKS.md` and the completion entry in `PROGRESS.md` are written only after the independent whole-branch review and its fixes (zodiann-development workflow).
 - [ ] **Step 6: Commit** `docs(ZOD-EPH-002): record the release and device verification`.
 
 ## Coverage of the acceptance criteria
@@ -389,7 +393,33 @@ Production dependencies: `swissLoads` calls `SwissEphemerisBinding().version()` 
 * The native library may crash on a damaged file (Task 5 finds out). The installer restores bundled bytes at each launch, which limits exposure.
 * ARM devices and iOS are unverified.
 * Until ZOD-EPH-006 the backup uses its own ΔT (Moon up to 78.6″ at 2100).
+* The backup library's unsynchronised state is not serialized here: concurrent isolates using the backup could get a wrong Pluto (hand-off in Task 8).
 
 ## Execution
 
 Sequential in one session: each task consumes the previous one's interfaces, so no parallel work is justified. A fresh reviewer checks the whole branch afterwards.
+
+## Plan review
+
+### Round 1 (2026-11-26, `plan-reviewer`, comprehensive, on commit `5ba55a0`)
+
+Verdict: **approve after corrections.** No product decision needed.
+
+| ID | Severity | Finding | Action |
+|---|---|---|---|
+| C1 | Critical | The named emulator `Pixel_9_Pro_API_35` no longer exists (confirmed with `emulator -list-avds`) | Applied: `Pixel_9_Pro_API_36` (x86_64), AVD and API recorded with results, logcat fallback |
+| I1 | Important | Release checks would pass with the source silently `none` or without the backup library | Applied: startup log line, both libraries and data files required, fresh install, Review Focus 6 |
+| I2 | Important | Startup tests allowed an always-true Swiss probe and never ran the production backup on a device | Applied: probe assertions, counting preparation, fresh install and backup device test |
+| I3 | Important | "All device tests pass" was false for the airplane-mode and two-launch tests | Applied: documented procedures and uninstall first |
+| I4 | Important | Wrong expected package list; rows already wrong would stay wrong | Applied: full-closure check with both lists, notices updated |
+| I5 | Important | Lint and tests were required only at the end | Applied: global constraint before every commit |
+| I6 | Important | Hand-offs and the ZOD-TST-001 overlap were not recorded | Applied: Task 8 Step 5 and Risks |
+| M1 | Minor | Symbol guard would trip on error messages | Applied |
+| M2 | Minor | Contradictory damaged-file assertions | Applied |
+| M3 | Minor | Negative-flag case did not test the sign check | Applied |
+| M4 | Minor | `coveredRange`, helper location and node behaviour unstated | Applied |
+| M5 | Minor | Stale temp file could survive | Applied |
+| M6 | Minor | Stale statements elsewhere; alignment not re-checked | Applied |
+| M7 | Minor | Include path, stale comments, `close()` and pre-1972 notes | Applied |
+
+Reviewer's own host checks (not device evidence): the leap list matches `swedate.c`; UT-input maxima 0.56″ (all bodies); measured file edges about 1800-01-03 to 2400-01-06 under P7; truncated and zeroed files returned errors without a crash.
