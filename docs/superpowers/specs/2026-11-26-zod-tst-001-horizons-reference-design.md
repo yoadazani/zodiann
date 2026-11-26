@@ -230,6 +230,13 @@ The text after `$$EOE` explains the columns ("Terrestrial Time ("TT") output was
 
 Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do not show whether the calendar time is rounded or truncated. A calendar-time refusal in a later request is a stop and report; the 1 ms tolerance is not widened.
 
+**The retrograde confirmation requests, predicted before sending** (offline, 2026-11-26, on `4b1acc6`; a prediction, not an observation):
+
+* 51 times (33 distinct strings). Largest predicted difference between the printed calendar time and the requested time: **0.968 ms** if Horizons truncates (2003-08-28, 2004-06-14), **0.216 ms** if it rounds (1956-09-10). None exceeds 1 ms, also when each string is read as its nearest double (at most 14.2 µs from the string).
+* **What would still refuse:** truncation, with Horizons' internal time below the requested one by more than the requested time's distance above its millisecond boundary. The smallest distance is 22.4 µs (2023-08-01, 2023-10-15, 2024-08-01, 2024-10-20, 2049-05-11); 2016-05-13 has 28.8 µs. Horizons' internal arithmetic is not documented.
+* The pilot echoed two TT times with those same distances on the expected millisecond (`2441317.500488241`, 22.4 µs; `2488434.500789167`, 28.8 µs). That is evidence, not proof.
+* `2456090.500766018` (2012-06-12) is what the planned double arithmetic gives; exact arithmetic rounds to `…019`. The sent value is 45 µs from the exact instant, inside every tolerance, and is kept: the dataset and the device pin use the same arithmetic.
+
 ### 8.4 Pilot results
 
 * All ten bodies have a row at TT 2101-01-01T00:01:08.184. Sources: Sun, Moon, Mercury and Venus DE441; Mars `mar099`; Jupiter `jup365_merged`; Saturn `sat441l`; Uranus `ura184_merged`; Neptune `nep098_merged`; Pluto `plu060_merged`.
