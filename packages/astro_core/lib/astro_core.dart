@@ -12,4 +12,7 @@ export 'src/ephemeris/mean_node.dart';
 export 'src/ephemeris/supported_date_range.dart';
 export 'src/ephemeris/supported_range_ephemeris.dart';
 export 'src/ephemeris/utc_range.dart';
+export 'src/time/delta_t_status.dart';
+export 'src/time/ephemeris_time.dart';
+export 'src/time/leap_second_table.dart';
 export 'src/zodiac/zodiac_sign.dart';
