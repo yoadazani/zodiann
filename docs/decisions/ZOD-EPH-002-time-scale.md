@@ -69,7 +69,7 @@ Scientific implications: geocentric positions for a given UTC instant no longer 
 | ZOD-EPH-006 | the backup adopts the same conversion (until then it keeps its own ΔT) |
 | ZOD-EPH-007 | updatable Earth-rotation and leap-second data |
 | ZOD-CRS-001, ZOD-CRS-002 | the steps of section 4 |
-| ZOD-TST-001, ZOD-TST-005 | the far-future ΔT conflict does not arise for Swiss Ephemeris under this conversion (host evidence; confirm on a device); the backup still shows it until ZOD-EPH-006 |
+| ZOD-TST-001, ZOD-TST-005 | the far-future ΔT conflict does not arise for Swiss Ephemeris under this conversion (confirmed on the x86_64 emulator, section 9); the backup still shows it until ZOD-EPH-006 |
 | ZOD-TST-006 | the convention gap must be explained if the comparison program treats civil time as UT1 (not checked for Astrolog) |
 | ZOD-NFR-017 | the criterion "a far-future date shows the ΔT-forecast banner" needs an owner decision |
 | ZOD-ABT-003 | the method screen states the time conversion |
@@ -96,4 +96,8 @@ Scientific implications: geocentric positions for a given UTC instant no longer 
 | Neptune | 0.198 | 0.198 |
 | Pluto | 0.246 | 0.246 |
 
-The adapter's own TT equals the fixture's within 0.000025″ of Moon longitude. The far-future ΔT conflict does not arise for this source; the backup keeps it until ZOD-EPH-006.
+The adapter's own TT equals the fixture's within 0.000025″ of Moon longitude.
+
+**What checks the conversion itself (branch review, 2026-11-26).** From 1972 the fixture's TT comes from the app's own conversion, so the matched-TT gate and the TT pin cannot detect an error in it, and the 1″ UTC-input gate resolves only about a second. The host test `packages/ephemeris_swiss/test/reference_tt_fixture_test.dart` therefore requires, for all ten bodies at every reference instant from 1972, that Horizons asked at the app's TT agrees within 0.002″ (a few milliseconds of Moon motion) with the ZOD-EPH-004 reference asked at UTC, where Horizons applies its own leap seconds.
+
+ The far-future ΔT conflict does not arise for this source; the backup keeps it until ZOD-EPH-006.

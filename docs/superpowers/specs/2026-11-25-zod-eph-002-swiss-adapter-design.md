@@ -101,6 +101,12 @@ Hand-offs recorded at implementation (each becomes a note when its task is plann
 * **ZOD-IOS-001:** the iOS hook must compile `zodiann_swiss_lock.c` with `-DTLSOFF`; the concurrency and startup tests need an iOS run.
 * **ZOD-NFR-017:** the time basis and the ΔT data status come from `ephemerisStatusProvider` (app layer).
 
+Added by the branch review (2026-11-26):
+
+* **ZOD-EPH-007:** `EphemerisStatus` reads the bundled leap table while the adapter accepts an injected one; new data must reach both from one instance, or the reported basis can disagree with the conversion used.
+* **ZOD-IOS-001:** until the iOS hook builds Swiss Ephemeris, the Swiss probe fails there and startup selects the backup. `libswisseph` also still exports the unlocked upstream `swe_*` symbols (only Dart is guarded); hiding them belongs with the next hook change.
+* **ZOD-REL-002:** repeat the release check on every release build (both libraries and both `.se1` files in each APK, and the startup line `zodiann ephemeris source: primary`); no automated test does it.
+
 ## 7. Left to the builder
 
 Names and file layout; the calculation interface's shape; the C function signatures; how the probe is made; how device fixtures are shared.

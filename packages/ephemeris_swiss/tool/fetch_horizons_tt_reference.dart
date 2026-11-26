@@ -13,7 +13,11 @@
 // conversion gives: from 1972, `ephemerisTimeFor` (astro_core); before 1972,
 // the instant as UT plus the delta T of the vendored Swiss Ephemeris, printed
 // by tool/tt_grid.c (compiled here with gcc). The device test pins this against
-// the device's own conversion, so a different conversion cannot hide.
+// the device's own conversion, so the device cannot convert differently from
+// this tool unnoticed. Neither can see an error in the conversion itself,
+// which both share: from 1972 that is checked by
+// test/reference_tt_fixture_test.dart, which compares these longitudes with
+// the ZOD-EPH-004 reference asked at UTC.
 //
 // Horizons is asked with TIME_TYPE='TT' at that Julian day, nine decimals
 // (about 86 microseconds). It returns rows in chronological order, so the

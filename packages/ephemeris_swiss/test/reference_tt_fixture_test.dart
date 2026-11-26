@@ -115,4 +115,51 @@ void main() {
     }
     expect(checked, greaterThan(100));
   });
+
+  // The only check of the conversion that does not use it (branch review,
+  // finding I1). The TT fixture is asked at the TT the app computes, so the
+  // matched-TT gate and the TT pin agree with the app whatever it computes, and
+  // the UTC-input gate (1 arcsecond) resolves only about a second. The
+  // ZOD-EPH-004 reference was asked at the UTC instant (Horizons' UT), where
+  // Horizons applies its own leap seconds from 1972. Both must give the same
+  // longitude. The Moon moves about 0.55 arcseconds per second, so this
+  // tolerance catches an error of a few milliseconds; rounding in the two
+  // fixtures accounts for less than half of it.
+  test('from 1972 Horizons asked at the app TT agrees with Horizons asked at '
+      'UTC, within 0.002 arcseconds', () {
+    final utcReference = jsonDecode(
+      File('../ephemeris_astronomy/test/fixtures/reference_longitudes.json')
+          .readAsStringSync(),
+    ) as Map<String, Object?>;
+    final query = utcReference['queryParameters']! as Map<String, Object?>;
+    expect(query['TIME_TYPE'], 'UT');
+    final atUtc = {
+      for (final e
+          in (utcReference['entries']! as List<Object?>)
+              .cast<Map<String, Object?>>())
+        '${e['body']}|${e['utc']}': (e['longitudeDegrees']! as num).toDouble(),
+    };
+    // A literal, so the app's conversion plays no part in this comparison.
+    final leapSecondsStart = DateTime.utc(1972);
+
+    var checked = 0;
+    final disagreements = <String>[];
+    for (final e in entries) {
+      final utc = DateTime.parse(e['utc']! as String);
+      if (utc.isBefore(leapSecondsStart)) continue;
+      final key = '${e['body']}|${e['utc']}';
+      expect(atUtc, contains(key));
+      checked++;
+      var degrees =
+          ((e['longitudeDegrees']! as num).toDouble() - atUtc[key]!).abs() %
+          360;
+      if (degrees > 180) degrees = 360 - degrees;
+      if (degrees * 3600 > 0.002) {
+        disagreements.add('$key: ${degrees * 3600} arcsec');
+      }
+    }
+
+    expect(checked, greaterThan(300));
+    expect(disagreements, isEmpty);
+  });
 }
