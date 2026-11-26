@@ -16,7 +16,7 @@
 
 * **No file under any `lib/` changes.** No `EphemerisPort`, adapter, backup implementation, backup range, formula or specification change. `native/*/upstream/` stays byte-identical.
 * Tolerances, never loosened, no body or instant dropped to pass: **1″** for each of the ten bodies against Horizons; node **0.01°**; Horizons TT-against-UT agreement **0.002″**; device TT pin **0.0005″**; echoed time **1 ms**; row protection **0.001″**. A failing gate means stop and report.
-* Every primary comparison is at the same TT (design section 6). Before 1972 no UT-asked Horizons value is gated.
+* Every primary comparison is at the same TT (design section 6). Before 1972 nothing of ours is compared with a UT-asked Horizons value (the time-scale control compares Horizons only with itself).
 * Horizons requests only with the parameters and dates of design sections 5 and 8 (pilot and control times included), sequential, at least 1 s apart. A new date or parameter needs the owner. Requests carry dates and body numbers only. Raw responses go to a scratch directory outside the repository; the only exception is the two pilot answers committed as parser samples (Task 2).
 * `reference_dates.json` is add-only: `version` 1 → 2, no instant dropped or changed.
 * Commands run in PowerShell with `fvm …` (a bare `melos` or global `dart` fails), from the repository root unless a step names a directory; write those as `Push-Location <dir>; fvm …; Pop-Location`. Before every commit that touches Dart: `fvm dart format <touched files>` and `fvm dart analyze --fatal-infos <touched packages>` are clean. Do not run a root `fvm flutter pub get` without restoring `packages/shared_ui/lib/l10n` with `git checkout -- packages/shared_ui/lib/l10n`.
@@ -84,9 +84,9 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
   * `isRetrograde`: `(0.2, 0.0, 359.8)` true; `(359.8, 0.0, 0.2)` false; `(10, 9, 9.5)` false; `(10, 10, 9)` false.
   * `changedRows`: equal rows → empty; a difference of 0.0009″ → empty; 0.0011″ → one line naming body and utc; a baseline row missing from `next` → one line containing `missing`; an extra row in `next` → empty; `359.9999999` against `0.0000001` (0.00072″ apart across 0°) → empty at the default tolerance, one line at `toleranceArcseconds: 0.0001`.
 
-- [ ] **Step 2:** `Set-Location packages/ephemeris_swiss; fvm dart test test/horizons_tool_test.dart`. Expected: compile failure, `horizons.dart` not found.
+- [ ] **Step 2:** `Push-Location packages/ephemeris_swiss; fvm dart test test/horizons_tool_test.dart; Pop-Location`. Expected: compile failure, `horizons.dart` not found.
 - [ ] **Step 3:** Implement. `horizonsCommands` as in the existing tools.
-- [ ] **Step 4:** Rerun. Expected: all pass.
+- [ ] **Step 4:** Rerun the Step 2 command (also the "tool tests" command of Tasks 3 to 5). Expected: all pass.
 - [ ] **Step 5:** Commit `feat(ZOD-TST-001): add the Horizons query and reference checks`.
 
 ### Task 2: Pilot requests (first download)
@@ -105,7 +105,7 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
 
 - [ ] **Step 1:** Implement the `pilot` mode (HTTP GET as in the old tool: non-200 throws; 1 s between requests). Any other or missing mode prints usage and exits 64.
 - [ ] **Step 2:** Run it. Expected: 11 files, each containing `$$SOE` and `$$EOE`. **A body with no ephemeris at the last instant: stop and ask the owner** (no substitute target or date on our own).
-- [ ] **Step 3: Inspect and record** in the design section 8: the exact time-scale header text for TT and UT, the Julian-day and fraction-of-second precision, the `ObsEcLon` and quantity 30 column labels, the API version line, the target `{source: …}` line, the centre line. **Stop and ask the owner** if the answer does not declare TT, or neither the printed Julian day nor the calendar time resolves 1 ms.
+- [ ] **Step 3: Inspect and record** in the design section 8: the exact time-scale header text for TT and UT, the Julian-day and fraction-of-second precision, the `ObsEcLon` and quantity 30 column labels, the API version line, the target `{source: …}` line, the centre line. Also record the decimal places of `ObsEcLon` and of quantity 30. **Stop and ask the owner** if the answer does not declare TT, if neither the printed Julian day nor the calendar time resolves 1 ms, if quantity 30 is printed to fewer than 3 decimals of a second, or if `ObsEcLon` is printed to fewer than 7 decimals of a degree.
 - [ ] **Step 4: The 1972 boundary:** the Moon longitude of row 2 of request 1 (TT) and of row 2 of request 2 (UT) agree within 0.002″. If not, **stop and ask** (options: leave that instant out of the UT cross-check, or choose another boundary instant).
 - [ ] **Step 5:** Add `packages/ephemeris_swiss/test/fixtures/horizons_sample_*.txt -text` to `.gitattributes`, copy answers 1 and 2 unchanged to the sample files, and commit `test(ZOD-TST-001): capture the Horizons output format`.
 
@@ -171,33 +171,38 @@ double timeScaleDisagreementArcseconds(double longitudeAtUt, double longitudeAtT
 String horizonsCopySource(Map<String, Object?> dataset); // the whole Dart file
 /// The cross-check request: TT is never used for it.
 Map<String, String> utcCrossCheckQuery(String command, List<DateTime> instantsFrom1972);
-/// 1 without a previous dataset; else its version, plus 1 if any row was added or changed.
+/// 1 without a previous dataset; else its version, plus 1 if any row was added or changed
+/// (changed: any stored value of an existing row differs, even within 0.001″).
 int nextDatasetVersion(Map<String, Object?>? previous, Map<String, Object?> next);
+/// The sent map as stored: every parameter except COMMAND and TLIST, without the
+/// enclosing single quotes ('UT' -> UT); COMMAND is then the body -> number map.
+Map<String, Object?> recordedQuery(Map<String, String> sent);
 /// Empty only when every gate below passes.
 List<String> datasetProblems(Map<String, Object?> dataset, {
     required List<String> instants,
     required Iterable<LongitudeRow> baseline,
-    Iterable<LongitudeRow> crossCheckBaseline = const []});
+    Iterable<LongitudeRow> crossCheckBaseline = const [],
+    Map<String, Object?>? previous});
 ```
 
-Dataset JSON keys: `version` (from `nextDatasetVersion`; 1 for this task), `referenceDatesVersion`, `source`, `retrievedOn`, `apiVersion`, `targetSources` (body → line), `quantity`, `timeScale`, `queryParameters` and `utcCrossCheckQueryParameters` (both written from the maps actually sent), `toleranceArcseconds` (1), `entries` {`body`,`utc`,`jdTt`,`ttMinusUtSeconds`,`longitudeDegrees`}, `utcCrossCheck` {`body`,`utc`,`jdUt`,`longitudeDegrees`} (instants ≥ 1972-01-01; `jdUt` is the string sent), `timeScaleControl` {`utc`,`jdUt`,`tdbMinusUtSeconds`,`jdTtDerived`,`longitudeAtUt`,`longitudeAtTt`} (Moon, instants < 1972), `retrogradeEvidence` {`body`,`utc`,`jdTtBefore`,`longitudeBefore`,`jdTtAfter`,`longitudeAfter`} (3 days).
+Dataset JSON keys: `version` (from `nextDatasetVersion`; 1 for this task), `referenceDatesVersion`, `source`, `retrievedOn`, `apiVersion`, `targetSources` (body → line), `quantity`, `timeScale`, `queryParameters` and `utcCrossCheckQueryParameters` (both built by `recordedQuery` from a map actually sent; the times are held by `entries.jdTt` and `utcCrossCheck.jdUt`), `toleranceArcseconds` (1), `entries` {`body`,`utc`,`jdTt`,`ttMinusUtSeconds`,`longitudeDegrees`}, `utcCrossCheck` {`body`,`utc`,`jdUt`,`longitudeDegrees`} (instants ≥ 1972-01-01; `jdUt` is the string sent), `timeScaleControl` {`utc`,`jdUt`,`tdbMinusUtSeconds`,`jdTtDerived`,`longitudeAtUt`,`longitudeAtTt`} (Moon, instants < 1972), `retrogradeEvidence` {`body`,`utc`,`jdTtBefore`,`longitudeBefore`,`jdTtAfter`,`longitudeAfter`} (3 days).
 
-Generated copy declares: `horizonsDatasetVersion`, `horizonsToleranceArcseconds`, `typedef HorizonsReference = ({String body, String utc, String jdTt, double ttMinusUtSeconds, double longitudeDegrees})`, `typedef HorizonsUtReference = ({String body, String utc, double longitudeDegrees})`, `const horizonsReference`, `const horizonsUtCrossCheck`, with a generated-file header.
+Generated copy declares: `horizonsDatasetVersion`, `horizonsToleranceArcseconds`, `typedef HorizonsReference = ({String body, String utc, String jdTt, double ttMinusUtSeconds, double longitudeDegrees})`, `typedef HorizonsUtReference = ({String body, String utc, double longitudeDegrees})`, `const horizonsReference`, `const horizonsUtCrossCheck`, with a generated-file header. The tolerance is `const double horizonsToleranceArcseconds`; the version is `const int horizonsDatasetVersion`.
 
-**Mode `dataset --baseline <json> --out <dir>`** (both required, else exit 64; requests of design 8.1; paths resolve against `Platform.script`):
+**Mode `dataset --baseline <json> --out <dir>`** (both required, else exit 64; requests of design 8.1). Fixed repository paths resolve against the package root (`Platform.script.resolve('../')`); `--baseline` and `--out` are relative to the current directory, or absolute.
 
-* reads the instants and `referenceDatesVersion` from `packages/astro_core/test/fixtures/reference_dates.json`;
-* reads the baseline completely before any write: the old Swiss TT fixture or a previous `horizons_reference.json` (both have `entries` with `body`, `utc`, `longitudeDegrees`; the latter also has `utcCrossCheck`, passed as `crossCheckBaseline`);
+* reads and validates, **before the first request**, `reference_dates.json` (instants and `referenceDatesVersion`) and the baseline: the old Swiss TT fixture or a previous `horizons_reference.json` (both have `entries` with `body`, `utc`, `longitudeDegrees`; the latter also has `utcCrossCheck`, passed as `crossCheckBaseline`);
+* if `packages/astro_core/test/fixtures/horizons_reference.json` exists, reads and validates it before the first request as `previous`: it feeds `nextDatasetVersion`, and its `entries` and `utcCrossCheck` are **always** compared by `changedRows`, in addition to `--baseline`. No argument skips this;
 * saves raw answers in `--out` (outside the repository);
 * asks the control as UT with `30,31`, sets `jdTtDerived = jdUt + tdbMinusUtSeconds/86400` to nine decimals, and asks TT there;
 * writes `packages/astro_core/test/fixtures/horizons_reference.json` **once**, after all 30 requests, **only when every parser check passes and `datasetProblems` is empty**; otherwise prints the problems and exits 1.
 
-`datasetProblems` reports: a missing (body, instant) entry; `changedRows` against `baseline` (entries) or `crossCheckBaseline`; a missing UT cross-check row from 1972, or one more than 0.002″ from its TT entry; a control row off by more than 0.002″; no control row with |TDB − UT| > 10 s; a declared pair not retrograde.
+`datasetProblems` reports: a missing (body, instant) entry; `changedRows` against `baseline` (entries), `crossCheckBaseline`, or `previous` (entries and cross-check); a missing control row for any instant before 1972; a missing evidence row for any declared pair; a missing UT cross-check row from 1972, or one more than 0.002″ from its TT entry; a control row off by more than 0.002″; no control row with |TDB − UT| > 10 s; a declared pair not retrograde.
 
 **There is no override for a changed row.** A legitimate change (a revised Horizons solution, a new leap second, a new library ΔT) stops the tool and needs an owner decision.
 
-- [ ] **Step 1: Failing tests:** `time scale disagreement` (`(10, 10 + 0.003/3600)` ≈ 0.003; wraps at 360); `the cross-check is asked in UT at the Julian day of the UTC instant` (`TIME_TYPE` `'UT'`, `TLIST` equal to `julianDayUt(utc).toStringAsFixed(9)` for two instants; `ArgumentError` before 1972); `version` (no previous → 1; same rows → previous; one row added → previous + 1); `a clean synthetic dataset has no problems`; then one test per problem above, each altering one value and expecting a non-empty list; `the copy holds every entry and cross-check row` (two-row synthetic dataset: output contains both typedefs, `const int horizonsDatasetVersion = 1;`, each row's body, utc, `jdTt` string and longitude, and no `timeScaleControl`).
-- [ ] **Step 2:** Run: compile failure. **Step 3:** Implement the functions, the `dataset` mode and the generator (`gen_horizons_copy.dart` reads `../astro_core/test/fixtures/horizons_reference.json`, writes `../../apps/astro_mobile/integration_test/horizons_reference.dart`). **Do not run `dataset` yet.**
+- [ ] **Step 1: Failing tests:** `time scale disagreement` (`(10, 10 + 0.003/3600)` ≈ 0.003; wraps at 360); `the cross-check is asked in UT at the Julian day of the UTC instant` (`TIME_TYPE` `'UT'`, `TLIST` equal to `julianDayUt(utc).toStringAsFixed(9)` for two instants; `ArgumentError` before 1972); `version` (no previous → 1; same rows → previous; one row added → previous + 1; one longitude changed by 0.0005″ → previous + 1); `the recorded query is the sent one without quotes` (from `utcCrossCheckQuery('301', [DateTime.utc(2000)])`: `TIME_TYPE` `UT`, `TLIST_TYPE` `JD`, `CENTER` `500@399`, no `TLIST`, `COMMAND` equal to `horizonsCommands`); `a clean synthetic dataset has no problems`; then one test per problem above, each altering one value and expecting a non-empty list (for `previous`: a row that differs by 0.002″ and is absent from `baseline`); `the copy holds every entry and cross-check row` (two-row synthetic dataset: output contains both typedefs, `const int horizonsDatasetVersion = 1;`, each row's body, utc, `jdTt` string and longitude, and no `timeScaleControl`).
+- [ ] **Step 2:** Run: compile failure. **Step 3:** Implement the functions, the `dataset` mode and the generator (`gen_horizons_copy.dart` reads `../astro_core/test/fixtures/horizons_reference.json` and writes `../../apps/astro_mobile/integration_test/horizons_reference.dart`, both relative to the package root). **Do not run `dataset` yet.**
 - [ ] **Step 4:** Run the tool tests (pass). **Step 5:** Commit `feat(ZOD-TST-001): build the dataset and its device copy`.
 
 ### Task 6: Date set version 2, the dataset and every consumer (one commit)
@@ -296,6 +301,14 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 
 **Design builder check (2026-11-26, fresh general-purpose agent, same commit):** not a plan-review round. Applied: the last-instant coverage probe, the 1972-boundary probe, no override for protected rows, backup rows must be identical, the wording of link 3, the nutation figure (re-measured: 0.00527°), the elongation figure, the two backup match tests. Sent to the owner: D1 (including editing backup tools and fixtures) and D6 (confirm `SEFLG_NONUT`).
 
-**Round 2:** pending.
+**Round 2 (2026-11-26, `plan-reviewer`, focused, `e9f7488..fc8d460`): "Needs user decision"** (only the open D1 to D6); no Critical, 4 Important, 5 Minor; all round 1 findings resolved. All nine applied after the round; **these last corrections have not been re-reviewed** (two rounds is the limit of a cycle).
+
+| ID | Finding | Done |
+|---|---|---|
+| I1 | recorded query parameters: quoted or not, and which body's | applied (`recordedQuery`) |
+| I2 | row protection could be bypassed through `--baseline` | applied (an existing dataset is always compared) |
+| I3 | path resolution would break the download command | applied; inputs read before the first request |
+| I4 | the pilot did not gate printed precision | applied |
+| M1 to M5 | command form; missing-row gates; "changed" defined; wording of the pre-1972 constraint; tolerance type | applied |
 
 **Open for the owner:** design section 13, D1 to D6.
