@@ -7,8 +7,8 @@ import 'swiss_ephemeris_binding.dart';
 /// the whole process) with [SwissEphemerisBinding.setEphePath]; this class
 /// never sets it.
 ///
-/// Importing this file loads `libswisseph`, which the build hook produces for
-/// Android only. The pure types are in
+/// A call loads `libswisseph`, which the build hook produces for Android
+/// only. The pure types are in
 /// `package:ephemeris_swiss/ephemeris_swiss.dart`.
 final class NativeSwissCalculationSource implements SwissCalculationSource {
   NativeSwissCalculationSource(this._binding);

@@ -12,6 +12,8 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+import 'di/support/fake_ephemeris_dependencies.dart';
+
 /// Identity is all these tests check; every member is unused.
 class _FakePort implements EphemerisPort {
   @override
@@ -148,31 +150,42 @@ void main() {
     expect(container.read(ephemerisPortProvider), same(fake));
   });
 
-  testWidgets(
-    'main() mounts ZodiannApp under a ProviderScope wired to appOverrides '
-    'and the launch language',
-    (tester) async {
-      // main() builds the real settings store over the preferences platform.
-      SharedPreferencesAsyncPlatform.instance =
-          InMemorySharedPreferencesAsync.empty();
-      tester.platformDispatcher.localesTestValue = const [Locale('he', 'IL')];
-      addTearDown(tester.platformDispatcher.clearAllTestValues);
-      await tester.runAsync(app.main);
-      await tester.pump();
-      expect(find.byType(ProviderScope), findsOneWidget);
-      final overrides = tester
-          .widget<ProviderScope>(find.byType(ProviderScope))
-          .overrides;
-      // Every DI binding, plus the language resolved before the first frame.
-      expect(overrides.length, appOverrides.length + 1);
-      expect(find.byType(ZodiannApp), findsOneWidget);
-      await tester.pumpAndSettle();
-      expect(
-        Localizations.localeOf(tester.element(find.byType(ScreenStub))),
-        const Locale('he'),
-      );
-    },
-  );
+  testWidgets('startup mounts ZodiannApp under a ProviderScope wired to the DI '
+      'bindings, the position source and the launch language', (tester) async {
+    // Startup builds the real settings store over the preferences
+    // platform. main() itself uses the native position source, so the
+    // function it calls is run here with fakes.
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
+    tester.platformDispatcher.localesTestValue = const [Locale('he', 'IL')];
+    addTearDown(tester.platformDispatcher.clearAllTestValues);
+    await tester.runAsync(
+      () =>
+          app.startZodiann(ephemeris: FakeEphemerisDependencies().dependencies),
+    );
+    await tester.pump();
+    expect(find.byType(ProviderScope), findsOneWidget);
+    final overrides = tester
+        .widget<ProviderScope>(find.byType(ProviderScope))
+        .overrides;
+    // Every DI binding, the position source and its status, and the
+    // language resolved before the first frame.
+    expect(overrides.length, appOverrides.length + 3);
+    expect(find.byType(ZodiannApp), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(
+      Localizations.localeOf(tester.element(find.byType(ScreenStub))),
+      const Locale('he'),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(ScreenStub)),
+      listen: false,
+    );
+    expect(
+      container.read(ephemerisPortProvider),
+      isA<SupportedRangeEphemeris>(),
+    );
+  });
 
   group('ZOD-UI-002 typography by locale', () {
     String? family(BuildContext ctx) =>

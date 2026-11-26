@@ -16,8 +16,8 @@
 //
 // String interpolation holes (`'${...}'`) are scanned like code.
 //
-// ZOD-EPH-002 adds the first production binding, and must write it in one
-// expression: `ephemerisPortProvider.overrideWithValue(
+// A production binding is written in one expression (ZOD-EPH-002):
+// `ephemerisPortProvider.overrideWithValue(
 // SupportedRangeEphemeris(<the adapter>(...)))`.
 
 import 'dart:io';

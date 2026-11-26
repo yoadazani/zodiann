@@ -5,7 +5,8 @@
 // iOS until the iOS half of the spike is verified) it adds no asset and
 // returns at once, so host tests never need a C toolchain. The host machine
 // has no MSVC, and `windows-latest` would otherwise pay a C build on every
-// run. Host tests must not import the native bindings.
+// run. Host code may compile an import of the native bindings (the app's
+// wiring does), but no host test may rely on a native call succeeding.
 //
 // ZOD-EPH-002: the project's lock (native/swisseph/zodiann_swiss_lock.c) is
 // compiled with the library, and TLSOFF gives it one state shared by every

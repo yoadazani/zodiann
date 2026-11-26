@@ -14,8 +14,8 @@ import 'swiss_calc.dart';
 /// [setEphePath] is called once and applies to every isolate, and [close]
 /// likewise affects every isolate.
 ///
-/// Importing this file loads `libswisseph`, which the build hook produces for
-/// Android only, so import it from device code and never from host tests.
+/// The first call loads `libswisseph`, which the build hook produces for
+/// Android only, so a call fails on the host.
 final class SwissEphemerisBinding {
   SwissEphemerisBinding();
 

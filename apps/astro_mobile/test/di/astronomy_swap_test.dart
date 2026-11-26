@@ -1,8 +1,8 @@
 // ZOD-EPH-004 Task 7 (acceptance criterion: "swap is only a DI override"):
 // the astronomy-engine adapter replaces any other `EphemerisPort` with one
-// provider override, and the code that consumes the port is unchanged. No
-// production wiring exists: the app binds no source (D5; ZOD-EPH-002 owns the
-// automatic source selection).
+// provider override, and the code that consumes the port is unchanged. The
+// running app chooses it only at startup, in one wiring file (ZOD-EPH-002;
+// ephemeris_wiring_test.dart).
 import 'dart:io';
 
 import 'package:astro_core/astro_core.dart';
@@ -53,6 +53,10 @@ Iterable<File> _dartFiles(Directory directory) => directory
     .listSync(recursive: true)
     .whereType<File>()
     .where((f) => f.path.endsWith('.dart'));
+
+/// The one file of the app library that may import the backup: it chooses the
+/// source at startup (ZOD-EPH-002).
+const _wiring = 'lib/src/di/ephemeris_wiring.dart';
 
 /// The `packages/feature_*` directories.
 List<Directory> _featurePackages() => Directory('../../packages')
@@ -105,8 +109,8 @@ void main() {
       expect(b.read(ephemerisPortProvider), isA<_OtherPort>());
     });
 
-    test('the adapter is not wired into the app: appOverrides binds nothing '
-        'and an unbound container still fails', () {
+    test('appOverrides binds nothing: the port is bound at bootstrap, and an '
+        'unbound container still fails', () {
       expect(appOverrides, isEmpty);
       final container = ProviderContainer.test();
       expect(() => container.read(ephemerisPortProvider), throwsA(anything));
@@ -149,8 +153,13 @@ void main() {
       expect(source, contains('ephemerisPortProvider'));
     });
 
-    test('no file of the app library or of any feature package imports '
-        'ephemeris_astronomy, and no feature package depends on it', () {
+    test('only the app wiring file imports ephemeris_astronomy: no other file '
+        'of the app library or of any feature package does, and no feature '
+        'package depends on it', () {
+      expect(
+        importsEphemerisAstronomy(File(_wiring).readAsStringSync()),
+        isTrue,
+      );
       final features = _featurePackages();
       expect(features.length, greaterThanOrEqualTo(2));
       final roots = [
@@ -162,6 +171,7 @@ void main() {
         expect(root.existsSync(), isTrue, reason: root.path);
         for (final file in _dartFiles(root)) {
           scanned++;
+          if (file.path.replaceAll(r'\', '/') == _wiring) continue;
           expect(
             importsEphemerisAstronomy(file.readAsStringSync()),
             isFalse,
