@@ -14,12 +14,12 @@
 
 ## Global Constraints
 
-* **Stages (owner, 2026-11-26):** the 11-request pilot is done, accepted, and **not repeated**. **Tasks 0 to 3 are approved**; they send no Horizons request, download nothing, run no emulator and touch no dataset or backup data. After Task 3: stop and report. Task 4 and every later request wait for a further approval. No push, PR or merge.
+* **Stages (owner, 2026-11-26):** the 11-request pilot is done, accepted, and **not repeated**. **Tasks 0 to 3 are approved**; they send no Horizons request, download nothing, run no emulator and touch no dataset or backup data. After Task 3: stop and report. Tasks 4 to 9, and every Horizons request, download and emulator run, wait for a further approval. No push, PR or merge.
 * The pilot's observations do not replace the time-scale control at the 22 pre-1972 instants (design section 6 link 4; Tasks 5 and 6).
 * **No file under any `lib/` changes.** No `EphemerisPort`, adapter, backup implementation, backup range, formula or specification change. `native/*/upstream/` stays byte-identical.
 * Tolerances, never loosened, no body or instant dropped to pass: **1″** for each of the ten bodies against Horizons; node **0.01°**; Horizons TT-against-UT agreement **0.002″**; device TT pin **0.0005″**; echoed time **1 ms**; row protection **0.001″**. A failing gate means stop and report.
 * Every primary comparison is at the same TT (design section 6). Before 1972 nothing of ours is compared with a UT-asked Horizons value (the time-scale control compares Horizons only with itself).
-* Horizons requests only with the parameters and dates of design sections 5 and 8 (pilot and control times included), sequential, at least 1 s apart. A new date or parameter needs the owner. Requests carry dates and body numbers only. Raw responses go to a scratch directory outside the repository; the only exception is the two pilot answers committed as parser samples (Task 2).
+* Horizons requests only with the parameters and dates of design sections 5 and 8 (control times included; the pilot requests are done and are not sent again), sequential, at least 1 s apart. A new date or parameter needs the owner. Requests carry dates and body numbers only. Raw responses go to a scratch directory outside the repository; the only exception is the two pilot answers committed as parser samples (Task 2).
 * `reference_dates.json` is add-only: `version` 1 → 2, no instant dropped or changed.
 * Commands run in PowerShell with `fvm …` (a bare `melos` or global `dart` fails), from the repository root unless a step names a directory; write those as `Push-Location <dir>; fvm …; Pop-Location`. Before every commit that touches Dart: `fvm dart format <touched files>` and `fvm dart analyze --fatal-infos <touched packages>` are clean. Do not run a root `fvm flutter pub get` without restoring `packages/shared_ui/lib/l10n` with `git checkout -- packages/shared_ui/lib/l10n`.
 * Commits: `<type>(ZOD-TST-001): <summary>` with the session's attribution trailers; explicit staging only; never stage `grep.exe.stackdump`. No push, PR or merge without the owner's approval.
@@ -123,16 +123,16 @@ HorizonsAnswer parseHorizonsAnswer(String text, {required String command,
 
 `apiVersion` is the number after `API VERSION:` (any value); `targetLine` is the whole `Target body name:` line, trimmed.
 
-Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `FormatException` whose message **starts with** the quoted word, so a test can tell which check refused:
+Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `FormatException` whose message **starts with the quoted word followed by a colon** (`time: …`, `time scale: …`), so a test can tell which check refused:
 
 1. `markers`: one `$$SOE` line, then one `$$EOE` line.
 2. `API version`: the line is present.
-3. `time scale`: the `Start time` and `Stop  time` lines, trailing spaces removed, both end in ` TT` or ` UT` equal to `timeType`.
+3. `time scale`: the `Start time` and `Stop  time` lines, trailing whitespace removed (`trimRight`), both end in ` TT` or ` UT` equal to `timeType`.
 4. `target`: the target line contains `(<command>)`.
-5. `centre`: the centre body line contains `Earth (399)` and the centre site is `GEOCENTRIC`.
+5. `centre`: the `Center body name:` line contains `Earth (399)`, and the text after `Center-site name:`, trimmed, equals `GEOCENTRIC`.
 6. `column`: the header is the last line before `$$SOE` containing `Date__(`; split at commas and trimmed; it holds, **by name** (never by index), the two date columns of the requested scale, `ObsEcLon`, and `TDB-UT` when `expectTdbMinusUt`.
 7. `rows`: as many rows as requested.
-8. For each row, in order: `fields` (as many as the header); `number` (the Julian day, longitude and, when expected, quantity 30 parse as numbers; the calendar time matches `yyyy-Mon-dd HH:mm:ss.fff`); `time` (**both** the printed Julian day and the calendar time are within 1 ms of the requested Julian day); `precision` (longitude at least 7 decimals, quantity 30 at least 3); `longitude` (in [0, 360)).
+8. For each row, in order: `fields` (as many as the header); `number` (the Julian day, longitude and, when expected, quantity 30 match `^-?d+.d+$`; the calendar time matches `yyyy-Mon-dd HH:mm:ss.fff`); `time` (**both** the printed Julian day and the calendar time are within 1 ms of the requested Julian day; instants are derived from Julian day strings in integer microseconds, whole and fraction parsed separately); `precision` (longitude at least 7 decimals, quantity 30 at least 3); `longitude` (in [0, 360)).
 
 `tdbMinusUtSeconds` is null unless expected.
 
@@ -140,7 +140,9 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
   * `parses the TT sample`: four rows; `julianDay` equals the four requested strings; longitudes `265.2972999`, `101.6302965`, `223.3148557`, `293.9451964`; every `tdbMinusUtSeconds` null; `apiVersion` `'1.2'`; `targetLine` contains `Moon (301)` and `DE441`.
   * `parses the UT sample with TDB-UT`: longitudes `265.2969812`, `101.6302965`, `223.3237860`, `293.9567420`; `tdbMinusUtSeconds` `-1.946024`, `42.183919`, `64.183903`, `69.183904`.
   * `a CRLF variant parses to the same rows` (the samples are LF).
-  * One test per refusal, each editing the sample text in memory (assert the edit changed the text) and expecting a `FormatException` whose message starts with the check's word: `a TT answer is refused for a UT request` and the reverse, and `a stop time naming another scale` (`time scale`); `a column header naming another scale`, `no ObsEcLon column`, `quantity 30 expected but absent` (`column`); `a missing row` (`rows`); `a row missing a field` (`fields`); `two rows swapped`, `an echoed Julian day 2 ms off`, `an echoed calendar time 2 ms off` (`time`); `a value that is not a number` (`n.a.`, `number`); `longitude printed to six decimals`, `quantity 30 printed to two decimals` (`precision`); `longitude 360` (`360.0000000`, `longitude`); `no $$SOE`, `no $$EOE` (`markers`); `no API version line` (`API version`); `another target` (`command: '10'`, `target`); `a non-geocentric centre body` and `a non-geocentric site` (`centre`).
+  * `the UT sample read without TDB-UT gives the same longitudes` (`expectTdbMinusUt: false`; every `tdbMinusUtSeconds` null).
+  * `a requested time 0.5 ms from the echo passes and the row carries the requested string` (TT sample, first requested day `'2415020.000000006'`; `rows.first.julianDay` equals it).
+  * One test per refusal, each editing the sample text in memory (assert the edit changed the text) or, where only arguments are named, changing the arguments. Row edits target the row text, for example `1899-Dec-31 12:00:00.000,`, because the header lines contain the same times. Each expects a `FormatException` whose message starts with the check's word and a colon (`startsWith('<word>:')`): `a TT answer is refused for a UT request` and the reverse, `a stop time naming another scale` (`00:01:08.1840 TT` to `UT`) and `a start time naming another scale` (`12:00:00.0000 TT` to `UT`) (`time scale`); `a column header naming another scale`, `no ObsEcLon column`, `quantity 30 expected but absent` (`column`); `a missing row`, `an extra row` (`rows`); `a row missing a field` (`fields`); `two rows swapped`, `an echoed Julian day 2 ms off`, `an echoed calendar time 2 ms off` (`time`); `a value that is not a number` (`n.a.`, `number`); `longitude printed to six decimals`, `quantity 30 printed to two decimals` (`precision`); `longitude 360` (`360.0000000`), `a negative longitude` (`-0.0000001`) (`longitude`); `no $$SOE`, `no $$EOE` (`markers`); `no API version line` (`API version`); `another target` (`command: '10'`, `target`); `a non-geocentric centre body` and `a non-geocentric site` (`centre`).
 - [ ] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
 - [ ] **Step 3:** Implement from the recorded format.
 - [ ] **Step 4:** Run. Expected: all pass.
@@ -152,7 +154,7 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
 
 **Interfaces:**
 
-`tool/fetch_horizons_reference.dart`, the only network code of the new tool, run from the package root as `fvm dart run tool/fetch_horizons_reference.dart <mode> … --out <dir outside the repository>`: HTTP GET of `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…))`; a non-200 answer throws; requests sequential, at least 1 s apart; every raw answer saved in `<dir>`; every answer read through `parseHorizonsAnswer`. A missing or unknown mode, or a missing `--out`, prints usage and exits 64 before any request.
+`tool/fetch_horizons_reference.dart`, the only network code of the new tool, run from the package root as `fvm dart run tool/fetch_horizons_reference.dart <mode> … --out <dir outside the repository>`: HTTP GET of `Uri.https('ssd.jpl.nasa.gov', '/api/horizons.api', horizonsQuery(…))`; a non-200 answer throws; requests sequential, at least 1 s apart; every raw answer saved in `<dir>` **before** it is read through `parseHorizonsAnswer`. A missing or unknown mode, or a missing `--out`, prints usage and exits 64 before any request.
 
 ```dart
 // swiss_host.dart: copied from the old tool (deleted in Task 6), same gcc flags and library sources.
@@ -331,3 +333,16 @@ D1 to D6 (design section 13) were open after round 2; **the owner approved the r
 ### Revision 1 (2026-11-26): the pilot workflow (owner decision, Option A)
 
 The pilot was run by a throwaway script outside the repository and accepted as the completed pilot. Amendments: Task 2 is now "answers as parser samples" (no `pilot` mode, no repeat); Task 3 pins its checks, their order and their messages to the verified format (centre check corrected: the answers never print `500`; both echoed times; precision gates now enforced by the parser); Task 1 gains a test that the repository's query reproduces the two sample requests; Task 4 now creates the fetch tool (its HTTP behaviour moved from Task 2); stage boundaries added to Global Constraints; design section 8 records the format and results (old 8.1 is now 8.6).
+
+**Revision 1, round 1 (`plan-reviewer`, on `a94d6e7..e6eb9b9`): "Approve after corrections"**; no Critical, 1 Important, 7 Minor, nothing for the owner.
+
+| ID | Finding | Done |
+|---|---|---|
+| I1 | the refusal word `time` is a prefix of `time scale` | applied (each message starts with the word and a colon) |
+| M1 | `NaN` would parse as a number | applied (decimal pattern) |
+| M2 | centre-site and line-end matching loose | applied |
+| M3 | a row edit could hit a header line; some wrong parsers would pass | applied (edit rule; three refusal and two passing tests) |
+| M4 | rounding of the printed milliseconds not established | applied (recorded; integer microseconds; tolerance not widened) |
+| M5 | a refused answer might not be on disk | applied |
+| M6 | stage-boundary wording | applied |
+| M7 | stale PROGRESS wording | applied |

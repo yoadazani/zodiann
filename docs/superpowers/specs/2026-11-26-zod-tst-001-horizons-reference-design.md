@@ -228,6 +228,8 @@ The text after `$$EOE` explains the columns ("Terrestrial Time ("TT") output was
 | `ObsEcLon` | 7 decimals of a degree | 0.00036″, below the 0.001″ row protection |
 | `TDB-UT` | 6 decimals of a second | 1 µs |
 
+Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do not show whether the calendar time is rounded or truncated. A calendar-time refusal in a later request is a stop and report; the 1 ms tolerance is not widened.
+
 ### 8.4 Pilot results
 
 * All ten bodies have a row at TT 2101-01-01T00:01:08.184. Sources: Sun, Moon, Mercury and Venus DE441; Mars `mar099`; Jupiter `jup365_merged`; Saturn `sat441l`; Uranus `ura184_merged`; Neptune `nep098_merged`; Pluto `plu060_merged`.
