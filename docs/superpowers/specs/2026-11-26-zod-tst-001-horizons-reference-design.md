@@ -235,7 +235,12 @@ Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do n
 * 51 times (33 distinct strings). Largest predicted difference between the printed calendar time and the requested time: **0.968 ms** if Horizons truncates (2003-08-28, 2004-06-14), **0.216 ms** if it rounds (1956-09-10). None exceeds 1 ms, also when each string is read as its nearest double (at most 14.2 µs from the string).
 * **What would still refuse:** truncation, with Horizons' internal time below the requested one by more than the requested time's distance above its millisecond boundary. The smallest distance is 22.4 µs (2023-08-01, 2023-10-15, 2024-08-01, 2024-10-20, 2049-05-11); 2016-05-13 has 28.8 µs. Horizons' internal arithmetic is not documented.
 * The pilot echoed two TT times with those same distances on the expected millisecond (`2441317.500488241`, 22.4 µs; `2488434.500789167`, 28.8 µs). That is evidence, not proof.
-* `2456090.500766018` (2012-06-12) is what the planned double arithmetic gives; exact arithmetic rounds to `…019`. The sent value is 45 µs from the exact instant, inside every tolerance, and is kept: the dataset and the device pin use the same arithmetic.
+
+**The canonical TT string** (2026-11-26). For every instant it is `ttJulianDay`: from 1972, `julianDayUt(utc.add(ttMinusUtc)).toStringAsFixed(9)`, the double the adapter passes to the library, printed to nine decimals; before 1972, `julianDayUt(utc) + ΔT/86400` printed the same way. It is **not** an exact-decimal rounding.
+
+* 2012-06-12 is **`2456090.500766018`**. The exact value is …`.500766018519`; the app's double (spacing 40.2 µs) is …`.500766018406`, below the half-way point, so it prints as `…018`, while rounding the exact value gives `…019`.
+* The same happens at 2010-01-01 and 2015-01-01. The rule reproduces all 530 `jdTt` strings of the ZOD-EPH-002 TT reference (340 from 1972, 190 before). Exact rounding would change 20 of them (those two instants), so it is not used.
+* The fetch tool, the dataset, the device copy, the node reference and the reference checks use this string (the plan's Task 5). The adapter itself passes its unrounded double. No nine-decimal string parses back to that double: the canonical one lands at most 40.2 µs from it, about 0.00002″ of Moon motion, inside the 0.0005″ device pin.
 
 ### 8.4 Pilot results
 
@@ -286,7 +291,7 @@ https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA
 
 **Remaining after the pilot: 38 requests, or 58 with option A (chosen).** Each later phase waits for the owner's approval.
 
-Sequential, 1 second apart. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. Re-running a failed request with the same parameters is within the approval; a new date or parameter is not.
+Sequential, 1 second apart, each limited to 60 s in all, never retried, redirected or sent again without the owner's approval. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. Re-running a failed request with the same parameters is within the approval; a new date or parameter is not.
 
 ## 9. Tests: what is repointed, changed or left alone
 
