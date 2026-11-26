@@ -141,7 +141,7 @@ Checks against the format of design 8.1 to 8.3, **in this order**. Each throws `
   * `parses the UT sample with TDB-UT`: longitudes `265.2969812`, `101.6302965`, `223.3237860`, `293.9567420`; `tdbMinusUtSeconds` `-1.946024`, `42.183919`, `64.183903`, `69.183904`.
   * `a CRLF variant parses to the same rows` (the samples are LF).
   * `the UT sample read without TDB-UT gives the same longitudes` (`expectTdbMinusUt: false`; every `tdbMinusUtSeconds` null).
-  * `a requested time 0.5 ms from the echo passes and the row carries the requested string` (TT sample, first requested day `'2415020.000000006'`; `rows.first.julianDay` equals it).
+  * `a requested time about 0.5 ms (0.518 ms) from the echo passes and the row carries the requested string` (TT sample, first requested day `'2415020.000000006'`; `rows.first.julianDay` equals it).
   * One test per refusal, each editing the sample text in memory (assert the edit changed the text) or, where only arguments are named, changing the arguments. Row edits target the row text, for example `1899-Dec-31 12:00:00.000,`, because the header lines contain the same times. Each expects a `FormatException` whose message starts with the check's word and a colon (`startsWith('<word>:')`): `a TT answer is refused for a UT request` and the reverse, `a stop time naming another scale` (`00:01:08.1840 TT` to `UT`) and `a start time naming another scale` (`12:00:00.0000 TT` to `UT`) (`time scale`); `a column header naming another scale`, `no ObsEcLon column`, `quantity 30 expected but absent` (`column`); `a missing row`, `an extra row` (`rows`); `a row missing a field` (`fields`); `two rows swapped`, `an echoed Julian day 2 ms off`, `an echoed calendar time 2 ms off` (`time`); `a value that is not a number` (`n.a.`, `number`); `longitude printed to six decimals`, `quantity 30 printed to two decimals` (`precision`); `longitude 360` (`360.0000000`), `a negative longitude` (`-0.0000001`) (`longitude`); `no $$SOE`, `no $$EOE` (`markers`); `no API version line` (`API version`); `another target` (`command: '10'`, `target`); `a non-geocentric centre body` and `a non-geocentric site` (`centre`).
 - [ ] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
 - [ ] **Step 3:** Implement from the recorded format.
@@ -346,3 +346,5 @@ The pilot was run by a throwaway script outside the repository and accepted as t
 | M5 | a refused answer might not be on disk | applied |
 | M6 | stage-boundary wording | applied |
 | M7 | stale PROGRESS wording | applied |
+
+**Revision 1, round 2 (`plan-reviewer`, focused, `e6eb9b9..bae0323`): "Approve"**; no Critical or Important, all eight round 1 findings resolved, nothing for the owner. Two optional wording items, both applied: a PROGRESS separator and commit hashes (M1), and the 0.518 ms figure in a test name (M2). **No open items.**
