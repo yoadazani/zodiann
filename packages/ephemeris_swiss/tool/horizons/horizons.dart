@@ -533,3 +533,277 @@ List<String> retrogradeUnresolved(Iterable<RetrogradeResult> results) {
       if (failing > (passingBackups[body] ?? 0)) body,
   ];
 }
+
+/// The disagreement, in arcseconds, between the longitudes Horizons gives for
+/// one instant asked in two time scales.
+double timeScaleDisagreementArcseconds(
+  double longitudeAtUt,
+  double longitudeAtTt,
+) => signedDegrees(longitudeAtUt, longitudeAtTt).abs() * 3600;
+
+/// The cross-check request: [instantsFrom1972] asked in UT, which Horizons
+/// reads as UTC. TT is never used for it.
+///
+/// Throws [ArgumentError] for an instant before the leap-second table.
+Map<String, String> utcCrossCheckQuery(
+  String command,
+  List<DateTime> instantsFrom1972,
+) {
+  for (final utc in instantsFrom1972) {
+    if (ephemerisTimeFor(utc) is! TerrestrialTime) {
+      throw ArgumentError.value(utc, 'instantsFrom1972', 'before 1972');
+    }
+  }
+  return horizonsQuery(
+    command: command,
+    julianDays: [
+      for (final utc in instantsFrom1972) julianDayUt(utc).toStringAsFixed(9),
+    ],
+    timeType: HorizonsTimeType.ut,
+  );
+}
+
+/// A sent query as the dataset records it: every parameter but the time list,
+/// without the quotes; `COMMAND` is the body to number map of all requests.
+Map<String, Object?> recordedQuery(Map<String, String> sent) => {
+  for (final MapEntry(:key, :value) in sent.entries)
+    if (key != 'TLIST')
+      key: key == 'COMMAND' ? horizonsCommands : value.replaceAll("'", ''),
+};
+
+/// The row lists of the dataset.
+const _datasetRowLists = [
+  'entries',
+  'utcCrossCheck',
+  'timeScaleControl',
+  'retrogradeEvidence',
+];
+
+/// The rows [key] of a decoded dataset; empty if it has none.
+List<Map<String, Object?>> _datasetRows(
+  Map<String, Object?> dataset,
+  String key,
+) => [
+  for (final row in (dataset[key] ?? const <Object?>[]) as List<Object?>)
+    row! as Map<String, Object?>,
+];
+
+/// The (body, utc, longitude) rows [key] of a decoded dataset or reference
+/// fixture; empty if it has none.
+List<LongitudeRow> datasetLongitudeRows(
+  Map<String, Object?> dataset,
+  String key,
+) => [
+  for (final row in _datasetRows(dataset, key))
+    (
+      body: row['body']! as String,
+      utc: row['utc']! as String,
+      longitudeDegrees: (row['longitudeDegrees']! as num).toDouble(),
+    ),
+];
+
+/// The version of the dataset [next]: 1 without a [previous] one, else the
+/// previous version, plus one if any row was added, removed or has any stored
+/// value changed, however little.
+int nextDatasetVersion(
+  Map<String, Object?>? previous,
+  Map<String, Object?> next,
+) {
+  if (previous == null) return 1;
+  Set<String> rows(Map<String, Object?> dataset) => {
+    for (final key in _datasetRowLists)
+      for (final row in _datasetRows(dataset, key))
+        jsonEncode([
+          key,
+          for (final field in row.keys.toList()..sort()) [field, row[field]],
+        ]),
+  };
+  final before = rows(previous);
+  final after = rows(next);
+  final unchanged = before.length == after.length && before.containsAll(after);
+  return (previous['version']! as int) + (unchanged ? 0 : 1);
+}
+
+/// The largest disagreement allowed between two Horizons answers for the same
+/// instant in two time scales (design section 6).
+const _timeScaleToleranceArcseconds = 0.002;
+
+/// A time-scale control is only meaningful where the two scales differ by more
+/// than this.
+const _discriminatingSeconds = 10;
+
+/// What is wrong with [dataset]; empty only when every gate passes.
+///
+/// Every body has an entry at each of [instants]; no row of [baseline],
+/// [crossCheckBaseline] or [previous] is missing or changed; before 1972 each
+/// instant has a time-scale control row and from 1972 each body has a UT
+/// cross-check row, both within 0.002 arcseconds; the control can tell the
+/// scales apart; and Horizons shows every declared pair retrograde.
+List<String> datasetProblems(
+  Map<String, Object?> dataset, {
+  required List<String> instants,
+  required Iterable<LongitudeRow> baseline,
+  Iterable<LongitudeRow> crossCheckBaseline = const [],
+  Map<String, Object?>? previous,
+}) {
+  final entries = datasetLongitudeRows(dataset, 'entries');
+  final crossCheck = datasetLongitudeRows(dataset, 'utcCrossCheck');
+  Map<(String, String), double> byKey(List<LongitudeRow> rows) => {
+    for (final row in rows) (row.body, row.utc): row.longitudeDegrees,
+  };
+  final atTt = byKey(entries);
+  final atUtc = byKey(crossCheck);
+  final controls = {
+    for (final row in _datasetRows(dataset, 'timeScaleControl'))
+      row['utc']! as String: row,
+  };
+  final evidence = {
+    for (final row in _datasetRows(dataset, 'retrogradeEvidence'))
+      (row['body']! as String, row['utc']! as String): row,
+  };
+  double number(Map<String, Object?> row, String field) =>
+      (row[field]! as num).toDouble();
+
+  final problems = <String>[
+    for (final change in changedRows(baseline, entries)) 'baseline: $change',
+    for (final change in changedRows(crossCheckBaseline, crossCheck))
+      'baseline cross-check: $change',
+    if (previous != null) ...[
+      for (final change in changedRows(
+        datasetLongitudeRows(previous, 'entries'),
+        entries,
+      ))
+        'previous dataset: $change',
+      for (final change in changedRows(
+        datasetLongitudeRows(previous, 'utcCrossCheck'),
+        crossCheck,
+      ))
+        'previous cross-check: $change',
+    ],
+  ];
+
+  for (final utc in instants) {
+    final historical = ephemerisTimeFor(DateTime.parse(utc)) is UniversalTime;
+    if (historical && !controls.containsKey(utc)) {
+      problems.add('no time-scale control row at $utc');
+    }
+    for (final body in horizonsCommands.keys) {
+      final entry = atTt[(body, utc)];
+      if (entry == null) problems.add('no entry for $body at $utc');
+      if (historical) continue;
+      final other = atUtc[(body, utc)];
+      if (other == null) {
+        problems.add('no UT cross-check row for $body at $utc');
+      } else if (entry != null &&
+          timeScaleDisagreementArcseconds(other, entry) >
+              _timeScaleToleranceArcseconds) {
+        problems.add(
+          '$body $utc: asked in UTC $other, asked at the app TT $entry',
+        );
+      }
+    }
+  }
+
+  for (final MapEntry(key: utc, value: row) in controls.entries) {
+    final disagreement = timeScaleDisagreementArcseconds(
+      number(row, 'longitudeAtUt'),
+      number(row, 'longitudeAtTt'),
+    );
+    if (disagreement > _timeScaleToleranceArcseconds) {
+      problems.add(
+        'time-scale control at $utc disagrees by '
+        '${disagreement.toStringAsFixed(6)} arcseconds',
+      );
+    }
+  }
+  if (!controls.values.any(
+    (row) => number(row, 'tdbMinusUtSeconds').abs() > _discriminatingSeconds,
+  )) {
+    problems.add(
+      'the time-scale control cannot tell UT from TT: no row differs by more '
+      'than $_discriminatingSeconds s',
+    );
+  }
+
+  for (final (:body, :utc) in retrogradeDeclarations) {
+    final row = evidence[(body, utc)];
+    final at = atTt[(body, utc)];
+    if (row == null) {
+      problems.add('no retrograde evidence for $body at $utc');
+    } else if (at != null &&
+        !isRetrograde(
+          before: number(row, 'longitudeBefore'),
+          at: at,
+          after: number(row, 'longitudeAfter'),
+        )) {
+      problems.add('$body is not retrograde at $utc');
+    }
+  }
+  return problems;
+}
+
+/// The whole Dart source of the device test's copy of [dataset]: the entries and
+/// the UT cross-check, as constants.
+String horizonsCopySource(Map<String, Object?> dataset) {
+  final source = StringBuffer()
+    ..writeln('// ZOD-TST-001: GENERATED by')
+    ..writeln('// packages/ephemeris_swiss/tool/gen_horizons_copy.dart from')
+    ..writeln('// packages/astro_core/test/fixtures/horizons_reference.json')
+    ..writeln('// (JPL Horizons, quantity 31, geocentric, apparent, retrieved')
+    ..writeln(
+      '// ${dataset['retrievedOn']}). '
+      '`test/horizons_reference_match_test.dart` keeps this',
+    )
+    ..writeln(
+      '// copy equal to the fixture. `utc` is an ISO-8601 string because '
+      'DateTime',
+    )
+    ..writeln('// is not const.')
+    ..writeln()
+    ..writeln('/// The version of the dataset.')
+    ..writeln('const int horizonsDatasetVersion = ${dataset['version']};')
+    ..writeln()
+    ..writeln('/// The tolerance of every body, in arcseconds.')
+    ..writeln(
+      'const double horizonsToleranceArcseconds = '
+      '${dataset['toleranceArcseconds']};',
+    )
+    ..writeln()
+    ..writeln('/// A longitude asked at the app TT, `jdTt`.')
+    ..writeln('typedef HorizonsReference = ({')
+    ..writeln('  String body,')
+    ..writeln('  String utc,')
+    ..writeln('  String jdTt,')
+    ..writeln('  double ttMinusUtSeconds,')
+    ..writeln('  double longitudeDegrees,')
+    ..writeln('});')
+    ..writeln()
+    ..writeln('/// A longitude asked at the UTC instant, from 1972.')
+    ..writeln('typedef HorizonsUtReference = ({')
+    ..writeln('  String body,')
+    ..writeln('  String utc,')
+    ..writeln('  double longitudeDegrees,')
+    ..writeln('});')
+    ..writeln()
+    ..writeln('const horizonsReference = <HorizonsReference>[');
+  for (final row in _datasetRows(dataset, 'entries')) {
+    source.writeln(
+      "  (body: '${row['body']}', utc: '${row['utc']}', "
+      "jdTt: '${row['jdTt']}', "
+      'ttMinusUtSeconds: ${row['ttMinusUtSeconds']}, '
+      'longitudeDegrees: ${row['longitudeDegrees']}),',
+    );
+  }
+  source
+    ..writeln('];')
+    ..writeln()
+    ..writeln('const horizonsUtCrossCheck = <HorizonsUtReference>[');
+  for (final row in _datasetRows(dataset, 'utcCrossCheck')) {
+    source.writeln(
+      "  (body: '${row['body']}', utc: '${row['utc']}', "
+      'longitudeDegrees: ${row['longitudeDegrees']}),',
+    );
+  }
+  source.writeln('];');
+  return '$source';
+}

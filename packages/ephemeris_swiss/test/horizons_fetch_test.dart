@@ -4,6 +4,7 @@
 // the real GET connect, and only to a server they start on this machine. Nothing
 // here compiles or runs a C tool.
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:ephemeris_swiss/ephemeris_swiss.dart';
@@ -102,6 +103,51 @@ List<int> _answerTo(Uri uri, {bool forward = false}) {
     for (final (i, day) in days.indexed)
       ' ${_calendar(day)}, $day, , , '
           '${(100 + (forward ? i % 3 : -(i % 3))).toStringAsFixed(7)},'
+          '  0.0000000,\n',
+  ].join();
+  final tail = sample.substring(sample.indexOf(r'$$EOE'));
+  return '$head\$\$SOE\n$rows$tail'.codeUnits;
+}
+
+/// The printed longitude of the body [command] at [julianDay] in the dataset
+/// fakes: slow and backward, so every gate passes.
+String _datasetLongitude(
+  String command,
+  String julianDay, {
+  double offsetDegrees = 0,
+}) =>
+    ((int.parse(command) * 7 +
+                200 -
+                (double.parse(julianDay) - 2400000) * 0.0001 +
+                offsetDegrees) %
+            360)
+        .toStringAsFixed(7);
+
+/// An answer to any dataset request, in the format of the pilot's samples.
+List<int> _datasetAnswer(Uri uri, {double offsetDegrees = 0}) {
+  String parameter(String name) =>
+      uri.queryParameters[name]!.replaceAll("'", '');
+  final command = parameter('COMMAND');
+  final scale = parameter('TIME_TYPE');
+  final quantity30 = parameter('QUANTITIES').startsWith('30');
+  final sample = File('test/fixtures/horizons_sample_tt.txt')
+      .readAsStringSync();
+  final head = [
+    for (final line
+        in sample.substring(0, sample.indexOf(r'$$SOE')).split('\n'))
+      if (line.startsWith('Start time') || line.startsWith('Stop  time'))
+        line.replaceFirst(' TT', ' $scale')
+      else if (line.startsWith(' Date__('))
+        ' Date__($scale)__HR:MN:SC.fff, Date_________JD$scale, , , '
+            '${quantity30 ? 'TDB-UT, ' : ''}ObsEcLon,   ObsEcLat,'
+      else
+        line.replaceFirst('(301)', '($command)'),
+  ].join('\n');
+  final rows = [
+    for (final day in parameter('TLIST').split(' '))
+      ' ${_calendar(day)}, $day, , , '
+          '${quantity30 ? '30.500000, ' : ''}'
+          '${_datasetLongitude(command, day, offsetDegrees: offsetDegrees)},'
           '  0.0000000,\n',
   ].join();
   final tail = sample.substring(sample.indexOf(r'$$EOE'));
@@ -619,6 +665,377 @@ void main() {
         ]);
       },
     );
+  });
+
+  group('dataset', () {
+    // The instants of the temporary date file, ascending: three before 1972.
+    const sorted = [
+      '1950-01-01T00:00:00Z',
+      '1953-11-18T00:00:00Z',
+      '1956-09-10T00:00:00Z',
+      '1972-01-01T00:00:00Z',
+      '2012-06-12T00:00:00Z',
+      '2023-08-01T00:00:00Z',
+      '2023-10-15T00:00:00Z',
+      '2049-05-11T00:00:00Z',
+    ];
+    const deltaT = [29.0, 30.5, 31.5];
+    final before1972 = sorted.sublist(0, 3);
+    final from1972 = sorted.sublist(3);
+
+    late Uri packageRoot;
+    late String baseline;
+    late String emptyBaseline;
+    late File dataset;
+
+    String ttOf(String utc) => ttJulianDay(
+      DateTime.parse(utc),
+      historicalDeltaTSeconds: before1972.contains(utc)
+          ? deltaT[before1972.indexOf(utc)]
+          : null,
+    );
+
+    void writeDates(List<String> dates) => File.fromUri(
+      packageRoot.resolve('../astro_core/test/fixtures/reference_dates.json'),
+    ).writeAsStringSync(jsonEncode({'version': 2, 'dates': dates}));
+
+    setUp(() {
+      packageRoot = (Directory(
+        inScratch('repo/packages/ephemeris_swiss'),
+      )..createSync(recursive: true)).uri;
+      dataset = File.fromUri(
+        packageRoot.resolve(
+          '../astro_core/test/fixtures/horizons_reference.json',
+        ),
+      );
+      dataset.parent.createSync(recursive: true);
+      // Not in chronological order: the tool sorts.
+      writeDates([...from1972, ...before1972]);
+      baseline = inScratch('baseline.json');
+      File(baseline).writeAsStringSync(
+        jsonEncode({
+          'entries': [
+            for (final utc in [sorted[0], sorted[3], sorted[7]])
+              {
+                'body': 'sun',
+                'utc': utc,
+                'longitudeDegrees': double.parse(
+                  _datasetLongitude('10', ttOf(utc)),
+                ),
+              },
+          ],
+        }),
+      );
+      emptyBaseline = inScratch('empty.json');
+      File(emptyBaseline)
+          .writeAsStringSync(jsonEncode({'entries': <Object>[]}));
+    });
+
+    _Harness harnessFor({
+      Future<HorizonsResponse> Function(Uri uri)? answer,
+      double offsetDegrees = 0,
+    }) => _Harness(
+      packageRoot: packageRoot,
+      deltaT: (_) => deltaT,
+      answer:
+          answer ??
+          ((uri) async => (
+            statusCode: 200,
+            bytes: _datasetAnswer(uri, offsetDegrees: offsetDegrees),
+          )),
+    );
+
+    List<String> run(String out, [String? against]) => [
+      'dataset',
+      '--baseline',
+      against ?? baseline,
+      '--out',
+      out,
+    ];
+
+    // NN, command and time scale of the thirty requests (design 8.6).
+    final names = [
+      for (final (i, command) in horizonsCommands.values.indexed)
+        '${'${i + 1}'.padLeft(2, '0')}_${command}_TT',
+      for (final (i, command) in horizonsCommands.values.indexed)
+        '${i + 11}_${command}_UT',
+      '21_301_UT',
+      '22_301_TT',
+      for (final (i, command)
+          in horizonsCommands.values.skip(2).toList().indexed)
+        '${i + 23}_${command}_TT',
+    ];
+
+    _offlineTest('sends the thirty requests of design 8.6 in order', () async {
+      final out = inScratch('raw');
+      final uriFileSeen = <bool>[];
+      late final _Harness harness;
+      harness = harnessFor(
+        answer: (uri) async {
+          final file = File(
+            '$out/${names[harness.requested.length - 1]}.uri.txt',
+          );
+          uriFileSeen.add(
+            file.existsSync() && file.readAsStringSync() == '$uri',
+          );
+          return (statusCode: 200, bytes: _datasetAnswer(uri));
+        },
+      );
+      expect(await harness.run(run(out)), 0);
+
+      final utDays = [
+        for (final utc in from1972)
+          julianDayUt(DateTime.parse(utc)).toStringAsFixed(9),
+      ];
+      final controlUt = [
+        for (final utc in before1972)
+          julianDayUt(DateTime.parse(utc)).toStringAsFixed(9),
+      ];
+      final expected = [
+        for (final command in horizonsCommands.values)
+          (command, 'TT', '31', [for (final utc in sorted) ttOf(utc)]),
+        for (final command in horizonsCommands.values)
+          (command, 'UT', '31', utDays),
+        ('301', 'UT', '30,31', controlUt),
+        (
+          '301',
+          'TT',
+          '31',
+          [
+            for (final day in controlUt)
+              (double.parse(day) + 30.5 / 86400).toStringAsFixed(9),
+          ],
+        ),
+        for (final MapEntry(key: body, value: command)
+            in horizonsCommands.entries.skip(2))
+          (
+            command,
+            'TT',
+            '31',
+            [
+              for (final d in retrogradeDeclarations)
+                if (d.body == body)
+                  for (final shift in [-3, 3])
+                    shiftJulianDay(ttOf(d.utc), shift),
+            ]..sort(),
+          ),
+      ];
+      expect(harness.requested, hasLength(30));
+      for (final (i, uri) in harness.requested.indexed) {
+        final (command, scale, quantities, days) = expected[i];
+        String parameter(String name) =>
+            uri.queryParameters[name]!.replaceAll("'", '');
+        expect(
+          (
+            parameter('COMMAND'),
+            parameter('TIME_TYPE'),
+            parameter('QUANTITIES'),
+            parameter('TLIST'),
+          ),
+          (command, scale, quantities, days.join(' ')),
+          reason: names[i],
+        );
+        expect(
+          File('$out/${names[i]}.uri.txt').readAsStringSync(),
+          '$uri',
+          reason: names[i],
+        );
+        expect(
+          File('$out/${names[i]}.txt').readAsBytesSync(),
+          _datasetAnswer(uri),
+          reason: names[i],
+        );
+      }
+      expect(uriFileSeen, List.filled(30, true));
+      expect(Directory(out).listSync(), hasLength(60));
+      final offline = datasetRequestUris(
+        instants: [...from1972, ...before1972],
+        historicalDeltaTSeconds: {
+          for (final (i, utc) in before1972.indexed) utc: deltaT[i],
+        },
+      );
+      expect(offline, [
+        ...harness.requested.sublist(0, 21),
+        ...harness.requested.sublist(22),
+      ]);
+      expect(harness.deltaTInstants, [
+        for (final utc in before1972) DateTime.parse(utc),
+      ]);
+    });
+
+    _offlineTest('writes the dataset only after all thirty answers', () async {
+      final existed = <bool>[];
+      final harness = harnessFor(
+        answer: (uri) async {
+          existed.add(dataset.existsSync());
+          return (statusCode: 200, bytes: _datasetAnswer(uri));
+        },
+      );
+      expect(await harness.run(run(inScratch('raw'))), 0);
+
+      expect(existed, List.filled(30, false));
+      expect(harness.events, [
+        'get',
+        for (var i = 1; i < 30; i++) ...['pause 1000', 'get'],
+      ]);
+      expect('${harness.out}', contains('80 entries'));
+      expect('${harness.out}', contains('3 baseline rows unchanged'));
+      final json =
+          jsonDecode(dataset.readAsStringSync()) as Map<String, Object?>;
+      List<Map<String, Object?>> rows(String key) =>
+          (json[key]! as List<Object?>).cast<Map<String, Object?>>();
+      expect(json['version'], 1);
+      expect(json['referenceDatesVersion'], 2);
+      expect(json['toleranceArcseconds'], 1);
+      expect(json['apiVersion'], '1.2');
+      expect(json['source'], contains('Horizons'));
+      expect(json['retrievedOn'], isNotEmpty);
+      expect(
+        (json['targetSources']! as Map<String, Object?>).keys,
+        horizonsCommands.keys,
+      );
+      expect(rows('entries'), hasLength(80));
+      expect(rows('utcCrossCheck'), hasLength(50));
+      expect(rows('timeScaleControl'), hasLength(3));
+      expect(rows('retrogradeEvidence'), hasLength(9));
+      final venus = rows('entries').singleWhere(
+        (e) => e['body'] == 'venus' && e['utc'] == '2012-06-12T00:00:00Z',
+      );
+      expect(venus['jdTt'], '2456090.500766018');
+      expect(venus['ttMinusUtSeconds'], 66.184);
+      expect(
+        venus['longitudeDegrees'],
+        double.parse(_datasetLongitude('299', '2456090.500766018')),
+      );
+      final control = rows('timeScaleControl').first;
+      expect(control['tdbMinusUtSeconds'], 30.5);
+      expect(
+        control['jdTtDerived'],
+        (double.parse(control['jdUt']! as String) + 30.5 / 86400)
+            .toStringAsFixed(9),
+      );
+      final query = json['queryParameters']! as Map<String, Object?>;
+      expect(query['TIME_TYPE'], 'TT');
+      expect(query['APPARENT'], 'AIRLESS');
+      expect(
+        (json['utcCrossCheckQueryParameters']!
+            as Map<String, Object?>)['TIME_TYPE'],
+        'UT',
+      );
+    });
+
+    _offlineTest('a refused answer writes no dataset and stops', () async {
+      var sent = 0;
+      final harness = harnessFor(
+        answer: (uri) async => (
+          statusCode: 200,
+          bytes: ++sent == 5 ? 'no data\n'.codeUnits : _datasetAnswer(uri),
+        ),
+      );
+      await expectLater(
+        harness.run(run(inScratch('raw'))),
+        throwsFormatException,
+      );
+      expect(harness.requested, hasLength(5));
+      expect(
+        File(inScratch('raw/05_499_TT.txt')).readAsStringSync(),
+        'no data\n',
+      );
+      expect(dataset.existsSync(), isFalse);
+    });
+
+    _offlineTest('a non-200 answer writes no dataset and stops', () async {
+      var sent = 0;
+      final harness = harnessFor(
+        answer: (uri) async => ++sent == 22
+            ? (statusCode: 503, bytes: 'busy\n'.codeUnits)
+            : (statusCode: 200, bytes: _datasetAnswer(uri)),
+      );
+      await expectLater(
+        harness.run(run(inScratch('raw'))),
+        throwsA(isA<HttpException>()),
+      );
+      expect(harness.requested, hasLength(22));
+      expect(File(inScratch('raw/22_301_TT.http503.txt')).existsSync(), isTrue);
+      expect(dataset.existsSync(), isFalse);
+    });
+
+    for (final (name, useEmptyBaseline) in [
+      ('a gate problem exits 1 and leaves the dataset byte-identical', false),
+      ('an existing dataset is compared whatever --baseline names', true),
+    ]) {
+      _offlineTest(name, () async {
+        expect(await harnessFor().run(run(inScratch('first'))), 0);
+        final written = dataset.readAsBytesSync();
+
+        final changed = harnessFor(offsetDegrees: 0.001);
+        expect(
+          await changed.run(
+            run(inScratch('second'), useEmptyBaseline ? emptyBaseline : null),
+          ),
+          1,
+        );
+        expect('${changed.err}', contains('changed by'));
+        expect(changed.requested, hasLength(30));
+        expect(dataset.readAsBytesSync(), written);
+      });
+    }
+
+    _offlineTest('the same answers again keep the version', () async {
+      expect(await harnessFor().run(run(inScratch('first'))), 0);
+      expect(
+        await harnessFor().run(run(inScratch('second'), emptyBaseline)),
+        0,
+      );
+      expect(
+        (jsonDecode(dataset.readAsStringSync())
+            as Map<String, Object?>)['version'],
+        1,
+      );
+    });
+
+    _offlineTest('without --baseline or --out nothing starts', () async {
+      final out = inScratch('raw');
+      for (final arguments in [
+        ['dataset', '--out', out],
+        ['dataset', '--baseline', baseline],
+        ['dataset', '--baseline', baseline, '--out'],
+        ['dataset', '--baseline', baseline, '--out', ''],
+        ['dataset', '--baseline', '', '--out', out],
+        ['dataset', '--out', out, '--baseline', baseline],
+        ['dataset', '--baseline', baseline, '--out', inScratch('repo/raw')],
+      ]) {
+        final harness = _Harness(
+          packageRoot: packageRoot,
+          answer: (uri) => fail('a request was sent: $uri'),
+          deltaT: (_) => fail('the delta T was computed'),
+        );
+        expect(await harness.run(arguments), 64, reason: '$arguments');
+      }
+      expect(Directory(out).existsSync(), isFalse);
+    });
+
+    for (final (name, prepare) in <(String, void Function())>[
+      (
+        'a declared instant missing from the dates',
+        () => writeDates([...before1972, ...from1972.take(4)]),
+      ),
+      ('a missing baseline', () => File(baseline).deleteSync()),
+      ('a broken existing dataset', () => dataset.writeAsStringSync('{')),
+    ]) {
+      _offlineTest('$name stops before any request', () async {
+        prepare();
+        final harness = harnessFor(
+          answer: (uri) => fail('a request was sent: $uri'),
+        );
+        await expectLater(
+          harness.run(run(inScratch('raw'))),
+          throwsA(anything),
+        );
+        expect(harness.requested, isEmpty);
+        expect(Directory(inScratch('raw')).existsSync(), isFalse);
+      });
+    }
   });
 
   // The real GET, against a server these tests start on this machine. The client

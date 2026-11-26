@@ -222,6 +222,7 @@ void main() {
 
   parserTests();
   retrogradeTests();
+  datasetTests();
 }
 
 /// The delta T the vendored library gives the two candidate instants before
@@ -900,5 +901,417 @@ void parserTests() {
         expect(() => _parseTt(text), _refusedBy('centre'));
       });
     });
+  });
+}
+
+/// Instants of the synthetic dataset: every declared retrograde instant, one
+/// other before 1972 and one other after it.
+final _datasetInstants = ({
+  '1950-01-01T00:00:00Z',
+  '2000-01-01T00:00:00Z',
+  for (final d in retrogradeDeclarations) d.utc,
+}.toList()..sort());
+
+bool _before1972(String utc) =>
+    DateTime.parse(utc).isBefore(DateTime.utc(1972));
+
+/// A longitude for [body] at the [index]th instant, far from the neighbours'.
+double _synthetic(String body, int index) =>
+    (horizonsCommands.keys.toList().indexOf(body) * 33 + index * 7 + 5) % 360 +
+    0.25;
+
+/// A dataset that passes every gate.
+Map<String, Object?> _cleanDataset() => {
+  'version': 1,
+  'entries': [
+    for (final body in horizonsCommands.keys)
+      for (final (i, utc) in _datasetInstants.indexed)
+        {
+          'body': body,
+          'utc': utc,
+          'jdTt': '24${i.toString().padLeft(5, '0')}.000000000',
+          'ttMinusUtSeconds': 30.5,
+          'longitudeDegrees': _synthetic(body, i),
+        },
+  ],
+  'utcCrossCheck': [
+    for (final body in horizonsCommands.keys)
+      for (final (i, utc) in _datasetInstants.indexed)
+        if (!_before1972(utc))
+          {
+            'body': body,
+            'utc': utc,
+            'jdUt': '24${i.toString().padLeft(5, '0')}.000000000',
+            'longitudeDegrees': _synthetic(body, i),
+          },
+  ],
+  'timeScaleControl': [
+    for (final (i, utc) in _datasetInstants.indexed)
+      if (_before1972(utc))
+        {
+          'utc': utc,
+          'jdUt': '24${i.toString().padLeft(5, '0')}.000000000',
+          'tdbMinusUtSeconds': 30.5,
+          'jdTtDerived': '24${i.toString().padLeft(5, '0')}.000353009',
+          'longitudeAtUt': _synthetic('moon', i),
+          'longitudeAtTt': _synthetic('moon', i),
+        },
+  ],
+  'retrogradeEvidence': [
+    for (final d in retrogradeDeclarations)
+      {
+        'body': d.body,
+        'utc': d.utc,
+        'jdTtBefore': '2400000.000000000',
+        'longitudeBefore':
+            _synthetic(d.body, _datasetInstants.indexOf(d.utc)) + 0.2,
+        'jdTtAfter': '2400006.000000000',
+        'longitudeAfter':
+            _synthetic(d.body, _datasetInstants.indexOf(d.utc)) - 0.2,
+      },
+  ],
+};
+
+/// A deep copy of the rows [key] of [dataset], which it replaces.
+List<Map<String, Object?>> _rowsOf(Map<String, Object?> dataset, String key) {
+  final rows = [
+    for (final row in dataset[key]! as List<Object?>)
+      {...row! as Map<String, Object?>},
+  ];
+  dataset[key] = rows;
+  return rows;
+}
+
+/// The (body, utc, longitude) rows of [key] in [dataset].
+List<LongitudeRow> _longitudes(Map<String, Object?> dataset, String key) => [
+  for (final row
+      in (dataset[key]! as List<Object?>).cast<Map<String, Object?>>())
+    (
+      body: row['body']! as String,
+      utc: row['utc']! as String,
+      longitudeDegrees: (row['longitudeDegrees']! as num).toDouble(),
+    ),
+];
+
+const _milli = 0.001 / 3600;
+
+void datasetTests() {
+  test('time scale disagreement', () {
+    expect(
+      timeScaleDisagreementArcseconds(10, 10 + 3 * _milli),
+      closeTo(0.003, 1e-9),
+    );
+    expect(
+      timeScaleDisagreementArcseconds(359.9999999, 0.0000001),
+      closeTo(0.00072, 1e-6),
+    );
+  });
+
+  group('utcCrossCheckQuery', () {
+    test('asks UT at the Julian day of the UTC instant', () {
+      final instants = [
+        DateTime.utc(1972),
+        DateTime.utc(2100, 12, 31, 23, 59, 59),
+      ];
+      final query = utcCrossCheckQuery('301', instants);
+      expect(query['TIME_TYPE'], "'UT'");
+      expect(query['QUANTITIES'], "'31'");
+      expect(
+        query['TLIST'],
+        "'${[for (final utc in instants) julianDayUt(utc).toStringAsFixed(9)].join(' ')}'",
+      );
+    });
+
+    test('refuses an instant before 1972', () {
+      expect(
+        () => utcCrossCheckQuery('301', [DateTime.utc(1971, 12, 31)]),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  test('the recorded query is the sent one without quotes', () {
+    final recorded = recordedQuery(
+      utcCrossCheckQuery('301', [DateTime.utc(2000)]),
+    );
+    expect(recorded['TIME_TYPE'], 'UT');
+    expect(recorded['TLIST_TYPE'], 'JD');
+    expect(recorded['CENTER'], '500@399');
+    expect(recorded['format'], 'text');
+    expect(recorded, isNot(contains('TLIST')));
+    expect(recorded['COMMAND'], horizonsCommands);
+  });
+
+  group('nextDatasetVersion', () {
+    test('1 without a previous dataset', () {
+      expect(nextDatasetVersion(null, _cleanDataset()), 1);
+    });
+
+    test('unchanged rows keep the version', () {
+      final previous = _cleanDataset()..['version'] = 4;
+      expect(nextDatasetVersion(previous, _cleanDataset()), 4);
+    });
+
+    test('an added row raises it', () {
+      final previous = _cleanDataset()..['version'] = 4;
+      final next = _cleanDataset();
+      _rowsOf(next, 'entries').add({
+        'body': 'sun',
+        'utc': '2001-01-01T00:00:00Z',
+        'jdTt': '2451911.000000000',
+        'ttMinusUtSeconds': 64.184,
+        'longitudeDegrees': 1.5,
+      });
+      expect(nextDatasetVersion(previous, next), 5);
+    });
+
+    test('a longitude changed by less than the row tolerance raises it', () {
+      final previous = _cleanDataset()..['version'] = 4;
+      final next = _cleanDataset();
+      final row = _rowsOf(next, 'entries').first;
+      row['longitudeDegrees'] =
+          (row['longitudeDegrees']! as double) + 0.5 * _milli;
+      expect(nextDatasetVersion(previous, next), 5);
+    });
+
+    test('a changed control or evidence value raises it', () {
+      final previous = _cleanDataset();
+      for (final (key, field) in [
+        ('timeScaleControl', 'tdbMinusUtSeconds'),
+        ('retrogradeEvidence', 'longitudeAfter'),
+        ('utcCrossCheck', 'jdUt'),
+      ]) {
+        final next = _cleanDataset();
+        _rowsOf(next, key).first[field] = field == 'jdUt' ? '1.0' : 1.25;
+        expect(nextDatasetVersion(previous, next), 2, reason: key);
+      }
+    });
+  });
+
+  group('datasetProblems', () {
+    List<String> problems(
+      Map<String, Object?> dataset, {
+      List<LongitudeRow>? baseline,
+      List<LongitudeRow> crossCheckBaseline = const [],
+      Map<String, Object?>? previous,
+    }) => datasetProblems(
+      dataset,
+      instants: _datasetInstants,
+      baseline: baseline ?? _longitudes(_cleanDataset(), 'entries'),
+      crossCheckBaseline: crossCheckBaseline,
+      previous: previous,
+    );
+
+    test('a clean synthetic dataset has no problems', () {
+      expect(
+        problems(
+          _cleanDataset(),
+          crossCheckBaseline: _longitudes(_cleanDataset(), 'utcCrossCheck'),
+          previous: _cleanDataset(),
+        ),
+        isEmpty,
+      );
+    });
+
+    /// The dataset with one change applied to the rows [key].
+    Map<String, Object?> altered(
+      String key,
+      void Function(List<Map<String, Object?>> rows) change,
+    ) {
+      final dataset = _cleanDataset();
+      change(_rowsOf(dataset, key));
+      return dataset;
+    }
+
+    void shift(Map<String, Object?> row, String field, double arcseconds) =>
+        row[field] = (row[field]! as num) + arcseconds / 3600;
+
+    test('a missing entry', () {
+      final dataset = altered('entries', (rows) => rows.removeAt(3));
+      expect(problems(dataset, baseline: []), isNotEmpty);
+    });
+
+    test('a longitude that differs from the baseline', () {
+      final baseline = _longitudes(_cleanDataset(), 'entries');
+      final first = baseline.first;
+      baseline[0] = (
+        body: first.body,
+        utc: first.utc,
+        longitudeDegrees: first.longitudeDegrees + 2 * _milli,
+      );
+      expect(problems(_cleanDataset(), baseline: baseline), isNotEmpty);
+    });
+
+    test('a baseline row that is gone', () {
+      final baseline = [
+        ..._longitudes(_cleanDataset(), 'entries'),
+        (body: 'sun', utc: '1999-01-01T00:00:00Z', longitudeDegrees: 1.0),
+      ];
+      expect(problems(_cleanDataset(), baseline: baseline), isNotEmpty);
+    });
+
+    test('a cross-check row that differs from its baseline', () {
+      final crossCheck = _longitudes(_cleanDataset(), 'utcCrossCheck');
+      final first = crossCheck.first;
+      crossCheck[0] = (
+        body: first.body,
+        utc: first.utc,
+        longitudeDegrees: first.longitudeDegrees + 2 * _milli,
+      );
+      expect(
+        problems(_cleanDataset(), crossCheckBaseline: crossCheck),
+        isNotEmpty,
+      );
+    });
+
+    test('a row that differs from the previous dataset only', () {
+      final previous = altered(
+        'entries',
+        (rows) => shift(rows.first, 'longitudeDegrees', 0.002),
+      );
+      expect(
+        problems(_cleanDataset(), baseline: [], previous: previous),
+        isNotEmpty,
+      );
+    });
+
+    test('a cross-check row that differs from the previous dataset', () {
+      final previous = altered(
+        'utcCrossCheck',
+        (rows) => shift(rows.first, 'longitudeDegrees', 0.002),
+      );
+      expect(
+        problems(_cleanDataset(), baseline: [], previous: previous),
+        isNotEmpty,
+      );
+    });
+
+    test('a missing control row', () {
+      final dataset = altered('timeScaleControl', (rows) => rows.removeLast());
+      expect(problems(dataset), isNotEmpty);
+    });
+
+    test('a missing evidence row', () {
+      final dataset = altered(
+        'retrogradeEvidence',
+        (rows) => rows.removeLast(),
+      );
+      expect(problems(dataset), isNotEmpty);
+    });
+
+    test('a missing UT cross-check row', () {
+      final dataset = altered('utcCrossCheck', (rows) => rows.removeLast());
+      expect(problems(dataset), isNotEmpty);
+    });
+
+    test('a UT cross-check row more than 0.002 arcseconds from its entry', () {
+      expect(
+        problems(
+          altered(
+            'utcCrossCheck',
+            (rows) => shift(rows.first, 'longitudeDegrees', 0.0019),
+          ),
+        ),
+        isEmpty,
+      );
+      expect(
+        problems(
+          altered(
+            'utcCrossCheck',
+            (rows) => shift(rows.first, 'longitudeDegrees', 0.003),
+          ),
+        ),
+        isNotEmpty,
+      );
+    });
+
+    test('a control row off by more than 0.002 arcseconds', () {
+      final dataset = altered(
+        'timeScaleControl',
+        (rows) => shift(rows.first, 'longitudeAtTt', 0.003),
+      );
+      expect(problems(dataset), isNotEmpty);
+    });
+
+    test('a control that cannot tell the scales apart', () {
+      final dataset = altered('timeScaleControl', (rows) {
+        for (final row in rows) {
+          row['tdbMinusUtSeconds'] = -9.5;
+        }
+      });
+      expect(problems(dataset), isNotEmpty);
+    });
+
+    test('a declared pair that is not retrograde', () {
+      final dataset = altered('retrogradeEvidence', (rows) {
+        final after = rows.first['longitudeAfter'];
+        rows.first['longitudeAfter'] = rows.first['longitudeBefore'];
+        rows.first['longitudeBefore'] = after;
+      });
+      expect(problems(dataset), isNotEmpty);
+    });
+  });
+
+  test('the copy holds every entry and cross-check row', () {
+    final source = horizonsCopySource({
+      'version': 1,
+      'retrievedOn': '2026-11-27',
+      'toleranceArcseconds': 1,
+      'entries': [
+        {
+          'body': 'sun',
+          'utc': '2000-01-01T00:00:00Z',
+          'jdTt': '2451544.500742870',
+          'ttMinusUtSeconds': 64.184,
+          'longitudeDegrees': 279.8600001,
+        },
+        {
+          'body': 'moon',
+          'utc': '1950-01-01T00:00:00Z',
+          'jdTt': '2433282.500337000',
+          'ttMinusUtSeconds': 29.0,
+          'longitudeDegrees': 12.5000002,
+        },
+      ],
+      'utcCrossCheck': [
+        {
+          'body': 'sun',
+          'utc': '2000-01-01T00:00:00Z',
+          'jdUt': '2451544.500000000',
+          'longitudeDegrees': 279.8600003,
+        },
+      ],
+      'timeScaleControl': [<String, Object?>{}],
+    });
+
+    expect(source, contains('GENERATED'));
+    expect(source, contains('const int horizonsDatasetVersion = 1;'));
+    expect(source, contains('const double horizonsToleranceArcseconds = 1;'));
+    expect(source, contains('typedef HorizonsReference = ({'));
+    expect(source, contains('typedef HorizonsUtReference = ({'));
+    expect(
+      source,
+      contains(
+        "(body: 'sun', utc: '2000-01-01T00:00:00Z', "
+        "jdTt: '2451544.500742870', ttMinusUtSeconds: 64.184, "
+        'longitudeDegrees: 279.8600001),',
+      ),
+    );
+    expect(
+      source,
+      contains(
+        "(body: 'moon', utc: '1950-01-01T00:00:00Z', "
+        "jdTt: '2433282.500337000', ttMinusUtSeconds: 29.0, "
+        'longitudeDegrees: 12.5000002),',
+      ),
+    );
+    expect(
+      source,
+      contains(
+        "(body: 'sun', utc: '2000-01-01T00:00:00Z', "
+        'longitudeDegrees: 279.8600003),',
+      ),
+    );
+    expect(source, isNot(contains('timeScaleControl')));
   });
 }
