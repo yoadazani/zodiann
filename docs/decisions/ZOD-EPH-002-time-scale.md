@@ -1,6 +1,6 @@
 # ZOD-EPH-002: time conversion for planet positions (approved specification deviation)
 
-> **Status: approved by the owner, 2026-11-25. Not yet implemented.** Measurements are from a host build, not a device. The specification text is unchanged: only the owner edits it. Background: [`docs/spikes/ZOD-EPH-002-time-scale.md`](../spikes/ZOD-EPH-002-time-scale.md).
+> **Status: approved by the owner, 2026-11-25; implemented by ZOD-EPH-002 and verified on an x86_64 Android emulator, 2026-11-26 (section 9).** ARM devices and iOS are unverified. The measurements of section 3 are from a host build. The specification text is unchanged: only the owner edits it. Background: [`docs/spikes/ZOD-EPH-002-time-scale.md`](../spikes/ZOD-EPH-002-time-scale.md).
 
 ## 1. Decision
 
@@ -78,3 +78,22 @@ Scientific implications: geocentric positions for a given UTC instant no longer 
 
 * Native calls use one shared library state with a lock, in a project-authored C file; vendored sources unchanged.
 * The astronomy-engine backup is selected automatically **only if the Swiss library does not load**; missing files or unsupported dates never switch sources. This refines "only ever an explicit user choice" in the [ZOD-FND-011 record](ZOD-FND-011-ephemeris-data-file-coverage-range.md) section 4 for that one case.
+
+## 9. Device results (2026-11-26)
+
+`Pixel_9_Pro_API_36` emulator (API 36, x86_64, 16 KB pages), through the production adapter and the locked library, `apps/astro_mobile/integration_test/swiss_ephemeris_accuracy_test.dart`. Maximum difference from JPL Horizons in arcseconds, 53 instants from 1899-12-31 to 2100-01-01 per body:
+
+| Body | UTC input | Matched TT |
+|---|---|---|
+| Sun | 0.242 | 0.243 |
+| Moon | 0.455 | 0.243 |
+| Mercury | 0.243 | 0.243 |
+| Venus | 0.242 | 0.242 |
+| Mars | 0.242 | 0.243 |
+| Jupiter | 0.228 | 0.228 |
+| Saturn | 0.252 | 0.252 |
+| Uranus | 0.560 | 0.560 |
+| Neptune | 0.198 | 0.198 |
+| Pluto | 0.246 | 0.246 |
+
+The adapter's own TT equals the fixture's within 0.000025″ of Moon longitude. The far-future ΔT conflict does not arise for this source; the backup keeps it until ZOD-EPH-006.

@@ -50,7 +50,7 @@ Give the app its primary position source: accurate, never silently approximate, 
 * A pure-Dart `EphemerisPort` over a small injected calculation interface (host-testable with a fake); the native implementation is exported only from the native library entry point.
 * `position`: node from `MeanAscendingNodeFormula`; non-UTC throws; outside `coveredRange`, `OutOfCoveredRange`; otherwise convert time, one library call, check `usedSwissEphemerisFiles`, normalize the longitude, take the speed from the same call.
 * Moshier fallback, a missing file, a warning **or a negative library return** gives `OutOfCoveredRange` (data unavailable). *My call:* a damaged file must not crash the app.
-* `coveredRange` comes from edges **measured on the device**, taken inward so every body succeeds throughout.
+* `coveredRange` comes from edges **measured on the device**, taken inward so every body succeeds throughout. Measured 2026-11-26: **1800-01-03 to 2400-01-06**.
 * *My call:* speed is reported as the library gives it (degrees per TT day); the difference from per-UTC-day exists only inside a leap second or the 1972 step.
 
 ### 4.4 Data files and startup (`astro_mobile`)
@@ -90,8 +90,31 @@ Give the app its primary position source: accurate, never silently approximate, 
 * The backup library keeps unsynchronised state; this task does not serialize it. A consumer running it on two isolates at once could get a wrong Pluto. Recommended addition to EPH-006 or the crossing tasks.
 * TT as a function of UTC has steps (decision record section 4): hand-off to CRS-001/002.
 * Swiss speed has small glitches near solar conjunction ([note](../../spikes/ZOD-EPH-004-swiss-speed-reference.md)): hand-off to CRS-001 and EPH-005.
-* iOS is unverified (accepted risk, IOS-001).
+* iOS is unverified (accepted risk, IOS-001). ARM devices are unverified.
+
+Hand-offs recorded at implementation (each becomes a note when its task is planned):
+
+* **ZOD-TST-001:** T-EPH-1 here uses the ZOD-EPH-004 UT reference copy and the new Swiss TT fixture; adding instants means refetching both and updating the 53 and 530 counts; TST-001 repoints T-EPH-1 to its fixture.
+* **ZOD-EPH-006 or the crossing tasks:** the backup's unsynchronised library state is not serialized (recommended addition). `packages/ephemeris_astronomy` comments still say host code never imports its native library; the app wiring now does.
+* **ZOD-CRS-001, ZOD-CRS-002:** the TT steps (decision record section 4).
+* **ZOD-CRS-001, ZOD-EPH-005:** Swiss speed glitches near solar conjunction.
+* **ZOD-IOS-001:** the iOS hook must compile `zodiann_swiss_lock.c` with `-DTLSOFF`; the concurrency and startup tests need an iOS run.
+* **ZOD-NFR-017:** the time basis and the ΔT data status come from `ephemerisStatusProvider` (app layer).
 
 ## 7. Left to the builder
 
 Names and file layout; the calculation interface's shape; the C function signatures; how the probe is made; how device fixtures are shared.
+
+## 8. Release build results (2026-11-26)
+
+`flutter build apk --release --split-per-abi`. Every APK holds `libswisseph.so`, `libastronomy.so`, `libdartjni.so` and both `.se1` files. All `LOAD` segments of `libswisseph.so` are aligned to `0x4000` on the three ABIs, and each exports the five locked functions. Sizes in bytes:
+
+| ABI | APK | `libswisseph` | `libastronomy` | `libdartjni` |
+|---|---|---|---|---|
+| armeabi-v7a | 21,129,866 | 571,676 | 206,636 | 82,048 |
+| arm64-v8a | 23,566,896 | 551,120 | 197,240 | 131,944 |
+| x86_64 | 24,849,443 | 637,656 | 249,232 | 117,256 |
+
+Against the ZOD-FND-003 measurement with the data files and without the library (2026-11-20: 17,820,246; 20,200,286; 21,452,092) the APKs are 3.3 to 3.4 MB larger. Much other app work landed in between, so the difference is not all this task's.
+
+A clean install of the x86_64 release APK on the API 36 emulator logged `zodiann ephemeris source: primary`, with no fatal exception or native crash and a running process.

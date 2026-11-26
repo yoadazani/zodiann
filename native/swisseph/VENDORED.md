@@ -15,12 +15,16 @@ Added by ZOD-FND-003 (2026-11-20). Everything under `upstream/` and the two `.se
 ## What is vendored
 
 - `upstream/`: the nine library sources named by the upstream `Makefile` (`SWEOBJ = swedate swehouse swejpl swemmoon swemplan sweph swephlib swecl swehel`), their headers (`swedate.h swehouse.h swejpl.h swemptab.h swenut2000a.h sweodef.h sweph.h swephexp.h swephlib.h swedll.h`), and `LICENSE`, `LICENSE.TXT`, `agpl-3.0.txt`, `readme.md`, `Makefile`, `seleapsec.txt`.
-- `packages/ephemeris_swiss/assets/ephe/sepl_18.se1` (planets) and `semo_18.se1` (Moon): a **spike subset** covering 1800 to 2400. ZOD-FND-011 decides the real coverage range. The data files live in the package because Flutter bundles only assets declared inside a package (decision D2 of the plan).
+- `packages/ephemeris_swiss/assets/ephe/sepl_18.se1` (planets) and `semo_18.se1` (Moon): the pair ZOD-FND-011 chose (nominally 1800 to 2400; ZOD-EPH-002 measured 1800-01-03 to 2400-01-06 for all ten bodies). The data files live in the package because Flutter bundles only assets declared inside a package (decision D2 of the plan).
 - **Upstream `LICENSE.TXT` is a symlink** (git mode `120000`) whose target is `LICENSE`. It is vendored as a regular 7-byte file containing the text `LICENSE`; its git blob id equals the upstream blob id. Its SHA-256 differs from `LICENSE`'s, so the manifest lists both.
 
 ## Not vendored (not modified, simply not copied)
 
 `swetest.c`, `swemini.c`, `swevents.c`, `swevents.h`, `sweephe4.c`, `sweephe4.h`, `swephgen4.c`, `obama.c`, `swein600.jpg`, upstream's `.gitattributes`, the directories `doc/`, `bin/`, `contrib/`, `setest/`, `windows/`, and every other file in `ephe/`.
+
+## Project-authored files, not vendored
+
+`zodiann_swiss_lock.c` and `zodiann_swiss_lock.h` sit beside `upstream/` (ZOD-EPH-002). They are not upstream files, are not in `MANIFEST.json`, and change nothing under `upstream/`. The build compiles them with the library and `-DTLSOFF`, an upstream switch (`sweodef.h`) that makes the library state shared by all threads.
 
 ## Why `.gitattributes` has two `-text` lines
 
