@@ -3,6 +3,7 @@
 // request; the parser is tested on two answers of the pilot of 2026-11-26.
 import 'dart:io';
 
+import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 import 'package:test/test.dart';
 
 import '../tool/horizons/horizons.dart';
@@ -204,6 +205,353 @@ void main() {
   });
 
   parserTests();
+  retrogradeTests();
+}
+
+/// The delta T the vendored library gives the two candidate instants before
+/// 1972, in seconds.
+const _deltaT = {
+  '1953-11-18T00:00:00Z': 30.572200534016,
+  '1956-09-10T00:00:00Z': 31.563208632313,
+};
+
+/// Design section 5.1, written out.
+const _primaries = <Declaration>[
+  (body: 'mercury', utc: '1953-11-18T00:00:00Z'),
+  (body: 'mercury', utc: '2049-05-11T00:00:00Z'),
+  (body: 'venus', utc: '2012-06-12T00:00:00Z'),
+  (body: 'mars', utc: '1956-09-10T00:00:00Z'),
+  (body: 'jupiter', utc: '2023-10-15T00:00:00Z'),
+  (body: 'saturn', utc: '2023-08-01T00:00:00Z'),
+  (body: 'uranus', utc: '2023-10-15T00:00:00Z'),
+  (body: 'neptune', utc: '2023-08-01T00:00:00Z'),
+  (body: 'pluto', utc: '2023-08-01T00:00:00Z'),
+];
+
+const _backups = {
+  'mercury': '2016-05-13T00:00:00Z',
+  'venus': '2004-06-14T00:00:00Z',
+  'mars': '2003-08-28T00:00:00Z',
+  'jupiter': '2024-10-20T00:00:00Z',
+  'saturn': '2024-08-01T00:00:00Z',
+  'uranus': '2024-10-20T00:00:00Z',
+  'neptune': '2024-08-01T00:00:00Z',
+  'pluto': '2024-08-01T00:00:00Z',
+};
+
+const _retrogradeBodies = [
+  'mercury',
+  'venus',
+  'mars',
+  'jupiter',
+  'saturn',
+  'uranus',
+  'neptune',
+  'pluto',
+];
+
+/// A result for [body] that is retrograde exactly when [passes].
+RetrogradeResult _result(
+  String body, {
+  required bool isBackup,
+  required bool passes,
+  String utc = _utc,
+}) => (
+  body: body,
+  utc: utc,
+  isBackup: isBackup,
+  before: passes ? 11 : 9,
+  at: 10,
+  after: passes ? 9 : 11,
+);
+
+void retrogradeTests() {
+  group('ttJulianDay', () {
+    DateTime at(String utc) => DateTime.parse(utc);
+    String plusSeconds(String utc, double seconds) =>
+        (julianDayUt(at(utc)) + seconds / 86400).toStringAsFixed(9);
+
+    test('from 1972 uses leap seconds', () {
+      // TAI - UTC was 34 s until 2012-07-01, and 37 s in 2023.
+      expect(
+        ttJulianDay(at('2012-06-12T00:00:00Z')),
+        plusSeconds('2012-06-12T00:00:00Z', 66.184),
+      );
+      expect(
+        ttJulianDay(at('2023-08-01T00:00:00Z')),
+        plusSeconds('2023-08-01T00:00:00Z', 69.184),
+      );
+    });
+
+    test('before 1972 it adds the given delta T', () {
+      expect(
+        ttJulianDay(at('1953-11-18T00:00:00Z'), historicalDeltaTSeconds: 30),
+        plusSeconds('1953-11-18T00:00:00Z', 30),
+      );
+    });
+
+    test('before 1972 without a finite delta T throws ArgumentError', () {
+      for (final deltaT in [null, double.nan, double.infinity]) {
+        expect(
+          () => ttJulianDay(
+            at('1953-11-18T00:00:00Z'),
+            historicalDeltaTSeconds: deltaT,
+          ),
+          throwsArgumentError,
+          reason: '$deltaT',
+        );
+      }
+    });
+
+    test('1971-12-31T23:59:59Z uses the given delta T', () {
+      expect(
+        ttJulianDay(at('1971-12-31T23:59:59Z'), historicalDeltaTSeconds: 30),
+        plusSeconds('1971-12-31T23:59:59Z', 30),
+      );
+    });
+
+    test('1972-01-01T00:00:00Z is +42.184 s even when a delta T is given', () {
+      // The string the pilot sent for this instant.
+      expect(
+        ttJulianDay(DateTime.utc(1972), historicalDeltaTSeconds: 30),
+        '2441317.500488241',
+      );
+    });
+
+    test("2100-12-31T23:59:59Z is the pilot's last instant", () {
+      expect(ttJulianDay(at('2100-12-31T23:59:59Z')), '2488434.500789167');
+    });
+  });
+
+  test('shiftJulianDay moves whole days and keeps the fraction', () {
+    expect(shiftJulianDay('2441317.500488241', -3), '2441314.500488241');
+    expect(shiftJulianDay('2441317.500488241', 3), '2441320.500488241');
+  });
+
+  group('retrograde candidates', () {
+    test('the primaries cover mercury to pluto and never sun or moon', () {
+      expect(retrogradePrimaries, _primaries);
+      expect({
+        for (final p in retrogradePrimaries) p.body,
+      }, _retrogradeBodies.toSet());
+    });
+
+    test('every primary body has a backup', () {
+      expect(retrogradeBackups, _backups);
+      expect(retrogradeBackups.keys.toSet(), {
+        for (final p in retrogradePrimaries) p.body,
+      });
+    });
+
+    test('the declarations are the primaries', () {
+      expect(retrogradeDeclarations, _primaries);
+    });
+
+    test('the historical instants are 1953-11-18 and 1956-09-10', () {
+      expect(retrogradeHistoricalInstants(), [
+        '1953-11-18T00:00:00Z',
+        '1956-09-10T00:00:00Z',
+      ]);
+    });
+
+    test('eight requests, mercury to pluto, 51 times', () {
+      // The TT Julian day sent for each instant.
+      const julianDays = {
+        '1953-11-18T00:00:00Z': '2434699.500353845',
+        '1956-09-10T00:00:00Z': '2435726.500365315',
+        '2003-08-28T00:00:00Z': '2452879.500742870',
+        '2004-06-14T00:00:00Z': '2453170.500742870',
+        '2012-06-12T00:00:00Z': '2456090.500766018',
+        '2016-05-13T00:00:00Z': '2457521.500789167',
+        '2023-08-01T00:00:00Z': '2460157.500800741',
+        '2023-10-15T00:00:00Z': '2460232.500800741',
+        '2024-08-01T00:00:00Z': '2460523.500800741',
+        '2024-10-20T00:00:00Z': '2460603.500800741',
+        '2049-05-11T00:00:00Z': '2469572.500800741',
+      };
+      final requests = retrogradeRequests(_deltaT);
+      expect([for (final r in requests) r.first.body], _retrogradeBodies);
+      expect(
+        [for (final r in requests) r.length * 3],
+        [9, 6, 6, 6, 6, 6, 6, 6],
+      );
+      for (final request in requests) {
+        final body = request.first.body;
+        expect({for (final c in request) c.body}, {body});
+        // The primaries and the backup of this body, ascending by instant.
+        final expected = [
+          for (final p in _primaries)
+            if (p.body == body) (p.utc, false),
+          (_backups[body]!, true),
+        ]..sort((a, b) => a.$1.compareTo(b.$1));
+        expect(
+          [for (final c in request) (c.utc, c.isBackup)],
+          expected,
+          reason: body,
+        );
+        final sent = [for (final c in request) ...c.julianDays];
+        for (var i = 1; i < sent.length; i++) {
+          expect(double.parse(sent[i]), greaterThan(double.parse(sent[i - 1])));
+        }
+        for (final candidate in request) {
+          final at = julianDays[candidate.utc]!;
+          final [whole, fraction] = at.split('.');
+          expect(candidate.julianDays, [
+            '${int.parse(whole) - 3}.$fraction',
+            at,
+            '${int.parse(whole) + 3}.$fraction',
+          ], reason: '$body ${candidate.utc}');
+        }
+      }
+    });
+
+    test('a missing delta T throws', () {
+      expect(
+        () => retrogradeRequests({'1953-11-18T00:00:00Z': 30}),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('retrograde results', () {
+    List<HorizonsRow> rowsFor(
+      List<RetrogradeCandidate> candidates,
+      List<double> longitudes,
+    ) {
+      final days = [for (final c in candidates) ...c.julianDays];
+      return [
+        for (var i = 0; i < days.length; i++)
+          (
+            julianDay: days[i],
+            longitudeDegrees: longitudes[i],
+            tdbMinusUtSeconds: null,
+          ),
+      ];
+    }
+
+    test('results pair three rows with each candidate', () {
+      final venus = retrogradeRequests(_deltaT)[1];
+      final results = retrogradeResults(
+        venus,
+        rowsFor(venus, [10, 9, 8, 20, 21, 22]),
+      );
+      expect(results, [
+        (
+          body: 'venus',
+          utc: '2004-06-14T00:00:00Z',
+          isBackup: true,
+          before: 10.0,
+          at: 9.0,
+          after: 8.0,
+        ),
+        (
+          body: 'venus',
+          utc: '2012-06-12T00:00:00Z',
+          isBackup: false,
+          before: 20.0,
+          at: 21.0,
+          after: 22.0,
+        ),
+      ]);
+    });
+
+    test('a row count that differs throws', () {
+      final venus = retrogradeRequests(_deltaT)[1];
+      final rows = rowsFor(venus, [10, 9, 8, 20, 21, 22]);
+      expect(
+        () => retrogradeResults(venus, rows.sublist(1)),
+        throwsArgumentError,
+      );
+      expect(
+        () => retrogradeResults(venus, [...rows, rows.last]),
+        throwsArgumentError,
+      );
+    });
+
+    test('the line shows both steps and the verdict', () {
+      expect(
+        retrogradeResultLine((
+          body: 'venus',
+          utc: '2004-06-14T00:00:00Z',
+          isBackup: true,
+          before: 0.5,
+          at: 359.5,
+          after: 358.5,
+        )),
+        'venus 2004-06-14T00:00:00Z backup: '
+        '0.5000000 359.5000000 358.5000000, '
+        'steps -1.0000000 -1.0000000, PASS',
+      );
+      expect(
+        retrogradeResultLine((
+          body: 'mars',
+          utc: '1956-09-10T00:00:00Z',
+          isBackup: false,
+          before: 10,
+          at: 9,
+          after: 10,
+        )),
+        'mars 1956-09-10T00:00:00Z primary: '
+        '10.0000000 9.0000000 10.0000000, '
+        'steps -1.0000000 +1.0000000, FAIL',
+      );
+    });
+  });
+
+  group('retrogradeUnresolved', () {
+    test('all pass: none', () {
+      expect(
+        retrogradeUnresolved([
+          _result('venus', isBackup: false, passes: true),
+          _result('venus', isBackup: true, passes: true),
+        ]),
+        isEmpty,
+      );
+    });
+
+    test('a primary failing with its backup passing: none', () {
+      expect(
+        retrogradeUnresolved([
+          _result('venus', isBackup: false, passes: false),
+          _result('venus', isBackup: true, passes: true),
+        ]),
+        isEmpty,
+      );
+    });
+
+    test('primary and backup failing: that body', () {
+      expect(
+        retrogradeUnresolved([
+          _result('mars', isBackup: false, passes: true),
+          _result('mars', isBackup: true, passes: true),
+          _result('venus', isBackup: false, passes: false),
+          _result('venus', isBackup: true, passes: false),
+        ]),
+        ['venus'],
+      );
+    });
+
+    test('both Mercury primaries failing with the backup passing: mercury', () {
+      expect(
+        retrogradeUnresolved([
+          _result('mercury', isBackup: false, passes: false),
+          _result('mercury', isBackup: true, passes: true),
+          _result('mercury', isBackup: false, passes: false),
+        ]),
+        ['mercury'],
+      );
+    });
+
+    test('only a backup failing: none', () {
+      expect(
+        retrogradeUnresolved([
+          _result('venus', isBackup: false, passes: true),
+          _result('venus', isBackup: true, passes: false),
+        ]),
+        isEmpty,
+      );
+    });
+  });
 }
 
 const _ttDays = [

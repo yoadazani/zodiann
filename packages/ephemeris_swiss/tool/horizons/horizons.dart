@@ -1,10 +1,14 @@
 // ZOD-TST-001: the pure part of the JPL Horizons reference tool: the query, the
-// answer parser and the checks on reference values. No network and no file
-// access, so all of it is tested offline (test/horizons_tool_test.dart). The
-// parameters and the answer format are those of
+// answer parser, the checks on reference values, and the retrograde candidates.
+// No network and no file access, so all of it is tested offline
+// (test/horizons_tool_test.dart). The candidates, the parameters and the answer
+// format are those of
 // docs/superpowers/specs/2026-11-26-zod-tst-001-horizons-reference-design.md,
-// section 8.
+// sections 5, 6 and 8.
 import 'dart:convert';
+
+import 'package:astro_core/astro_core.dart';
+import 'package:ephemeris_swiss/ephemeris_swiss.dart';
 
 /// The time scale Horizons reads a request's Julian days in.
 enum HorizonsTimeType { tt, ut }
@@ -327,4 +331,205 @@ HorizonsAnswer parseHorizonsAnswer(
     ));
   }
   return (apiVersion: apiVersion, targetLine: targetLine, rows: rows);
+}
+
+/// One body declared retrograde at one instant.
+typedef Declaration = ({String body, String utc});
+
+/// Design section 5.1: the instant or instants proposed for each body from
+/// Mercury to Pluto. Proposals only until Horizons confirms them; never edited,
+/// so the confirmation requests stay what they were.
+const List<Declaration> retrogradePrimaries = [
+  (body: 'mercury', utc: '1953-11-18T00:00:00Z'),
+  (body: 'mercury', utc: '2049-05-11T00:00:00Z'),
+  (body: 'venus', utc: '2012-06-12T00:00:00Z'),
+  (body: 'mars', utc: '1956-09-10T00:00:00Z'),
+  (body: 'jupiter', utc: '2023-10-15T00:00:00Z'),
+  (body: 'saturn', utc: '2023-08-01T00:00:00Z'),
+  (body: 'uranus', utc: '2023-10-15T00:00:00Z'),
+  (body: 'neptune', utc: '2023-08-01T00:00:00Z'),
+  (body: 'pluto', utc: '2023-08-01T00:00:00Z'),
+];
+
+/// The pairs the dataset uses. Changed only if the confirmation replaces a
+/// primary by its backup.
+const List<Declaration> retrogradeDeclarations = retrogradePrimaries;
+
+/// The one backup instant of each body, used if a primary is not retrograde.
+const Map<String, String> retrogradeBackups = {
+  'mercury': '2016-05-13T00:00:00Z',
+  'venus': '2004-06-14T00:00:00Z',
+  'mars': '2003-08-28T00:00:00Z',
+  'jupiter': '2024-10-20T00:00:00Z',
+  'saturn': '2024-08-01T00:00:00Z',
+  'uranus': '2024-10-20T00:00:00Z',
+  'neptune': '2024-08-01T00:00:00Z',
+  'pluto': '2024-08-01T00:00:00Z',
+};
+
+/// The Julian day string, nine decimals, sent as TT for [utc]: the TT the app
+/// assigns it (design section 6). From the start of the leap-second table that
+/// is `ephemerisTimeFor`'s offset; before it, [utc] read as UT plus
+/// [historicalDeltaTSeconds].
+///
+/// Throws [ArgumentError] before the table without a finite delta T, or if
+/// [utc] is not UTC.
+String ttJulianDay(DateTime utc, {double? historicalDeltaTSeconds}) {
+  final double julianDay;
+  switch (ephemerisTimeFor(utc)) {
+    case TerrestrialTime(:final ttMinusUtc):
+      julianDay = julianDayUt(utc.add(ttMinusUtc));
+    case UniversalTime():
+      final deltaT = historicalDeltaTSeconds;
+      if (deltaT == null || !deltaT.isFinite) {
+        throw ArgumentError.value(
+          deltaT,
+          'historicalDeltaTSeconds',
+          'a finite delta T is needed for $utc',
+        );
+      }
+      julianDay = julianDayUt(utc) + deltaT / 86400;
+  }
+  return julianDay.toStringAsFixed(9);
+}
+
+/// [julianDay] moved by whole [days]; the fraction digits are unchanged.
+String shiftJulianDay(String julianDay, int days) {
+  final [whole, fraction] = julianDay.split('.');
+  return '${int.parse(whole) + days}.$fraction';
+}
+
+/// One instant under test, with the three Julian days asked for it: 3 days
+/// before, the instant, 3 days after.
+typedef RetrogradeCandidate = ({
+  String body,
+  String utc,
+  bool isBackup,
+  List<String> julianDays,
+});
+
+/// Every primary and backup instant under test.
+List<({String body, String utc, bool isBackup})> _instantsUnderTest() => [
+  for (final p in retrogradePrimaries)
+    (body: p.body, utc: p.utc, isBackup: false),
+  for (final MapEntry(key: body, value: utc) in retrogradeBackups.entries)
+    (body: body, utc: utc, isBackup: true),
+];
+
+/// The candidate instants before the leap-second table, ascending: those whose
+/// TT needs a delta T.
+List<String> retrogradeHistoricalInstants() => {
+  for (final instant in _instantsUnderTest())
+    if (ephemerisTimeFor(DateTime.parse(instant.utc)) is UniversalTime)
+      instant.utc,
+}.toList()..sort();
+
+/// The candidates of the confirmation requests: one list per request, Mercury to
+/// Pluto, ascending by instant within it. [historicalDeltaTSeconds] holds the
+/// delta T of each instant of [retrogradeHistoricalInstants].
+///
+/// Throws [ArgumentError] if one of those is missing.
+List<List<RetrogradeCandidate>> retrogradeRequests(
+  Map<String, double> historicalDeltaTSeconds,
+) {
+  RetrogradeCandidate candidate(
+    ({String body, String utc, bool isBackup}) instant,
+  ) {
+    final at = ttJulianDay(
+      DateTime.parse(instant.utc),
+      historicalDeltaTSeconds: historicalDeltaTSeconds[instant.utc],
+    );
+    return (
+      body: instant.body,
+      utc: instant.utc,
+      isBackup: instant.isBackup,
+      julianDays: [shiftJulianDay(at, -3), at, shiftJulianDay(at, 3)],
+    );
+  }
+
+  final instants = _instantsUnderTest()..sort((a, b) => a.utc.compareTo(b.utc));
+  return [
+    // horizonsCommands lists the bodies from the Sun outward.
+    for (final body in horizonsCommands.keys)
+      if (retrogradeBackups.containsKey(body))
+        [
+          for (final instant in instants)
+            if (instant.body == body) candidate(instant),
+        ],
+  ];
+}
+
+/// The three longitudes Horizons gave for one candidate.
+typedef RetrogradeResult = ({
+  String body,
+  String utc,
+  bool isBackup,
+  double before,
+  double at,
+  double after,
+});
+
+/// Pairs the rows of one answer with its request's candidates, three rows each,
+/// in request order.
+///
+/// Throws [ArgumentError] unless there are three rows per candidate.
+List<RetrogradeResult> retrogradeResults(
+  List<RetrogradeCandidate> candidates,
+  List<HorizonsRow> rows,
+) {
+  if (rows.length != 3 * candidates.length) {
+    throw ArgumentError.value(
+      rows.length,
+      'rows',
+      'expected three for each of ${candidates.length} candidates',
+    );
+  }
+  return [
+    for (final (i, candidate) in candidates.indexed)
+      (
+        body: candidate.body,
+        utc: candidate.utc,
+        isBackup: candidate.isBackup,
+        before: rows[3 * i].longitudeDegrees,
+        at: rows[3 * i + 1].longitudeDegrees,
+        after: rows[3 * i + 2].longitudeDegrees,
+      ),
+  ];
+}
+
+bool _passes(RetrogradeResult r) =>
+    isRetrograde(before: r.before, at: r.at, after: r.after);
+
+/// One report line: body, instant, primary or backup, the three longitudes,
+/// both signed steps, and PASS or FAIL.
+String retrogradeResultLine(RetrogradeResult result) {
+  String degrees(double value) => value.toStringAsFixed(7);
+  String step(double from, double to) {
+    final value = signedDegrees(from, to);
+    return '${value < 0 ? '' : '+'}${degrees(value)}';
+  }
+
+  final (:body, :utc, :isBackup, :before, :at, :after) = result;
+  return '$body $utc ${isBackup ? 'backup' : 'primary'}: '
+      '${degrees(before)} ${degrees(at)} ${degrees(after)}, '
+      'steps ${step(before, at)} ${step(at, after)}, '
+      '${_passes(result) ? 'PASS' : 'FAIL'}';
+}
+
+/// The bodies the rule of design section 5.1 cannot settle: more of their
+/// primaries fail than they have passing backups. A body has one backup, so two
+/// failing Mercury primaries are unresolved even if it passes.
+List<String> retrogradeUnresolved(Iterable<RetrogradeResult> results) {
+  final failingPrimaries = <String, int>{};
+  final passingBackups = <String, int>{};
+  for (final result in results) {
+    if (_passes(result) == result.isBackup) {
+      final counts = result.isBackup ? passingBackups : failingPrimaries;
+      counts[result.body] = (counts[result.body] ?? 0) + 1;
+    }
+  }
+  return [
+    for (final MapEntry(key: body, value: failing) in failingPrimaries.entries)
+      if (failing > (passingBackups[body] ?? 0)) body,
+  ];
 }
