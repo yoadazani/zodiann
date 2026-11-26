@@ -236,6 +236,18 @@ Every pilot time lies within 0.03 ms of a whole millisecond, so the answers do n
 * **What would still refuse:** truncation, with Horizons' internal time below the requested one by more than the requested time's distance above its millisecond boundary. The smallest distance is 22.4 µs (2023-08-01, 2023-10-15, 2024-08-01, 2024-10-20, 2049-05-11); 2016-05-13 has 28.8 µs. Horizons' internal arithmetic is not documented.
 * The pilot echoed two TT times with those same distances on the expected millisecond (`2441317.500488241`, 22.4 µs; `2488434.500789167`, 28.8 µs). That is evidence, not proof.
 
+**The dataset requests, predicted before sending** (offline, 2026-11-27, same method; the worst predicted difference between the printed calendar time and the request):
+
+| Set (design 8.6) | Times | Worst if truncated | Worst if rounded |
+|---|---|---|---|
+| TT entries | 64 | **1.013 ms**, `2447892.500661852` (1990-01-01), nearest double | 0.493 ms |
+| UT cross-check | 42 | 0.971 ms | 0.029 ms |
+| Control, UT | 22 | **1.010 ms**, `2440423.345138889` (1969-07-20T20:17), nearest double | 0.010 ms |
+| Retrograde evidence | 12 | 0.955 ms | 0.216 ms |
+| Control, TT (estimate: UT + library ΔT; the real times come from Horizons) | 22 | 0.994 ms | 0.493 ms |
+
+The two values over 1 ms occur only if Horizons truncates **and** reads the string as its nearest double (reading it exactly gives 0.997 ms and 0.010 ms). The Task 4B answers show whether it truncates or rounds: at 2003-08-28, 2004-06-14 and 2012-06-12 a truncating printer shows `.183` and a rounding one `.184` (plan Task 4 Step 4B-echo). The pilot could not tell.
+
 **The canonical TT string** (2026-11-26). For every instant it is `ttJulianDay`: from 1972, `julianDayUt(utc.add(ttMinusUtc)).toStringAsFixed(9)`, the double the adapter passes to the library, printed to nine decimals; before 1972, `julianDayUt(utc) + ΔT/86400` printed the same way. It is **not** an exact-decimal rounding.
 
 * 2012-06-12 is **`2456090.500766018`**. The exact value is …`.500766018519`; the app's double (spacing 40.2 µs) is …`.500766018406`, below the half-way point, so it prints as `…018`, while rounding the exact value gives `…019`.
@@ -291,7 +303,7 @@ https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27301%27&OBJ_DATA
 
 **Remaining after the pilot: 38 requests, or 58 with option A (chosen).**
 
-Sequential, 1 second apart, each limited to 60 s in all, never retried, redirected or sent again without the owner's approval. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. Re-running a failed request with the same parameters is within the approval; a new date or parameter is not.
+Sequential, 1 second apart, each limited to 60 s in all, never retried, redirected or sent again without the owner's approval. The documentation states no API rate limit. A request holds only dates and body numbers, with Dart's default client identification. About 1.2 kB of times at most, well under usual URL limits. A failed or refused request is not run again without the owner's approval; a new date or parameter needs it too.
 
 ## 9. Tests: what is repointed, changed or left alone
 
@@ -340,7 +352,7 @@ Neither changes the backup's implementation, range, tolerance or boundary tests.
 
 ## 13. Owner decisions on the open questions
 
-**Answered 2026-11-26: the owner approved the recommended answer in every row.** D1: option A. D2: keep the 53. D3: leave. D4: accept. D5: the download is approved in principle and **authorised one stage at a time** (so far the pilot only). D6: confirmed.
+**Answered 2026-11-26.** D1: option A. D2: keep the 53. D3: leave. D4: accept. D5: the download is in scope. D6: confirmed.
 
 | ID | Question | Recommendation (approved) |
 |---|---|---|
