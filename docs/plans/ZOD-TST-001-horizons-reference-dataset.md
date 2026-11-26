@@ -17,9 +17,9 @@
 * **No file under any `lib/` changes.** No `EphemerisPort`, adapter, backup implementation, backup range, formula or specification change. `native/*/upstream/` stays byte-identical.
 * Tolerances, never loosened, no body or instant dropped to pass: **1″** for each of the ten bodies against Horizons; node **0.01°**; Horizons TT-against-UT agreement **0.002″**; device TT pin **0.0005″**; echoed time **1 ms**; row protection **0.001″**. A failing gate means stop and report.
 * Every primary comparison is at the same TT (design section 6). Before 1972 no UT-asked Horizons value is gated.
-* Horizons requests only with the parameters and dates of design sections 5 and 8, sequential, at least 1 s apart. A new date or parameter needs the owner. Requests carry dates and body numbers only. Raw responses go to a scratch directory outside the repository.
+* Horizons requests only with the parameters and dates of design sections 5 and 8 (pilot and control times included), sequential, at least 1 s apart. A new date or parameter needs the owner. Requests carry dates and body numbers only. Raw responses go to a scratch directory outside the repository; the only exception is the two pilot answers committed as parser samples (Task 2).
 * `reference_dates.json` is add-only: `version` 1 → 2, no instant dropped or changed.
-* Commands run in PowerShell from the repository root with `fvm …` (a bare `melos` or global `dart` fails). Do not run a root `fvm flutter pub get` without restoring `packages/shared_ui/lib/l10n` with `git checkout -- packages/shared_ui/lib/l10n`.
+* Commands run in PowerShell with `fvm …` (a bare `melos` or global `dart` fails), from the repository root unless a step names a directory; write those as `Push-Location <dir>; fvm …; Pop-Location`. Before every commit that touches Dart: `fvm dart format <touched files>` and `fvm dart analyze --fatal-infos <touched packages>` are clean. Do not run a root `fvm flutter pub get` without restoring `packages/shared_ui/lib/l10n` with `git checkout -- packages/shared_ui/lib/l10n`.
 * Commits: `<type>(ZOD-TST-001): <summary>` with the session's attribution trailers; explicit staging only; never stage `grep.exe.stackdump`. No push, PR or merge without the owner's approval.
 
 ## Review Focus
@@ -29,6 +29,7 @@
 3. A refetch silently changes or loses a reference row: `changedRows` reports both (Task 1) and the tool writes nothing.
 4. Longitudes across 0°/360° in differences and retrograde checks (Task 1).
 5. A date added to the shared set without refetching: version and instant-set tests fail (Task 6).
+6. The UT cross-check asked in TT by mistake would pass every numeric gate: the recorded query and Julian days are asserted (Tasks 5, 6).
 
 ## Acceptance mapping
 
@@ -90,19 +91,23 @@ List<String> changedRows(Iterable<LongitudeRow> baseline,
 
 ### Task 2: Pilot requests (first download)
 
-**Files:** Create `packages/ephemeris_swiss/tool/fetch_horizons_reference.dart`; Create `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt`, `horizons_sample_ut.txt`.
+**Files:** Create `packages/ephemeris_swiss/tool/fetch_horizons_reference.dart`; Create `packages/ephemeris_swiss/test/fixtures/horizons_sample_tt.txt`, `horizons_sample_ut.txt`; Modify `.gitattributes`.
 
-**Interfaces:** `fvm dart run tool/fetch_horizons_reference.dart pilot --out <absolute dir outside the repo>` sends exactly two requests with `horizonsQuery`, command `'301'`, saves each raw answer in `<dir>`, and does nothing else:
+**Interfaces:** from `packages/ephemeris_swiss`, `fvm dart run tool/fetch_horizons_reference.dart pilot --out <absolute dir outside the repo>` sends exactly 11 requests with `horizonsQuery`, saves each raw answer in `<dir>`, and does nothing else:
 
-| Request | Time type | Quantities | Julian days |
-|---|---|---|---|
-| 1 | TT | `31` | `2415020.000000000`, `2451545.000000000`, `2488434.000000000` |
-| 2 | UT | `30,31` | the same |
+| Request | Command | Time type | Quantities | Julian days |
+|---|---|---|---|---|
+| 1 | `301` | TT | `31` | `2415020.000000000`, `2441317.500488241`, `2451545.000000000`, `2488434.500789167` |
+| 2 | `301` | UT | `30,31` | `2415020.000000000`, `2441317.500000000`, `2451545.000000000`, `2488434.500789167` |
+| 3 to 11 | the other nine bodies, one each | TT | `31` | `2488434.500789167` |
+
+`2441317.5…` is 1972-01-01T00:00:00 (as TT: +42.184 s). `2488434.500789167` is the TT of 2100-12-31T23:59:59Z (+69.184 s), which falls in 2101.
 
 - [ ] **Step 1:** Implement the `pilot` mode (HTTP GET as in the old tool: non-200 throws; 1 s between requests). Any other or missing mode prints usage and exits 64.
-- [ ] **Step 2:** Run it. Expected: two files, each containing `$$SOE` and `$$EOE`.
+- [ ] **Step 2:** Run it. Expected: 11 files, each containing `$$SOE` and `$$EOE`. **A body with no ephemeris at the last instant: stop and ask the owner** (no substitute target or date on our own).
 - [ ] **Step 3: Inspect and record** in the design section 8: the exact time-scale header text for TT and UT, the Julian-day and fraction-of-second precision, the `ObsEcLon` and quantity 30 column labels, the API version line, the target `{source: …}` line, the centre line. **Stop and ask the owner** if the answer does not declare TT, or neither the printed Julian day nor the calendar time resolves 1 ms.
-- [ ] **Step 4:** Copy the two answers unchanged to the sample files. Commit `test(ZOD-TST-001): capture the Horizons output format`.
+- [ ] **Step 4: The 1972 boundary:** the Moon longitude of row 2 of request 1 (TT) and of row 2 of request 2 (UT) agree within 0.002″. If not, **stop and ask** (options: leave that instant out of the UT cross-check, or choose another boundary instant).
+- [ ] **Step 5:** Add `packages/ephemeris_swiss/test/fixtures/horizons_sample_*.txt -text` to `.gitattributes`, copy answers 1 and 2 unchanged to the sample files, and commit `test(ZOD-TST-001): capture the Horizons output format`.
 
 ### Task 3: Answer parser
 
@@ -122,7 +127,7 @@ HorizonsAnswer parseHorizonsAnswer(String text, {required String command,
 
 Checks: both markers; a CSV header row, columns located **by name** (never by fixed index); the declared time scale equals `timeType`; the target line names `command`; the centre is the geocentre (500, body 399); as many rows as requested; each row's echoed time within 1 ms of its requested Julian day, in order; longitude in [0, 360); quantity 30 present when expected.
 
-- [ ] **Step 1: Write the failing tests** against the samples: `parses the TT sample` (three rows, longitudes equal the literals read from the file, `apiVersion` and `targetLine` non-empty); `parses the UT sample with TDB-UT` (three non-null values); then one test per failure, each editing the sample text in memory and expecting `FormatException`: `a TT answer is refused for a UT request` and the reverse; `a missing row`; `two rows swapped`; `an echoed time 2 ms off`; `no ObsEcLon column`; `no $$EOE`; `another target` (parse with `command: '10'`); `a non-geocentric centre`; `longitude 360`; `quantity 30 expected but absent`.
+- [ ] **Step 1: Write the failing tests** against the samples: `parses the TT sample` (four rows, longitudes equal the literals read from the file, `apiVersion` and `targetLine` non-empty); `parses the UT sample with TDB-UT` (four non-null values); `a CRLF variant and an LF variant parse to the same rows`; then one test per failure, each editing the sample text in memory and expecting `FormatException`: `a TT answer is refused for a UT request` and the reverse; `a missing row`; `two rows swapped`; `an echoed time 2 ms off`; `no ObsEcLon column`; `no $$EOE`; `another target` (parse with `command: '10'`); `a non-geocentric centre`; `longitude 360`; `quantity 30 expected but absent`.
 - [ ] **Step 2:** Run. Expected: compile failure, `parseHorizonsAnswer` undefined.
 - [ ] **Step 3:** Implement from the recorded format.
 - [ ] **Step 4:** Run. Expected: all pass.
@@ -135,7 +140,7 @@ Checks: both markers; a CSV header row, columns located **by name** (never by fi
 **Interfaces:**
 
 ```dart
-// swiss_host.dart: moved from the old tool, same gcc flags and library sources.
+// swiss_host.dart: copied from the old tool (deleted in Task 6), same gcc flags and library sources.
 List<String> runSwissHostTool(Uri packageRoot, String cFileName, List<String> arguments); // stdout lines; non-zero exit throws
 // horizons.dart
 typedef Declaration = ({String body, String utc});
@@ -147,11 +152,11 @@ String ttJulianDay(DateTime utc, {double? historicalDeltaTSeconds});
 
 `retrogradeDeclarations`: mercury 1953-11-18 and 2049-05-11; venus 2012-06-12; mars 1956-09-10; jupiter 2023-10-15; saturn 2023-08-01; uranus 2023-10-15; neptune 2023-08-01; pluto 2023-08-01 (all `T00:00:00Z`). Backups: mercury 2016-05-13; venus 2004-06-14; mars 2003-08-28; jupiter and uranus 2024-10-20; saturn, neptune and pluto 2024-08-01.
 
-- [ ] **Step 1: Failing tests:** `ttJulianDay from 1972 uses leap seconds` (`2012-06-12T00:00:00Z` → `julianDayUt + 66.184/86400` (TAI − UTC was 34 s until 2012-07-01), nine decimals; `2023-08-01` → +69.184); `before 1972 it adds the given delta T` (`1953-11-18`, 30.0 → +30/86400); `before 1972 without delta T throws ArgumentError`; `declarations cover mercury to pluto and never sun or moon`; `every declared body has a backup`.
+- [ ] **Step 1: Failing tests:** `ttJulianDay from 1972 uses leap seconds` (`2012-06-12T00:00:00Z` → `julianDayUt + 66.184/86400` (TAI − UTC was 34 s until 2012-07-01), nine decimals; `2023-08-01` → +69.184); `before 1972 it adds the given delta T` (`1953-11-18`, 30.0 → +30/86400); `before 1972 without delta T throws ArgumentError`; `1971-12-31T23:59:59Z uses the given delta T`; `1972-01-01T00:00:00Z is +42.184 s even when a delta T is given`; `declarations cover mercury to pluto and never sun or moon`; `every declared body has a backup`.
 - [ ] **Step 2:** Run. Expected: compile failure.
 - [ ] **Step 3:** Implement, and the mode `confirm-retrograde --out <dir>`: for each body Mercury to Pluto, one TT request holding JD(t) − 3, JD(t), JD(t) + 3 for each of its primary and backup instants (ascending), where JD(t) = `ttJulianDay`; delta T from `runSwissHostTool(…, 'tt_grid.c', …)`. Print one line per pair: body, instant, three longitudes, both signed steps, `PASS` or `FAIL`. Exit 1 if any body has a declared instant failing and its backup failing.
 - [ ] **Step 4:** Run tests (pass), then the mode (8 requests). Expected: exit 0.
-- [ ] **Step 5: Apply the rule** of design 5.1. If a declared pair failed and the backup passed, edit `retrogradeDeclarations`, update the design's coverage table and the counts in Task 6, and report it. Record all results in the design.
+- [ ] **Step 5: Apply the rule** of design 5.1 and record all results in the design. If a declared pair failed and its backup passed: replace the pair in `retrogradeDeclarations`. Mercury has two declared instants and one backup, so the backup replaces only one; if both Mercury instants fail, stop and ask (the tool's exit code 1 covers this too). In `_v2Instants` and `_addedInDateSetVersion2` (Task 6), drop a failed instant only if no other declared pair uses it, and add the backup instant. Then recompute and **write into this plan before Task 6**: N instants; rows 10N; instants and rows from 1972; instants before 1972 (also the control rows); backup instants and rows; and every literal in Tasks 6 and 7 that depends on them. Report the substitution to the owner.
 - [ ] **Step 6:** Commit `feat(ZOD-TST-001): confirm the retrograde instants with Horizons`.
 
 ### Task 5: Dataset mode and device-copy generator
@@ -164,24 +169,43 @@ String ttJulianDay(DateTime utc, {double? historicalDeltaTSeconds});
 // horizons.dart
 double timeScaleDisagreementArcseconds(double longitudeAtUt, double longitudeAtTt);
 String horizonsCopySource(Map<String, Object?> dataset); // the whole Dart file
+/// The cross-check request: TT is never used for it.
+Map<String, String> utcCrossCheckQuery(String command, List<DateTime> instantsFrom1972);
+/// 1 without a previous dataset; else its version, plus 1 if any row was added or changed.
+int nextDatasetVersion(Map<String, Object?>? previous, Map<String, Object?> next);
+/// Empty only when every gate below passes.
+List<String> datasetProblems(Map<String, Object?> dataset, {
+    required List<String> instants,
+    required Iterable<LongitudeRow> baseline,
+    Iterable<LongitudeRow> crossCheckBaseline = const []});
 ```
 
-Dataset JSON keys: `version` (1), `referenceDatesVersion`, `source`, `retrievedOn`, `apiVersion`, `targetSources` (body → line), `quantity`, `timeScale`, `queryParameters`, `toleranceArcseconds` (1), `entries` {`body`,`utc`,`jdTt`,`ttMinusUtSeconds`,`longitudeDegrees`}, `utcCrossCheck` {`body`,`utc`,`longitudeDegrees`} (instants ≥ 1972-01-01), `timeScaleControl` {`utc`,`jdUt`,`tdbMinusUtSeconds`,`jdTtDerived`,`longitudeAtUt`,`longitudeAtTt`} (Moon, instants < 1972), `retrogradeEvidence` {`body`,`utc`,`longitudeBefore`,`longitudeAfter`} (3 days).
+Dataset JSON keys: `version` (from `nextDatasetVersion`; 1 for this task), `referenceDatesVersion`, `source`, `retrievedOn`, `apiVersion`, `targetSources` (body → line), `quantity`, `timeScale`, `queryParameters` and `utcCrossCheckQueryParameters` (both written from the maps actually sent), `toleranceArcseconds` (1), `entries` {`body`,`utc`,`jdTt`,`ttMinusUtSeconds`,`longitudeDegrees`}, `utcCrossCheck` {`body`,`utc`,`jdUt`,`longitudeDegrees`} (instants ≥ 1972-01-01; `jdUt` is the string sent), `timeScaleControl` {`utc`,`jdUt`,`tdbMinusUtSeconds`,`jdTtDerived`,`longitudeAtUt`,`longitudeAtTt`} (Moon, instants < 1972), `retrogradeEvidence` {`body`,`utc`,`jdTtBefore`,`longitudeBefore`,`jdTtAfter`,`longitudeAfter`} (3 days).
 
 Generated copy declares: `horizonsDatasetVersion`, `horizonsToleranceArcseconds`, `typedef HorizonsReference = ({String body, String utc, String jdTt, double ttMinusUtSeconds, double longitudeDegrees})`, `typedef HorizonsUtReference = ({String body, String utc, double longitudeDegrees})`, `const horizonsReference`, `const horizonsUtCrossCheck`, with a generated-file header.
 
-`dataset --baseline <json> --out <dir>` (requests of design 8.1) fails closed, writing nothing, when: a parser check fails; `changedRows(baseline, entries)` is non-empty; any UT cross-check row differs from its TT row by more than 0.002″; any time-scale control row differs by more than 0.002″ (the control asks UT with `30,31`, sets `jdTtDerived = jdUt + tdbMinusUtSeconds/86400` to nine decimals, and asks TT there); no control row has |TDB − UT| > 10 s; a declared pair is not retrograde.
+**Mode `dataset --baseline <json> --out <dir>`** (both required, else exit 64; requests of design 8.1; paths resolve against `Platform.script`):
 
-- [ ] **Step 1: Failing tests:** `time scale disagreement` (`(10, 10 + 0.003/3600)` ≈ 0.003; wraps at 360); `the copy holds every entry and cross-check row` (two-row synthetic dataset: output contains both typedefs, `const int horizonsDatasetVersion = 1;`, each row's body, utc, `jdTt` string and longitude, and no `timeScaleControl`).
-- [ ] **Step 2:** Run: compile failure. **Step 3:** Implement both functions, the `dataset` mode and the generator (`gen_horizons_copy.dart` reads `../astro_core/test/fixtures/horizons_reference.json`, writes `../../apps/astro_mobile/integration_test/horizons_reference.dart`). **Do not run `dataset` yet.**
-- [ ] **Step 4:** Run tool tests (pass) and `fvm dart analyze --fatal-infos packages/ephemeris_swiss` (no issues). **Step 5:** Commit `feat(ZOD-TST-001): build the dataset and its device copy`.
+* reads the instants and `referenceDatesVersion` from `packages/astro_core/test/fixtures/reference_dates.json`;
+* reads the baseline completely before any write: the old Swiss TT fixture or a previous `horizons_reference.json` (both have `entries` with `body`, `utc`, `longitudeDegrees`; the latter also has `utcCrossCheck`, passed as `crossCheckBaseline`);
+* saves raw answers in `--out` (outside the repository);
+* asks the control as UT with `30,31`, sets `jdTtDerived = jdUt + tdbMinusUtSeconds/86400` to nine decimals, and asks TT there;
+* writes `packages/astro_core/test/fixtures/horizons_reference.json` **once**, after all 30 requests, **only when every parser check passes and `datasetProblems` is empty**; otherwise prints the problems and exits 1.
+
+`datasetProblems` reports: a missing (body, instant) entry; `changedRows` against `baseline` (entries) or `crossCheckBaseline`; a missing UT cross-check row from 1972, or one more than 0.002″ from its TT entry; a control row off by more than 0.002″; no control row with |TDB − UT| > 10 s; a declared pair not retrograde.
+
+**There is no override for a changed row.** A legitimate change (a revised Horizons solution, a new leap second, a new library ΔT) stops the tool and needs an owner decision.
+
+- [ ] **Step 1: Failing tests:** `time scale disagreement` (`(10, 10 + 0.003/3600)` ≈ 0.003; wraps at 360); `the cross-check is asked in UT at the Julian day of the UTC instant` (`TIME_TYPE` `'UT'`, `TLIST` equal to `julianDayUt(utc).toStringAsFixed(9)` for two instants; `ArgumentError` before 1972); `version` (no previous → 1; same rows → previous; one row added → previous + 1); `a clean synthetic dataset has no problems`; then one test per problem above, each altering one value and expecting a non-empty list; `the copy holds every entry and cross-check row` (two-row synthetic dataset: output contains both typedefs, `const int horizonsDatasetVersion = 1;`, each row's body, utc, `jdTt` string and longitude, and no `timeScaleControl`).
+- [ ] **Step 2:** Run: compile failure. **Step 3:** Implement the functions, the `dataset` mode and the generator (`gen_horizons_copy.dart` reads `../astro_core/test/fixtures/horizons_reference.json`, writes `../../apps/astro_mobile/integration_test/horizons_reference.dart`). **Do not run `dataset` yet.**
+- [ ] **Step 4:** Run the tool tests (pass). **Step 5:** Commit `feat(ZOD-TST-001): build the dataset and its device copy`.
 
 ### Task 6: Date set version 2, the dataset and every consumer (one commit)
 
 One commit, because the date set, the data and its consumers each fail without the others.
 
 **Files:**
-* Modify: `packages/astro_core/test/fixtures/reference_dates.json`, `test/accuracy/reference_dates_test.dart`
+* Modify: `packages/astro_core/test/fixtures/reference_dates.json`, `test/accuracy/reference_dates_test.dart`, `test/accuracy/t_eph_2_mean_node_test.dart`
 * Create: `packages/astro_core/test/fixtures/horizons_reference.json`, `test/accuracy/horizons_reference_test.dart`
 * Create: `packages/ephemeris_swiss/test/horizons_reference_time_test.dart`
 * Create: `apps/astro_mobile/integration_test/horizons_reference.dart` (generated), `test/horizons_reference_match_test.dart`
@@ -191,16 +215,20 @@ One commit, because the date set, the data and its consumers each fail without t
 
 The 11 version-2 instants (all `Z`): `1953-11-18T00:00:00`, `1956-09-10T00:00:00`, `1971-12-31T23:59:59`, `1972-01-01T00:00:00`, `2012-06-12T00:00:00`, `2023-08-01T00:00:00`, `2023-10-15T00:00:00`, `2049-05-11T00:00:00`, `2100-07-01T00:00:00`, `2100-12-31T00:00:00`, `2100-12-31T23:59:59`.
 
-- [ ] **Step 1: Failing tests, date set.** In `reference_dates_test.dart`: add `_v2Instants` (the 11) and `version 2 holds every version-2 instant` (`version == 2`, `_v1Instants.length + _v2Instants.length == dates.length == 64`, all contained). Rename the window test to `stays between T = −1 and the end of the supported range` with end `SupportedDateRange.end`.
+- [ ] **Step 1: Failing tests, date set.** In `reference_dates_test.dart`: add `_v2Instants` (the 11) and `version 2 holds every version-2 instant` (`version == 2`, `_v1Instants.length + _v2Instants.length == dates.length == 64`, all contained). Rename the window test to `stays between T = −1 and the end of the supported range` with end `SupportedDateRange.end`. As recorded in PROGRESS ("Carry into ZOD-TST-001"), the T = ±1 knowledge moves to T-EPH-2: in its accuracy-bound group add `only the three 2100 instants lie outside T = ±1` (the instants before 1899-12-31T12:00Z are none; those after 2100-01-01T12:00Z equal `2100-07-01T00:00:00Z`, `2100-12-31T00:00:00Z`, `2100-12-31T23:59:59Z`). The existing `is within the bound on every reference date` is unchanged, so the bound is still asserted on all of them. No new production import in that file.
 - [ ] **Step 2: Failing tests, dataset** (`horizons_reference_test.dart`):
   * `provenance`: `version == 1`; `referenceDatesVersion` equals the date file's `version`; `source` contains `Horizons`; `retrievedOn`, `apiVersion` non-empty; `targetSources` has the ten bodies; `queryParameters` `CENTER` `500@399`, `EPHEM_TYPE` `OBSERVER`, `QUANTITIES` `31`, `TIME_TYPE` `TT`, `TLIST_TYPE` `JD`, `APPARENT` `AIRLESS`; tolerance 1.
   * `every body at every shared instant, once` (640 keys equal dates × bodies); longitudes in [0, 360); `jdTt` matches `^\d+\.\d{9}$`.
   * `at least 50 instants from 1900 to 2100` (63); `includes 2100-12-31T23:59:59Z and 1999-12-31T23:59:59Z`.
   * `a retrograde instant for each body from mercury to pluto, none for sun or moon`: the (body, utc) set equals the nine declared pairs written as literals; every utc is a shared instant; for each, the shortest signed steps before→at and at→after are both negative.
-  * `the UT cross-check holds every body from 1972, and nothing earlier` (420).
+  * `the UT cross-check holds every body from 1972, and nothing earlier` (420); `utcCrossCheckQueryParameters` has `TIME_TYPE` `UT` and `TLIST_TYPE` `JD`.
+  * `retrograde evidence is asked 3 days either side`: `jdTtBefore` and `jdTtAfter` differ from the entry's `jdTt` by −3 and +3 days within 2e-9.
   * `Horizons TIME_TYPE=TT is the same scale as its UT`: 22 control rows equal to the shared instants before 1972; `|atTt − atUt| ≤ 0.002″`; `jdTtDerived` within 2e-9 of `jdUt + tdbMinusUtSeconds/86400`; some `|tdbMinusUtSeconds| > 10`.
-- [ ] **Step 3: Failing tests, consumers.** `horizons_reference_time_test.dart` repoints the old test's three conversion tests to the shared dataset, asserting exactly 420, 220 and 420 checked rows (the third compares `entries` with `utcCrossCheck`, 0.002″, with `DateTime.utc(1972)` as a literal). `horizons_reference_match_test.dart` requires the copy's version, tolerance, both lengths and every field of every row to equal the JSON.
-- [ ] **Step 4:** Run `reference_dates_test.dart` and `horizons_reference_test.dart` in `packages/astro_core`. Expected: FAIL (`version` is 1; dataset file missing).
+- [ ] **Step 3: Failing tests, consumers.** `horizons_reference_time_test.dart` repoints the old test's three conversion tests to the shared dataset, asserting exactly 420, 220 and 420 checked rows (the third compares `entries` with `utcCrossCheck`, 0.002″, with `DateTime.utc(1972)` as a literal; it also asserts, as the old test did, that the cross-check was asked in UT: `utcCrossCheckQueryParameters['TIME_TYPE'] == 'UT'`, and every row's `jdUt == julianDayUt(utc).toStringAsFixed(9)`). `horizons_reference_match_test.dart` requires the copy's version, tolerance, both lengths and every field of every row to equal the JSON.
+- [ ] **Step 4:** Run:
+  * `Push-Location packages/astro_core; fvm dart test test/accuracy; Pop-Location` → FAIL: `version` is 1; the three 2100 instants are absent; the dataset file is missing.
+  * `Push-Location packages/ephemeris_swiss; fvm dart test test/horizons_reference_time_test.dart; Pop-Location` → FAIL: dataset file missing.
+  * `Push-Location apps/astro_mobile; fvm flutter test test/horizons_reference_match_test.dart; Pop-Location` → FAIL: the copy's import does not exist.
 - [ ] **Step 5:** Edit `reference_dates.json`: `version` 2, the 11 instants in chronological order, description extended with `Version 2 (ZOD-TST-001): retrograde instants, the 1972 boundary and 2100 through 31 December.`
 - [ ] **Step 6:** Download, from `packages/ephemeris_swiss` (also for Step 7): `fvm dart run tool/fetch_horizons_reference.dart dataset --baseline test/fixtures/reference_longitudes_tt.json --out <scratch dir>` (30 requests). Expected: exit 0, `640 entries`, 530 baseline rows unchanged. A refusal: stop and report.
 - [ ] **Step 7:** `fvm dart run tool/gen_horizons_copy.dart`; `fvm dart format ../../apps/astro_mobile/integration_test/horizons_reference.dart`.
@@ -213,10 +241,10 @@ The 11 version-2 instants (all `Z`): `1953-11-18T00:00:00`, `1956-09-10T00:00:00
   | `conversion cross-check from 1972: UTC input against Horizons asked at UTC` | adapter with `horizonsUtCrossCheck`; also asserts no row before 1972 | 420 |
   | `the dataset TT is the TT the adapter uses` | Moon, ≤ 0.0005″ | 64 |
 
-  The header comment says that this is T-EPH-1 and ACC-1, that the tests are mandatory (ACC-5), and why no pre-1972 UT value is gated. Other tests in the file are unchanged.
+  Replace **every** use of `swissTtToleranceArcseconds`, including those in `the comparison itself` and `damaged files`, with `horizonsToleranceArcseconds`; those and the other tests are otherwise unchanged. Rewrite the file header, which describes UTC input at the reference instants: this is T-EPH-1 and ACC-1, the tests are mandatory (ACC-5), and why no pre-1972 UT value is gated.
 - [ ] **Step 9:** Delete the five old files. Run `git grep -nE "swiss_reference_longitudes_tt|fetch_horizons_tt_reference|reference_tt_fixture_test" -- apps packages test tool`. Expected: only `packages/ephemeris_astronomy` and `astronomy_*` hits (the backup's own files of those names).
-- [ ] **Step 10: Backup tests (option A).** In both fixture tests, require rows for every shared instant in [1899-12-31T12:00Z, 2100-01-01T12:00Z], and add `only instants after the covered range are left out`: the excluded set equals `{2100-07-01T00:00:00Z, 2100-12-31T00:00:00Z, 2100-12-31T23:59:59Z}`, and the included set contains `1899-12-31T12:00:00Z` and `2100-01-01T12:00:00Z`. Existing boundary tests stay. Run them. Expected: FAIL naming the eight new in-range instants.
-- [ ] **Step 11:** In both backup tools, filter the instants to that same range before building `dateStrings` and the time list (queries otherwise unchanged); update "53" comments. Run both from `packages/ephemeris_astronomy` (20 requests). Expected: `wrote 610 entries` each.
+- [ ] **Step 10: Backup tests (option A).** In both fixture tests, require rows for every shared instant in [1899-12-31T12:00Z, 2100-01-01T12:00Z], and add `only instants after the covered range are left out`: the excluded set equals `{2100-07-01T00:00:00Z, 2100-12-31T00:00:00Z, 2100-12-31T23:59:59Z}`, and the included set contains `1899-12-31T12:00:00Z` and `2100-01-01T12:00:00Z`. Existing boundary tests stay. Run `Push-Location packages/ephemeris_astronomy; fvm dart test test/reference_fixture_test.dart test/reference_tt_fixture_test.dart; Pop-Location`. Expected: each coverage test FAILS at its first missing key, `sun|1953-11-18T00:00:00Z`; `only instants after the covered range are left out` passes at once.
+- [ ] **Step 11:** In both backup tools, filter the instants to that same range before building `dateStrings` and the time list; query parameters unchanged. Change the written `instants` provenance string and the header comments to `every instant of reference_dates.json within 1899-12-31T12:00Z to 2100-01-01T12:00Z (N at the time of the fetch)`, and update the "53" comments. Run both from `packages/ephemeris_astronomy` (20 requests). Expected: `wrote 610 entries` each. The two `astronomy_reference_longitudes*_match_test.dart` host tests are unchanged and must pass.
 - [ ] **Step 12: Old backup rows unchanged.** A scratch script outside the repository loads each fixture from `git show HEAD:<path>` and from the working tree and requires every old (body, utc) row to be present with identical `longitudeDegrees` (and `utDays`, `ttDays`, `deltaTSeconds`, `jdTt` for the TT fixture). Expected: 530 identical, 0 differences, each. Any difference: stop and report. Format the two generated copies.
 - [ ] **Step 13:** `astronomy_accuracy_test.dart`: `hasLength(53)` → `hasLength(61)`, "53 instants" → "61 instants"; tolerance unchanged. `astronomy_speed_vs_swiss_test.dart`: a const set `_addedInDateSetVersion2` (the eight in-range instants), excluded from `referenceInstants`, then `expect(referenceInstants, hasLength(53))`; bounds unchanged.
 - [ ] **Step 14:** `fvm dart run melos run lint`; `fvm dart run melos run test`. Expected: exit 0. `git diff --stat main -- ":(glob)**/lib/**"` prints nothing.
@@ -230,17 +258,17 @@ The 11 version-2 instants (all `Z`): `1953-11-18T00:00:00`, `1956-09-10T00:00:00
 
 **Interfaces:** `node_grid <data dir> <jd tt>…` prints per Julian day: mean-node longitude and returned flags for `SEFLG_SWIEPH | SEFLG_SPEED | SEFLG_NONUT`, the J2000 variant's longitude (`… | SEFLG_J2000`), and the true node's (`SE_TRUE_NODE`, default flags); exits non-zero on any error or warning. The generator takes the instants and `jdTt` from `horizons_reference.json` and writes `version` 1, `referenceDatesVersion`, `source` (library version, host build), `requestedFlags` 322, `entries` {`utc`,`jdTt`,`meanNodeDegrees`,`returnedFlags`,`j2000Degrees`,`trueNodeDegrees`}.
 
-- [ ] **Step 1: Failing host test** (imports only `astro_core` and `package:test`): `covers every shared instant once` (64); `the reference is the mean node on the mean equinox of date` (every `returnedFlags`: `& 64 != 0`, `& 32 == 0`, `& 65536 == 0`); `the formula is within 0.01 degrees of Swiss at every shared instant` (`meanAscendingNodeAt(utc).longitude`, shortest angle ≤ 0.01); `controls: J2000 and the true node differ by more than 0.01 degrees` (maximum over the set > 0.01 for each).
+- [ ] **Step 1: Failing host test** (imports only `astro_core` and `package:test`): `the fixture belongs to the shared dataset` (`version == 1`; `referenceDatesVersion` equals the date file's `version`; `requestedFlags == 322`; every entry's `jdTt` equals the `jdTt` of that `utc` in `horizons_reference.json`); `covers every shared instant once` (64); `the reference is the mean node on the mean equinox of date` (every `returnedFlags`: `& 64 != 0`, `& 32 == 0`, `& 65536 == 0`); `the formula is within 0.01 degrees of Swiss at every shared instant` (`meanAscendingNodeAt(utc).longitude`, shortest angle ≤ 0.01); `controls: J2000 and the true node differ by more than 0.01 degrees` (maximum over the set > 0.01 for each).
 - [ ] **Step 2:** Run. Expected: FAIL, fixture missing.
-- [ ] **Step 3:** Implement the C tool and generator; run it. **Step 4:** Run the test (pass) and note the printed maximum (planning measured at most 0.00216° over a daily sweep).
-- [ ] **Step 5: Device test:** with `SwissEphemerisBinding` and the packaged data: at the 64 instants (`jdTt` from `horizonsReference`) and monthly from 1900-01-01 to 2100-12-01 (2,412 instants, TT by the production rule: `calcUt` before 1972, else `calcTt(julianDayUt(utc + ttMinusUtc))`), `port.position(Body.node, utc)` is within 0.01° of body 10 with flags `seflgSwieph | seflgSpeed | 64`; every returned flag word has 64 set and 32 clear; J2000 (`| 32`) and body 11 exceed 0.01° somewhere. Print the maxima. Constants for 10, 11, 32 and 64 are declared in the test.
+- [ ] **Step 3:** Implement the C tool and generator; run it. **Step 4:** Run the test (pass); the 0.01° test prints the maximum and its instant (planning measured at most 0.00216° over a daily sweep).
+- [ ] **Step 5: Device test:** with `SwissEphemerisBinding` and the packaged data: at the 64 instants (`jdTt` from `horizonsReference`) and monthly from 1900-01-01 to 2100-12-01 (2,412 instants, TT by the production rule: `calcUt` before 1972, else `calcTt(julianDayUt(utc + ttMinusUtc))`), `port.position(Body.node, utc)` is within 0.01° of body 10 with flags `seflgSwieph | seflgSpeed | 64`; every flag word returned by the **mean-node reference calls** has 64 set and 32 clear (the J2000 control returns 32 set); J2000 (`| 32`) and body 11 exceed 0.01° somewhere. Print the maxima. Constants for 10, 11, 32 and 64 are declared in the test.
 - [ ] **Step 6:** Lint and tests exit 0. Commit `test(ZOD-TST-001): validate the mean node against Swiss Ephemeris`.
 
 ### Task 8: Device verification and mutation proofs
 
 Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configuration unchanged). From `apps/astro_mobile`, one file at a time: `fvm flutter test integration_test/<file> -d emulator-5554`.
 
-- [ ] **Step 1:** `swiss_ephemeris_accuracy_test.dart`, `swiss_mean_node_test.dart`; under option A also `astronomy_accuracy_test.dart`, `astronomy_speed_vs_swiss_test.dart`. Expected: all pass. Record every per-body maximum, in particular at the 2100 instants and the retrograde instants. A result over its bound: stop and report.
+- [ ] **Step 1:** `swiss_ephemeris_accuracy_test.dart`, `swiss_mean_node_test.dart`; under option A also `astronomy_accuracy_test.dart`, `astronomy_speed_vs_swiss_test.dart`. Expected: all pass. Record every per-body maximum, in particular at the 2100 instants and the retrograde instants. A result over its bound: stop and report. Under option A also stop and report if a backup body exceeds the 17.6″ matched-TT figure documented in `astronomy_ephemeris.dart` (no `lib/` change is allowed here).
 - [ ] **Step 2: Mutation proofs** (temporary, each observed failing, then restored with `git status` clean): one copied longitude +2″ → the T-EPH-1 / ACC-1 gate fails; one Moon `jdTt` +1 s in the copy → the TT pin fails; `meanNodeEpochLongitude` +0.02 → the host node test fails; the device node test's flags without 64 → its flag assertion fails.
 - [ ] **Step 3:** Record device, head commit, counts and maxima in the design (a results section). A dropped or disconnected run is void and repeated.
 
@@ -248,9 +276,26 @@ Emulator `Pixel_9_Pro_API_36` (x86_64; start with `-memory 3072`, saved configur
 
 - [ ] **Step 1:** `superpowers:requesting-code-review`: one fresh reviewer over the whole branch. Fix important findings test-first.
 - [ ] **Step 2:** `superpowers:verification-before-completion`: lint, full tests, `git diff --stat main -- ":(glob)**/lib/**"` empty, `git status --short`; rerun device files touched by review fixes.
-- [ ] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`. Hand-offs recorded: ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's two fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006.
+- [ ] **Step 3:** Documentation: task file (criteria ticked with evidence, status, Notes with hand-offs; criteria wording unchanged); `TASKS.md` status; `docs/PROGRESS.md` (completed task, verification with head commit, blockers: backup item still open for ZOD-TST-005, decisions; the "Carry into ZOD-TST-001" item marked done); one line in `docs/decisions/ZOD-EPH-002-time-scale.md` section 9 pointing from the removed test path to `horizons_reference_time_test.dart`; a dated update line in `docs/decisions/ZOD-FND-011-ephemeris-data-file-coverage-range.md` section 5 (what is now validated through 2100-12-31, for the primary only); a dated update on the `TASKS.md` ZOD-EPH-004 bullet that still says an owner decision is needed before ZOD-TST-001. Hand-offs recorded in PROGRESS (other task files are not edited; each becomes a Notes line when that task is planned): ZOD-EPH-002 (its 53-instant UTC-input evidence is superseded by the repointed gate), ZOD-TST-004 (build on the repointed gate), ZOD-TST-005 (shared TT is the primary's; the backup's fixtures and speed-test exclusion; time-model discrepancy), ZOD-EPH-006, ZOD-TST-017 (the T-EPH-1 / ACC-1 gate runs on a device, not in CI).
 - [ ] **Step 4:** Commit `docs(ZOD-TST-001): record verification and completion`. **Stop: push and PR need the owner's approval.**
 
 ## Plan review
 
-Pending.
+**Round 1 (2026-11-26, `plan-reviewer`, on `e9f7488`): "Needs user decision"** (D1 blocks Task 6); 1 Critical, 5 Important, 10 Minor.
+
+| ID | Finding | Done |
+|---|---|---|
+| C1 | removed constant still used by other device tests | applied |
+| I1 | the UT cross-check could be asked in TT and still pass | applied (query and `jdUt` recorded and asserted) |
+| I2 | the `dataset` gates had no tests | applied (`datasetProblems`) |
+| I3 | `dataset` inputs and outputs unstated | applied |
+| I4 | backup-date substitution not executable | applied |
+| I5 | node test accepted a stale or mistimed fixture | applied |
+| M1 to M8, M10 | evidence Julian days; version rule; node wording; commands and expected output; backup provenance strings; sample line endings; elongation figure; pilot dates in the approval; boundary tests | applied |
+| M9 | documentation and hand-offs | applied differently: the other task files are not edited (project convention: a Notes line when each is planned); the rest applied, including the recorded "move the window check to T-EPH-2" item |
+
+**Design builder check (2026-11-26, fresh general-purpose agent, same commit):** not a plan-review round. Applied: the last-instant coverage probe, the 1972-boundary probe, no override for protected rows, backup rows must be identical, the wording of link 3, the nutation figure (re-measured: 0.00527°), the elongation figure, the two backup match tests. Sent to the owner: D1 (including editing backup tools and fixtures) and D6 (confirm `SEFLG_NONUT`).
+
+**Round 2:** pending.
+
+**Open for the owner:** design section 13, D1 to D6.
