@@ -53,13 +53,34 @@ void main() {
     expect(fixture['toleranceArcseconds'], 60);
   });
 
-  test('every instant of reference_dates.json has all ten bodies', () {
+  bool covered(Object? date) {
+    final utc = DateTime.parse(date! as String);
+    return !utc.isBefore(rangeStart) && !utc.isAfter(rangeEnd);
+  }
+
+  // The shared date set reaches 2100-12-31 (ZOD-TST-001); the backup's covered
+  // range ends at 2100-01-01T12:00Z, so its reference stops there.
+  test('every instant of reference_dates.json in the covered range has all ten '
+      'bodies', () {
     final present = {for (final e in entries) '${e['body']}|${e['utc']}'};
-    for (final date in referenceDates) {
+    for (final date in referenceDates.where(covered)) {
       for (final body in _physicalBodies) {
         expect(present, contains('$body|$date'), reason: '$body at $date');
       }
     }
+  });
+
+  test('only instants after the covered range are left out', () {
+    expect(referenceDates.where((date) => !covered(date)).toSet(), {
+      '2100-07-01T00:00:00Z',
+      '2100-12-31T00:00:00Z',
+      '2100-12-31T23:59:59Z',
+    });
+    // Both boundary instants stay in.
+    expect(
+      referenceDates.where(covered),
+      containsAll(['1899-12-31T12:00:00Z', '2100-01-01T12:00:00Z']),
+    );
   });
 
   test('there is no entry for the node and none outside the ten bodies', () {

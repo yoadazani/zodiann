@@ -1,0 +1,520 @@
+{
+  "version": 1,
+  "referenceDatesVersion": 2,
+  "source": "Swiss Ephemeris 2.10.03, vendored source compiled on the host (tool/node_grid.c) with the packaged data files; SE_MEAN_NODE on the mean equinox of date (SEFLG_NONUT) at the TT of the Horizons dataset, with J2000 and SE_TRUE_NODE controls",
+  "requestedFlags": 322,
+  "entries": [
+    {
+      "utc": "1899-12-31T12:00:00Z",
+      "jdTt": "2415019.999977374",
+      "meanNodeDegrees": 259.182941399,
+      "returnedFlags": 322,
+      "j2000Degrees": 260.579522156,
+      "trueNodeDegrees": 260.273628654
+    },
+    {
+      "utc": "1900-01-01T00:00:00Z",
+      "jdTt": "2415020.499977392",
+      "meanNodeDegrees": 259.156464458,
+      "returnedFlags": 322,
+      "j2000Degrees": 260.5530261,
+      "trueNodeDegrees": 260.268350539
+    },
+    {
+      "utc": "1905-01-01T00:00:00Z",
+      "jdTt": "2416846.500057206",
+      "meanNodeDegrees": 162.46268123,
+      "returnedFlags": 322,
+      "j2000Degrees": 163.789438337,
+      "trueNodeDegrees": 161.476731304
+    },
+    {
+      "utc": "1910-01-01T00:00:00Z",
+      "jdTt": "2418672.500129142",
+      "meanNodeDegrees": 65.768908746,
+      "returnedFlags": 322,
+      "j2000Degrees": 67.025858793,
+      "trueNodeDegrees": 66.952070345
+    },
+    {
+      "utc": "1912-06-30T06:00:00Z",
+      "jdTt": "2419583.750166892",
+      "meanNodeDegrees": 17.514695547,
+      "returnedFlags": 322,
+      "j2000Degrees": 18.736808635,
+      "trueNodeDegrees": 17.940825455
+    },
+    {
+      "utc": "1915-01-01T00:00:00Z",
+      "jdTt": "2420498.500202448",
+      "meanNodeDegrees": 329.075146517,
+      "returnedFlags": 322,
+      "j2000Degrees": 330.262289351,
+      "trueNodeDegrees": 327.463199894
+    },
+    {
+      "utc": "1920-01-01T00:00:00Z",
+      "jdTt": "2422324.500250308",
+      "meanNodeDegrees": 232.381395965,
+      "returnedFlags": 322,
+      "j2000Degrees": 233.498728452,
+      "trueNodeDegrees": 233.889845943
+    },
+    {
+      "utc": "1925-01-01T00:00:00Z",
+      "jdTt": "2424151.500275417",
+      "meanNodeDegrees": 135.634703099,
+      "returnedFlags": 322,
+      "j2000Degrees": 136.68218714,
+      "trueNodeDegrees": 134.255518565
+    },
+    {
+      "utc": "1930-01-01T00:00:00Z",
+      "jdTt": "2425977.500282672",
+      "meanNodeDegrees": 38.940975367,
+      "returnedFlags": 322,
+      "j2000Degrees": 39.918646057,
+      "trueNodeDegrees": 40.35822459
+    },
+    {
+      "utc": "1935-01-01T00:00:00Z",
+      "jdTt": "2427803.500279712",
+      "meanNodeDegrees": 302.24725851,
+      "returnedFlags": 322,
+      "j2000Degrees": 303.155115757,
+      "trueNodeDegrees": 301.297793344
+    },
+    {
+      "utc": "1940-01-01T00:00:00Z",
+      "jdTt": "2429629.500282729",
+      "meanNodeDegrees": 205.553551673,
+      "returnedFlags": 322,
+      "j2000Degrees": 206.391592728,
+      "trueNodeDegrees": 206.217841883
+    },
+    {
+      "utc": "1945-01-01T00:00:00Z",
+      "jdTt": "2431456.500313088",
+      "meanNodeDegrees": 108.806899896,
+      "returnedFlags": 322,
+      "j2000Degrees": 109.575085942,
+      "trueNodeDegrees": 108.388635395
+    },
+    {
+      "utc": "1950-01-01T00:00:00Z",
+      "jdTt": "2433282.500334864",
+      "meanNodeDegrees": 12.113212747,
+      "returnedFlags": 322,
+      "j2000Degrees": 12.811579796,
+      "trueNodeDegrees": 12.560829985
+    },
+    {
+      "utc": "1950-12-31T23:59:59Z",
+      "jdTt": "2433647.500327797",
+      "meanNodeDegrees": 352.785067927,
+      "returnedFlags": 322,
+      "j2000Degrees": 353.469478814,
+      "trueNodeDegrees": 351.890668449
+    },
+    {
+      "utc": "1953-11-18T00:00:00Z",
+      "jdTt": "2434699.500353845",
+      "meanNodeDegrees": 297.077647642,
+      "returnedFlags": 322,
+      "j2000Degrees": 297.721833644,
+      "trueNodeDegrees": 296.019845778
+    },
+    {
+      "utc": "1955-01-01T00:00:00Z",
+      "jdTt": "2435108.500359609",
+      "meanNodeDegrees": 275.41953578,
+      "returnedFlags": 322,
+      "j2000Degrees": 276.048082742,
+      "trueNodeDegrees": 275.514508338
+    },
+    {
+      "utc": "1956-09-10T00:00:00Z",
+      "jdTt": "2435726.500365315",
+      "meanNodeDegrees": 242.694076947,
+      "returnedFlags": 322,
+      "j2000Degrees": 243.298993115,
+      "trueNodeDegrees": 242.067747915
+    },
+    {
+      "utc": "1960-01-01T00:00:00Z",
+      "jdTt": "2436934.500383681",
+      "meanNodeDegrees": 178.725869191,
+      "returnedFlags": 322,
+      "j2000Degrees": 179.284594292,
+      "trueNodeDegrees": 178.021924502
+    },
+    {
+      "utc": "1965-01-01T00:00:00Z",
+      "jdTt": "2438761.500413560",
+      "meanNodeDegrees": 81.979258831,
+      "returnedFlags": 322,
+      "j2000Degrees": 82.468122382,
+      "trueNodeDegrees": 83.048605992
+    },
+    {
+      "utc": "1969-07-20T20:17:00Z",
+      "jdTt": "2440423.345598802",
+      "meanNodeDegrees": 353.97823554,
+      "returnedFlags": 322,
+      "j2000Degrees": 354.403551463,
+      "trueNodeDegrees": 352.476839458
+    },
+    {
+      "utc": "1970-01-01T00:00:00Z",
+      "jdTt": "2440587.500465062",
+      "meanNodeDegrees": 345.285611482,
+      "returnedFlags": 322,
+      "j2000Degrees": 345.704650206,
+      "trueNodeDegrees": 344.059983796
+    },
+    {
+      "utc": "1971-12-31T23:59:59Z",
+      "jdTt": "2441317.500477199",
+      "meanNodeDegrees": 306.629337407,
+      "returnedFlags": 322,
+      "j2000Degrees": 307.020461091,
+      "trueNodeDegrees": 305.32345091
+    },
+    {
+      "utc": "1972-01-01T00:00:00Z",
+      "jdTt": "2441317.500488241",
+      "meanNodeDegrees": 306.629336822,
+      "returnedFlags": 322,
+      "j2000Degrees": 307.020460506,
+      "trueNodeDegrees": 305.323450487
+    },
+    {
+      "utc": "1975-01-01T00:00:00Z",
+      "jdTt": "2442413.500534537",
+      "meanNodeDegrees": 248.591973528,
+      "returnedFlags": 322,
+      "j2000Degrees": 248.941185813,
+      "trueNodeDegrees": 249.953435151
+    },
+    {
+      "utc": "1980-01-01T00:00:00Z",
+      "jdTt": "2444239.500592407",
+      "meanNodeDegrees": 151.898346535,
+      "returnedFlags": 322,
+      "j2000Degrees": 152.17773094,
+      "trueNodeDegrees": 150.467146444
+    },
+    {
+      "utc": "1985-01-01T00:00:00Z",
+      "jdTt": "2446066.500627130",
+      "meanNodeDegrees": 55.151777333,
+      "returnedFlags": 322,
+      "j2000Degrees": 55.361294002,
+      "trueNodeDegrees": 56.587822837
+    },
+    {
+      "utc": "1990-01-01T00:00:00Z",
+      "jdTt": "2447892.500661852",
+      "meanNodeDegrees": 318.458172271,
+      "returnedFlags": 322,
+      "j2000Degrees": 318.597857966,
+      "trueNodeDegrees": 316.860444978
+    },
+    {
+      "utc": "1995-01-01T00:00:00Z",
+      "jdTt": "2449718.500708148",
+      "meanNodeDegrees": 221.764576947,
+      "returnedFlags": 322,
+      "j2000Degrees": 221.834430103,
+      "trueNodeDegrees": 223.287324858
+    },
+    {
+      "utc": "1999-12-31T23:59:59Z",
+      "jdTt": "2451544.500731296",
+      "meanNodeDegrees": 125.070993203,
+      "returnedFlags": 322,
+      "j2000Degrees": 125.071012297,
+      "trueNodeDegrees": 123.979659689
+    },
+    {
+      "utc": "2000-01-01T00:00:00Z",
+      "jdTt": "2451544.500742870",
+      "meanNodeDegrees": 125.07099259,
+      "returnedFlags": 322,
+      "j2000Degrees": 125.071011684,
+      "trueNodeDegrees": 123.979659138
+    },
+    {
+      "utc": "2000-01-01T12:00:00Z",
+      "jdTt": "2451545.000742870",
+      "meanNodeDegrees": 125.044515707,
+      "returnedFlags": 322,
+      "j2000Degrees": 125.044515678,
+      "trueNodeDegrees": 123.954022614
+    },
+    {
+      "utc": "2000-12-31T23:59:59Z",
+      "jdTt": "2451910.500731296",
+      "meanNodeDegrees": 105.689914929,
+      "returnedFlags": 322,
+      "j2000Degrees": 105.675936431,
+      "trueNodeDegrees": 105.51796984
+    },
+    {
+      "utc": "2005-01-01T00:00:00Z",
+      "jdTt": "2453371.500742870",
+      "meanNodeDegrees": 28.324466665,
+      "returnedFlags": 322,
+      "j2000Degrees": 28.254611914,
+      "trueNodeDegrees": 28.92661311
+    },
+    {
+      "utc": "2010-01-01T00:00:00Z",
+      "jdTt": "2455197.500766018",
+      "meanNodeDegrees": 291.630903636,
+      "returnedFlags": 322,
+      "j2000Degrees": 291.49121176,
+      "trueNodeDegrees": 291.080446397
+    },
+    {
+      "utc": "2012-06-12T00:00:00Z",
+      "jdTt": "2456090.500766018",
+      "meanNodeDegrees": 244.343201662,
+      "returnedFlags": 322,
+      "j2000Degrees": 244.169355567,
+      "trueNodeDegrees": 244.972686834
+    },
+    {
+      "utc": "2015-01-01T00:00:00Z",
+      "jdTt": "2457023.500777592",
+      "meanNodeDegrees": 194.937351578,
+      "returnedFlags": 322,
+      "j2000Degrees": 194.727821017,
+      "trueNodeDegrees": 195.43900656
+    },
+    {
+      "utc": "2020-01-01T00:00:00Z",
+      "jdTt": "2458849.500800741",
+      "meanNodeDegrees": 98.243809265,
+      "returnedFlags": 322,
+      "j2000Degrees": 97.964438526,
+      "trueNodeDegrees": 98.387736182
+    },
+    {
+      "utc": "2023-08-01T00:00:00Z",
+      "jdTt": "2460157.500800741",
+      "meanNodeDegrees": 28.980315228,
+      "returnedFlags": 322,
+      "j2000Degrees": 28.650915573,
+      "trueNodeDegrees": 28.530624103
+    },
+    {
+      "utc": "2023-10-15T00:00:00Z",
+      "jdTt": "2460232.500800741",
+      "meanNodeDegrees": 25.008784768,
+      "returnedFlags": 322,
+      "j2000Degrees": 24.676516463,
+      "trueNodeDegrees": 24.874532668
+    },
+    {
+      "utc": "2024-12-31T23:59:59Z",
+      "jdTt": "2460676.500789167",
+      "meanNodeDegrees": 1.497325414,
+      "returnedFlags": 322,
+      "j2000Degrees": 1.148074666,
+      "trueNodeDegrees": 0.877237359
+    },
+    {
+      "utc": "2025-01-01T00:00:00Z",
+      "jdTt": "2460676.500800741",
+      "meanNodeDegrees": 1.497324801,
+      "returnedFlags": 322,
+      "j2000Degrees": 1.148074053,
+      "trueNodeDegrees": 0.877235019
+    },
+    {
+      "utc": "2026-11-12T00:00:00Z",
+      "jdTt": "2461356.500800741",
+      "meanNodeDegrees": 325.488783697,
+      "returnedFlags": 322,
+      "j2000Degrees": 325.113523642,
+      "trueNodeDegrees": 325.580378653
+    },
+    {
+      "utc": "2030-01-01T00:00:00Z",
+      "jdTt": "2462502.500800741",
+      "meanNodeDegrees": 264.803804442,
+      "returnedFlags": 322,
+      "j2000Degrees": 264.384710431,
+      "trueNodeDegrees": 265.510517575
+    },
+    {
+      "utc": "2035-01-01T00:00:00Z",
+      "jdTt": "2464328.500800741",
+      "meanNodeDegrees": 168.110294446,
+      "returnedFlags": 322,
+      "j2000Degrees": 167.621355652,
+      "trueNodeDegrees": 167.19100754
+    },
+    {
+      "utc": "2040-01-01T00:00:00Z",
+      "jdTt": "2466154.500800741",
+      "meanNodeDegrees": 71.416794814,
+      "returnedFlags": 322,
+      "j2000Degrees": 70.858009601,
+      "trueNodeDegrees": 72.825443298
+    },
+    {
+      "utc": "2045-01-01T00:00:00Z",
+      "jdTt": "2467981.500800741",
+      "meanNodeDegrees": 334.670351833,
+      "returnedFlags": 322,
+      "j2000Degrees": 334.041680646,
+      "trueNodeDegrees": 333.191705762
+    },
+    {
+      "utc": "2049-05-11T00:00:00Z",
+      "jdTt": "2469572.500800741",
+      "meanNodeDegrees": 250.420994779,
+      "returnedFlags": 322,
+      "j2000Degrees": 249.731463459,
+      "trueNodeDegrees": 249.539852308
+    },
+    {
+      "utc": "2050-01-01T00:00:00Z",
+      "jdTt": "2469807.500800741",
+      "meanNodeDegrees": 237.97687294,
+      "returnedFlags": 322,
+      "j2000Degrees": 237.27835209,
+      "trueNodeDegrees": 239.500107893
+    },
+    {
+      "utc": "2055-01-01T00:00:00Z",
+      "jdTt": "2471633.500800741",
+      "meanNodeDegrees": 141.283404415,
+      "returnedFlags": 322,
+      "j2000Degrees": 140.51503298,
+      "trueNodeDegrees": 139.69426016
+    },
+    {
+      "utc": "2060-01-01T00:00:00Z",
+      "jdTt": "2473459.500800741",
+      "meanNodeDegrees": 44.589946261,
+      "returnedFlags": 322,
+      "j2000Degrees": 43.751721871,
+      "trueNodeDegrees": 46.168756158
+    },
+    {
+      "utc": "2061-07-28T18:30:00Z",
+      "jdTt": "2474034.271634074",
+      "meanNodeDegrees": 14.153705515,
+      "returnedFlags": 322,
+      "j2000Degrees": 13.293493406,
+      "trueNodeDegrees": 13.467957802
+    },
+    {
+      "utc": "2065-01-01T00:00:00Z",
+      "jdTt": "2475286.500800741",
+      "meanNodeDegrees": 307.843544786,
+      "returnedFlags": 322,
+      "j2000Degrees": 306.935428701,
+      "trueNodeDegrees": 306.725227989
+    },
+    {
+      "utc": "2070-01-01T00:00:00Z",
+      "jdTt": "2477112.500800741",
+      "meanNodeDegrees": 211.150107381,
+      "returnedFlags": 322,
+      "j2000Degrees": 210.172135089,
+      "trueNodeDegrees": 212.002378205
+    },
+    {
+      "utc": "2075-01-01T00:00:00Z",
+      "jdTt": "2478938.500800741",
+      "meanNodeDegrees": 114.456680351,
+      "returnedFlags": 322,
+      "j2000Degrees": 113.408851669,
+      "trueNodeDegrees": 113.667232834
+    },
+    {
+      "utc": "2080-01-01T00:00:00Z",
+      "jdTt": "2480764.500800741",
+      "meanNodeDegrees": 17.763263697,
+      "returnedFlags": 322,
+      "j2000Degrees": 16.645575711,
+      "trueNodeDegrees": 18.120215117
+    },
+    {
+      "utc": "2085-01-01T00:00:00Z",
+      "jdTt": "2482591.500800741",
+      "meanNodeDegrees": 281.016903749,
+      "returnedFlags": 322,
+      "j2000Degrees": 279.829317949,
+      "trueNodeDegrees": 281.075415878
+    },
+    {
+      "utc": "2090-01-01T00:00:00Z",
+      "jdTt": "2484417.500800741",
+      "meanNodeDegrees": 184.323507856,
+      "returnedFlags": 322,
+      "j2000Degrees": 183.066059919,
+      "trueNodeDegrees": 183.863288323
+    },
+    {
+      "utc": "2095-01-01T00:00:00Z",
+      "jdTt": "2486243.500800741",
+      "meanNodeDegrees": 87.630122342,
+      "returnedFlags": 322,
+      "j2000Degrees": 86.302811391,
+      "trueNodeDegrees": 88.325092461
+    },
+    {
+      "utc": "2099-12-31T23:59:59Z",
+      "jdTt": "2488069.500789167",
+      "meanNodeDegrees": 350.936747823,
+      "returnedFlags": 322,
+      "j2000Degrees": 349.539572203,
+      "trueNodeDegrees": 349.834655958
+    },
+    {
+      "utc": "2100-01-01T00:00:00Z",
+      "jdTt": "2488069.500800741",
+      "meanNodeDegrees": 350.93674721,
+      "returnedFlags": 322,
+      "j2000Degrees": 349.53957159,
+      "trueNodeDegrees": 349.83465568
+    },
+    {
+      "utc": "2100-01-01T12:00:00Z",
+      "jdTt": "2488070.000800741",
+      "meanNodeDegrees": 350.910270383,
+      "returnedFlags": 322,
+      "j2000Degrees": 349.513075633,
+      "trueNodeDegrees": 349.826691567
+    },
+    {
+      "utc": "2100-07-01T00:00:00Z",
+      "jdTt": "2488250.500800741",
+      "meanNodeDegrees": 341.352136111,
+      "returnedFlags": 322,
+      "j2000Degrees": 339.948035386,
+      "trueNodeDegrees": 340.399629816
+    },
+    {
+      "utc": "2100-12-31T00:00:00Z",
+      "jdTt": "2488433.500800741",
+      "meanNodeDegrees": 331.661617811,
+      "returnedFlags": 322,
+      "j2000Degrees": 330.250515407,
+      "trueNodeDegrees": 330.082810096
+    },
+    {
+      "utc": "2100-12-31T23:59:59Z",
+      "jdTt": "2488434.500789167",
+      "meanNodeDegrees": 331.608664772,
+      "returnedFlags": 322,
+      "j2000Degrees": 330.197524108,
+      "trueNodeDegrees": 329.972895176
+    }
+  ]
+}

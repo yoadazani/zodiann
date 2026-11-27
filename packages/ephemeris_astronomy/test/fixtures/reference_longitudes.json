@@ -1,6 +1,6 @@
 {
   "source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api)",
-  "retrievedOn": "2026-11-21",
+  "retrievedOn": "2026-11-26",
   "quantity": "31 (Observer ecliptic longitude): per the Horizons manual, IAU76/80 ecliptic-of-date longitude of the apparent position with light-time, gravitational deflection and stellar aberration; ZOD-FND-003 found it agrees with the true equinox of date",
   "queryParameters": {
     "COMMAND": {
@@ -26,7 +26,7 @@
     "CSV_FORMAT": "YES",
     "OBJ_DATA": "NO"
   },
-  "instants": "every instant of packages/astro_core/test/fixtures/reference_dates.json (53 at the time of the fetch)",
+  "instants": "every instant of reference_dates.json within 1899-12-31T12:00Z to 2100-01-01T12:00Z (61 at the time of the fetch)",
   "toleranceArcseconds": 60,
   "entries": [
     {
@@ -101,8 +101,18 @@
     },
     {
       "body": "sun",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 235.3582698
+    },
+    {
+      "body": "sun",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 279.7937523
+    },
+    {
+      "body": "sun",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 167.2549753
     },
     {
       "body": "sun",
@@ -123,6 +133,16 @@
       "body": "sun",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 280.1562711
+    },
+    {
+      "body": "sun",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 279.6626849
+    },
+    {
+      "body": "sun",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 279.662698
     },
     {
       "body": "sun",
@@ -181,6 +201,11 @@
     },
     {
       "body": "sun",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 81.4373112
+    },
+    {
+      "body": "sun",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 280.2304304
     },
@@ -188,6 +213,16 @@
       "body": "sun",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 280.009492
+    },
+    {
+      "body": "sun",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 128.5252773
+    },
+    {
+      "body": "sun",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 201.3771188
     },
     {
       "body": "sun",
@@ -207,92 +242,97 @@
     {
       "body": "sun",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 280.6023362
+      "longitudeDegrees": 280.6023364
     },
     {
       "body": "sun",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 280.3735304
+      "longitudeDegrees": 280.3735306
     },
     {
       "body": "sun",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 280.1573006
+      "longitudeDegrees": 280.1573008
     },
     {
       "body": "sun",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 280.9649282
+      "longitudeDegrees": 280.9649283
+    },
+    {
+      "body": "sun",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 50.7582115
     },
     {
       "body": "sun",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 280.7483824
+      "longitudeDegrees": 280.7483826
     },
     {
       "body": "sun",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 280.5237822
+      "longitudeDegrees": 280.5237823
     },
     {
       "body": "sun",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 280.30238
+      "longitudeDegrees": 280.3023801
     },
     {
       "body": "sun",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 126.2151509
+      "longitudeDegrees": 126.2151511
     },
     {
       "body": "sun",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 281.1130772
+      "longitudeDegrees": 281.1130773
     },
     {
       "body": "sun",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 280.8897244
+      "longitudeDegrees": 280.8897246
     },
     {
       "body": "sun",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 280.6706906
+      "longitudeDegrees": 280.6706908
     },
     {
       "body": "sun",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 280.4561724
+      "longitudeDegrees": 280.4561726
     },
     {
       "body": "sun",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 281.2646117
+      "longitudeDegrees": 281.2646119
     },
     {
       "body": "sun",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 281.0422036
+      "longitudeDegrees": 281.0422037
     },
     {
       "body": "sun",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 280.8111794
+      "longitudeDegrees": 280.8111796
     },
     {
       "body": "sun",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 280.6041808
+      "longitudeDegrees": 280.6041809
     },
     {
       "body": "sun",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 280.6041926
+      "longitudeDegrees": 280.6041927
     },
     {
       "body": "sun",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 281.1136515
+      "longitudeDegrees": 281.1136517
     },
     {
       "body": "moon",
@@ -366,8 +406,18 @@
     },
     {
       "body": "moon",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 14.3616977
+    },
+    {
+      "body": "moon",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 358.8977646
+    },
+    {
+      "body": "moon",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 234.3349049
     },
     {
       "body": "moon",
@@ -388,6 +438,16 @@
       "body": "moon",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 190.6990372
+    },
+    {
+      "body": "moon",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 101.630119
+    },
+    {
+      "body": "moon",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 101.6302965
     },
     {
       "body": "moon",
@@ -446,6 +506,11 @@
     },
     {
       "body": "moon",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 357.7741182
+    },
+    {
+      "body": "moon",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 50.6170294
     },
@@ -453,6 +518,16 @@
       "body": "moon",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 346.1383767
+    },
+    {
+      "body": "moon",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 297.4889909
+    },
+    {
+      "body": "moon",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 204.2614513
     },
     {
       "body": "moon",
@@ -472,92 +547,97 @@
     {
       "body": "moon",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 238.4215593
+      "longitudeDegrees": 238.4215595
     },
     {
       "body": "moon",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 185.6287114
+      "longitudeDegrees": 185.6287116
     },
     {
       "body": "moon",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 116.1518597
+      "longitudeDegrees": 116.1518599
     },
     {
       "body": "moon",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 66.7612348
+      "longitudeDegrees": 66.761235
+    },
+    {
+      "body": "moon",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 150.9895531
     },
     {
       "body": "moon",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 18.6755971
+      "longitudeDegrees": 18.6755973
     },
     {
       "body": "moon",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 314.6028157
+      "longitudeDegrees": 314.6028159
     },
     {
       "body": "moon",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 247.2330572
+      "longitudeDegrees": 247.2330574
     },
     {
       "body": "moon",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 264.7174166
+      "longitudeDegrees": 264.7174168
     },
     {
       "body": "moon",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 204.3712548
+      "longitudeDegrees": 204.371255
     },
     {
       "body": "moon",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 152.7336217
+      "longitudeDegrees": 152.7336219
     },
     {
       "body": "moon",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 85.3971249
+      "longitudeDegrees": 85.397125
     },
     {
       "body": "moon",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 18.2629976
+      "longitudeDegrees": 18.2629978
     },
     {
       "body": "moon",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 345.2049748
+      "longitudeDegrees": 345.204975
     },
     {
       "body": "moon",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 282.9361168
+      "longitudeDegrees": 282.9361169
     },
     {
       "body": "moon",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 214.6234236
+      "longitudeDegrees": 214.6234238
     },
     {
       "body": "moon",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 157.4114452
+      "longitudeDegrees": 157.4114454
     },
     {
       "body": "moon",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 157.4116074
+      "longitudeDegrees": 157.4116076
     },
     {
       "body": "moon",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 164.4237529
+      "longitudeDegrees": 164.4237531
     },
     {
       "body": "mercury",
@@ -631,8 +711,18 @@
     },
     {
       "body": "mercury",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 227.9389865
+    },
+    {
+      "body": "mercury",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 283.6070295
+    },
+    {
+      "body": "mercury",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 191.5514074
     },
     {
       "body": "mercury",
@@ -653,6 +743,16 @@
       "body": "mercury",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 299.0214552
+    },
+    {
+      "body": "mercury",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 257.1255869
+    },
+    {
+      "body": "mercury",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 257.1255993
     },
     {
       "body": "mercury",
@@ -711,6 +811,11 @@
     },
     {
       "body": "mercury",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 98.618702
+    },
+    {
+      "body": "mercury",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 293.6560816
     },
@@ -718,6 +823,16 @@
       "body": "mercury",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 274.3833145
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 154.22902
+    },
+    {
+      "body": "mercury",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 197.6188686
     },
     {
       "body": "mercury",
@@ -737,92 +852,97 @@
     {
       "body": "mercury",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 279.456943
+      "longitudeDegrees": 279.4569432
     },
     {
       "body": "mercury",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 296.5727257
+      "longitudeDegrees": 296.5727259
     },
     {
       "body": "mercury",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 277.7345751
+      "longitudeDegrees": 277.7345752
     },
     {
       "body": "mercury",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 262.0048481
+      "longitudeDegrees": 262.0048483
+    },
+    {
+      "body": "mercury",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 45.3758521
     },
     {
       "body": "mercury",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 270.0594886
+      "longitudeDegrees": 270.0594888
     },
     {
       "body": "mercury",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 298.9117655
+      "longitudeDegrees": 298.9117657
     },
     {
       "body": "mercury",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 281.1394638
+      "longitudeDegrees": 281.1394639
     },
     {
       "body": "mercury",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 131.5658866
+      "longitudeDegrees": 131.5658868
     },
     {
       "body": "mercury",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 264.5702856
+      "longitudeDegrees": 264.5702858
     },
     {
       "body": "mercury",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 263.3689122
+      "longitudeDegrees": 263.3689124
     },
     {
       "body": "mercury",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 300.1950683
+      "longitudeDegrees": 300.1950685
     },
     {
       "body": "mercury",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 284.578988
+      "longitudeDegrees": 284.5789882
     },
     {
       "body": "mercury",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 267.4265716
+      "longitudeDegrees": 267.4265718
     },
     {
       "body": "mercury",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 259.8424128
+      "longitudeDegrees": 259.842413
     },
     {
       "body": "mercury",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 299.6602956
+      "longitudeDegrees": 299.6602958
     },
     {
       "body": "mercury",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 288.0057532
+      "longitudeDegrees": 288.0057534
     },
     {
       "body": "mercury",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 288.005772
+      "longitudeDegrees": 288.0057722
     },
     {
       "body": "mercury",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 288.8176384
+      "longitudeDegrees": 288.8176386
     },
     {
       "body": "venus",
@@ -896,8 +1016,18 @@
     },
     {
       "body": "venus",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 217.8104776
+    },
+    {
+      "body": "venus",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 235.836625
+    },
+    {
+      "body": "venus",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 121.6397503
     },
     {
       "body": "venus",
@@ -918,6 +1048,16 @@
       "body": "venus",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 274.4532541
+    },
+    {
+      "body": "venus",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 310.7907446
+    },
+    {
+      "body": "venus",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 310.7907605
     },
     {
       "body": "venus",
@@ -976,6 +1116,11 @@
     },
     {
       "body": "venus",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 72.1447999
+    },
+    {
+      "body": "venus",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 296.7219753
     },
@@ -983,6 +1128,16 @@
       "body": "venus",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 314.4094923
+    },
+    {
+      "body": "venus",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 147.0243634
+    },
+    {
+      "body": "venus",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 155.2754705
     },
     {
       "body": "venus",
@@ -1002,92 +1157,97 @@
     {
       "body": "venus",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 289.5470697
+      "longitudeDegrees": 289.5470699
     },
     {
       "body": "venus",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 233.518377
+      "longitudeDegrees": 233.5183772
     },
     {
       "body": "venus",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 243.7427553
+      "longitudeDegrees": 243.7427554
     },
     {
       "body": "venus",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 262.4020083
+      "longitudeDegrees": 262.4020084
+    },
+    {
+      "body": "venus",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 5.6387626
     },
     {
       "body": "venus",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 281.2480381
+      "longitudeDegrees": 281.2480383
     },
     {
       "body": "venus",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 300.0341915
+      "longitudeDegrees": 300.0341917
     },
     {
       "body": "venus",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 317.3076302
+      "longitudeDegrees": 317.3076304
     },
     {
       "body": "venus",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 161.0139014
+      "longitudeDegrees": 161.0139016
     },
     {
       "body": "venus",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 328.332683
+      "longitudeDegrees": 328.3326832
     },
     {
       "body": "venus",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 269.8751181
+      "longitudeDegrees": 269.8751183
     },
     {
       "body": "venus",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 234.2547968
+      "longitudeDegrees": 234.254797
     },
     {
       "body": "venus",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 246.6693285
+      "longitudeDegrees": 246.6693287
     },
     {
       "body": "venus",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 265.73492
+      "longitudeDegrees": 265.7349202
     },
     {
       "body": "venus",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 284.6419835
+      "longitudeDegrees": 284.6419837
     },
     {
       "body": "venus",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 303.3093681
+      "longitudeDegrees": 303.3093683
     },
     {
       "body": "venus",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 320.0704712
+      "longitudeDegrees": 320.0704714
     },
     {
       "body": "venus",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 320.0704851
+      "longitudeDegrees": 320.0704853
     },
     {
       "body": "venus",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 320.6717012
+      "longitudeDegrees": 320.6717014
     },
     {
       "body": "mars",
@@ -1161,8 +1321,18 @@
     },
     {
       "body": "mars",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 190.1591719
+    },
+    {
+      "body": "mars",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 349.8112151
+    },
+    {
+      "body": "mars",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 348.3982736
     },
     {
       "body": "mars",
@@ -1183,6 +1353,16 @@
       "body": "mars",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 342.236237
+    },
+    {
+      "body": "mars",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 3.3802921
+    },
+    {
+      "body": "mars",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 3.3803004
     },
     {
       "body": "mars",
@@ -1241,6 +1421,11 @@
     },
     {
       "body": "mars",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 169.4386232
+    },
+    {
+      "body": "mars",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 321.0509001
     },
@@ -1248,6 +1433,16 @@
       "body": "mars",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 238.3846079
+    },
+    {
+      "body": "mars",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 163.234706
+    },
+    {
+      "body": "mars",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 211.9157894
     },
     {
       "body": "mars",
@@ -1267,92 +1462,97 @@
     {
       "body": "mars",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 314.7013237
+      "longitudeDegrees": 314.7013239
     },
     {
       "body": "mars",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 233.0836791
+      "longitudeDegrees": 233.0836793
     },
     {
       "body": "mars",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 102.4864205
+      "longitudeDegrees": 102.4864207
     },
     {
       "body": "mars",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 308.5305759
+      "longitudeDegrees": 308.5305761
+    },
+    {
+      "body": "mars",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 76.7204393
     },
     {
       "body": "mars",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 227.7146938
+      "longitudeDegrees": 227.714694
     },
     {
       "body": "mars",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 81.2164287
+      "longitudeDegrees": 81.2164288
     },
     {
       "body": "mars",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 301.7063677
+      "longitudeDegrees": 301.7063679
     },
     {
       "body": "mars",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 208.6806401
+      "longitudeDegrees": 208.6806403
     },
     {
       "body": "mars",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 222.2705857
+      "longitudeDegrees": 222.2705859
     },
     {
       "body": "mars",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 61.1951768
+      "longitudeDegrees": 61.195177
     },
     {
       "body": "mars",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 295.7781539
+      "longitudeDegrees": 295.7781541
     },
     {
       "body": "mars",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 216.0819823
+      "longitudeDegrees": 216.0819825
     },
     {
       "body": "mars",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 44.0405084
+      "longitudeDegrees": 44.0405085
     },
     {
       "body": "mars",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 289.9945463
+      "longitudeDegrees": 289.9945465
     },
     {
       "body": "mars",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 210.3218424
+      "longitudeDegrees": 210.3218426
     },
     {
       "body": "mars",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 29.5253547
+      "longitudeDegrees": 29.5253549
     },
     {
       "body": "mars",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 29.5253594
+      "longitudeDegrees": 29.5253596
     },
     {
       "body": "mars",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 29.7293427
+      "longitudeDegrees": 29.7293429
     },
     {
       "body": "jupiter",
@@ -1426,8 +1626,18 @@
     },
     {
       "body": "jupiter",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 84.6214072
+    },
+    {
+      "body": "jupiter",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 116.8504918
+    },
+    {
+      "body": "jupiter",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 163.2405338
     },
     {
       "body": "jupiter",
@@ -1448,6 +1658,16 @@
       "body": "jupiter",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 212.3250046
+    },
+    {
+      "body": "jupiter",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 262.3497426
+    },
+    {
+      "body": "jupiter",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 262.3497454
     },
     {
       "body": "jupiter",
@@ -1506,6 +1726,11 @@
     },
     {
       "body": "jupiter",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 60.0629328
+    },
+    {
+      "body": "jupiter",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 141.7588084
     },
@@ -1513,6 +1738,16 @@
       "body": "jupiter",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 276.6703386
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 43.6823046
+    },
+    {
+      "body": "jupiter",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 43.0034023
     },
     {
       "body": "jupiter",
@@ -1532,92 +1767,97 @@
     {
       "body": "jupiter",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 230.5745047
+      "longitudeDegrees": 230.5745049
     },
     {
       "body": "jupiter",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 5.8320197
+      "longitudeDegrees": 5.8320199
     },
     {
       "body": "jupiter",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 181.4555793
+      "longitudeDegrees": 181.4555795
     },
     {
       "body": "jupiter",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 310.4542295
+      "longitudeDegrees": 310.4542297
+    },
+    {
+      "body": "jupiter",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 91.0271264
     },
     {
       "body": "jupiter",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 121.6915484
+      "longitudeDegrees": 121.6915486
     },
     {
       "body": "jupiter",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 262.4874598
+      "longitudeDegrees": 262.48746
     },
     {
       "body": "jupiter",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 51.1655948
+      "longitudeDegrees": 51.165595
     },
     {
       "body": "jupiter",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 112.0291885
+      "longitudeDegrees": 112.0291887
     },
     {
       "body": "jupiter",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 216.1339983
+      "longitudeDegrees": 216.1339985
     },
     {
       "body": "jupiter",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 347.5119642
+      "longitudeDegrees": 347.5119644
     },
     {
       "body": "jupiter",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 164.5934663
+      "longitudeDegrees": 164.5934665
     },
     {
       "body": "jupiter",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 295.0626169
+      "longitudeDegrees": 295.0626171
     },
     {
       "body": "jupiter",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 100.4761824
+      "longitudeDegrees": 100.4761826
     },
     {
       "body": "jupiter",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 248.417657
+      "longitudeDegrees": 248.4176572
     },
     {
       "body": "jupiter",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 30.2192516
+      "longitudeDegrees": 30.2192517
     },
     {
       "body": "jupiter",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 201.2063158
+      "longitudeDegrees": 201.206316
     },
     {
       "body": "jupiter",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 201.2063171
+      "longitudeDegrees": 201.2063173
     },
     {
       "body": "jupiter",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 201.259162
+      "longitudeDegrees": 201.2591621
     },
     {
       "body": "saturn",
@@ -1691,8 +1931,18 @@
     },
     {
       "body": "saturn",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 213.1441276
+    },
+    {
+      "body": "saturn",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 228.3408175
+    },
+    {
+      "body": "saturn",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 237.5079445
     },
     {
       "body": "saturn",
@@ -1713,6 +1963,16 @@
       "body": "saturn",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 32.0622903
+    },
+    {
+      "body": "saturn",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 60.4242255
+    },
+    {
+      "body": "saturn",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 60.4242249
     },
     {
       "body": "saturn",
@@ -1771,6 +2031,11 @@
     },
     {
       "body": "saturn",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 202.9102531
+    },
+    {
+      "body": "saturn",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 240.8662688
     },
@@ -1778,6 +2043,16 @@
       "body": "saturn",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 291.3949664
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 335.7128216
+    },
+    {
+      "body": "saturn",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 330.8616469
     },
     {
       "body": "saturn",
@@ -1797,92 +2072,97 @@
     {
       "body": "saturn",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 48.3977687
+      "longitudeDegrees": 48.3977689
     },
     {
       "body": "saturn",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 123.5818237
+      "longitudeDegrees": 123.5818238
     },
     {
       "body": "saturn",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 191.6545612
+      "longitudeDegrees": 191.6545614
     },
     {
       "body": "saturn",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 247.1008801
+      "longitudeDegrees": 247.1008803
+    },
+    {
+      "body": "saturn",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 297.3896596
     },
     {
       "body": "saturn",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 297.5742803
+      "longitudeDegrees": 297.5742805
     },
     {
       "body": "saturn",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 351.4992134
+      "longitudeDegrees": 351.4992135
     },
     {
       "body": "saturn",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 57.1547972
+      "longitudeDegrees": 57.1547974
     },
     {
       "body": "saturn",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 86.7975747
+      "longitudeDegrees": 86.7975749
     },
     {
       "body": "saturn",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 132.4892177
+      "longitudeDegrees": 132.4892179
     },
     {
       "body": "saturn",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 198.862637
+      "longitudeDegrees": 198.8626372
     },
     {
       "body": "saturn",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 253.1028165
+      "longitudeDegrees": 253.1028167
     },
     {
       "body": "saturn",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 303.4591952
+      "longitudeDegrees": 303.4591954
     },
     {
       "body": "saturn",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 358.3078061
+      "longitudeDegrees": 358.3078062
     },
     {
       "body": "saturn",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 65.4114405
+      "longitudeDegrees": 65.4114407
     },
     {
       "body": "saturn",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 140.7910148
+      "longitudeDegrees": 140.791015
     },
     {
       "body": "saturn",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 205.6316617
+      "longitudeDegrees": 205.6316619
     },
     {
       "body": "saturn",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 205.6316624
+      "longitudeDegrees": 205.6316626
     },
     {
       "body": "saturn",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 205.660469
+      "longitudeDegrees": 205.6604692
     },
     {
       "body": "uranus",
@@ -1956,8 +2236,18 @@
     },
     {
       "body": "uranus",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 112.9363975
+    },
+    {
+      "body": "uranus",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 116.3291475
+    },
+    {
+      "body": "uranus",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 125.2864229
     },
     {
       "body": "uranus",
@@ -1978,6 +2268,16 @@
       "body": "uranus",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 188.7206104
+    },
+    {
+      "body": "uranus",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 198.0903791
+    },
+    {
+      "body": "uranus",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 198.0903794
     },
     {
       "body": "uranus",
@@ -2036,6 +2336,11 @@
     },
     {
       "body": "uranus",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 8.147002
+    },
+    {
+      "body": "uranus",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 12.6133443
     },
@@ -2043,6 +2348,16 @@
       "body": "uranus",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 32.6940395
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 52.7487948
+    },
+    {
+      "body": "uranus",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 52.2198113
     },
     {
       "body": "uranus",
@@ -2062,92 +2377,97 @@
     {
       "body": "uranus",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 75.5576363
+      "longitudeDegrees": 75.5576365
     },
     {
       "body": "uranus",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 98.4545421
+      "longitudeDegrees": 98.4545423
     },
     {
       "body": "uranus",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 122.2532497
+      "longitudeDegrees": 122.2532499
     },
     {
       "body": "uranus",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 146.4804753
+      "longitudeDegrees": 146.4804755
+    },
+    {
+      "body": "uranus",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 161.8375183
     },
     {
       "body": "uranus",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 170.7326104
+      "longitudeDegrees": 170.7326106
     },
     {
       "body": "uranus",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 194.533971
+      "longitudeDegrees": 194.5339712
     },
     {
       "body": "uranus",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 217.4771784
+      "longitudeDegrees": 217.4771786
     },
     {
       "body": "uranus",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 218.8689556
+      "longitudeDegrees": 218.8689558
     },
     {
       "body": "uranus",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 239.5331354
+      "longitudeDegrees": 239.5331356
     },
     {
       "body": "uranus",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 260.6202879
+      "longitudeDegrees": 260.620288
     },
     {
       "body": "uranus",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 280.8373826
+      "longitudeDegrees": 280.8373828
     },
     {
       "body": "uranus",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 300.4795093
+      "longitudeDegrees": 300.4795095
     },
     {
       "body": "uranus",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 319.7884177
+      "longitudeDegrees": 319.7884178
     },
     {
       "body": "uranus",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 338.8659193
+      "longitudeDegrees": 338.8659195
     },
     {
       "body": "uranus",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 358.1165694
+      "longitudeDegrees": 358.1165696
     },
     {
       "body": "uranus",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 17.7413057
+      "longitudeDegrees": 17.7413059
     },
     {
       "body": "uranus",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 17.7413058
+      "longitudeDegrees": 17.741306
     },
     {
       "body": "uranus",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 17.7436851
+      "longitudeDegrees": 17.7436853
     },
     {
       "body": "neptune",
@@ -2221,8 +2541,18 @@
     },
     {
       "body": "neptune",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 204.7622955
+    },
+    {
+      "body": "neptune",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 208.0044012
+    },
+    {
+      "body": "neptune",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 208.6420598
     },
     {
       "body": "neptune",
@@ -2243,6 +2573,16 @@
       "body": "neptune",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 239.8858503
+    },
+    {
+      "body": "neptune",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 244.0990971
+    },
+    {
+      "body": "neptune",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 244.0990975
     },
     {
       "body": "neptune",
@@ -2301,6 +2641,11 @@
     },
     {
       "body": "neptune",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 333.1375446
+    },
+    {
+      "body": "neptune",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 335.3845348
     },
@@ -2308,6 +2653,16 @@
       "body": "neptune",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 346.2645207
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 357.4342864
+    },
+    {
+      "body": "neptune",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 355.5952324
     },
     {
       "body": "neptune",
@@ -2327,92 +2682,97 @@
     {
       "body": "neptune",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 8.3781398
+      "longitudeDegrees": 8.37814
     },
     {
       "body": "neptune",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 19.5622321
+      "longitudeDegrees": 19.5622323
     },
     {
       "body": "neptune",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 30.8374796
+      "longitudeDegrees": 30.8374797
     },
     {
       "body": "neptune",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 42.1679053
+      "longitudeDegrees": 42.1679055
+    },
+    {
+      "body": "neptune",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 53.4479272
     },
     {
       "body": "neptune",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 53.6034214
+      "longitudeDegrees": 53.6034215
     },
     {
       "body": "neptune",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 65.0546178
+      "longitudeDegrees": 65.054618
     },
     {
       "body": "neptune",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 76.5583489
+      "longitudeDegrees": 76.5583491
     },
     {
       "body": "neptune",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 82.1849378
+      "longitudeDegrees": 82.1849379
     },
     {
       "body": "neptune",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 88.0646722
+      "longitudeDegrees": 88.0646724
     },
     {
       "body": "neptune",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 99.5449529
+      "longitudeDegrees": 99.5449531
     },
     {
       "body": "neptune",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 111.0175894
+      "longitudeDegrees": 111.0175895
     },
     {
       "body": "neptune",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 122.4240378
+      "longitudeDegrees": 122.424038
     },
     {
       "body": "neptune",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 133.7438384
+      "longitudeDegrees": 133.7438386
     },
     {
       "body": "neptune",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 145.0232591
+      "longitudeDegrees": 145.0232593
     },
     {
       "body": "neptune",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 156.183119
+      "longitudeDegrees": 156.1831191
     },
     {
       "body": "neptune",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 167.2905216
+      "longitudeDegrees": 167.2905217
     },
     {
       "body": "neptune",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 167.2905215
+      "longitudeDegrees": 167.2905217
     },
     {
       "body": "neptune",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 167.2868563
+      "longitudeDegrees": 167.2868565
     },
     {
       "body": "pluto",
@@ -2486,8 +2846,18 @@
     },
     {
       "body": "pluto",
+      "utc": "1953-11-18T00:00:00Z",
+      "longitudeDegrees": 145.0001651
+    },
+    {
+      "body": "pluto",
       "utc": "1955-01-01T00:00:00Z",
       "longitudeDegrees": 146.5390812
+    },
+    {
+      "body": "pluto",
+      "utc": "1956-09-10T00:00:00Z",
+      "longitudeDegrees": 148.9246275
     },
     {
       "body": "pluto",
@@ -2508,6 +2878,16 @@
       "body": "pluto",
       "utc": "1970-01-01T00:00:00Z",
       "longitudeDegrees": 177.3921739
+    },
+    {
+      "body": "pluto",
+      "utc": "1971-12-31T23:59:59Z",
+      "longitudeDegrees": 182.0490356
+    },
+    {
+      "body": "pluto",
+      "utc": "1972-01-01T00:00:00Z",
+      "longitudeDegrees": 182.0490356
     },
     {
       "body": "pluto",
@@ -2566,6 +2946,11 @@
     },
     {
       "body": "pluto",
+      "utc": "2012-06-12T00:00:00Z",
+      "longitudeDegrees": 278.7008307
+    },
+    {
+      "body": "pluto",
       "utc": "2015-01-01T00:00:00Z",
       "longitudeDegrees": 283.1648881
     },
@@ -2573,6 +2958,16 @@
       "body": "pluto",
       "utc": "2020-01-01T00:00:00Z",
       "longitudeDegrees": 292.3855818
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-08-01T00:00:00Z",
+      "longitudeDegrees": 298.8933332
+    },
+    {
+      "body": "pluto",
+      "utc": "2023-10-15T00:00:00Z",
+      "longitudeDegrees": 297.8956326
     },
     {
       "body": "pluto",
@@ -2592,92 +2987,97 @@
     {
       "body": "pluto",
       "utc": "2030-01-01T00:00:00Z",
-      "longitudeDegrees": 309.16484
+      "longitudeDegrees": 309.1648402
     },
     {
       "body": "pluto",
       "utc": "2035-01-01T00:00:00Z",
-      "longitudeDegrees": 316.8169166
+      "longitudeDegrees": 316.8169168
     },
     {
       "body": "pluto",
       "utc": "2040-01-01T00:00:00Z",
-      "longitudeDegrees": 324.0416275
+      "longitudeDegrees": 324.0416277
     },
     {
       "body": "pluto",
       "utc": "2045-01-01T00:00:00Z",
-      "longitudeDegrees": 330.9533187
+      "longitudeDegrees": 330.9533189
+    },
+    {
+      "body": "pluto",
+      "utc": "2049-05-11T00:00:00Z",
+      "longitudeDegrees": 339.2277156
     },
     {
       "body": "pluto",
       "utc": "2050-01-01T00:00:00Z",
-      "longitudeDegrees": 337.5330678
+      "longitudeDegrees": 337.5330679
     },
     {
       "body": "pluto",
       "utc": "2055-01-01T00:00:00Z",
-      "longitudeDegrees": 343.8122857
+      "longitudeDegrees": 343.8122859
     },
     {
       "body": "pluto",
       "utc": "2060-01-01T00:00:00Z",
-      "longitudeDegrees": 349.8787073
+      "longitudeDegrees": 349.8787075
     },
     {
       "body": "pluto",
       "utc": "2061-07-28T18:30:00Z",
-      "longitudeDegrees": 354.022673
+      "longitudeDegrees": 354.0226732
     },
     {
       "body": "pluto",
       "utc": "2065-01-01T00:00:00Z",
-      "longitudeDegrees": 355.7214356
+      "longitudeDegrees": 355.7214358
     },
     {
       "body": "pluto",
       "utc": "2070-01-01T00:00:00Z",
-      "longitudeDegrees": 1.3656934
+      "longitudeDegrees": 1.3656936
     },
     {
       "body": "pluto",
       "utc": "2075-01-01T00:00:00Z",
-      "longitudeDegrees": 6.8389275
+      "longitudeDegrees": 6.8389276
     },
     {
       "body": "pluto",
       "utc": "2080-01-01T00:00:00Z",
-      "longitudeDegrees": 12.1652202
+      "longitudeDegrees": 12.1652204
     },
     {
       "body": "pluto",
       "utc": "2085-01-01T00:00:00Z",
-      "longitudeDegrees": 17.3918743
+      "longitudeDegrees": 17.3918745
     },
     {
       "body": "pluto",
       "utc": "2090-01-01T00:00:00Z",
-      "longitudeDegrees": 22.4741117
+      "longitudeDegrees": 22.4741119
     },
     {
       "body": "pluto",
       "utc": "2095-01-01T00:00:00Z",
-      "longitudeDegrees": 27.4756685
+      "longitudeDegrees": 27.4756687
     },
     {
       "body": "pluto",
       "utc": "2099-12-31T23:59:59Z",
-      "longitudeDegrees": 32.403024
+      "longitudeDegrees": 32.4030241
     },
     {
       "body": "pluto",
       "utc": "2100-01-01T00:00:00Z",
-      "longitudeDegrees": 32.4030239
+      "longitudeDegrees": 32.4030241
     },
     {
       "body": "pluto",
       "utc": "2100-01-01T12:00:00Z",
-      "longitudeDegrees": 32.4003516
+      "longitudeDegrees": 32.4003518
     }
   ]
 }
